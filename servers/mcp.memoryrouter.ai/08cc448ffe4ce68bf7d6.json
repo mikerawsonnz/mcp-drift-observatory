@@ -1,0 +1,1095 @@
+{
+  "canon_version": "1",
+  "full_hash": "6b11d59d1c6743c70784ca372dc93b7016f5110c38f5add0181efba4a21d8a2b",
+  "name": "ai.memoryrouter/memoryrouter",
+  "observed_at": "2026-08-20T09:12:09.217867Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 10,
+  "tools": [
+    {
+      "_meta": {
+        "anthropic/maxResultSizeChars": 40000,
+        "openai/toolInvocation/invoked": "Memory search complete",
+        "openai/toolInvocation/invoking": "Searching memories…",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "memories:read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Use this when the user asks about a prior decision, preference, person, project, or other fact that may be in their connected MemoryRouter vault. Semantically searches only the OAuth-selected vault and does not modify it. Tier guide: tier 3 holds the highest-level consolidated reflections (identity, principles, what matters most), tier 2 holds reflections of specific meaningful events, tier 1 holds raw verbatim memories. Match filters to the question. Broad 'most important things we have done' questions: tiers [3], importance 8 or higher, large limit such as 250. Big-picture overviews like 'what do you know about this area or period': tiers [3] with no importance filter. Specific lookups like 'find the decision about X': omit tiers to search all tiers blended and leave importance unset; a high importance filter hides the specific detail you are looking for. Specific meaningful events without raw noise: tiers [2] or [2, 3]. Exact verbatim detail: if the detail is not already in context, drill down by lineage: search tiers [3] to find the relevant thread, then use inspect_memory on the result to see the tier 2 reflections it consolidated, then inspect those to reach the raw memories underneath. Direct tiers [1] search works when you know exact wording to match. Mixing tiers is legitimate; adjust the importance threshold to the question rather than always setting it high. Only reflections (tiers 2 and 3) carry importance ratings. For time-window questions like 'what happened last week' or 'lately' use date_search_memories instead.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "importance": {
+            "description": "Minimum importance threshold, 1 to 10. Only reflections (tiers 2 and 3) carry ratings, so raw memories are excluded whenever this is set. Use 8 or higher with tiers [3] for broad 'most important' questions. Leave unset for general or specific searches; a high threshold hides relevant material.",
+            "maximum": 10,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "limit": {
+            "default": 5,
+            "description": "Maximum number of relevant memories to return. Use a large limit such as 250 for broad 'most important things' questions over tiers [3].",
+            "maximum": 250,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "description": "A concise natural-language description of the past context to recall.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "tiers": {
+            "description": "Restrict results to these memory tiers. 3 highest-level consolidated reflections (identity, principles, what matters most), 2 reflections of specific meaningful events, 1 raw verbatim memories. Use [3] for broad 'most important' or big-picture questions, [2] or [2, 3] for specific meaningful events, [1] for exact verbatim detail when you know the wording to match; otherwise drill down from [3] with inspect_memory. Omit to search all tiers blended, the right default for specific lookups. Mixing tiers is fine. Only tiers 2 and 3 carry importance ratings.",
+            "items": {
+              "enum": [
+                1,
+                2,
+                3
+              ],
+              "type": "integer"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_memories",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "consolidation_available": {
+            "type": "boolean"
+          },
+          "count": {
+            "type": "integer"
+          },
+          "memories": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "content": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "importance": {
+                  "type": "integer"
+                },
+                "score": {
+                  "type": "number"
+                },
+                "source": {
+                  "type": "string"
+                },
+                "tier": {
+                  "type": "integer"
+                },
+                "timestamp": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "content",
+                "source",
+                "timestamp",
+                "score",
+                "tier"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "query": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "query",
+          "count",
+          "memories"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "memories:read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Search memories"
+    },
+    {
+      "_meta": {
+        "anthropic/maxResultSizeChars": 40000,
+        "openai/toolInvocation/invoked": "Date search complete",
+        "openai/toolInvocation/invoking": "Searching memories by date…",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "memories:read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Use this to retrieve memories from a specific time window, for questions like 'what happened last week' or 'most important things this month or lately'. Tier guide: tier 3 holds the highest-level consolidated reflections (identity, principles, what matters most), tier 2 holds reflections of specific meaningful events, tier 1 holds raw verbatim memories. Match filters to the question. Time-bounded 'most important things last month' questions: tiers [3], importance 8 or higher, generous max_tokens. Big-picture overviews of a period like 'what do you know about July': tiers [3] with no importance filter. Specific lookups in a window like 'find the decision about X': omit tiers to include all tiers and leave importance unset; a high importance filter hides the specific detail you are looking for. Specific meaningful events without raw noise: tiers [2] or [2, 3]. Exact verbatim detail: if the detail is not already in context, drill down by lineage: search tiers [3] to find the relevant thread, then use inspect_memory on the result to see the tier 2 reflections it consolidated, then inspect those to reach the raw memories underneath. Direct tiers [1] search works when you know exact wording to match. Mixing tiers is legitimate; adjust the importance threshold to the question rather than always setting it high. Only reflections (tiers 2 and 3) carry importance ratings. Omit query for a chronological review; include query to rank by relevance within the window. Resolve relative phrases like 'lately' to concrete ISO dates before calling. Reads only the OAuth-selected vault and does not modify it.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "from": {
+            "description": "Window start, ISO 8601 date or datetime (e.g. 2026-08-10 or 2026-08-10T00:00:00Z). Required. Must be a concrete date, not a relative phrase.",
+            "maxLength": 64,
+            "minLength": 4,
+            "type": "string"
+          },
+          "importance": {
+            "description": "Minimum importance threshold, 1 to 10. Only reflections (tiers 2 and 3) carry ratings, so raw memories are excluded whenever this is set. Use 8 or higher with tiers [3] for broad 'most important' questions. Leave unset for general or specific searches; a high threshold hides relevant material.",
+            "maximum": 10,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "max_tokens": {
+            "description": "Token budget for returned results. Server default 50000; use a smaller value like 5000 for a quick look. When a page is truncated, continue with the returned next_to or next_from cursor.",
+            "maximum": 200000,
+            "minimum": 1000,
+            "type": "integer"
+          },
+          "query": {
+            "description": "Optional relevance query. Omit for a pure chronological browse; include to rank results within the window.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "tiers": {
+            "description": "Restrict results to these memory tiers. 3 highest-level consolidated reflections (identity, principles, what matters most), 2 reflections of specific meaningful events, 1 raw verbatim memories. Use [3] for broad 'most important' or big-picture questions, [2] or [2, 3] for specific meaningful events, [1] for exact verbatim detail when you know the wording to match; otherwise drill down from [3] with inspect_memory. Omit to search all tiers blended, the right default for specific lookups. Mixing tiers is fine. Only tiers 2 and 3 carry importance ratings.",
+            "items": {
+              "enum": [
+                1,
+                2,
+                3
+              ],
+              "type": "integer"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "to": {
+            "description": "Window end, ISO 8601 date or datetime. Optional, defaults to now.",
+            "maxLength": 64,
+            "minLength": 4,
+            "type": "string"
+          }
+        },
+        "required": [
+          "from"
+        ],
+        "type": "object"
+      },
+      "name": "date_search_memories",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "from": {
+            "type": "string"
+          },
+          "memories": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "content": {
+                  "type": "string"
+                },
+                "date": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "importance": {
+                  "type": "integer"
+                },
+                "score": {
+                  "type": "number"
+                },
+                "tier": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "content",
+                "date",
+                "tier"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "next_from": {
+            "type": "string"
+          },
+          "next_to": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "truncated": {
+            "type": "boolean"
+          },
+          "window": {
+            "properties": {
+              "from": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "to": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "type": [
+              "object",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "from",
+          "count",
+          "memories"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "memories:read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Search memories by date"
+    },
+    {
+      "_meta": {
+        "openai/toolInvocation/invoked": "Memory save requested",
+        "openai/toolInvocation/invoking": "Saving approved memory…",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "memories:write"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Use this only when the user explicitly asks to remember something or confirms a proposed durable fact. Saves concise user-approved content to the OAuth-selected vault; do not use it for silent conversation capture.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "description": "The concise fact, preference, decision, or outcome the user approved for storage.",
+            "maxLength": 12000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "tags": {
+            "description": "Optional short category labels. These are preserved as provenance text until structured tags ship.",
+            "items": {
+              "maxLength": 64,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 10,
+            "type": "array"
+          }
+        },
+        "required": [
+          "content"
+        ],
+        "type": "object"
+      },
+      "name": "store_memory",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "accepted": {
+            "type": "boolean"
+          },
+          "source": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "rejected"
+            ],
+            "type": "string"
+          },
+          "vaultRef": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "accepted",
+          "status",
+          "vaultRef",
+          "source"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "memories:write"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Remember something"
+    },
+    {
+      "_meta": {
+        "openai/toolInvocation/invoked": "Memory status ready",
+        "openai/toolInvocation/invoking": "Checking memory status…",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "memories:read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Use this when the user asks whether MemoryRouter is connected, which opaque vault binding is active, or how many memories/tokens the connected vault contains. Does not reveal the memory key.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "memory_status",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "connected": {
+            "type": "boolean"
+          },
+          "grantedScopes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "reflection": {
+            "additionalProperties": false,
+            "description": "Reflection debt for the connected vault. Fields are null when the debt probe is unavailable.",
+            "properties": {
+              "raw_unconsolidated_tokens": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "suggestion": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "threshold_tokens": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "tier2_unconsolidated_tokens": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "raw_unconsolidated_tokens",
+              "tier2_unconsolidated_tokens",
+              "threshold_tokens",
+              "suggestion"
+            ],
+            "type": "object"
+          },
+          "storage": {
+            "type": "string"
+          },
+          "totalMemories": {
+            "type": "integer"
+          },
+          "totalTokens": {
+            "type": "integer"
+          },
+          "vaultRef": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "connected",
+          "vaultRef",
+          "totalMemories",
+          "totalTokens",
+          "storage",
+          "grantedScopes"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "memories:read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Check memory status"
+    },
+    {
+      "_meta": {
+        "openai/toolInvocation/invoked": "Delete request complete",
+        "openai/toolInvocation/invoking": "Deleting connected vault memories…",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "memories:delete"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Use this only after the user explicitly requests a full-vault deletion, receives a permanent whole-vault warning, and provides the exact confirmation phrase in a later turn. Permanently deletes every memory in the OAuth-selected vault. This cannot delete one memory; use delete_memories for specific items. Requires separate memories:delete authorization and destructive host confirmation.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmation": {
+            "description": "Exact phrase the user must provide after being warned that deletion is permanent.",
+            "enum": [
+              "DELETE ALL MEMORIES"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "confirmation"
+        ],
+        "type": "object"
+      },
+      "name": "forget_all_memories",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "deleted": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "vaultRef": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "deleted",
+          "vaultRef",
+          "message"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "memories:delete"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Delete all memories in connected vault"
+    },
+    {
+      "_meta": {
+        "openai/toolInvocation/invoked": "Consolidation batch ready",
+        "openai/toolInvocation/invoking": "Checking out memories for consolidation…",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "memories:reflect"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Use this when the user asks to consolidate, reflect on, or organize their memories, or when memory_status or a search result reports that consolidation is available. Checks out a batch of unconsolidated memories from the connected vault under a 15 minute lease and returns their texts plus server instructions for writing reflection entries. Follow the returned instructions to write the entries, then call commit_reflections with the batch_id. Nothing is modified until commit.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "max_tokens": {
+            "default": 50000,
+            "description": "Token budget for the checked-out batch. Defaults to 50000. No connector-side cap.",
+            "minimum": 1000,
+            "type": "integer"
+          },
+          "tier": {
+            "default": 1,
+            "description": "1 consolidates raw memories into reflections; 2 consolidates reflections into high-level reflections.",
+            "enum": [
+              1,
+              2
+            ],
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "consolidate_memories",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "batch_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "count": {
+            "type": "integer"
+          },
+          "covers": {
+            "properties": {
+              "from": {
+                "type": "string"
+              },
+              "to": {
+                "type": "string"
+              }
+            },
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "est_tokens": {
+            "type": "integer"
+          },
+          "lease_expires_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "memories": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "date": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text",
+                "date"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "message": {
+            "type": "string"
+          },
+          "reflection_contract": {
+            "type": "object"
+          },
+          "tier": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "batch_id",
+          "tier",
+          "count"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "memories:reflect"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Consolidate memories (checkout)"
+    },
+    {
+      "_meta": {
+        "openai/toolInvocation/invoked": "Reflections committed",
+        "openai/toolInvocation/invoking": "Committing reflection entries…",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "memories:reflect"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Use this to complete a consolidation started with consolidate_memories. Submits the reflection entries you wrote for the checked-out batch. Each entry is standalone prose with an importance rating from 1 to 10. The server stores the reflections, links them to their source memories, and marks the sources consolidated. Safe to retry: committing the same batch twice returns the original result.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "batch_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "entries": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "importance": {
+                  "maximum": 10,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "text": {
+                  "maxLength": 8000,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text",
+                "importance"
+              ],
+              "type": "object"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "batch_id",
+          "entries"
+        ],
+        "type": "object"
+      },
+      "name": "commit_reflections",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "already_committed": {
+            "type": "boolean"
+          },
+          "committed": {
+            "type": "boolean"
+          },
+          "debt": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "entries_created": {
+            "type": "integer"
+          },
+          "sources_consolidated": {
+            "type": "integer"
+          },
+          "tier": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "committed",
+          "already_committed",
+          "tier",
+          "entries_created",
+          "sources_consolidated"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "memories:reflect"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Commit reflections"
+    },
+    {
+      "_meta": {
+        "anthropic/maxResultSizeChars": 40000,
+        "openai/toolInvocation/invoked": "Memory lineage ready",
+        "openai/toolInvocation/invoking": "Inspecting memory lineage…",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "memories:read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Use this when the user asks why the assistant believes something, or wants to see the source memories behind a reflection. Given a memory id from a search result, returns the lower-tier memories that reflection was built from, or, for a raw memory, which reflections it was consolidated into. Use repeatedly to drill down from a high-level reflection to the tier 2 reflections and raw memories beneath it. Read only.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "memory_id": {
+            "description": "A memory id (UUID) from a search result or a previous inspect.",
+            "maxLength": 36,
+            "minLength": 36,
+            "type": "string"
+          }
+        },
+        "required": [
+          "memory_id"
+        ],
+        "type": "object"
+      },
+      "name": "inspect_memory",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "consolidated_into": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "covers": {
+            "properties": {
+              "from": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "to": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "memory_id": {
+            "type": "string"
+          },
+          "sources": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "content": {
+                  "type": "string"
+                },
+                "date": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "importance": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "tier": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "tier",
+                "content",
+                "importance",
+                "date"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "sources_deleted": {
+            "type": "integer"
+          },
+          "sources_total": {
+            "type": "integer"
+          },
+          "tier": {
+            "type": "integer"
+          },
+          "truncated": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "memory_id",
+          "tier",
+          "covers",
+          "sources",
+          "sources_total",
+          "sources_deleted",
+          "truncated"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "memories:read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Inspect memory lineage"
+    },
+    {
+      "_meta": {
+        "openai/toolInvocation/invoked": "Selected deletion complete",
+        "openai/toolInvocation/invoking": "Deleting selected memories…",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "memories:delete"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Use this only when the user explicitly asks to delete specific memories and confirms after seeing what will be deleted. Permanently deletes the identified memories from the connected vault by their ids from search or inspect results. Deleting a raw memory does not delete reflections built from it. This cannot be undone. For deleting everything, forget_all_memories is the separate whole-vault tool.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmation": {
+            "description": "Exact phrase the user must provide after being shown which memories will be deleted.",
+            "enum": [
+              "DELETE SELECTED MEMORIES"
+            ],
+            "type": "string"
+          },
+          "ids": {
+            "description": "Memory ids (UUIDs) to permanently delete.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "ids",
+          "confirmation"
+        ],
+        "type": "object"
+      },
+      "name": "delete_memories",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "deleted": {
+            "type": "integer"
+          },
+          "failed": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "message": {
+            "type": "string"
+          },
+          "not_found": {
+            "type": "integer"
+          },
+          "vaultRef": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "deleted",
+          "not_found",
+          "failed",
+          "vaultRef"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "memories:delete"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Delete specific memories"
+    },
+    {
+      "_meta": {
+        "anthropic/maxResultSizeChars": 40000,
+        "openai/toolInvocation/invoked": "Search complete",
+        "openai/toolInvocation/invoking": "Searching MemoryRouter…",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "memories:read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Use this legacy compatibility alias when a client explicitly requests a tool named search. It searches the OAuth-selected MemoryRouter vault without modifying it. For normal ChatGPT recall, prefer search_memories; this tool does not provide citable item permalinks or Company Knowledge fetch support.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "query": {
+            "description": "Natural-language search query.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "results": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "url"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "results"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "memories:read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Search MemoryRouter knowledge"
+    }
+  ],
+  "url": "https://mcp.memoryrouter.ai/mcp"
+}

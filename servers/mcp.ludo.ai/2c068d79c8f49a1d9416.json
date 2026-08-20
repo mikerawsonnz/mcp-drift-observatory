@@ -1,0 +1,1917 @@
+{
+  "canon_version": "1",
+  "full_hash": "e8f0236f7944f740ac476a9ac7262525be0cdd3678ba6a2555feee762b942858",
+  "name": "ai.ludo/game-assets",
+  "observed_at": "2026-08-20T09:12:04.097819Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 32,
+  "tools": [
+    {
+      "description": "Validates an API key. Returns 200 if valid, 403 if invalid.",
+      "inputSchema": {
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "validateApiKeyEndpoint"
+    },
+    {
+      "description": "Generate game-art images from a text prompt alone, selecting an image_type (e.g. sprite) and optionally art_style, perspective, and aspect_ratio. Synchronous: the call blocks until generation finishes and returns an array of image results, each with a url; request n (1-8) to control how many variations come back. Because it generates purely from text it takes no source image, so there is no upload size limit to trip. Credits are charged only on success, scaled to the number of images produced. Use createImage to make new images from scratch; use generateWithStyle to match a reference image's art style, editImage to modify an existing image, and removeBackground to cut out a subject. Pass an optional request_id to tag the results so you can retrieve them later via getImageResults. Requires an API key (user scope).\n\nCredits: This endpoint consumes 0.5 credits per result.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for generating an image from text prompt",
+            "properties": {
+              "art_style": {
+                "description": "Visual art style for the sprite (e.g., \"Pixel Art\", \"Cartoonish\", \"Realistic\").",
+                "enum": [
+                  "Any style",
+                  "Cel-Shaded",
+                  "Inked Painterly",
+                  "Illustration",
+                  "Western Cartoon",
+                  "Anime/Manga",
+                  "Chibi",
+                  "8-Bit",
+                  "16-Bit",
+                  "32-Bit",
+                  "Hi-Bit",
+                  "Retro 2D",
+                  "Hand-Painted",
+                  "Digital Painting",
+                  "Comic Book",
+                  "Block Print",
+                  "Sketch",
+                  "Watercolor",
+                  "Stylized 3D",
+                  "Pixar Style",
+                  "Low Poly",
+                  "Photorealistic 3D",
+                  "Voxel Art",
+                  "Retro 3D",
+                  "Flat Design",
+                  "Minimalist",
+                  "Silhouette",
+                  "Noir",
+                  "Neon",
+                  "Glitch Art",
+                  "Claymation",
+                  "Paper Craft",
+                  "Textile"
+                ],
+                "example": "Any style",
+                "type": "string"
+              },
+              "aspect_ratio": {
+                "description": "Aspect ratio of the output image.",
+                "enum": [
+                  "default",
+                  "ar_1_1",
+                  "ar_4_3",
+                  "ar_16_9",
+                  "ar_19_9",
+                  "ar_3_4",
+                  "ar_9_16",
+                  "ar_9_19"
+                ],
+                "example": "default",
+                "type": "string"
+              },
+              "augment_prompt": {
+                "default": true,
+                "description": "Augment the prompt behind the scenes. Disable to have more control.",
+                "example": true,
+                "type": "boolean"
+              },
+              "image_type": {
+                "description": "What kind of image to generate.",
+                "enum": [
+                  "generic",
+                  "screenshot",
+                  "art",
+                  "asset",
+                  "sprite",
+                  "sprite-vfx",
+                  "sprite-tiling-horizontal",
+                  "sprite-tiling-vertical",
+                  "icon",
+                  "logo",
+                  "ui_asset",
+                  "fixed_background",
+                  "side_scrolling_background",
+                  "vertical_scrolling_background",
+                  "parallax_layer",
+                  "texture",
+                  "horizontal_tile",
+                  "tile",
+                  "item-icon",
+                  "portrait",
+                  "card-art",
+                  "splash",
+                  "3d"
+                ],
+                "example": "generic",
+                "type": "string"
+              },
+              "n": {
+                "default": 1,
+                "description": "Number of image variations to generate",
+                "example": 1,
+                "format": "integer",
+                "maximum": 8,
+                "minimum": 1,
+                "type": "number"
+              },
+              "perspective": {
+                "description": "Camera angle/view for the sprite (e.g., \"Side view\", \"Front view\", \"Isometric\").",
+                "enum": [
+                  "Any perspective",
+                  "Side-Scroll",
+                  "Isometric",
+                  "High Angle",
+                  "Top-Down",
+                  "2.5D",
+                  "First-Person",
+                  "Third-Person",
+                  "Over-the-Shoulder",
+                  "Free Camera"
+                ],
+                "example": "Any perspective",
+                "type": "string"
+              },
+              "prompt": {
+                "description": "Text description of the image to generate. The more detailed the prompt, the more accurate the image will be.",
+                "type": "string"
+              },
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "image_type",
+              "prompt"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "createImage"
+    },
+    {
+      "description": "Generate new images that match the visual style of a reference image: supply a style_image (URL or base64) plus a text prompt describing what to create and an image_type (defaults to sprite). Synchronous: the call blocks and returns an array of image results, each with a url; request n (1-4) to control the number of variations. The style_image is uploaded and validated, and an image larger than 15MB is rejected with HTTP 400. Credits are charged only on success, scaled to the number of images produced. Use this instead of createImage when style consistency with an existing asset matters; use editImage to alter the content of a specific image rather than borrow its style, and removeBackground to isolate a subject. Pass an optional request_id to tag the results so you can retrieve them later via getImageResults. Requires an API key (user scope).\n\nCredits: This endpoint consumes 0.5 credits per result.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for generating new content while maintaining the visual style of a reference image",
+            "properties": {
+              "augment_prompt": {
+                "default": true,
+                "description": "Augment the prompt behind the scenes. Disable to have more control.",
+                "example": true,
+                "type": "boolean"
+              },
+              "image_type": {
+                "default": "sprite",
+                "description": "What kind of image to generate.",
+                "enum": [
+                  "generic",
+                  "screenshot",
+                  "art",
+                  "asset",
+                  "sprite",
+                  "sprite-vfx",
+                  "sprite-tiling-horizontal",
+                  "sprite-tiling-vertical",
+                  "icon",
+                  "logo",
+                  "ui_asset",
+                  "fixed_background",
+                  "side_scrolling_background",
+                  "vertical_scrolling_background",
+                  "parallax_layer",
+                  "texture",
+                  "horizontal_tile",
+                  "tile",
+                  "item-icon",
+                  "portrait",
+                  "card-art",
+                  "splash",
+                  "3d"
+                ],
+                "example": "generic",
+                "type": "string"
+              },
+              "n": {
+                "default": 1,
+                "description": "Number of variations to generate (1-4).",
+                "example": 1,
+                "format": "integer",
+                "maximum": 4,
+                "minimum": 1,
+                "type": "number"
+              },
+              "prompt": {
+                "description": "Text description of what to generate (e.g., \"a warrior character\", \"a forest background\", \"a treasure chest\").",
+                "type": "string"
+              },
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              },
+              "style_image": {
+                "description": "URL or base64-encoded reference image whose visual style should be matched.",
+                "example": "<url> OR data:image/png;base64,...",
+                "type": "string"
+              }
+            },
+            "required": [
+              "style_image",
+              "prompt",
+              "image_type"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "generateWithStyle"
+    },
+    {
+      "description": "Modify an existing image according to text instructions: supply a source image (URL or base64) and a prompt describing the changes (e.g. \"add clouds\", \"warmer color scheme\"), with an optional reference_image for extra style or content guidance. Synchronous: the call blocks and returns an array of image results, each with a url; request n (1-4) to control the number of edited variations. Provided images are uploaded and validated, and any image larger than 15MB is rejected with HTTP 400. Credits are charged only on success, scaled to the number of images produced. Use editImage to transform a specific existing image; use createImage to generate from text alone, generateWithStyle to borrow a reference's art style, and removeBackground for the dedicated background-removal case. Pass an optional request_id to tag the results so you can retrieve them later via getImageResults. Requires an API key (user scope).\n\nCredits: This endpoint consumes 0.5 credits per result.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for editing an existing image based on text instructions",
+            "properties": {
+              "augment_prompt": {
+                "default": true,
+                "description": "Augment the prompt behind the scenes. Disable to have more control.",
+                "example": true,
+                "type": "boolean"
+              },
+              "image": {
+                "description": "URL or base64-encoded source image to edit.",
+                "example": "<url> OR data:image/png;base64,...",
+                "type": "string"
+              },
+              "n": {
+                "default": 1,
+                "description": "Number of edited variations to generate (1-4).",
+                "example": 1,
+                "format": "integer",
+                "maximum": 4,
+                "minimum": 1,
+                "type": "number"
+              },
+              "prompt": {
+                "description": "Text description of the changes to make (e.g., \"remove the background\", \"add clouds to the sky\", \"make it darker\", \"change the color scheme to warmer tones\").",
+                "type": "string"
+              },
+              "reference_image": {
+                "description": "Optional URL or base64-encoded reference image for style or content guidance.",
+                "example": "<url> OR data:image/png;base64,...",
+                "type": "string"
+              },
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "image",
+              "prompt"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "editImage"
+    },
+    {
+      "description": "Animate a static sprite into a spritesheet driven by a motion text prompt (image-to-spritesheet): supply an initial_image (URL or base64) plus a motion_prompt like \"walking\" or \"attack slash\", and optionally a final_image to interpolate between a start and end frame. For animations driven by up to three keyframes (including a middle frame), use animateSpriteKeyframes instead. Synchronous: the call blocks until the spritesheet is rendered and returns a single sprite result directly (spritesheet URL, frame layout, and optionally a GIF or individual frame URLs when requested) with no separate polling step. The chosen model must support sprite animation and the duration must be valid for it; incompatible model/duration combinations return HTTP 400. Credits are charged only on success, based on the produced duration and never more than the duration you requested. For best results, call generatePose first to put the character into the desired pose, then animate it here; use listAnimationPresets to discover named presets, and prefer transferMotion when you already have a reference video or preset to copy motion from rather than describing it in text. Pass an optional request_id to tag the result so you can locate it later via getSpriteResults. Requires an API key (user scope).\n\nCredits: cost varies by model and duration (credits/sec): Blitz 1.9/s (min 4), Eagle 2.6/s (min 4), Eagle with Audio 3.1/s (min 4), Forge 1.5/s (min 4); see this endpoint's full pricing table in the API docs.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for generating an animated spritesheet from a static image. Input images can either be provided in base64 or URL. If the image was generated using Ludo, ideally it should be generated using the \"sprite\", \"sprite-vfx\" or \"ui_asset\" type.",
+            "properties": {
+              "augment_prompt": {
+                "default": true,
+                "description": "Augment the prompt behind the scenes. Disable to have more control.",
+                "example": true,
+                "type": "boolean"
+              },
+              "crop": {
+                "description": "Crop sprite frames to fit content. Results in smaller spritesheets but inconsistent frame sizes across different animations.",
+                "type": "boolean"
+              },
+              "duration": {
+                "description": "Duration in seconds. Available values depend on the model:\n- blitz: 1.2, 1.5, 2, 2.5, 3, 3.5, 4\n- eagle: 1, 2, 3, 4\n- eagle-audio: 1, 2, 3, 4\n- forge: 1, 1.5, 2, 2.5, 3, 3.5, 4",
+                "format": "float",
+                "type": "number"
+              },
+              "final_image": {
+                "description": "The url OR base64 of ending frame image. When provided, the animation will interpolate between the initial and final frames.",
+                "example": "<url> OR data:image/png;base64,...",
+                "type": "string"
+              },
+              "frame_size": {
+                "default": 0,
+                "description": "Size of each frame in pixels (width and height). 0 is for maximum resolution. -1 is for AI 1.5x upscaling. -9 is for matching the size and position of the input frame. Accepted values: 32, 64, 96, 128, 192, 256, 384, 0, -1, -9.",
+                "example": 32,
+                "format": "integer",
+                "type": "number"
+              },
+              "frames": {
+                "default": 36,
+                "description": "Number of frames in the output spritesheet. Accepted values: 4, 9, 16, 25, 36, 49, 64.",
+                "example": 4,
+                "format": "integer",
+                "type": "number"
+              },
+              "gif": {
+                "default": false,
+                "description": "When true, generates an animated GIF from the spritesheet and returns it in gif_url. Disabled by default to reduce response time.",
+                "example": false,
+                "type": "boolean"
+              },
+              "image_type": {
+                "description": "Type of sprite being animated. Affects generation parameters and styling.",
+                "enum": [
+                  "sprite",
+                  "sprite-vfx",
+                  "ui_asset"
+                ],
+                "example": "sprite",
+                "type": "string"
+              },
+              "individual_frames": {
+                "default": false,
+                "description": "When true, extracts each frame from the spritesheet as an individual image and returns the URLs in individual_frame_urls.",
+                "example": false,
+                "type": "boolean"
+              },
+              "initial_image": {
+                "description": "The url OR base64 of the starting frame image to animate. This is the base sprite that will be brought to life.",
+                "example": "<url> OR data:image/png;base64,...",
+                "type": "string"
+              },
+              "loop": {
+                "default": true,
+                "description": "Trim the animation at the beginning or end to create a seamless loop. Not guaranteed to produce a perfect loop.",
+                "example": true,
+                "type": "boolean"
+              },
+              "margin_ratio": {
+                "description": "Deprecated — prefer margin_ratio_horizontal / margin_ratio_vertical. Amount of padding around the sprite as a ratio (0.0 to 1.0), applied to both axes (equivalent to setting both per-axis params to this value). Only used when margin_ratio_mode is \"manual\". Cannot be combined with the per-axis params: providing both fails with HTTP 400.",
+                "format": "float",
+                "type": "number"
+              },
+              "margin_ratio_horizontal": {
+                "description": "Horizontal padding around the sprite as a ratio (0.0 to 1.0). Only used when margin_ratio_mode is \"manual\". Useful for animations that extend sideways (e.g., sword slashes, punches). Cannot be combined with the legacy margin_ratio param.",
+                "format": "float",
+                "type": "number"
+              },
+              "margin_ratio_mode": {
+                "default": "auto",
+                "description": "Controls how margins are applied around the sprite.",
+                "enum": [
+                  "auto",
+                  "manual",
+                  "none"
+                ],
+                "example": "auto",
+                "type": "string"
+              },
+              "margin_ratio_vertical": {
+                "description": "Vertical padding around the sprite as a ratio (0.0 to 1.0). Only used when margin_ratio_mode is \"manual\". Useful for animations that extend up or down (e.g., jumps). Cannot be combined with the legacy margin_ratio param.",
+                "format": "float",
+                "type": "number"
+              },
+              "model": {
+                "default": "blitz",
+                "description": "Model to use. Available models:\n- \"blitz\" (Blitz): Visual Quality: 4/10 · Motion Stability: 8/10 · 1.9 credits/s, min 4\n- \"eagle\" (Eagle): Visual Quality: 8/10 · Motion Stability: 5/10 · 2.6 credits/s, min 4\n- \"eagle-audio\" (Eagle with Audio): Visual Quality: 8/10 · Motion Stability: 5/10 · 3.1 credits/s, min 4\n- \"forge\" (Forge): 1.5 credits/s, min 4\nLegacy aliases: \"standard\" → blitz.",
+                "enum": [
+                  "blitz",
+                  "standard",
+                  "eagle",
+                  "eagle-audio",
+                  "forge"
+                ],
+                "example": "blitz",
+                "type": "string"
+              },
+              "motion_prompt": {
+                "description": "Text description of the desired animation (e.g., \"walking\", \"jumping\", \"idle breathing\", \"attack slash\").",
+                "type": "string"
+              },
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              },
+              "spritesheet_with_background": {
+                "default": false,
+                "description": "When true, also returns the spritesheet with background intact (before background removal). Useful for manually fixing background removal issues. The with-background spritesheet URL will be in spritesheet_with_background_url.",
+                "example": false,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "motion_prompt",
+              "initial_image"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "animateSprite"
+    },
+    {
+      "description": "Animate a sprite through up to three fixed keyframes — initial_image, middle_image and final_image (each a URL or base64) — producing a spritesheet that interpolates through the provided frames in order. At least one of initial_image or middle_image is required (a final_image alone has nothing to anchor the animation); any keyframe may be omitted. The motion_prompt is optional here — when omitted, the motion is derived purely from the keyframes. Always runs on the Forge model (there is no model parameter; Forge is the only model supporting middle keyframes), so durations follow Forge's pricing. Synchronous: the call blocks until the spritesheet is rendered and returns a single sprite result directly (spritesheet URL, frame layout, and optionally a GIF or individual frame URLs when requested) with no separate polling step. Credits are charged only on success, based on the produced duration and never more than the duration you requested. Use animateSprite instead for the classic single-image + text-prompt animation with model choice. Pass an optional request_id to tag the result so you can locate it later via getSpriteResults. Requires an API key (user scope).\n\nCredits: cost varies by model and duration (credits/sec): Forge 1.5/s (min 4); see this endpoint's full pricing table in the API docs.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for generating an animated spritesheet that interpolates through up to three fixed keyframes (initial / middle / final). Runs exclusively on the Forge model. Input images can be provided in base64 or URL. At least one of initial_image or middle_image must be provided.",
+            "properties": {
+              "augment_prompt": {
+                "default": true,
+                "description": "Augment the prompt behind the scenes. Disable to have more control.",
+                "example": true,
+                "type": "boolean"
+              },
+              "crop": {
+                "description": "Crop sprite frames to fit content. Results in smaller spritesheets but inconsistent frame sizes across different animations.",
+                "type": "boolean"
+              },
+              "duration": {
+                "description": "Animation length in seconds. This endpoint always runs on the Forge model, so only Forge's durations apply — the source of truth is MODEL_PRICING (credits.js), surfaced via /credits/costs.",
+                "format": "float",
+                "type": "number"
+              },
+              "final_image": {
+                "description": "The url OR base64 of the final keyframe. Requires an initial_image or middle_image to anchor the animation.",
+                "example": "<url> OR data:image/png;base64,...",
+                "type": "string"
+              },
+              "frame_size": {
+                "default": 0,
+                "description": "Size of each frame in pixels (width and height). 0 is for maximum resolution. -1 is for AI 1.5x upscaling. -9 is for matching the size and position of the input frame. Accepted values: 32, 64, 96, 128, 192, 256, 384, 0, -1, -9.",
+                "example": 32,
+                "format": "integer",
+                "type": "number"
+              },
+              "frames": {
+                "default": 36,
+                "description": "Number of frames in the output spritesheet. Accepted values: 4, 9, 16, 25, 36, 49, 64.",
+                "example": 4,
+                "format": "integer",
+                "type": "number"
+              },
+              "gif": {
+                "default": false,
+                "description": "When true, generates an animated GIF from the spritesheet and returns it in gif_url. Disabled by default to reduce response time.",
+                "example": false,
+                "type": "boolean"
+              },
+              "image_type": {
+                "description": "Type of sprite being animated. Affects generation parameters and styling.",
+                "enum": [
+                  "sprite",
+                  "sprite-vfx",
+                  "ui_asset"
+                ],
+                "example": "sprite",
+                "type": "string"
+              },
+              "individual_frames": {
+                "default": false,
+                "description": "When true, extracts each frame from the spritesheet as an individual image and returns the URLs in individual_frame_urls.",
+                "example": false,
+                "type": "boolean"
+              },
+              "initial_image": {
+                "description": "The url OR base64 of the first keyframe. Optional when a middle_image is provided.",
+                "example": "<url> OR data:image/png;base64,...",
+                "type": "string"
+              },
+              "loop": {
+                "default": true,
+                "description": "Trim the animation at the beginning or end to create a seamless loop. Not guaranteed to produce a perfect loop.",
+                "example": true,
+                "type": "boolean"
+              },
+              "margin_ratio": {
+                "description": "Deprecated — prefer margin_ratio_horizontal / margin_ratio_vertical. Amount of padding around the sprite as a ratio (0.0 to 1.0), applied to both axes (equivalent to setting both per-axis params to this value). Only used when margin_ratio_mode is \"manual\". Cannot be combined with the per-axis params: providing both fails with HTTP 400.",
+                "format": "float",
+                "type": "number"
+              },
+              "margin_ratio_horizontal": {
+                "description": "Horizontal padding around the sprite as a ratio (0.0 to 1.0). Only used when margin_ratio_mode is \"manual\". Useful for animations that extend sideways (e.g., sword slashes, punches). Cannot be combined with the legacy margin_ratio param.",
+                "format": "float",
+                "type": "number"
+              },
+              "margin_ratio_mode": {
+                "default": "auto",
+                "description": "Controls how margins are applied around the sprite.",
+                "enum": [
+                  "auto",
+                  "manual",
+                  "none"
+                ],
+                "example": "auto",
+                "type": "string"
+              },
+              "margin_ratio_vertical": {
+                "description": "Vertical padding around the sprite as a ratio (0.0 to 1.0). Only used when margin_ratio_mode is \"manual\". Useful for animations that extend up or down (e.g., jumps). Cannot be combined with the legacy margin_ratio param.",
+                "format": "float",
+                "type": "number"
+              },
+              "middle_image": {
+                "description": "The url OR base64 of the middle keyframe the animation passes through between the initial and final frames.",
+                "example": "<url> OR data:image/png;base64,...",
+                "type": "string"
+              },
+              "motion_prompt": {
+                "description": "Optional text description of the desired animation (e.g., \"walking\", \"attack slash\"). When omitted, the motion is derived purely from the keyframes.",
+                "type": "string"
+              },
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              },
+              "spritesheet_with_background": {
+                "default": false,
+                "description": "When true, also returns the spritesheet with background intact (before background removal). Useful for manually fixing background removal issues. The with-background spritesheet URL will be in spritesheet_with_background_url.",
+                "example": false,
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "animateSpriteKeyframes"
+    },
+    {
+      "description": "Re-pose an existing sprite into a new target pose while preserving the character, taking a source image (URL or base64), a pose name (or \"Other\" with a free-text description), and an optional n (1-4) for how many variations to produce. Only works with sprite image types (not icons, screenshots, etc.). Synchronous: the call blocks and returns an array of pose results, each containing the generated image url, the pose and description used, and a suggested motion_prompt tuned for that pose. Credits are charged only on success, scaled by the number of images generated. This is typically the first step before animating: call generatePose to set the character's pose, then feed the result (and its suggested motion_prompt) into animateSprite for the best animation quality; use rotateSprite instead when you want to change the camera angle rather than the pose. Pass an optional request_id to tag the results so you can locate them later via getSpriteResults. Requires an API key (user scope).\n\nCredits: This endpoint consumes 0.5 credits per result.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for generating a new pose for an existing sprite",
+            "properties": {
+              "augment_prompt": {
+                "default": true,
+                "description": "Augment the prompt behind the scenes. Disable to have more control.",
+                "example": true,
+                "type": "boolean"
+              },
+              "description": {
+                "description": "Optional additional instructions or description to guide the pose generation.",
+                "type": "string"
+              },
+              "image": {
+                "description": "URL or base64-encoded source sprite image to generate a new pose from.",
+                "example": "<url> OR data:image/png;base64,...",
+                "type": "string"
+              },
+              "n": {
+                "default": 1,
+                "description": "Number of pose variations to generate (1-4).",
+                "example": 1,
+                "format": "integer",
+                "maximum": 4,
+                "minimum": 1,
+                "type": "number"
+              },
+              "pose": {
+                "description": "Target pose for the sprite. Use the value \"Other\" to generate other poses not listed in the accepted values, and fill the field description accordingly.",
+                "enum": [
+                  "Idle (Front)",
+                  "Idle (Back)",
+                  "Idle (Left Facing)",
+                  "Idle (Right Facing)",
+                  "Walk (Left)",
+                  "Walk (Right)",
+                  "Walk (Towards the camera)",
+                  "Walk (Away from the camera)",
+                  "Run (Left)",
+                  "Run (Right)",
+                  "Run (Towards the camera)",
+                  "Run (Away from the camera)",
+                  "Crouching",
+                  "Crawling",
+                  "Sitting",
+                  "Defending / Blocking",
+                  "Attack Ready",
+                  "Jump Preparation",
+                  "Sleeping",
+                  "Flying",
+                  "Other"
+                ],
+                "example": "Idle (Front)",
+                "type": "string"
+              },
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "image",
+              "pose"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "generatePose"
+    },
+    {
+      "description": "Re-render an existing sprite from a different camera viewpoint while keeping the same character and pose, taking a source image (URL or base64), a required camera_rotation azimuth (one of 0, 45, 90, 135, 180, -135, -90, -45 degrees), an optional camera_elevation (0, 30, or 60 degrees; omit to keep the current elevation), and an optional n (1-4) for the number of variations. Only works with sprite image types (not icons, screenshots, etc.). Synchronous: the call blocks and returns an array of rotate-sprite results, each with the generated image url and the camera_rotation and camera_elevation that were applied. Credits are charged only on success, scaled by the number of images generated. Use this to produce alternate view angles of a character; use generatePose instead to change the character's pose rather than the camera, and animateSprite or transferMotion to bring a sprite to life. Pass an optional request_id to tag the results so you can retrieve them later via getSpriteResults. Requires an API key (user scope).\n\nCredits: This endpoint consumes 0.5 credits per result.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for rotating the camera view of an existing sprite",
+            "properties": {
+              "augment_prompt": {
+                "default": true,
+                "description": "Augment the prompt behind the scenes. Disable to have more control.",
+                "example": true,
+                "type": "boolean"
+              },
+              "camera_elevation": {
+                "description": "Optional camera elevation/tilt in degrees. 0 = eye-level, 30 = elevated, 60 = high-angle. Omit to keep the sprite's current elevation. Accepted values: 0, 30, 60.",
+                "example": 0,
+                "type": "integer"
+              },
+              "camera_rotation": {
+                "description": "Camera azimuth angle in degrees. 0 = front, 45 = front-right, 90 = right side, 135 = back-right, 180 = back, -135 = back-left, -90 = left side, -45 = front-left. Accepted values: 0, 45, 90, 135, 180, -135, -90, -45.",
+                "example": 0,
+                "type": "integer"
+              },
+              "image": {
+                "description": "URL or base64-encoded source sprite image to rotate.",
+                "example": "<url> OR data:image/png;base64,...",
+                "type": "string"
+              },
+              "n": {
+                "default": 1,
+                "description": "Number of variations to generate (1-4).",
+                "example": 1,
+                "format": "integer",
+                "maximum": 4,
+                "minimum": 1,
+                "type": "number"
+              },
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "image",
+              "camera_rotation"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "rotateSprite"
+    },
+    {
+      "description": "Transfer motion from a reference video or a named animation preset onto a static sprite image, producing an animated spritesheet that mimics the reference movement. Provide the sprite as image (URL or base64) plus either a video URL or a preset_id together with perspective and direction. Synchronous: the call blocks and returns a single sprite result directly (spritesheet URL, plus optional GIF, individual frames, or with-background spritesheet when requested) with no polling step. It returns HTTP 400 if neither a video nor a complete preset_id/perspective/direction triple is supplied, if the named preset, perspective, or direction cannot be resolved, or if the model/duration combination is invalid. Credits are charged only on success, based on the spritesheet's actual produced duration (which may be shorter than requested if the reference video is shorter). Use this when you have an existing motion clip or preset to copy; prefer animateSprite to generate animation purely from a text prompt, and call listAnimationPresets first to get valid preset_id, perspective, and direction values. Pass an optional request_id to tag the result so you can retrieve it later via getSpriteResults. Requires an API key (user scope).\n\nCredits: cost varies by model and duration (credits/sec): Forge 2/s (min 4), Tango 4/s (min 4); see this endpoint's full pricing table in the API docs.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for transferring motion from a video onto a static sprite image, producing an animated spritesheet.",
+            "properties": {
+              "crop": {
+                "description": "Crop sprite frames to fit content. Results in smaller spritesheets but inconsistent frame sizes across different animations.",
+                "type": "boolean"
+              },
+              "direction": {
+                "description": "Direction for the animation preset. When using a preset, `direction` is required.",
+                "enum": [
+                  "N",
+                  "NE",
+                  "E",
+                  "SE",
+                  "S",
+                  "SW",
+                  "W",
+                  "NW"
+                ],
+                "example": "N",
+                "type": "string"
+              },
+              "duration": {
+                "default": 1.5,
+                "description": "Duration in seconds. If the reference video is longer, it will be compressed to this duration. Available values depend on the model:\n- forge: 1, 1.5, 2, 2.5, 3, 3.5, 4\n- tango: 1, 1.5, 2, 2.5, 3, 3.5, 4",
+                "example": 1.5,
+                "format": "float",
+                "type": "number"
+              },
+              "frame_size": {
+                "default": 0,
+                "description": "Size of each frame in pixels (width and height). 0 is for maximum resolution. Accepted values: 32, 64, 96, 128, 192, 256, 384, 0.",
+                "example": 32,
+                "format": "integer",
+                "type": "number"
+              },
+              "frames": {
+                "default": 36,
+                "description": "Number of frames in the output spritesheet. Accepted values: 4, 9, 16, 25, 36, 49, 64.",
+                "example": 4,
+                "format": "integer",
+                "type": "number"
+              },
+              "gif": {
+                "default": false,
+                "description": "When true, generates an animated GIF from the spritesheet and returns it in gif_url. Disabled by default to reduce response time.",
+                "example": false,
+                "type": "boolean"
+              },
+              "image": {
+                "description": "Payload for generating an animated spritesheet from a static image. Input images can either be provided in base64 or URL. If the image was generated using Ludo, ideally it should be generated using the \"sprite\", \"sprite-vfx\" or \"ui_asset\" type.",
+                "example": "data:image/png;base64,...",
+                "type": "string"
+              },
+              "individual_frames": {
+                "default": false,
+                "description": "When true, extracts each frame from the spritesheet as an individual image and returns the URLs in individual_frame_urls.",
+                "example": false,
+                "type": "boolean"
+              },
+              "loop": {
+                "description": "Trim the animation at the beginning or end to create a seamless loop.",
+                "type": "boolean"
+              },
+              "margin_ratio": {
+                "default": 0.15,
+                "description": "Deprecated — prefer margin_ratio_horizontal / margin_ratio_vertical. Amount of padding around the sprite as a ratio (0.0 to 1.0), applied to both axes (equivalent to setting both per-axis params to this value). Only used when margin_ratio_mode is \"manual\". Cannot be combined with the per-axis params: providing both fails with HTTP 400. Defaults to 0.15 when no margin param is provided.",
+                "example": 0.15,
+                "format": "float",
+                "type": "number"
+              },
+              "margin_ratio_horizontal": {
+                "description": "Horizontal padding around the sprite as a ratio (0.0 to 1.0). Only used when margin_ratio_mode is \"manual\". Useful for animations that extend sideways (e.g., sword slashes, punches). Cannot be combined with the legacy margin_ratio param.",
+                "format": "float",
+                "type": "number"
+              },
+              "margin_ratio_mode": {
+                "default": "manual",
+                "description": "Controls how margins are applied around the sprite.",
+                "enum": [
+                  "manual",
+                  "none"
+                ],
+                "example": "manual",
+                "type": "string"
+              },
+              "margin_ratio_vertical": {
+                "description": "Vertical padding around the sprite as a ratio (0.0 to 1.0). Only used when margin_ratio_mode is \"manual\". Useful for animations that extend up or down (e.g., jumps). Cannot be combined with the legacy margin_ratio param.",
+                "format": "float",
+                "type": "number"
+              },
+              "model": {
+                "default": "tango",
+                "description": "Model to use. Available models:\n- \"forge\" (Forge): 2 credits/s, min 4\n- \"tango\" (Tango): 4 credits/s, min 4",
+                "enum": [
+                  "forge",
+                  "tango"
+                ],
+                "example": "forge",
+                "type": "string"
+              },
+              "perspective": {
+                "description": "Perspective ID to use with the animation preset. When using a preset, `perspective` is required.",
+                "type": "string"
+              },
+              "preset_id": {
+                "description": "ID of an animation preset to use instead of a video URL. Use the animation-presets endpoint to list available presets. When using a preset, `perspective` and `direction` are required.",
+                "type": "string"
+              },
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              },
+              "spritesheet_with_background": {
+                "default": false,
+                "description": "When true, also returns the spritesheet with background intact (before background removal). Useful for manually fixing background removal issues. The with-background spritesheet URL will be in spritesheet_with_background_url.",
+                "example": false,
+                "type": "boolean"
+              },
+              "video": {
+                "description": "URL of the video to use as motion source. You can use videos from the animateSprite endpoint or provide your own. Videos up to 4 seconds will produce better results. Either `video` or `preset_id` + `perspective` + `direction` must be provided.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "image"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "transferMotion"
+    },
+    {
+      "description": "List the available animation presets along with their perspectives and the eight supported compass directions (N, NE, E, SE, S, SW, W, NW). Synchronous GET with no request body: it returns an animations array (each with id, name, category, description, duration, preview_url, and — when the preset can be retargeted onto a rigged 3D model — clip_url), a deduplicated perspectives array, and the directions list. This is a free discovery endpoint and does not charge credits. Use it to obtain the preset_id, perspective, and direction values that transferMotion needs, and to find motion preset names you can reference when animating; pair it with transferMotion (to apply a preset onto a sprite), animateSprite (text-prompt animation), or animate3DModelPreset (apply a clip_url-backed preset to a rigged 3D model). Requires an API key (user scope).",
+      "inputSchema": {
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "listAnimationPresets"
+    },
+    {
+      "description": "Edit a previously generated spritesheet: re-prompt its underlying animation (edit_mode \"prompt\"), extend the frame beyond its borders (\"outpaint\"), or repair a bad loop (\"fix_loop\"). Pass the `spritesheet_url` you received from `animateSprite`, `transferMotion`, or an earlier edit — it must be a spritesheet you generated within the last 7 days; arbitrary external images are not accepted. A `prompt` is required for edit_mode \"prompt\", optional for \"outpaint\", and not accepted for \"fix_loop\"; optionally add up to 5 reference `images` (URL or base64) to guide the edit. Synchronous: the call blocks until the edited spritesheet is rendered and returns the same result shape as animateSprite (spritesheet URL, frame layout, optional GIF or individual frames). Credits are charged only on success, based on the produced duration and never more than the duration you requested. Pass an optional `request_id` to tag the result for later retrieval via `getSpriteResults`. Requires an API key (user scope).\n\nCredits: cost varies by model and duration (credits/sec): Forge 2/s (min 4); see this endpoint's full pricing table in the API docs.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for editing a previously generated spritesheet. edit_mode selects the operation — prompt-driven edit (default), outpaint, or loop fixing.",
+            "properties": {
+              "crop": {
+                "description": "Crop sprite frames to fit content. Results in smaller spritesheets but inconsistent frame sizes across different animations.",
+                "type": "boolean"
+              },
+              "duration": {
+                "description": "Duration in seconds. Available values depend on the model:\n- forge: 1, 1.5, 2, 2.5, 3, 3.5, 4",
+                "format": "float",
+                "type": "number"
+              },
+              "edit_mode": {
+                "default": "prompt",
+                "description": "Edit operation to perform.",
+                "enum": [
+                  "prompt",
+                  "outpaint",
+                  "fix_loop"
+                ],
+                "example": "prompt",
+                "type": "string"
+              },
+              "frame_size": {
+                "description": "Size of each frame in pixels (width and height). 0 is for maximum resolution. Defaults to the source spritesheet's frame size. Accepted values: 32, 64, 96, 128, 192, 256, 384, 0.",
+                "example": 32,
+                "format": "integer",
+                "type": "number"
+              },
+              "frames": {
+                "description": "Number of frames in the output spritesheet. Defaults to the source spritesheet's frame count. Accepted values: 4, 9, 16, 25, 36, 49, 64.",
+                "example": 4,
+                "format": "integer",
+                "type": "number"
+              },
+              "gif": {
+                "default": false,
+                "description": "When true, generates an animated GIF from the spritesheet and returns it in gif_url. Disabled by default to reduce response time.",
+                "example": false,
+                "type": "boolean"
+              },
+              "images": {
+                "description": "Optional reference images (up to 5), each a URL or base64, to guide the edit.",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 5,
+                "type": "array"
+              },
+              "individual_frames": {
+                "default": false,
+                "description": "When true, extracts each frame from the spritesheet as an individual image and returns the URLs in individual_frame_urls.",
+                "example": false,
+                "type": "boolean"
+              },
+              "loop": {
+                "default": true,
+                "description": "Trim the animation at the beginning or end to create a seamless loop.",
+                "example": true,
+                "type": "boolean"
+              },
+              "model": {
+                "default": "forge",
+                "description": "Model to use. Available models:\n- \"forge\" (Forge): 2 credits/s, min 4",
+                "enum": [
+                  "forge"
+                ],
+                "example": "forge",
+                "type": "string"
+              },
+              "prompt": {
+                "description": "Edit instruction. Required for edit_mode \"prompt\", optional for \"outpaint\", not accepted for \"fix_loop\".",
+                "type": "string"
+              },
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              },
+              "spritesheet_url": {
+                "description": "URL of a spritesheet you generated in the last 7 days (returned by animateSprite, transferMotion, or a previous edit as spritesheet_url). External URLs are not accepted.",
+                "example": "<url>",
+                "type": "string"
+              },
+              "spritesheet_with_background": {
+                "default": false,
+                "description": "When true, also returns the spritesheet with background intact (before background removal). The with-background spritesheet URL will be in spritesheet_with_background_url.",
+                "example": false,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "spritesheet_url"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "editSpritesheet"
+    },
+    {
+      "description": "Generate a short video clip from a source image and a motion text prompt (image-to-video). Synchronous: the call blocks until rendering finishes and returns the video URL and its actual duration in seconds — there is no separate polling step. Optionally pass `final_image` to interpolate between a start and end frame. The chosen `model` and `duration` must be compatible (incompatible combinations return HTTP 400); see the `model` and `duration` fields for the values each model accepts. Credits are charged only on success, based on the produced duration and never more than the duration you requested. Pass an optional `request_id` to tag the result so you can locate it later via `getVideoResults`. Related tools: use `createImage` for static images, `animateSprite` for sprite-sheet animation, and `getVideoResults` to list videos you generated earlier. Requires an API key (user scope).\n\nCredits: cost varies by model and duration (credits/sec): Blitz 1/s, Eagle 1.3/s, Eagle with Audio 1.8/s; see this endpoint's full pricing table in the API docs.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for generating a video from a source image and motion prompt",
+            "properties": {
+              "augment_prompt": {
+                "default": true,
+                "description": "Augment the prompt behind the scenes. Disable to have more control.",
+                "example": true,
+                "type": "boolean"
+              },
+              "duration": {
+                "description": "Duration in seconds. Available values depend on the model:\n- blitz: 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12\n- eagle: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15\n- eagle-audio: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15",
+                "example": 3,
+                "format": "float",
+                "type": "number"
+              },
+              "final_image": {
+                "description": "URL or base64-encoded end frame image. When provided, the video will interpolate between the initial and final frames.",
+                "example": "<url> OR data:image/png;base64,...",
+                "type": "string"
+              },
+              "image": {
+                "description": "URL or base64-encoded source image (the starting frame for the video)",
+                "example": "<url> OR data:image/png;base64,...",
+                "type": "string"
+              },
+              "model": {
+                "default": "blitz",
+                "description": "Model to use. Available models:\n- \"blitz\" (Blitz): Visual Quality: 4/10 · Motion Stability: 8/10 · 1 credits/s\n- \"eagle\" (Eagle): Visual Quality: 8/10 · Motion Stability: 5/10 · 1.3 credits/s\n- \"eagle-audio\" (Eagle with Audio): Visual Quality: 8/10 · Motion Stability: 5/10 · 1.8 credits/s\nLegacy aliases: \"standard\" → blitz.",
+                "enum": [
+                  "blitz",
+                  "standard",
+                  "eagle",
+                  "eagle-audio"
+                ],
+                "example": "blitz",
+                "type": "string"
+              },
+              "prompt": {
+                "description": "Text description of the motion or action for the video (e.g., \"walking forward\", \"waving hand\", \"camera zoom in\")",
+                "type": "string"
+              },
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "image",
+              "prompt"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "createVideo"
+    },
+    {
+      "description": "Generate a video from 1-5 reference images and a text prompt (references-to-video). Unlike createVideo, which animates a single source image, this composes a new scene that borrows characters, objects, and style from the reference images. Each image can be a URL or base64. Synchronous: the call blocks until rendering finishes and returns the video URL and its actual duration in seconds. Choose the output shape with `aspect_ratio` (\"default\" lets the model decide). The chosen `model` and `duration` must be compatible (incompatible combinations return HTTP 400). Credits are charged only on success, based on the produced duration and never more than the duration you requested. Pass an optional `request_id` to tag the result so you can locate it later via `getVideoResults`. Related tools: `createVideo` for image-to-video, `editVideo` to modify a generated video. Requires an API key (user scope).\n\nCredits: cost varies by model and duration (credits/sec): Eagle 1.5/s, Eagle with Audio 2/s; see this endpoint's full pricing table in the API docs.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for generating a video from 1-5 reference images and a text prompt.",
+            "properties": {
+              "aspect_ratio": {
+                "default": "default",
+                "description": "Output aspect ratio. \"default\" lets the model choose.",
+                "enum": [
+                  "default",
+                  "ar_1_1",
+                  "ar_16_9",
+                  "ar_9_16",
+                  "ar_4_3",
+                  "ar_3_4",
+                  "ar_21_9"
+                ],
+                "example": "default",
+                "type": "string"
+              },
+              "duration": {
+                "default": 5,
+                "description": "Duration in seconds. Available values depend on the model:\n- eagle: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15\n- eagle-audio: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15",
+                "example": 5,
+                "format": "float",
+                "type": "number"
+              },
+              "images": {
+                "description": "Reference images (1 to 5), each a URL or base64. The generated video borrows characters, objects, and style from them.",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 5,
+                "minItems": 1,
+                "type": "array"
+              },
+              "model": {
+                "default": "eagle",
+                "description": "Model to use. Available models:\n- \"eagle\" (Eagle): Visual Quality: 8/10 · Motion Stability: 5/10 · 1.5 credits/s\n- \"eagle-audio\" (Eagle with Audio): Visual Quality: 8/10 · Motion Stability: 5/10 · 2 credits/s",
+                "enum": [
+                  "eagle",
+                  "eagle-audio"
+                ],
+                "example": "eagle",
+                "type": "string"
+              },
+              "prompt": {
+                "description": "Text description of the video to generate.",
+                "type": "string"
+              },
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "prompt",
+              "images"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "createVideoFromReferences"
+    },
+    {
+      "description": "Edit a previously generated video with a text prompt and optional reference images (video-to-video). Pass the video `url` you received from `createVideo`, `createVideoFromReferences`, or an earlier edit — it must be a video you generated within the last 7 days; arbitrary external videos are not accepted. Optionally add up to 5 reference `images` (URL or base64) to guide the edit. Synchronous: the call blocks until rendering finishes and returns the new video URL and its actual duration in seconds. Credits are charged only on success, based on the produced duration and never more than the duration you requested. Pass an optional `request_id` to tag the result so you can locate it later via `getVideoResults`. Related tools: `createVideo` to generate the source clip, `createVideoFromReferences` for reference-driven generation. Requires an API key (user scope).\n\nCredits: cost varies by model and duration (credits/sec): Eagle 2/s; see this endpoint's full pricing table in the API docs.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for editing a previously generated video with a text prompt and optional reference images.",
+            "properties": {
+              "duration": {
+                "description": "Duration in seconds. Available values depend on the model:\n- eagle: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15",
+                "format": "float",
+                "type": "number"
+              },
+              "images": {
+                "description": "Optional reference images (up to 5), each a URL or base64, to guide the edit.",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 5,
+                "type": "array"
+              },
+              "model": {
+                "default": "eagle",
+                "description": "Model to use. Available models:\n- \"eagle\" (Eagle): Visual Quality: 8/10 · Motion Stability: 5/10 · 2 credits/s",
+                "enum": [
+                  "eagle"
+                ],
+                "example": "eagle",
+                "type": "string"
+              },
+              "prompt": {
+                "description": "Edit instruction describing the desired change.",
+                "type": "string"
+              },
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              },
+              "video": {
+                "description": "URL of a video you generated in the last 7 days (returned by createVideo, createVideoFromReferences, or a previous edit). External URLs are not accepted.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "prompt",
+              "video"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "editVideo"
+    },
+    {
+      "description": "Upscale a previously generated video to twice its resolution (2x). Pass the video `url` you received from `createVideo`, `createVideoFromReferences`, or `editVideo` — it must be a video you generated within the last 7 days; arbitrary external videos are not accepted. Only videos below 960x960 pixels can be upscaled (larger sources are rejected). Synchronous: the call blocks until upscaling finishes and returns the new video URL and its duration in seconds. Billed per second of video, independent of model, charged only on success. Pass an optional `request_id` to tag the result so you can locate it later via `getVideoResults`. Related tools: `createVideo` for image-to-video, `editVideo` to modify a generated video. Requires an API key (user scope).\n\nCredits: 0.2 credits per second of video.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for upscaling a previously generated video to twice its resolution.",
+            "properties": {
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              },
+              "video": {
+                "description": "URL of a video you generated in the last 7 days (returned by createVideo, createVideoFromReferences, or editVideo). External URLs are not accepted. Only videos below 960x960 pixels can be upscaled.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "video"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "upscaleVideo"
+    },
+    {
+      "description": "Remove the background from a single image, returning the subject isolated on a transparent background. Supply the source image (URL or base64); optionally set crop to trim the result to the content, and creative_edit (default true) for higher-quality output that may not match the input pixel-for-pixel. Synchronous: the call blocks and returns a single image result with a url (not an array). The image is uploaded and validated, and an image larger than 15MB is rejected with HTTP 400. Credits are charged only on success. Use removeBackground for this dedicated cutout task; editImage can also remove backgrounds via a prompt but is better for broader edits, while createImage and generateWithStyle produce new images rather than process an existing one. Pass an optional request_id to tag the result so you can retrieve it later via getImageResults. Requires an API key (user scope).\n\nCredits: This endpoint consumes 0.5 credits per result.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for removing the background of an image",
+            "properties": {
+              "creative_edit": {
+                "default": true,
+                "description": "Higher quality results but the image will not be exactly the same as the input.",
+                "example": true,
+                "type": "boolean"
+              },
+              "crop": {
+                "default": false,
+                "description": "Whether to crop/trim the result to fit the content.",
+                "example": false,
+                "type": "boolean"
+              },
+              "image": {
+                "description": "URL or base64-encoded image to remove the background from.",
+                "example": "<url> OR data:image/png;base64,...",
+                "type": "string"
+              },
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "image"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "removeBackground"
+    },
+    {
+      "description": "Convert a single source image into a textured 3D model (image-to-3D). Synchronous: the call blocks while the mesh is generated, decompressed, and re-uploaded, then returns a downloadable GLB model_url plus an array of snapshot image URLs rendered from different angles (handy for previews). Accepts optional mesh controls: target_num_faces (max triangle count, 1000-200000, default 50000), texture_size (1024 or 2048, default 2048), and texture_type (\"pbr\", \"simple\", or \"none\", default \"pbr\"). Credits are charged only on success. Pass an optional request_id to tag the result so you can locate it later via get3DModelResults. Requires an API key (user scope).\n\nCredits: This endpoint consumes 3 credits per call.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "properties": {
+              "image": {
+                "description": "URL or base64-encoded image to convert to 3D",
+                "example": "<url> OR data:image/png;base64,...",
+                "type": "string"
+              },
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              },
+              "target_num_faces": {
+                "default": 50000,
+                "description": "Maximum triangle count for the mesh (1000-200000)",
+                "example": 50000,
+                "maximum": 200000,
+                "minimum": 1000,
+                "type": "integer"
+              },
+              "texture_size": {
+                "default": 2048,
+                "description": "Texture resolution in pixels Accepted values: 1024, 2048.",
+                "example": 1024,
+                "type": "integer"
+              },
+              "texture_type": {
+                "default": "pbr",
+                "description": "Texture type",
+                "enum": [
+                  "pbr",
+                  "simple",
+                  "none"
+                ],
+                "example": "pbr",
+                "type": "string"
+              }
+            },
+            "required": [
+              "image"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "create3DModel"
+    },
+    {
+      "description": "Rig a 3D model: generate a skeleton and skin weights for an existing GLB so it can be animated. Accepts a URL or base64-encoded GLB in `model`. Synchronous: the call blocks while the rig is generated, then returns a downloadable `model_url` for the rigged GLB. rig_type selects the skeleton prior — general (default, any asset), humanoid (anime-style characters), game (classic game-character rigs), or the pinned humanoid templates for two-armed, two-legged characters: humanoid_template (standard 22-joint skeleton with named joints, required for animating from the preset library) and humanoid_template_hands (52 joints, five fingers per hand). joint_naming relabels the identified joints to a convention — smpl (default), mixamo, humanik, unreal, godot, rigify, or vroid — without changing the skeleton. Credits are charged only on success. Rigging is non-destructive to geometry but replaces any prior skeleton, so animations made against an old rig no longer apply. Requires an API key (user scope).\n\nCredits: This endpoint consumes 1 credits per call.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "properties": {
+              "joint_naming": {
+                "default": "smpl",
+                "description": "Bone naming convention for the identified joints: smpl (default), mixamo (Unity's humanoid auto-mapper), humanik (same names unprefixed — Maya/MotionBuilder/FBX), unreal (UE mannequin), godot (SkeletonProfileHumanoid), rigify (Blender) or vroid (VRM). Purely a relabel — the skeleton is identical.",
+                "enum": [
+                  "smpl",
+                  "mixamo",
+                  "humanik",
+                  "unreal",
+                  "godot",
+                  "rigify",
+                  "vroid"
+                ],
+                "example": "smpl",
+                "type": "string"
+              },
+              "model": {
+                "description": "URL or base64-encoded GLB to rig.",
+                "example": "<url> OR data:model/gltf-binary;base64,...",
+                "type": "string"
+              },
+              "request_id": {
+                "description": "Optional client-provided id to retrieve the result later.",
+                "type": "string"
+              },
+              "rig_type": {
+                "default": "general",
+                "description": "Which skeleton to build: general (any asset), humanoid (anime-style characters), game (classic game-character rigs), or the pinned humanoid templates with named joints required for the animation preset library — humanoid_template (22 joints) / humanoid_template_hands (52, five fingers per hand). Templates only suit two-armed, two-legged characters.",
+                "enum": [
+                  "general",
+                  "humanoid",
+                  "game",
+                  "humanoid_template",
+                  "humanoid_template_hands"
+                ],
+                "example": "general",
+                "type": "string"
+              }
+            },
+            "required": [
+              "model"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "rigModel"
+    },
+    {
+      "description": "Generate text-driven skeletal animations for an already-rigged 3D model. Pass the rigged GLB in `model` (URL or base64) and a motion `prompt` (e.g. \"walking\", \"swinging its axe\"). The model must already have a skeleton — rig it first via the rig endpoint if not. Synchronous: returns num_variants candidate animations (default 4), each a standalone animation-only GLB (skeleton + one clip, no mesh) in `glb_url` plus an mp4 `preview_url`, so you can pick the best one and fuse it with your model in a game engine or three.js. mode selects the representation — rot_trans (default, most faithful) or rot_only (for retargeting). Animation quality is hit-or-miss, which is why multiple candidates are returned. Credits are charged once per call regardless of variant count, only on success. Requires an API key (user scope).\n\nCredits: This endpoint consumes 0.2 credits per call.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "properties": {
+              "augment_prompt": {
+                "default": true,
+                "description": "Rewrite the prompt into a detailed motion caption with an LLM (recommended).",
+                "example": true,
+                "type": "boolean"
+              },
+              "loop": {
+                "default": true,
+                "description": "Return to the initial pose: each clip plays forward then mirrors back to the rest pose for a seamless loop. Best for one-way motions (crouch, punch, wave); reads oddly for cyclic gaits like walking.",
+                "example": true,
+                "type": "boolean"
+              },
+              "mode": {
+                "default": "rot_trans",
+                "description": "Animation representation: rot_trans (per-bone rotation+translation, most faithful) or rot_only (rotation + root translation only, for retargeting).",
+                "enum": [
+                  "rot_trans",
+                  "rot_only"
+                ],
+                "example": "rot_trans",
+                "type": "string"
+              },
+              "model": {
+                "description": "URL or base64-encoded already-rigged GLB to animate. Rig it first via the rig endpoint if it has no skeleton.",
+                "example": "<url> OR data:model/gltf-binary;base64,...",
+                "type": "string"
+              },
+              "num_variants": {
+                "default": 4,
+                "description": "Number of candidate animations to generate; each returned as a standalone animation-only GLB with an mp4 preview.",
+                "example": 4,
+                "maximum": 8,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "prompt": {
+                "description": "Desired motion, e.g. \"walking\" or \"swinging its axe\".",
+                "type": "string"
+              },
+              "request_id": {
+                "description": "Optional client-provided id to retrieve the result later.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "model",
+              "prompt"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "animate3DModel"
+    },
+    {
+      "description": "Apply a curated animation preset to an already-rigged 3D model (retargeting). Pass the rigged GLB in `model` (URL or base64) and a `preset_id` from the animation presets list (see the spritesheet animation-presets endpoint) — only presets that expose a `clip_url` can be applied to a 3D model. The model must have a humanoid-template rig (rig it with rig_type humanoid_template or humanoid_template_hands). Synchronous: returns one retargeted animation — a standalone animation-only GLB in `glb_url` plus an mp4 `preview_url` — in the same `animations` envelope as the animate endpoint. crop_loop trims the clip to its seamlessly-looping span (omit to follow the preset's own loop flag); in_place removes net travel so the character moves on the spot, as game-engine locomotion expects (omit to follow crop_loop). Credits are charged only on success. Requires an API key (user scope).\n\nCredits: This endpoint consumes 0.2 credits per call.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "properties": {
+              "crop_loop": {
+                "description": "Trim the animation to the span that loops seamlessly. Omit to follow the preset's own loop flag. Ignored when no clean loop exists.",
+                "type": "boolean"
+              },
+              "in_place": {
+                "description": "Remove the animation's net travel so the character moves on the spot (engine-driven locomotion). Omit to follow crop_loop.",
+                "type": "boolean"
+              },
+              "model": {
+                "description": "URL or base64-encoded already-rigged GLB (rig it with a humanoid_template rig_type first).",
+                "example": "<url> OR data:model/gltf-binary;base64,...",
+                "type": "string"
+              },
+              "preset_id": {
+                "description": "id of an animation preset from the presets list. Only presets that expose a clip_url can be applied to a 3D model.",
+                "type": "string"
+              },
+              "request_id": {
+                "description": "Optional client-provided id to retrieve the result later.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "model",
+              "preset_id"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "animate3DModelPreset"
+    },
+    {
+      "description": "Produce a short sound effect (SFX) from a text description, such as \"laser gun firing\" or \"footsteps on gravel\". Synchronous: the call blocks until generation finishes and returns a single audio result containing a URL; there is no separate polling step. The description field is required, duration is capped at 10 seconds (0 means auto-pick based on the description), and you may set loop to true for a seamlessly looping effect. Credits are charged on success. Use this for short, discrete sounds; use createAmbiance for a continuous looping background soundscape, createMusic for musical pieces, and createAudioTransform to remix an existing audio sample. Pass an optional request_id to tag the result so you can locate it later via getAudioResults. Requires an API key (user scope).\n\nCredits: This endpoint consumes 2 credits per call.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for generating a sound effect from a text description",
+            "properties": {
+              "augment_prompt": {
+                "default": true,
+                "description": "Augment the prompt behind the scenes. Disable to have more control.",
+                "example": true,
+                "type": "boolean"
+              },
+              "description": {
+                "description": "Text description of the sound effect to generate (e.g., \"laser gun firing\", \"footsteps on gravel\").",
+                "type": "string"
+              },
+              "duration": {
+                "default": 0,
+                "description": "Duration in seconds. Use 0 for automatic duration based on the description.",
+                "example": 0,
+                "format": "float",
+                "maximum": 10,
+                "minimum": 0,
+                "type": "number"
+              },
+              "loop": {
+                "default": false,
+                "description": "Generate a sound effect that loops seamlessly.",
+                "example": false,
+                "type": "boolean"
+              },
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "description"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "createSoundEffect"
+    },
+    {
+      "description": "Produce a looping background ambiance soundscape from a text description, such as \"windy forest at dusk\" or \"busy tavern interior\". Synchronous: the call blocks until generation finishes and returns a single audio result containing a URL; there is no separate polling step. The description field is required and duration is capped at 10 seconds (0 means auto-pick based on the description). Credits are charged on success. Use this for continuous, atmospheric background loops; use createSoundEffect for short discrete sound effects, createMusic for musical pieces, and createAudioTransform to remix an existing audio sample. Pass an optional request_id to tag the result so you can locate it later via getAudioResults. Requires an API key (user scope).\n\nCredits: This endpoint consumes 2 credits per call.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for generating a seamless looping ambiance soundscape from a text description",
+            "properties": {
+              "augment_prompt": {
+                "default": true,
+                "description": "Augment the prompt behind the scenes. Disable to have more control.",
+                "example": true,
+                "type": "boolean"
+              },
+              "description": {
+                "description": "Text description of the ambiance to generate (e.g., \"windy forest at dusk\", \"busy tavern interior\").",
+                "type": "string"
+              },
+              "duration": {
+                "default": 0,
+                "description": "Duration in seconds. Use 0 for automatic duration based on the description.",
+                "example": 0,
+                "format": "float",
+                "maximum": 10,
+                "minimum": 0,
+                "type": "number"
+              },
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "description"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "createAmbiance"
+    },
+    {
+      "description": "Produce a piece of music from a text description, such as \"epic orchestral battle theme\" or \"calm piano melody\", with optional lyrics. Synchronous: the call blocks until generation finishes and returns a single audio result containing a URL; there is no separate polling step. The description field is required; duration must be one of the allowed values (0 means auto, otherwise multiples of 10 up to 180 seconds) and out-of-range values return HTTP 400. Credits are charged on success. Use this for songs and musical scores; use createSoundEffect for short sound effects, createAmbiance for looping background soundscapes, and createAudioTransform to remix an existing audio sample. Pass an optional request_id to tag the result so you can locate it later via getAudioResults. Requires an API key (user scope).\n\nCredits: This endpoint consumes 3 credits per call.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for generating music from a text description",
+            "properties": {
+              "augment_prompt": {
+                "default": true,
+                "description": "Augment the prompt behind the scenes. Disable to have more control.",
+                "example": true,
+                "type": "boolean"
+              },
+              "description": {
+                "description": "Text description of the music to generate (e.g., \"epic orchestral battle theme\", \"calm piano melody\").",
+                "type": "string"
+              },
+              "duration": {
+                "default": 0,
+                "description": "Duration in seconds. Use 0 for automatic duration based on the description. Accepted values: 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180.",
+                "example": 0,
+                "type": "integer"
+              },
+              "lyrics": {
+                "description": "Optional lyrics to include in the generated music.",
+                "type": "string"
+              },
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "description"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "createMusic"
+    },
+    {
+      "description": "Remix an existing audio sample (a sound effect, ambiance, or music clip) into a variation guided by a text prompt, for example turning a track into an 80s synthwave or metal version. Both the sample and the prompt are required; the sample is uploaded as a URL or base64 audio and must be at most 15MB or the call returns HTTP 400, and duration must be one of the allowed values (0 means match the source, otherwise multiples of 10 up to 180 seconds). Synchronous: the call blocks until generation finishes and returns a single audio result containing a URL; there is no separate polling step. The optional modification_strength (0 to 1, default 0.5) controls how far the result departs from the original. Credits are charged on success. Use this to transform existing audio you already have; use createSoundEffect, createAmbiance, or createMusic to generate audio from scratch. Pass an optional request_id to tag the result so you can locate it later via getAudioResults. Requires an API key (user scope).\n\nCredits: This endpoint consumes 3 credits per call.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for remixing an audio sample (sound effect, ambiance or music) into a variation guided by a text prompt",
+            "properties": {
+              "augment_prompt": {
+                "default": true,
+                "description": "Augment the prompt behind the scenes. Disable to have more control.",
+                "example": true,
+                "type": "boolean"
+              },
+              "duration": {
+                "default": 0,
+                "description": "Duration in seconds. Use 0 for automatic duration matching the source sample. Accepted values: 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180.",
+                "example": 0,
+                "type": "integer"
+              },
+              "modification_strength": {
+                "default": 0.5,
+                "description": "Controls how strongly the source sample is modified. 0 keeps it close to the original, 1 transforms it fully.",
+                "example": 0.5,
+                "format": "float",
+                "maximum": 1,
+                "minimum": 0,
+                "type": "number"
+              },
+              "prompt": {
+                "description": "Text description guiding the remix (e.g., \"make it sound like an 80s synthwave track\", \"turn this into a metal version\").",
+                "type": "string"
+              },
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              },
+              "sample": {
+                "description": "URL or base64-encoded source audio sample to remix (15MB max).",
+                "example": "<url> OR data:audio/mp3;base64,...",
+                "type": "string"
+              }
+            },
+            "required": [
+              "sample",
+              "prompt"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "createAudioTransform"
+    },
+    {
+      "description": "Design a new voice from a character description (such as \"deep-voiced warrior\" or \"cheerful young girl\") and have it speak a short line of text, returning a sample of that newly created voice. Both voice_description and text are required, the spoken text is limited to 200 characters or the call returns HTTP 400, and type selects \"human\" or \"non-human\" voices. Synchronous: the call blocks until generation finishes and returns a single audio result containing a URL; there is no separate polling step. Credits are charged on success. Use this to invent and audition a voice from a description; use createSpeech for text-to-speech that clones a specific voice from an audio sample, and createSpeechPreset for text-to-speech using a named preset voice. Pass an optional request_id to tag the result so you can locate it later via getAudioResults. Requires an API key (user scope).\n\nCredits: This endpoint consumes 1 credits per call.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for generating a voice sample from a character description",
+            "properties": {
+              "augment_prompt": {
+                "default": true,
+                "description": "Augment the prompt behind the scenes. Disable to have more control.",
+                "example": true,
+                "type": "boolean"
+              },
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              },
+              "text": {
+                "description": "Text for the voice to speak (max 20 words).",
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": {
+                "default": "human",
+                "description": "Type of voice to generate.",
+                "enum": [
+                  "human",
+                  "non-human"
+                ],
+                "example": "human",
+                "type": "string"
+              },
+              "voice_description": {
+                "description": "Text description of the voice character (e.g., \"deep-voiced warrior\", \"cheerful young girl\").",
+                "type": "string"
+              }
+            },
+            "required": [
+              "voice_description",
+              "text"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "createVoice"
+    },
+    {
+      "description": "Convert text to speech by cloning the voice from an audio sample you provide (voice-cloning text-to-speech). Both text and sample are required; the text is limited to 1000 characters and the sample is supplied as a URL or base64 audio that must be at most 15MB, with violations returning HTTP 400. Synchronous: the call blocks until generation finishes and returns a single audio result containing a URL; there is no separate polling step. Credits are charged on success. Use this when you have a reference voice sample to clone; use createSpeechPreset to speak with a built-in named preset voice instead, and createVoice to design a brand-new voice from a text description rather than cloning one. Pass an optional request_id to tag the result so you can locate it later via getAudioResults. Requires an API key (user scope).\n\nCredits: This endpoint consumes 1 credits per call.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for text-to-speech generation using voice cloning",
+            "properties": {
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              },
+              "sample": {
+                "description": "URL or base64-encoded audio sample for voice cloning.",
+                "example": "<url> OR data:audio/mp3;base64,...",
+                "type": "string"
+              },
+              "text": {
+                "description": "Text to convert to speech (max 100 words).",
+                "maxLength": 1000,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "text",
+              "sample"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "createSpeech"
+    },
+    {
+      "description": "Convert text to speech using a named built-in preset voice, with optional emotion and language settings. Both text and voice_preset_id are required and the text is limited to 1000 characters; invalid input returns HTTP 400. Synchronous: the call blocks until generation finishes and returns a single audio result containing a URL; there is no separate polling step. Credits are charged on success. Use this when you want a ready-made catalog voice and do not need to supply your own sample; use createSpeech to clone a voice from an audio sample instead, and createVoice to design a new voice from a text description. Pass an optional request_id to tag the result so you can locate it later via getAudioResults. Requires an API key (user scope).\n\nCredits: This endpoint consumes 1 credits per call.",
+      "inputSchema": {
+        "properties": {
+          "requestBody": {
+            "description": "Payload for text-to-speech generation using a voice preset",
+            "properties": {
+              "emotion": {
+                "description": "Emotion to apply to the speech.",
+                "enum": [
+                  "Default",
+                  "Happy",
+                  "Sad",
+                  "Angry",
+                  "Fearful",
+                  "Disgusted",
+                  "Surprised",
+                  "Neutral"
+                ],
+                "example": "Default",
+                "type": "string"
+              },
+              "language": {
+                "description": "Language code for the speech.",
+                "enum": [
+                  "auto",
+                  "English",
+                  "Afrikaans",
+                  "Arabic",
+                  "Bulgarian",
+                  "Catalan",
+                  "Chinese",
+                  "Chinese,Yue",
+                  "Croatian",
+                  "Czech",
+                  "Danish",
+                  "English",
+                  "Filipino",
+                  "Finnish",
+                  "French",
+                  "German",
+                  "Greek",
+                  "Hebrew",
+                  "Hindi",
+                  "Hungarian",
+                  "Indonesian",
+                  "Italian",
+                  "Japanese",
+                  "Korean",
+                  "Malay",
+                  "Norwegian",
+                  "Nynorsk",
+                  "Persian",
+                  "Polish",
+                  "Portuguese",
+                  "Romanian",
+                  "Russian",
+                  "Slovak",
+                  "Slovenian",
+                  "Spanish",
+                  "Swedish",
+                  "Tamil",
+                  "Thai",
+                  "Turkish",
+                  "Ukrainian",
+                  "Vietnamese"
+                ],
+                "example": "auto",
+                "type": "string"
+              },
+              "request_id": {
+                "description": "Optional client-provided identifier for this request. Use this to retrieve results later via the results endpoint.",
+                "type": "string"
+              },
+              "text": {
+                "description": "Text to convert to speech (max 100 words).",
+                "maxLength": 1000,
+                "type": "string"
+              },
+              "voice_preset_id": {
+                "description": "Voice preset identifier.",
+                "enum": [
+                  "Serious woman",
+                  "Wise woman",
+                  "Calm woman",
+                  "Fast-paced woman",
+                  "Calm young girl",
+                  "Expressive teen girl",
+                  "Calm teen girl",
+                  "Sweet girl",
+                  "Patient man",
+                  "Determined man",
+                  "Young elegant man",
+                  "Teen boy",
+                  "Friendly man",
+                  "Deep voice man"
+                ],
+                "example": "Serious woman",
+                "type": "string"
+              }
+            },
+            "required": [
+              "text",
+              "voice_preset_id"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requestBody"
+        ],
+        "type": "object"
+      },
+      "name": "createSpeechPreset"
+    },
+    {
+      "description": "List images you previously generated through the API, most recent first. This is a free read-only history lookup (no credits, no generation); it does not create anything. Pass an optional request_id query parameter to return only the results tagged with that id when you originally called createImage, editImage, generateWithStyle, generatePose, rotateSprite, or removeBackground. Requires an API key (user scope).",
+      "inputSchema": {
+        "properties": {
+          "request_id": {
+            "description": "Filter results by request_id",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "getImageResults"
+    },
+    {
+      "description": "List spritesheets you previously generated through the API, most recent first. This is a free read-only history lookup (no credits, no generation); it does not create anything. Pass an optional request_id query parameter to return only the results tagged with that id when you originally called animateSprite or transferMotion. Requires an API key (user scope).",
+      "inputSchema": {
+        "properties": {
+          "request_id": {
+            "description": "Filter results by request_id",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "getSpriteResults"
+    },
+    {
+      "description": "List videos you previously generated through the API, most recent first. This is a free read-only history lookup (no credits, no generation); it does not create anything. Pass an optional request_id query parameter to return only the results tagged with that id when you originally called createVideo. Requires an API key (user scope).",
+      "inputSchema": {
+        "properties": {
+          "request_id": {
+            "description": "Filter results by request_id",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "getVideoResults"
+    },
+    {
+      "description": "List audio clips you previously generated through the API, most recent first. This is a free read-only history lookup (no credits, no generation); it does not create anything. Pass an optional request_id query parameter to return only the results tagged with that id when you originally called createSoundEffect, createAmbiance, createMusic, createAudioTransform, createVoice, createSpeech, or createSpeechPreset. Requires an API key (user scope).",
+      "inputSchema": {
+        "properties": {
+          "request_id": {
+            "description": "Filter results by request_id",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "getAudioResults"
+    },
+    {
+      "description": "List 3D models you previously generated through the API, most recent first. This is a free read-only history lookup (no credits, no generation); it does not create anything. Pass an optional request_id query parameter to return only the results tagged with that id when you originally called create3DModel. Requires an API key (user scope).",
+      "inputSchema": {
+        "properties": {
+          "request_id": {
+            "description": "Filter results by request_id",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "get3DModelResults"
+    }
+  ],
+  "url": "https://mcp.ludo.ai/mcp"
+}

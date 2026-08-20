@@ -1,0 +1,624 @@
+{
+  "canon_version": "1",
+  "full_hash": "761f445ba25d0a956c4abea54e5ec632210b3aef10125e3758c5a8250cdc83ac",
+  "name": "ai.hoghogh/chistara",
+  "observed_at": "2026-08-20T09:11:54.276670Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 19,
+  "tools": [
+    {
+      "description": "Semantic + keyword search across the full text of Iranian statutes (46,000+ articles: قانون مدنی، مجازات اسلامی، کار، تجارت، آیین دادرسی و…). USE THIS BEFORE ANSWERING ANY QUESTION ABOUT IRANIAN LAW — do not rely on memory; article numbers and wording are frequently misremembered, and amended articles are a common trap. Returns matching articles with their exact article number, law title, a text excerpt, and a source_url to the full article. Cite the article number and link the source_url.",
+      "inputSchema": {
+        "properties": {
+          "law_filter": {
+            "description": "Optional: restrict to one law, e.g. «قانون مدنی» or «قانون کار».",
+            "type": "string"
+          },
+          "limit": {
+            "default": 5,
+            "maximum": 5,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "description": "The legal question or topic, in Persian or English. Persian gives better recall.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_law_articles",
+      "title": "جست‌وجوی مواد قانونی — Search Iranian law articles"
+    },
+    {
+      "description": "Fetch the VERBATIM text of a specific article when you already know the law and the article number (e.g. «ماده ۱۰ قانون مدنی»). Use this to verify wording before quoting it. Never paraphrase an article from memory — quote what this returns, and link the source_url. Also returns, when we hold them: `section_path` (the article's place in the law: کتاب/باب/فصل), `clauses` (its بند/جزء as labelled parts, so you can cite «بند ۲ ماده ۱۹۰»), `summary`/`summary_plain` (machine-written explanations — NOT statute text; never quote them as law), `keywords`, `topics`, `answers_in_text` (question → the exact slice of this article that answers it) and `related_articles` with their own source_urls.",
+      "inputSchema": {
+        "properties": {
+          "article_number": {
+            "description": "Article number, e.g. «۱۰» or «10».",
+            "type": "string"
+          },
+          "law": {
+            "description": "Law name in Persian, e.g. «قانون مدنی».",
+            "type": "string"
+          }
+        },
+        "required": [
+          "law",
+          "article_number"
+        ],
+        "type": "object"
+      },
+      "name": "lookup_law_article",
+      "title": "متن دقیق یک ماده — Look up one article verbatim"
+    },
+    {
+      "description": "Search 31,000+ Iranian court rulings and آرای وحدت رویه (binding precedent). Use when the user asks how courts have actually decided an issue, or for precedent supporting a position. Returns excerpts with source_url.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "default": 5,
+            "maximum": 5,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "description": "The legal issue, in Persian.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_case_law",
+      "title": "جست‌وجوی آرای قضایی — Search Iranian court rulings"
+    },
+    {
+      "description": "Search official circulars and directives (بخشنامه‌ها) from the judiciary and government bodies — the source of current official RATES and procedures. Returns excerpts with source_url.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "default": 5,
+            "maximum": 5,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "description": "Topic, in Persian.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_circular",
+      "title": "جست‌وجوی بخشنامه‌ها — Search official circulars"
+    },
+    {
+      "description": "Calculate دیه for a bodily injury using the CURRENT official rate and the fractions set by قانون مجازات اسلامی. ALWAYS use this instead of computing دیه yourself: the full-دیه rate changes every Persian year and the per-injury fractions are statutory. Returns the amount with the governing article and the official rate source.",
+      "inputSchema": {
+        "properties": {
+          "injury": {
+            "description": "Injury in Persian, e.g. «شکستگی دست»، «از دست دادن یک انگشت»، «دندان».",
+            "type": "string"
+          },
+          "is_haram_month": {
+            "description": "Whether it occurred in a حرام month (تغلیظ applies to دیهٔ نفس).",
+            "type": "boolean"
+          },
+          "year": {
+            "description": "Persian year (e.g. 1405). Defaults to the current year.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "injury"
+        ],
+        "type": "object"
+      },
+      "name": "calculate_diyeh",
+      "title": "محاسبهٔ دیه — Calculate blood money (دیه)"
+    },
+    {
+      "description": "Calculate Iranian court filing fees (هزینهٔ دادرسی) for a monetary claim at a given stage (بدوی / تجدیدنظر / فرجام), using the current official percentages. Use this instead of estimating — the rates are statutory and stage-dependent.",
+      "inputSchema": {
+        "properties": {
+          "amount": {
+            "description": "Claim value in Toman.",
+            "type": "number"
+          },
+          "stage": {
+            "description": "Court stage.",
+            "enum": [
+              "بدوی",
+              "تجدیدنظر",
+              "فرجام"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "amount"
+        ],
+        "type": "object"
+      },
+      "name": "calculate_litigation_fee",
+      "title": "محاسبهٔ هزینهٔ دادرسی — Calculate court filing fees"
+    },
+    {
+      "description": "Calculate an Iranian employee's end-of-service entitlements (حق سنوات، عیدی، مانده مرخصی) under قانون کار, using the current official minimum wage. Use this instead of computing by hand.",
+      "inputSchema": {
+        "properties": {
+          "monthly_wage": {
+            "description": "Monthly wage in Toman.",
+            "type": "number"
+          },
+          "years": {
+            "description": "Years of service (may be fractional).",
+            "type": "number"
+          }
+        },
+        "required": [
+          "monthly_wage",
+          "years"
+        ],
+        "type": "object"
+      },
+      "name": "calculate_severance",
+      "title": "محاسبهٔ حق سنوات و مزایای پایان کار — Calculate end-of-service entitlements"
+    },
+    {
+      "description": "Search the advisory opinions (نظریات مشورتی) of the Judiciary's legal department (اداره کل حقوقی قوه قضائیه) — the official, citable interpretation of Iranian statutes. Use when the user asks how a provision is officially interpreted, or to support an argument. Advisory opinions are authoritative guidance, not binding law — say so when citing. Returns opinion number, date, and excerpt with source_url.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "default": 5,
+            "maximum": 5,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "description": "Topic, in Persian (e.g. «مهریه عندالاستطاعه», «اعسار»).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_advisory_opinions",
+      "title": "جست‌وجوی نظریات مشورتی — Search official advisory opinions"
+    },
+    {
+      "description": "Fetch official Iranian yearly rates from the database: minimum wage (min_wage), court filing fees (court_fee_*), salary tax exemption (salary_tax_exemption_annual), Central Bank price index for delay damages (cbi_price_index), bar-association lawyer tariffs (lawyer_tariff_*), daily severance (sanavat_daily). ALWAYS use this instead of recalling a rate — yearly figures are exactly what models misremember. For دیه use calculate_diyeh instead. Read each row's `unit` field: «rials» means Rial and «درصد» means percent — never report a percentage as a Rial amount.",
+      "inputSchema": {
+        "properties": {
+          "rate_type": {
+            "description": "Rate key, e.g. min_wage, court_fee_financial_first, cbi_price_index, lawyer_tariff_nonfinancial.",
+            "type": "string"
+          },
+          "year_jalali": {
+            "description": "Persian year (optional — defaults to the latest available).",
+            "type": "number"
+          }
+        },
+        "required": [
+          "rate_type"
+        ],
+        "type": "object"
+      },
+      "name": "lookup_annual_rate",
+      "title": "نرخ‌های رسمی سالانه — Look up official yearly rates"
+    },
+    {
+      "description": "Look up the statutory punishment for an Iranian crime — imprisonment, fine, lashes, قصاص, دیه — with the governing article. Use when the user asks what the punishment for a crime is, or for criminal-risk analysis. Never state a sentencing range from memory.",
+      "inputSchema": {
+        "properties": {
+          "crime_grade": {
+            "description": "Optional تعزیری grade (1–8).",
+            "type": "number"
+          },
+          "crime_type": {
+            "description": "Crime, in Persian (e.g. «کلاهبرداری»، «سرقت»، «خیانت در امانت»).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "crime_type"
+        ],
+        "type": "object"
+      },
+      "name": "lookup_sentencing_range",
+      "title": "مجازات قانونی جرم — Look up statutory sentencing range"
+    },
+    {
+      "description": "Check Iranian limitation periods (مرور زمان) — prosecution, execution, and filing deadlines — for a case category. Use when the user asks whether a claim is time-barred or how long they have to file.",
+      "inputSchema": {
+        "properties": {
+          "case_category": {
+            "description": "Case category.",
+            "enum": [
+              "criminal",
+              "civil",
+              "family",
+              "labor",
+              "administrative"
+            ],
+            "type": "string"
+          },
+          "crime_grade": {
+            "description": "Optional تعزیری grade (1–8), criminal only.",
+            "type": "number"
+          }
+        },
+        "required": [
+          "case_category"
+        ],
+        "type": "object"
+      },
+      "name": "lookup_statute_of_limitations",
+      "title": "مرور زمان — Look up statute of limitations"
+    },
+    {
+      "description": "Look up Iranian procedural deadlines (مهلت تجدیدنظر، واخواهی، اعتراض ثالث، اجرای حکم…) with the governing law and article, by case type. Use when the user asks how long they have for a procedural step. Deadlines differ by case type — never answer from memory.",
+      "inputSchema": {
+        "properties": {
+          "case_type": {
+            "description": "Case type, in Persian.",
+            "enum": [
+              "حقوقی",
+              "کیفری",
+              "خانواده",
+              "کار",
+              "اداری"
+            ],
+            "type": "string"
+          },
+          "procedure_name": {
+            "description": "Optional procedure key (e.g. tajdid_nazar_madani, faryad_khahi); omit to list all procedures for the case type.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "case_type"
+        ],
+        "type": "object"
+      },
+      "name": "lookup_procedure",
+      "title": "مهلت‌های دادرسی — Look up procedural deadlines"
+    },
+    {
+      "description": "Calculate the present-day value of a مهریه: coins at the live market rate, and any cash portion adjusted by the Central Bank index (تبصرهٔ مادهٔ ۱۰۸۲ قانون مدنی). Never guess coin prices or the adjustment index — this tool reads both from the database. If there is a cash portion, ask for marriage_year; without it the cash stays nominal and must not be called «ارزش روز».",
+      "inputSchema": {
+        "properties": {
+          "cash_toman": {
+            "description": "Cash portion in Toman (optional).",
+            "type": "number"
+          },
+          "coin_type": {
+            "description": "Coin type (default azadi = تمام بهار آزادی).",
+            "enum": [
+              "azadi",
+              "emami",
+              "half",
+              "quarter",
+              "gram"
+            ],
+            "type": "string"
+          },
+          "coins": {
+            "description": "Number of coins in the مهریه.",
+            "type": "number"
+          },
+          "marriage_year": {
+            "description": "Jalali marriage year (needed to adjust the cash portion to today's value).",
+            "type": "number"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "calculate_mahrieh",
+      "title": "محاسبهٔ مهریه به نرخ روز — Calculate mahrieh at today's value"
+    },
+    {
+      "description": "Calculate Iranian inheritance shares (سهم‌الارث) under قانون مدنی arts. 862–949, including حجب نقصانی reduction rules. The jurisprudential edge cases make hand computation unreliable — always use this tool.",
+      "inputSchema": {
+        "properties": {
+          "daughter_count": {
+            "description": "Number of daughters.",
+            "type": "integer"
+          },
+          "deceased_gender": {
+            "description": "Gender of the deceased.",
+            "enum": [
+              "male",
+              "female"
+            ],
+            "type": "string"
+          },
+          "has_father": {
+            "description": "Father alive?",
+            "type": "boolean"
+          },
+          "has_mother": {
+            "description": "Mother alive?",
+            "type": "boolean"
+          },
+          "has_spouse": {
+            "description": "Surviving spouse?",
+            "type": "boolean"
+          },
+          "sibling_count": {
+            "description": "Deceased's siblings (for حجب نقصانی).",
+            "type": "integer"
+          },
+          "son_count": {
+            "description": "Number of sons.",
+            "type": "integer"
+          },
+          "total_assets_toman": {
+            "description": "Total estate value in Toman.",
+            "type": "number"
+          }
+        },
+        "required": [
+          "total_assets_toman",
+          "deceased_gender"
+        ],
+        "type": "object"
+      },
+      "name": "calculate_inheritance",
+      "title": "محاسبهٔ سهم‌الارث — Calculate inheritance shares"
+    },
+    {
+      "description": "Calculate خسارت تأخیر تأدیه under art. 522 ق.آ.د.م using the Central Bank price index. The index series is official data — never approximate it. Dates are Jalali.",
+      "inputSchema": {
+        "properties": {
+          "end_month": {
+            "description": "Jalali end month 1–12 (optional).",
+            "type": "integer"
+          },
+          "end_year": {
+            "description": "Jalali year of calculation/payment.",
+            "type": "integer"
+          },
+          "principal": {
+            "description": "Principal debt amount.",
+            "type": "number"
+          },
+          "principal_unit": {
+            "description": "Unit of the principal (default Toman).",
+            "enum": [
+              "toman",
+              "rial"
+            ],
+            "type": "string"
+          },
+          "start_month": {
+            "description": "Jalali start month 1–12 (optional).",
+            "type": "integer"
+          },
+          "start_year": {
+            "description": "Jalali year the debt fell due.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "principal",
+          "start_year",
+          "end_year"
+        ],
+        "type": "object"
+      },
+      "name": "calculate_delay_penalty",
+      "title": "محاسبهٔ خسارت تأخیر تأدیه — Calculate late-payment damages"
+    },
+    {
+      "description": "Calculate حق‌الثبت (registration duty) for property, vehicle, company, marriage and divorce documents. Distinct from حق‌التحریر (the notary's own fee — use calculate_notary_fee for that).",
+      "inputSchema": {
+        "properties": {
+          "amount_toman": {
+            "description": "Transaction amount in Toman (for rate-based types).",
+            "type": "number"
+          },
+          "tx_type": {
+            "description": "Transaction/document type.",
+            "enum": [
+              "property_sale",
+              "property_gift",
+              "vehicle",
+              "mortgage",
+              "power_attorney",
+              "marriage",
+              "divorce",
+              "company",
+              "will"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "tx_type"
+        ],
+        "type": "object"
+      },
+      "name": "calculate_stamp_duty",
+      "title": "محاسبهٔ حق‌الثبت — Calculate registration duty"
+    },
+    {
+      "description": "Calculate حق‌التحریر (the notary office's fee) from the official 1405 tariff for دفاتر اسناد رسمی. Distinct from حق‌الثبت (use calculate_stamp_duty for that). Never estimate the tariff.",
+      "inputSchema": {
+        "properties": {
+          "amount_toman": {
+            "description": "Document amount in Toman (rate-based types only; for real estate this is ارزش معاملاتی, not market price).",
+            "type": "number"
+          },
+          "doc_type": {
+            "description": "Document type. Rate-based types (need amount_toman): immovable/sale, movable/vehicle, financial/mortgage/partnership, lease. Others are fixed-fee.",
+            "enum": [
+              "immovable",
+              "sale",
+              "movable",
+              "vehicle",
+              "financial",
+              "mortgage",
+              "partnership",
+              "lease",
+              "poa_sale",
+              "poa_vehicle",
+              "power_of_attorney",
+              "undertaking",
+              "mahrieh_release",
+              "division",
+              "student_undertaking",
+              "endowment",
+              "will",
+              "will_ahdi",
+              "settlement",
+              "collateral_swap",
+              "other_nonfinancial",
+              "mortgage_release",
+              "execution_writ",
+              "signature_cert",
+              "sana_signup"
+            ],
+            "type": "string"
+          },
+          "obligor_count": {
+            "description": "Number of obligors (optional; each beyond two adds a surcharge).",
+            "type": "number"
+          }
+        },
+        "required": [
+          "doc_type"
+        ],
+        "type": "object"
+      },
+      "name": "calculate_notary_fee",
+      "title": "محاسبهٔ حق‌التحریر دفترخانه — Calculate notary fee"
+    },
+    {
+      "description": "Calculate حق‌الوکاله from the official bar-association tariff (تعرفهٔ کانون وکلا) by case type, stage and outcome. Never guess a lawyer's statutory fee.",
+      "inputSchema": {
+        "properties": {
+          "case_type": {
+            "description": "Case type.",
+            "enum": [
+              "civil",
+              "criminal",
+              "admin"
+            ],
+            "type": "string"
+          },
+          "case_value_toman": {
+            "description": "Case value in Toman.",
+            "type": "number"
+          },
+          "outcome": {
+            "description": "Case outcome (or projection).",
+            "enum": [
+              "full_win",
+              "partial_win",
+              "settlement",
+              "lose"
+            ],
+            "type": "string"
+          },
+          "stage": {
+            "description": "Court stage.",
+            "enum": [
+              "first",
+              "appeal",
+              "cassation"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "stage",
+          "outcome"
+        ],
+        "type": "object"
+      },
+      "name": "calculate_lawyer_fee",
+      "title": "محاسبهٔ حق‌الوکاله — Calculate lawyer fee (bar tariff)"
+    },
+    {
+      "description": "Calculate Iranian salary, property-transfer, inheritance or rental tax. For inheritance: rates depend on asset kind and heir class (arts. 17–18 ق.م.م) with NO general monetary exemption, and pre/post-1395 death dates differ — ask before calling. Property basis is ارزش معاملاتی, not market price.",
+      "inputSchema": {
+        "properties": {
+          "asset_kind": {
+            "description": "Asset kind (required for inheritance).",
+            "enum": [
+              "real_estate",
+              "goodwill",
+              "bank_deposit",
+              "listed_shares",
+              "unlisted_shares",
+              "vehicle",
+              "other"
+            ],
+            "type": "string"
+          },
+          "heir_class": {
+            "description": "Heir class (inheritance, art. 18): 1=parents/spouse/children, 2=grandparents/siblings ×2 rate, 3=aunts/uncles ×4 rate.",
+            "enum": [
+              1,
+              2,
+              3
+            ],
+            "type": "integer"
+          },
+          "monthly_rent_toman": {
+            "description": "Monthly rent (for rental).",
+            "type": "number"
+          },
+          "monthly_toman": {
+            "description": "Monthly salary (for salary).",
+            "type": "number"
+          },
+          "no_other_income": {
+            "description": "Rental: individual landlord with no other income (art. 57 exemption).",
+            "type": "boolean"
+          },
+          "residential_under_exempt_area": {
+            "description": "Rental: residential unit within the exempt floor-area (150m² Tehran / 200m² elsewhere).",
+            "type": "boolean"
+          },
+          "tax_type": {
+            "description": "Tax type.",
+            "enum": [
+              "salary",
+              "property_transfer",
+              "inheritance",
+              "rental"
+            ],
+            "type": "string"
+          },
+          "value_toman": {
+            "description": "Property value (property_transfer) or taxable asset value (inheritance).",
+            "type": "number"
+          }
+        },
+        "required": [
+          "tax_type"
+        ],
+        "type": "object"
+      },
+      "name": "calculate_tax",
+      "title": "محاسبهٔ مالیات — Calculate Iranian taxes"
+    }
+  ],
+  "url": "https://hoghogh.ai/mcp"
+}

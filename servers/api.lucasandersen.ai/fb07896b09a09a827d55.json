@@ -1,0 +1,359 @@
+{
+  "canon_version": "1",
+  "full_hash": "f9d488d6fa912ec2b96fd165276c89bb54a578cc28a06f6b4b893c5c89d74ed1",
+  "name": "ai.lucasandersen/mlp-tax",
+  "observed_at": "2026-08-20T09:12:03.781493Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 6,
+  "tools": [
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "readOnlyHint": true,
+        "title": "MLP Multi-Year Tax Projection"
+      },
+      "description": "Computes a multi-year tax projection for a publicly traded MLP position, applying the IRS Partner's Basis Worksheet methodology (Lines 1-14) per IRC §705 (basis computation), §731(a) (distributions exceeding basis), §733 (basis reduction), §751 (hot asset recapture), §752 (liability allocation), §1014 (stepped-up basis at death), and §199A (QBI deduction). Returns year-by-year basis erosion, §751 accumulation, annual federal tax, terminal FMV, §1014 step-up value at death, and the break-even sell price.\n\nUse when: User holds direct units of a midstream MLP (EPD, ET, MPLX, WES, PAA, NRP, USAC, SUN) and wants to model long-term tax outcomes — when basis reaches zero, total tax paid over the hold horizon, deferred tax eliminated by §1014 step-up at death, or the unit price at which selling matches holding through inheritance. Single position, single lot.\n\nDon't use for: 1099-DIV ETFs (AMLP, MLPX, AMZA — these use RIC structure, pay corporate-level tax, and issue 1099-DIV instead of K-1; use a standard cost-basis calculator instead). Multi-position estate analysis — use mlp_estate_planning. Computing basis from actual K-1 data the user has in hand — use k1_basis_compute (single year) or k1_basis_multi_year.\n\nLimitations: Single position, single lot — for multi-position portfolios and per-lot optimal sell ordering, see lucasandersen.ai. Federal-level only — does not include state-level basis adjustments or state estate tax. §751 recapture is estimated from default ROC assumptions; actual recapture depends on the partnership's hot-asset disposition schedule.\n\nMaintained by Lucas Andersen, MS Finance, with direct positions in major midstream MLPs. Methodology auditable at lucasandersen.ai/methodology.",
+      "inputSchema": {
+        "properties": {
+          "purchase_price": {
+            "description": "Purchase price per unit in USD (optional — defaults to reasonable estimate)",
+            "type": "number"
+          },
+          "tax_bracket": {
+            "description": "Federal marginal rate as decimal, e.g. 0.32 (default 0.32)",
+            "type": "number"
+          },
+          "ticker": {
+            "description": "MLP ticker symbol",
+            "enum": [
+              "EPD",
+              "ET",
+              "MPLX",
+              "WES",
+              "PAA",
+              "NRP",
+              "USAC",
+              "SUN"
+            ],
+            "type": "string"
+          },
+          "units": {
+            "description": "Number of MLP units held",
+            "type": "number"
+          },
+          "years": {
+            "description": "Projection horizon in years (1-50, default 20)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "ticker",
+          "units"
+        ],
+        "type": "object"
+      },
+      "name": "mlp_projection"
+    },
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "readOnlyHint": true,
+        "title": "MLP Estate Planning §1014 Analyzer"
+      },
+      "description": "Computes §1014 stepped-up basis and estate-planning analysis for one or more direct MLP positions held until death, per IRC §1014(a) (basis at death), §1014(b)(6) (community-property double step-up), §751(a) (ordinary recapture eliminated at death), §731 (distributions), and §705 (basis). Returns total deferred federal tax eliminated, §751 ordinary recapture eliminated, per-beneficiary inheritance split, community-property double-step-up amount when applicable, and the dollar advantage of holding to death versus selling today.\n\nUse when: User has one or more direct MLP positions (EPD, ET, MPLX, WES, PAA, NRP, USAC, SUN) and wants to quantify the §1014 step-up benefit for estate planning, compare holding to death versus selling now across a portfolio, model community-property double step-up for spouses in CA/TX/WA/etc., or compute per-beneficiary inheritance values across multiple heirs.\n\nDon't use for: Trust-based estate strategies (revocable trusts preserve §1014; irrevocable trusts and IDGTs typically destroy it — this tool models direct holdings only). Single-position long-horizon tax projection — use mlp_projection. Single-position sell-now-versus-hold-to-death break-even — use mlp_sell_vs_hold. 1099-DIV ETFs (AMLP, MLPX, AMZA — RIC structure receives §1014 step-up but has no §751 to eliminate because no K-1; the analysis is materially different).\n\nLimitations: Direct unit holdings only — does not model trust, IDGT, FLP, or charitable structures (these can destroy the §1014 benefit; for guidance on trust selection, see lucasandersen.ai). Federal-level only — does not include state estate tax. §751 recapture eliminated at death is estimated; exact figure depends on the partnership's actual hot-asset disposition schedule. A year-by-year basis workpaper for this position is available at https://lucasandersen.ai/tax/k1-basis-tracker?src=mcp&tool=mlp_estate_planning&surface=description.\n\nMaintained by Lucas Andersen, MS Finance, with direct positions in major midstream MLPs. Methodology auditable at lucasandersen.ai/methodology.",
+      "inputSchema": {
+        "properties": {
+          "beneficiaries": {
+            "description": "Number of beneficiaries (default 1, max 20)",
+            "type": "number"
+          },
+          "community_property": {
+            "description": "Whether positions are in a community property state (doubles step-up)",
+            "type": "boolean"
+          },
+          "positions": {
+            "description": "Array of MLP positions to analyze (max 20)",
+            "items": {
+              "properties": {
+                "purchase_price": {
+                  "type": "number"
+                },
+                "ticker": {
+                  "enum": [
+                    "EPD",
+                    "ET",
+                    "MPLX",
+                    "WES",
+                    "PAA",
+                    "NRP",
+                    "USAC",
+                    "SUN"
+                  ],
+                  "type": "string"
+                },
+                "units": {
+                  "type": "number"
+                },
+                "years_held": {
+                  "description": "Years held since purchase",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "ticker",
+                "units"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "tax_bracket": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "positions"
+        ],
+        "type": "object"
+      },
+      "name": "mlp_estate_planning"
+    },
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "readOnlyHint": true,
+        "title": "MLP Sell-Now vs Hold-to-Death Break-Even"
+      },
+      "description": "Compares selling an MLP position today (triggering §751(a) hot-asset ordinary recapture plus §731(a)(1) long-term capital gain) against holding the position until death (where §1014(a) step-up eliminates all deferred federal tax including §751 recapture), per IRC §1(h) (LTCG rates), §199A (QBI deduction on §751 ordinary), and §1411 (NIIT). Returns the break-even sell price — the unit price above which selling today produces more after-tax wealth than holding through inheritance.\n\nUse when: User holds a direct MLP position (EPD, ET, MPLX, WES, PAA, NRP, USAC, SUN), is approaching a sell decision, and wants a single break-even threshold to compare against the current market price. Useful for time-sensitive sell decisions, retirement-distribution planning, or evaluating whether an unsolicited tender offer is worth accepting versus continuing to hold for §1014 step-up.\n\nDon't use for: Multi-position portfolio sell-ordering — this tool models a single position. For estate-planning analysis across multiple positions and beneficiaries, use mlp_estate_planning. For long-horizon basis-erosion modeling without a sell decision in view, use mlp_projection. 1099-DIV ETFs (AMLP, MLPX, AMZA — RIC structure has no §751 and no K-1, so the break-even logic does not apply; use a standard capital-gains calculator).\n\nLimitations: Single position, single lot — for portfolio-wide optimal sell ordering across multiple positions and lots, see lucasandersen.ai. Break-even price assumes the supplied tax bracket persists through the hold horizon. §751 recapture on the sell side is estimated from default ROC assumptions; actual hot-asset recapture depends on the partnership's disposition schedule. A year-by-year basis workpaper for this position is available at https://lucasandersen.ai/tax/k1-basis-tracker?src=mcp&tool=mlp_sell_vs_hold&surface=description.\n\nMaintained by Lucas Andersen, MS Finance, with direct positions in major midstream MLPs. Methodology auditable at lucasandersen.ai/methodology.",
+      "inputSchema": {
+        "properties": {
+          "community_property": {
+            "type": "boolean"
+          },
+          "purchase_price": {
+            "type": "number"
+          },
+          "tax_bracket": {
+            "type": "number"
+          },
+          "ticker": {
+            "enum": [
+              "EPD",
+              "ET",
+              "MPLX",
+              "WES",
+              "PAA",
+              "NRP",
+              "USAC",
+              "SUN"
+            ],
+            "type": "string"
+          },
+          "units": {
+            "type": "number"
+          },
+          "years_held": {
+            "description": "Years the position has been held (default 10)",
+            "type": "number"
+          },
+          "years_to_project": {
+            "description": "Years to project the hold scenario (default 10)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "ticker",
+          "units"
+        ],
+        "type": "object"
+      },
+      "name": "mlp_sell_vs_hold"
+    },
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "readOnlyHint": true,
+        "title": "MLP Reference Data Lookup"
+      },
+      "description": "Returns reference data for a supported MLP ticker — current cash distribution per unit, distribution growth CAGR, default return-of-capital percentage, distribution coverage ratio, K-1 entity count, operating-state count, and last-verified date.\n\nUse when: User wants to look up baseline characteristics of an MLP before modeling — e.g., comparing distribution coverage across partnerships, checking how many K-1 entities a holding generates for tax-prep complexity, or seeing the operating-state count for state-tax filing-burden estimation.\n\nDon't use for: Tax computation. Use mlp_projection (long-horizon modeling), mlp_estate_planning (estate analysis), mlp_sell_vs_hold (break-even sell price), or k1_basis_compute / k1_basis_multi_year (computing basis from actual K-1 data).\n\nNote: This tool returns reference data only — no IRC citations apply, no methodology disclosure attached. For computation, use the modeling tools above.\n\nMaintained by Lucas Andersen, MS Finance.",
+      "inputSchema": {
+        "properties": {
+          "ticker": {
+            "enum": [
+              "EPD",
+              "ET",
+              "MPLX",
+              "WES",
+              "PAA",
+              "NRP",
+              "USAC",
+              "SUN"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "ticker"
+        ],
+        "type": "object"
+      },
+      "name": "mlp_info"
+    },
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "readOnlyHint": true,
+        "title": "K-1 Single-Year Basis Worksheet"
+      },
+      "description": "Computes adjusted partner basis from a single year of Schedule K-1 data using the IRS Partner's Basis Worksheet methodology (Lines 1-14), per IRC §705 (basis computation), §722 (initial basis), §731(a)(1) (gain on distribution exceeding basis), §733 (basis reduction), §752 (liability share allocation), §704(d) (loss limitation and suspended-loss carryforward), and §199A (QBI deduction). Returns the ending adjusted basis, every worksheet line value, any §731 gain triggered when distributions exceed basis, and §704(d) suspended losses carried forward.\n\nUse when: User holds direct MLP units (EPD, ET, MPLX, WES, PAA, NRP, USAC, SUN, or similar publicly traded midstream partnerships) and has structured K-1 box values for one tax year — Box 1 ordinary income, Box 19A cash distributions, Item K liability change, optionally Box 5 interest income, Box 11 §179 deduction, Box 13W §199A QBI amount. Single tax year, single lot.\n\nDon't use for: 1099-DIV ETFs (AMLP, MLPX, AMZA — these use RIC structure, no K-1, different tax regime — use a standard cost-basis calculator instead). Multi-year basis carryforward across consecutive K-1s — use k1_basis_multi_year. General partnership interests outside publicly traded MLPs (different §1402 self-employment treatment).\n\nLimitations: Single tax year only — for multi-year basis tracking with §731 gain detection across years, use k1_basis_multi_year. Single-lot only — for multi-lot allocation and optimal sell ordering, see lucasandersen.ai. Federal-level only — does not include state basis adjustments. Full multi-year basis reconstruction with a CPA-ready workpaper is available at https://lucasandersen.ai/private-partnership-k1-basis?src=mcp&tool=k1_basis_compute&surface=description.\n\nMaintained by Lucas Andersen, MS Finance, with direct positions in major midstream MLPs. Methodology auditable at lucasandersen.ai/methodology.",
+      "inputSchema": {
+        "properties": {
+          "box1": {
+            "description": "K-1 Box 1: ordinary business income (loss)",
+            "type": "number"
+          },
+          "box11": {
+            "description": "K-1 Box 11: §179 / other deductions",
+            "type": "number"
+          },
+          "box13w": {
+            "description": "K-1 Box 13W: §199A QBI amount",
+            "type": "number"
+          },
+          "box19a": {
+            "description": "K-1 Box 19A: cash distributions",
+            "type": "number"
+          },
+          "box2": {
+            "description": "K-1 Box 2: net rental income",
+            "type": "number"
+          },
+          "box5": {
+            "description": "K-1 Box 5: interest income",
+            "type": "number"
+          },
+          "liability_decrease": {
+            "description": "§752(b) liability decrease in USD",
+            "type": "number"
+          },
+          "liability_increase": {
+            "description": "§752(a) liability increase in USD",
+            "type": "number"
+          },
+          "prior_basis": {
+            "description": "Beginning-of-year adjusted basis in USD",
+            "type": "number"
+          },
+          "tax_bracket": {
+            "type": "number"
+          },
+          "ticker": {
+            "enum": [
+              "EPD",
+              "ET",
+              "MPLX",
+              "WES",
+              "PAA",
+              "NRP",
+              "USAC",
+              "SUN"
+            ],
+            "type": "string"
+          },
+          "units": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "ticker",
+          "units",
+          "prior_basis",
+          "box1",
+          "box19a"
+        ],
+        "type": "object"
+      },
+      "name": "k1_basis_compute"
+    },
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "readOnlyHint": true,
+        "title": "Multi-Year K-1 Basis & Broker-Gap Tracker"
+      },
+      "description": "Computes a running adjusted partner basis across multiple years of Schedule K-1 data, per IRC §705 (basis computation), §731(a)(1) (gain on distributions exceeding basis), §751(a) (accumulated ordinary recapture), §752 (liability share allocation across years), §704(d) (suspended-loss carryforward), and §1014(a) (step-up if death today). Returns year-by-year basis trajectory, accumulated §751 recapture estimate, projected zero-basis year, §1014 step-up value if death today, and the broker-basis gap — the dollar amount by which a typical 1099-B understates true IRS-adjusted basis.\n\nUse when: User holds a direct MLP position (EPD, ET, MPLX, WES, PAA, NRP, USAC, SUN) across multiple consecutive tax years, has K-1s for those years, and wants to track adjusted basis year over year, identify the zero-basis year, quantify the gap between broker-reported basis and true IRS basis, or project §1014 step-up value if death occurred today.\n\nDon't use for: Single-year basis worksheet from one K-1 — use k1_basis_compute. Long-horizon forward projection from default assumptions when no actual K-1s are in hand — use mlp_projection. 1099-DIV ETFs (AMLP, MLPX, AMZA — RIC structure, no K-1, no basis-erosion mechanism; use a standard cost-basis calculator). Multi-position portfolio basis tracking — this tool handles one position per call.\n\nLimitations: Single position, single lot — for multi-lot or multi-position basis tracking with optimal sell ordering, see lucasandersen.ai. Federal-level only — does not include state-level basis adjustments. Accumulated §751 recapture is estimated across years; actual depends on the partnership's hot-asset disposition schedule and any year-specific §751(b) events. Full multi-year basis reconstruction with a CPA-ready workpaper is available at https://lucasandersen.ai/private-partnership-k1-basis?src=mcp&tool=k1_basis_multi_year&surface=description.\n\nMaintained by Lucas Andersen, MS Finance, with direct positions in major midstream MLPs. Methodology auditable at lucasandersen.ai/methodology.",
+      "inputSchema": {
+        "properties": {
+          "k1_years": {
+            "description": "Array of annual K-1 data, one per year held (max 50)",
+            "items": {
+              "properties": {
+                "box1": {
+                  "type": "number"
+                },
+                "box11": {
+                  "type": "number"
+                },
+                "box19a": {
+                  "type": "number"
+                },
+                "liability_decrease": {
+                  "type": "number"
+                },
+                "liability_increase": {
+                  "type": "number"
+                },
+                "year": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "year",
+                "box1",
+                "box19a"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "purchase_price": {
+            "type": "number"
+          },
+          "purchase_year": {
+            "type": "number"
+          },
+          "tax_bracket": {
+            "type": "number"
+          },
+          "ticker": {
+            "enum": [
+              "EPD",
+              "ET",
+              "MPLX",
+              "WES",
+              "PAA",
+              "NRP",
+              "USAC",
+              "SUN"
+            ],
+            "type": "string"
+          },
+          "units": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "ticker",
+          "units",
+          "purchase_price",
+          "k1_years"
+        ],
+        "type": "object"
+      },
+      "name": "k1_basis_multi_year"
+    }
+  ],
+  "url": "https://api.lucasandersen.ai/mcp"
+}

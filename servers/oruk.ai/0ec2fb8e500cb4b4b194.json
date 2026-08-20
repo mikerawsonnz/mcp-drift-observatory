@@ -1,0 +1,245 @@
+{
+  "canon_version": "1",
+  "full_hash": "d9de487d7e2da13958b330fd2d6fe27e3efacd83ed5f97c1ac236e2db50326d8",
+  "name": "ai.oruk/speech",
+  "observed_at": "2026-08-20T09:12:22.562128Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 7,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Analyze speech (transcript + tone)"
+      },
+      "description": "Transcribe English audio AND score how it was said in one call: transcript, tagged transcript, calibrated emotion (15 labels) and speaking-style (16 labels) scores, and time-local segments. Use this when the user cares about both the words and the delivery — meetings, support calls, interviews, voice notes. Accepts a public audio URL or base64 bytes (wav/flac/mp3/m4a/ogg/webm, ≤30 MB / ≤60 min). Returns compact summaries by default. For words only use oruk_transcribe_audio; for tone only use oruk_analyze_tone.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "api_key": {
+            "description": "Only for temporary keys from oruk_create_trial_key. Permanent keys belong in your MCP client config as an \"Authorization: Bearer <key>\" header, never in tool arguments.",
+            "maxLength": 200,
+            "type": "string"
+          },
+          "audio_base64": {
+            "description": "Base64-encoded audio bytes for local files (up to 8 MB decoded). Prefer audio_url for anything larger.",
+            "maxLength": 11500000,
+            "type": "string"
+          },
+          "audio_url": {
+            "description": "Publicly fetchable audio file URL (wav, flac, mp3, m4a, ogg, webm; up to 30 MB / 60 minutes of English speech).",
+            "format": "uri",
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "detail": {
+            "description": "compact (default) returns top label scores and condensed segments; full adds every label score and word-level timings.",
+            "enum": [
+              "compact",
+              "full"
+            ],
+            "type": "string"
+          },
+          "filename": {
+            "description": "Original filename including extension (e.g. call.wav). Helps decoding when audio_base64 is used.",
+            "maxLength": 160,
+            "type": "string"
+          },
+          "model": {
+            "description": "oruk-resonance (default for transcription/analysis, highest accuracy) or oruk-spectra-1 (default for tone, most efficient).",
+            "enum": [
+              "oruk-spectra-1",
+              "oruk-resonance"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "oruk_analyze_speech",
+      "title": "Analyze speech (transcript + tone)"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Transcribe audio"
+      },
+      "description": "Transcribe prerecorded English audio to text with time-ordered segments and word timings. Use this when only the words matter. Accepts a public audio URL or base64 bytes (wav/flac/mp3/m4a/ogg/webm, ≤30 MB / ≤60 min). Does not score emotion or tone — use oruk_analyze_speech for transcript + tone together, or oruk_analyze_tone for tone alone.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "api_key": {
+            "description": "Only for temporary keys from oruk_create_trial_key. Permanent keys belong in your MCP client config as an \"Authorization: Bearer <key>\" header, never in tool arguments.",
+            "maxLength": 200,
+            "type": "string"
+          },
+          "audio_base64": {
+            "description": "Base64-encoded audio bytes for local files (up to 8 MB decoded). Prefer audio_url for anything larger.",
+            "maxLength": 11500000,
+            "type": "string"
+          },
+          "audio_url": {
+            "description": "Publicly fetchable audio file URL (wav, flac, mp3, m4a, ogg, webm; up to 30 MB / 60 minutes of English speech).",
+            "format": "uri",
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "detail": {
+            "description": "compact (default) returns top label scores and condensed segments; full adds every label score and word-level timings.",
+            "enum": [
+              "compact",
+              "full"
+            ],
+            "type": "string"
+          },
+          "filename": {
+            "description": "Original filename including extension (e.g. call.wav). Helps decoding when audio_base64 is used.",
+            "maxLength": 160,
+            "type": "string"
+          },
+          "model": {
+            "description": "oruk-resonance (default for transcription/analysis, highest accuracy) or oruk-spectra-1 (default for tone, most efficient).",
+            "enum": [
+              "oruk-spectra-1",
+              "oruk-resonance"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "oruk_transcribe_audio",
+      "title": "Transcribe audio"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Analyze vocal tone and emotion"
+      },
+      "description": "Score how speech sounds without transcribing it: calibrated multilabel emotion (happy, frustrated, worried, …) and speaking-style (sarcastic, confident, hesitant, warm, …) predictions per acoustic segment. Use this when the user asks about mood, delivery, sentiment, sarcasm, or emotional dynamics in audio. Accepts a public audio URL or base64 bytes (≤30 MB / ≤60 min, English). Outputs are calibrated acoustic annotations of delivery, not claims about inner state. Need the words too? Use oruk_analyze_speech.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "api_key": {
+            "description": "Only for temporary keys from oruk_create_trial_key. Permanent keys belong in your MCP client config as an \"Authorization: Bearer <key>\" header, never in tool arguments.",
+            "maxLength": 200,
+            "type": "string"
+          },
+          "audio_base64": {
+            "description": "Base64-encoded audio bytes for local files (up to 8 MB decoded). Prefer audio_url for anything larger.",
+            "maxLength": 11500000,
+            "type": "string"
+          },
+          "audio_url": {
+            "description": "Publicly fetchable audio file URL (wav, flac, mp3, m4a, ogg, webm; up to 30 MB / 60 minutes of English speech).",
+            "format": "uri",
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "detail": {
+            "description": "compact (default) returns top label scores and condensed segments; full adds every label score and word-level timings.",
+            "enum": [
+              "compact",
+              "full"
+            ],
+            "type": "string"
+          },
+          "filename": {
+            "description": "Original filename including extension (e.g. call.wav). Helps decoding when audio_base64 is used.",
+            "maxLength": 160,
+            "type": "string"
+          },
+          "model": {
+            "description": "oruk-resonance (default for transcription/analysis, highest accuracy) or oruk-spectra-1 (default for tone, most efficient).",
+            "enum": [
+              "oruk-spectra-1",
+              "oruk-resonance"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "oruk_analyze_tone",
+      "title": "Analyze vocal tone and emotion"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Check API key, credits, and usage"
+      },
+      "description": "Verify that an oruk API key works and report the organization’s plan, remaining credit balance, and recent API usage. Use this as the first call after setup (\"check my oruk credits\"), or when a billing/auth error needs diagnosing. Requires a key: the Authorization header from your MCP config, or a trial key passed as api_key.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "api_key": {
+            "description": "Only for temporary keys from oruk_create_trial_key. Permanent keys belong in the Authorization header of your MCP client config.",
+            "maxLength": 200,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "oruk_check_credits",
+      "title": "Check API key, credits, and usage"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Create a free trial API key"
+      },
+      "description": "Mint a real, temporary oruk API key with no account required: 3 requests, expires in 30 minutes, spends from a capped shared budget. Use this when no Authorization header is configured and the user wants to try transcription or tone analysis right now. Pass the returned key as the api_key argument of the audio tools. Share the signup link with the user so they can keep using oruk afterwards ($50 trial credit).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "oruk_create_trial_key",
+      "title": "Create a free trial API key"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "List models, pricing, and labels"
+      },
+      "description": "List oruk’s speech models with lifecycle and per-task pricing (USD per audio minute), the five API tasks, the 15 emotion and 16 speaking-style labels, and audio limits. No API key required. Use this to choose a model, estimate cost before analyzing long audio, or see which labels exist.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "oruk_list_models",
+      "title": "List models, pricing, and labels"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get started with oruk"
+      },
+      "description": "Quickstart for the oruk Speech API and this MCP server: how to get an API key, per-client MCP configuration snippets, SDK install commands, and an optional routing rule the user can add to their agent instructions. No API key required. Use this when setting oruk up for the first time or when the user asks how oruk works.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "oruk_get_started",
+      "title": "Get started with oruk"
+    }
+  ],
+  "url": "https://oruk.ai/mcp"
+}

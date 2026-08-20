@@ -1,0 +1,1216 @@
+{
+  "canon_version": "1",
+  "full_hash": "c16af6191e5581894fcea399739c9916d038d8f9f427e632970adb589bed5a21",
+  "name": "ai.flowcastle/flowcastle",
+  "observed_at": "2026-08-20T09:11:48.883285Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 28,
+  "tools": [
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List applications"
+      },
+      "description": "List the applications this API key can access, with the caller role and the permissions it grants. Start here when using a personal API key (usr_...): every other tool needs an explicit applicationId, which this tool supplies. Read-only, takes no arguments. Returns an array of { id, name, role, permissions }; an empty array means the key is valid but belongs to no application yet.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_applications"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Create application"
+      },
+      "description": "Create a new application (workspace) owned by the caller. Requires a personal API key (usr_...) — application-scoped keys cannot create applications. Seeds default flows unless skipDefaultFlows is true. Creates persistent state and is NOT idempotent: calling it twice creates two applications. Returns the new application id, which you then pass as applicationId to the other tools.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "description": "Display name for the new application. Defaults to a localized \"My First Application\" when omitted or blank.",
+            "type": "string"
+          },
+          "preferredLanguage": {
+            "description": "Language for the seeded default flows and the default name. Only \"en\", \"ru\", and \"es\" are supported — any other value silently falls back to \"en\".",
+            "type": "string"
+          },
+          "skipDefaultFlows": {
+            "description": "Set true to create an empty application with no seeded starter flows. Defaults to false.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "name": "create_application"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Update application settings"
+      },
+      "description": "Update application-level settings (name, active state, default language, incoming-message behavior). Requires the manage_settings permission in that application. Only the fields you pass are changed; omitted fields keep their current value, so the call is idempotent. Returns the updated application.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          },
+          "defaultLanguage": {
+            "description": "Default language for new flows. Only \"en\", \"ru\", and \"es\" are supported; any other value falls back to \"en\".",
+            "type": "string"
+          },
+          "incomingMessageBehavior": {
+            "description": "What happens to an inbound message that matches no trigger: LIVE_CHAT routes it to a human operator, EXECUTE_FLOW runs the flow named by incomingMessageFlowId.",
+            "enum": [
+              "LIVE_CHAT",
+              "EXECUTE_FLOW"
+            ],
+            "type": "string"
+          },
+          "incomingMessageFlowId": {
+            "description": "Flow to run for unmatched inbound messages. Required in practice when incomingMessageBehavior is EXECUTE_FLOW.",
+            "type": "string"
+          },
+          "isActive": {
+            "description": "Set false to deactivate the application — its bots stop responding. Omit to leave unchanged.",
+            "type": "boolean"
+          },
+          "name": {
+            "description": "New display name. Omit to leave unchanged.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "update_application"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List watched groups"
+      },
+      "description": "List the group/channel chats a telegram_mtproto userbot monitors. Read-only. The watched list is the single source of truth for which chats the userbot processes: messages from unlisted group/channel chats are dropped (fail closed) and their contacts never materialize; DMs always pass. botId may be omitted when the application has exactly one userbot.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          },
+          "botId": {
+            "description": "The telegram_mtproto bot. Omit when the application has exactly one userbot.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_watched_groups"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Set watched groups"
+      },
+      "description": "Replace a telegram_mtproto userbot's watched-groups list — the chats it monitors. Requires the manage_settings permission. SET semantics: send the COMPLETE desired list every time (call list_watched_groups first and include existing entries you want to keep — omitting one removes it). Each entry needs a chatId (e.g. \"-100…\", for chats the account has joined) or a public username/t.me link; mode \"joined\" (default) processes a chat the account is in, \"public_peek\" (max 10, needs a username) polls a public chat without joining. The running userbot picks the change up within a few minutes, no restart. An empty list means \"watch every joined chat\" — NOT \"watch nothing\".",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          },
+          "botId": {
+            "description": "The telegram_mtproto bot. Omit when the application has exactly one userbot.",
+            "type": "string"
+          },
+          "groups": {
+            "description": "The complete replacement list. Empty array = watch every joined chat.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "chatId": {
+                  "description": "Marked chat id (e.g. \"-1004441063705\") of a chat the account is in. Supply this or username.",
+                  "type": "string"
+                },
+                "mode": {
+                  "description": "\"joined\" (default) = passive updates for a chat the account is in; \"public_peek\" = poll a public chat without joining (max 10).",
+                  "enum": [
+                    "joined",
+                    "public_peek"
+                  ],
+                  "type": "string"
+                },
+                "title": {
+                  "description": "Optional display label shown in the dashboard panel.",
+                  "type": "string"
+                },
+                "username": {
+                  "description": "Public @username or t.me link. Required for public_peek entries.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "maxItems": 100,
+            "type": "array"
+          }
+        },
+        "required": [
+          "groups"
+        ],
+        "type": "object"
+      },
+      "name": "set_watched_groups"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Import userbot chats as contacts"
+      },
+      "description": "Import a telegram_mtproto userbot's existing chats as contacts — DM partners, groups, and channels — so everything the account already talks to becomes a valid send_message target without waiting for each chat to message first. Requires the manage_broadcasts permission. Reads the account's dialog list live (the userbot must be connected; large accounts can take up to a minute) and creates missing contacts; existing contacts are untouched, so the call is idempotent. Pass kinds to narrow the import (e.g. [\"group\",\"channel\"] to leave personal DMs out). Does NOT change the watched-groups list. botId may be omitted when the application has exactly one userbot.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          },
+          "botId": {
+            "description": "The telegram_mtproto bot. Omit when the application has exactly one userbot.",
+            "type": "string"
+          },
+          "kinds": {
+            "description": "Dialog kinds to import. Defaults to all three (\"user\" = the account's direct-message partners).",
+            "items": {
+              "enum": [
+                "group",
+                "channel",
+                "user"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "limit": {
+            "description": "How many most-recent dialogs to read from the account. Defaults to 1000.",
+            "maximum": 5000,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "sync_dialog_contacts"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get workspace summary"
+      },
+      "description": "Return a compact application, flow, sequence, operation, and bot summary — the cheapest way to orient in a workspace. Read-only, no side effects. Deliberately omits variables and full flow graphs: use get_variable_context for variables, get_flow_context for a flow's topology, and get_application_context when you need flows, bots, and variables together.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          },
+          "flowId": {
+            "description": "Narrow the summary to one flow. Omit to summarize every flow in the application.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_workspace_summary"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Search variables"
+      },
+      "description": "Search variable definitions by scope and keyword. Read-only. Returns { variables, total, returned, truncated } — compare returned against total to detect a cut-off result set and re-call with a higher limit. Values are withheld unless includeValues is true; variables marked secret stay redacted either way. Use the returned ids in `{{var|<id>}}` references.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          },
+          "includeValues": {
+            "description": "Set true to include stored values, each previewed to 500 characters. Defaults to false — leave it off unless you need the data, since values may hold personal data. Secret variables remain redacted regardless.",
+            "type": "boolean"
+          },
+          "limit": {
+            "description": "Maximum variables to return. Defaults to 30; values above 50 are clamped to 50.",
+            "maximum": 50,
+            "minimum": 1,
+            "type": "number"
+          },
+          "query": {
+            "description": "Case-insensitive substring filter matched against the variable name, full path, description, type, and scope. Omit to list without filtering.",
+            "type": "string"
+          },
+          "scope": {
+            "description": "Restrict to one variable scope. Defaults to \"all\".",
+            "enum": [
+              "all",
+              "application",
+              "bot",
+              "contact"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_variable_context"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get application context"
+      },
+      "description": "Return the full application-level automation context in one read-only call: every flow (with folders), connected bots, variables, sequences, and operations. This is the broad orientation call — prefer get_workspace_summary when you only need names and counts, since this response grows with workspace size. Operation graphs are hidden flows and appear only in the operations list, never in flows.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_application_context"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List modules"
+      },
+      "description": "Return a compact index of both installed and available marketplace modules, with each module's key, versions, description, actions, and triggers. Read-only. Start here when you need a capability the core action kinds do not cover; then call get_module_details for the exact input fields of one module, and install_module to add it. Returns a summary only — action input fields and setup requirements come from get_module_details.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_module_catalog"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get module details"
+      },
+      "description": "Return everything needed to use one module: action input fields and their types, trigger configuration, manual setup fields (credentials an operator must fill in the dashboard), and references to already-installed actions. Read-only. Call get_module_catalog first to obtain moduleKey, and call this again after install_module to read the installed action references you need when drafting actions. An unknown moduleKey does not raise — the response carries an `error` string plus `availableModules` listing valid keys and versions.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          },
+          "moduleKey": {
+            "description": "Required. The module's stable key exactly as returned by get_module_catalog (not its display name).",
+            "type": "string"
+          },
+          "moduleVersion": {
+            "description": "Pin a specific version. Omit to resolve the installed version when the module is installed, falling back to the marketplace entry for that key.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "moduleKey"
+        ],
+        "type": "object"
+      },
+      "name": "get_module_details"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Install module"
+      },
+      "description": "Install an exact marketplace module version into an application and create any missing installed-template actions. Requires the manage_automation permission. Call get_module_catalog first to select the module and version, then get_module_details after installation to inspect setup requirements and installed action references. Safe to re-run: installing a version that is already installed only fills in missing template actions rather than duplicating them. Modules with manual setup fields still need an operator to enter credentials in the dashboard before their actions will run.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          },
+          "moduleKey": {
+            "description": "Required. The module's stable key from get_module_catalog.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "moduleVersion": {
+            "description": "Required — the exact version string to install, as listed by get_module_catalog. There is no implicit \"latest\"; pick a concrete version.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "moduleKey",
+          "moduleVersion"
+        ],
+        "type": "object"
+      },
+      "name": "install_module"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get flow topology"
+      },
+      "description": "Return one flow's graph topology: its blocks, how they link, and a short summary per block. Read-only. Deliberately omits block data and action configs to stay cheap — once you know which block matters, call get_block_details for its full contents. This is the normal first step before editing an existing flow.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          },
+          "flowId": {
+            "description": "Required. Flow id, as returned by get_workspace_summary or get_application_context.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "flowId"
+        ],
+        "type": "object"
+      },
+      "name": "get_flow_context"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get block details"
+      },
+      "description": "Return the complete contents of one block: block data, action configs, HTTP request bodies, custom-code files, triggers, menu payloads, and media paths. Read-only. This is the heaviest read in the API — call get_flow_context first to find the block you need rather than walking a flow block by block. Always read a block before updating it, since update_block replaces the fields you send.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          },
+          "blockId": {
+            "description": "Required. Block id, as listed by get_flow_context for that flow.",
+            "type": "string"
+          },
+          "flowId": {
+            "description": "Required. Id of the flow that owns the block.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "flowId",
+          "blockId"
+        ],
+        "type": "object"
+      },
+      "name": "get_block_details"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get action schema"
+      },
+      "description": "Return the action-authoring contract: every supported action kind with its required fields, the placeholder ids for referencing entities created earlier in the same batch, the `{{var|...}}` / `{{sysvar|...}}` / `{{out|...}}` reference syntax, and the creatable block types. Read-only, takes no arguments, and needs no API key. Read this before drafting any apply_actions batch — it is the schema those actions are validated against.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_action_schema"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get flow design guidelines"
+      },
+      "description": "Return the flow-design rules that validation does NOT enforce: when to split a branch into its own flow, how navigation and menus must be wired, and worked examples. Read-only, takes no arguments, and needs no API key. Read this before any structural edit (new blocks, new branches, new flows) — a batch can pass validate_actions and still be badly structured, and these rules are what catch that.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_design_guidelines"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Search flow examples"
+      },
+      "description": "Search the library of reusable flow examples covering common business cases (lead capture, onboarding, payments, reminders). Read-only, needs no API key. Returns compact matches — id, title, summary, tags — with no flow body; pass an id to get_flow_example for the full example. Calling it with no arguments returns the top examples, and a query matching nothing returns an empty list rather than an error.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "description": "Maximum examples to return, between 1 and 8. Values outside that range are rejected.",
+            "maximum": 8,
+            "minimum": 1,
+            "type": "number"
+          },
+          "query": {
+            "description": "Free-text keyword matched against example titles, summaries, and tags. Omit to browse without filtering.",
+            "type": "string"
+          },
+          "tags": {
+            "description": "Array of tag strings to filter by, e.g. [\"payments\",\"onboarding\"]. Combined with query when both are given.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "name": "search_flow_examples"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get flow example"
+      },
+      "description": "Return one reusable flow example by id, optionally with a complete action batch you can adapt and pass to apply_actions. Read-only, needs no API key. Call search_flow_examples first to find the id.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Required. Example id exactly as returned by search_flow_examples.",
+            "type": "string"
+          },
+          "includeSchemaExample": {
+            "description": "Set true to include the full action-batch example — much larger, but it is the part you adapt for apply_actions. Defaults to false.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_flow_example"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Validate action batch (dry run)"
+      },
+      "description": "Dry-run validation of a proposed batch of flow-builder actions. Mutates nothing and is safe to repeat. OPTIONAL: apply_actions runs this exact validation itself and applies nothing when invalid, so calling validate_actions first is redundant — use it only to check a draft you do not intend to apply yet. Returns the same errors and warnings apply_actions would report. Note that passing validation does not mean the design is sound; structural rules live in get_design_guidelines.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "actions": {
+            "description": "Ordered batch of at least one action, applied in array order. An invalid batch is rejected up front and applies nothing, but execution itself is NOT atomic: if an action fails mid-batch, execution stops there and the actions before it stay applied — re-read state before retrying.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "action": {
+                  "description": "The action kind to perform. Call get_action_schema for the required fields of each kind.",
+                  "enum": [
+                    "create_variable",
+                    "create_block",
+                    "update_block",
+                    "create_link",
+                    "create_flow",
+                    "update_flow",
+                    "create_broadcast",
+                    "create_recurrence_schedule",
+                    "attach_recurrence_to_broadcast",
+                    "update_broadcast",
+                    "create_sequence",
+                    "update_sequence",
+                    "create_folder",
+                    "move_flow_to_folder",
+                    "create_operation",
+                    "run_operation",
+                    "delete_block",
+                    "delete_link",
+                    "delete_flow",
+                    "delete_variable",
+                    "create_media_from_url",
+                    "create_knowledge_base",
+                    "create_knowledge_base_text_document"
+                  ],
+                  "type": "string"
+                },
+                "data": {
+                  "additionalProperties": {},
+                  "description": "Action payload. Shape depends on `action` — get_action_schema returns the required and optional fields per kind.",
+                  "type": "object"
+                },
+                "target": {
+                  "description": "Id of the entity the action operates on (block, flow, variable, broadcast, ...). To reference an entity created earlier in the same batch, use its placeholder id — flow_1, block_1, var_1, broadcast_1, schedule_1, button_1, media_1, operation_1. get_action_schema lists the full placeholder set.",
+                  "type": "string"
+                },
+                "validation": {
+                  "description": "Optional assertions to check before applying, as returned by get_action_schema.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "action",
+                "data"
+              ],
+              "type": "object"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          },
+          "conversationId": {
+            "description": "Optional id used to group the resulting audit records under one editing session.",
+            "type": "string"
+          },
+          "flowId": {
+            "description": "Default flow id for actions in the batch that do not carry their own. Optional when every action targets an explicit flow.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "actions"
+        ],
+        "type": "object"
+      },
+      "name": "validate_actions"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Apply action batch"
+      },
+      "description": "Validate and apply a batch of flow-builder actions — the single write path for editing flows, blocks, variables, broadcasts, sequences, and folders. Call this directly; a separate validate_actions call beforehand is unnecessary. Broadcasts have no dedicated tool and are managed here: create_broadcast makes a DRAFT (it owns its flow via data.flowId — add the message blocks in the same batch, no separate create_flow), optionally with create_recurrence_schedule + attach_recurrence_to_broadcast for recurring; a later update_broadcast with status SCHEDULED (and scheduledAt for one-shots) is what actually schedules/sends it. The full recipe is in get_action_schema under `broadcasts`. DESTRUCTIVE: the batch may include delete_block, delete_link, delete_flow, and delete_variable. Confirm with the user before applying deletions. IRREVERSIBLE SIDE EFFECTS: run_operation starts a real operation run, which may send broadcasts to real contacts and write application variables. It cannot be undone or recalled, is not idempotent, and is available only through this tool — confirm with the user before applying a batch containing one, and never blindly retry a timed-out call that did. Validation always runs first and an invalid batch applies nothing. Execution is NOT atomic, however: if an action fails mid-batch, the actions before it stay applied and execution stops — re-read state with get_flow_context before retrying rather than blindly resending the batch. Not idempotent — resending a batch of create_* actions creates duplicates. Read get_action_schema for the action contract and get_design_guidelines before any structural edit. Returns { success, changes, errors, warnings, actionId } plus an idRemap mapping placeholder ids to the real ids that were created.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "actions": {
+            "description": "Ordered batch of at least one action, applied in array order. An invalid batch is rejected up front and applies nothing, but execution itself is NOT atomic: if an action fails mid-batch, execution stops there and the actions before it stay applied — re-read state before retrying.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "action": {
+                  "description": "The action kind to perform. Call get_action_schema for the required fields of each kind.",
+                  "enum": [
+                    "create_variable",
+                    "create_block",
+                    "update_block",
+                    "create_link",
+                    "create_flow",
+                    "update_flow",
+                    "create_broadcast",
+                    "create_recurrence_schedule",
+                    "attach_recurrence_to_broadcast",
+                    "update_broadcast",
+                    "create_sequence",
+                    "update_sequence",
+                    "create_folder",
+                    "move_flow_to_folder",
+                    "create_operation",
+                    "run_operation",
+                    "delete_block",
+                    "delete_link",
+                    "delete_flow",
+                    "delete_variable",
+                    "create_media_from_url",
+                    "create_knowledge_base",
+                    "create_knowledge_base_text_document"
+                  ],
+                  "type": "string"
+                },
+                "data": {
+                  "additionalProperties": {},
+                  "description": "Action payload. Shape depends on `action` — get_action_schema returns the required and optional fields per kind.",
+                  "type": "object"
+                },
+                "target": {
+                  "description": "Id of the entity the action operates on (block, flow, variable, broadcast, ...). To reference an entity created earlier in the same batch, use its placeholder id — flow_1, block_1, var_1, broadcast_1, schedule_1, button_1, media_1, operation_1. get_action_schema lists the full placeholder set.",
+                  "type": "string"
+                },
+                "validation": {
+                  "description": "Optional assertions to check before applying, as returned by get_action_schema.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "action",
+                "data"
+              ],
+              "type": "object"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          },
+          "conversationId": {
+            "description": "Optional id used to group the resulting audit records under one editing session.",
+            "type": "string"
+          },
+          "flowId": {
+            "description": "Default flow id for actions in the batch that do not carry their own. Optional when every action targets an explicit flow.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "actions"
+        ],
+        "type": "object"
+      },
+      "name": "apply_actions"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Send message to one contact"
+      },
+      "description": "Send a message to ONE contact right now, outside any flow. For reaching many contacts use a broadcast instead. Target the contact with contactId (globally unique — preferred), or with platformId (the platform-side id, e.g. the Telegram user id). platformId is NOT globally unique: it is unique only per bot, so the same Telegram user talking to two of your bots is two contacts sharing one platformId. Pass botId alongside it whenever the application has more than one bot; without botId the call succeeds only if exactly one contact in the application matches, and otherwise fails listing the candidate bots. `{{var|name}}` placeholders in the text resolve against that contact's variable context. Requires the manage_broadcasts permission. Media: pass up to 10 attachments as publicly reachable http(s) URLs; the text becomes the caption (max 1024 characters) and may be empty. Several attachments send as one album. The kind is inferred from the URL's file extension — override with type when the URL has none. Not supported for SDK bots. Delivery is asynchronous: a successful response means the bot accepted the send, not that the platform delivered it (a broken media URL surfaces in the flow logs, not here). Unsubscribed contacts are rejected. NOT idempotent and not reversible — each call sends another message to a real person, and a sent message cannot be recalled. Confirm the recipient and text with the user before calling, and never retry a timed-out call blindly.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          },
+          "botId": {
+            "description": "Bot to send from. Required in practice when targeting by platformId in a multi-bot application; without it the call succeeds only if exactly one contact matches, and otherwise fails listing the candidate bots.",
+            "type": "string"
+          },
+          "contactId": {
+            "description": "Preferred way to target the recipient: the globally unique FlowCastle contact id. Supply either this or platformId.",
+            "type": "string"
+          },
+          "media": {
+            "description": "Up to 10 attachments. Several items send as one album with `text` as the shared caption.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "filename": {
+                  "description": "Filename shown for DOCUMENT sends. Defaults to the URL's basename.",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "Attachment kind. Inferred from the URL's file extension when omitted; unrecognized extensions fall back to DOCUMENT.",
+                  "enum": [
+                    "IMAGE",
+                    "IMAGE_URL",
+                    "VIDEO",
+                    "VIDEO_NOTE",
+                    "DOCUMENT",
+                    "VOICE",
+                    "STICKER"
+                  ],
+                  "type": "string"
+                },
+                "url": {
+                  "description": "Required. Publicly reachable http(s) URL of the file; the platform downloads it from there.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "url"
+              ],
+              "type": "object"
+            },
+            "maxItems": 10,
+            "type": "array"
+          },
+          "platformId": {
+            "description": "Platform-side user id (e.g. the Telegram user id). NOT globally unique — unique only per bot — so pass botId alongside it when the application has more than one bot.",
+            "type": "string"
+          },
+          "text": {
+            "description": "Message body. Required unless media is passed; with media it becomes the caption (max 1024 characters) and may be omitted. `{{var|name}}` placeholders resolve against the recipient's variable context.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "send_message"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List contacts"
+      },
+      "description": "List and search contacts in the application, paginated, newest first. Read-only. Filters combine as AND; search matches name, username, email, phone, and platformId. Returns compact contact summaries without variable values — use get_contact for one contact's variables. Remember platformId is unique only per bot, so the same person talking to two bots appears as two contacts.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          },
+          "botId": {
+            "description": "Only contacts belonging to this bot. Omit for all bots in the application.",
+            "type": "string"
+          },
+          "isActive": {
+            "description": "True for active contacts only, false for deactivated only. Omit for both.",
+            "type": "boolean"
+          },
+          "limit": {
+            "description": "Contacts per page, between 1 and 100. Defaults to 20.",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "number"
+          },
+          "page": {
+            "description": "1-based page number. Defaults to 1.",
+            "minimum": 1,
+            "type": "number"
+          },
+          "search": {
+            "description": "Case-insensitive substring matched against first/last name, username, email, phone, and platformId. Omit to list without searching.",
+            "type": "string"
+          },
+          "status": {
+            "description": "Only contacts with this subscription status (\"subscribed\" or \"unsubscribed\"). Omit for both.",
+            "enum": [
+              "subscribed",
+              "unsubscribed"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_contacts"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get contact details"
+      },
+      "description": "Return one contact's full profile plus every contact-variable value stored for them. Read-only. Values may hold personal data; variables of type SECRET are always redacted. Call list_contacts first to find the contactId.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          },
+          "contactId": {
+            "description": "Required. Contact id, as returned by list_contacts or send_message.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "contactId"
+        ],
+        "type": "object"
+      },
+      "name": "get_contact"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Create contact"
+      },
+      "description": "Create a contact manually — for imports or externally-sourced audiences; contacts who message a bot are created automatically. Requires the manage_broadcasts permission. platformId must be unique within the bot (duplicate fails with 409); botId may be omitted only when the application has exactly one bot. The variables map takes variable NAMES (or full folder paths when a name is ambiguous) — not ids — and unknown names fail with 422. NOT idempotent: retrying a success creates nothing new only because the duplicate platformId is rejected.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          },
+          "botId": {
+            "description": "Bot the contact belongs to. Optional only when the application has exactly one bot; otherwise the call fails listing the candidate bots.",
+            "type": "string"
+          },
+          "email": {
+            "description": "Email address.",
+            "type": "string"
+          },
+          "firstName": {
+            "description": "First name.",
+            "type": "string"
+          },
+          "lastName": {
+            "description": "Last name.",
+            "type": "string"
+          },
+          "phone": {
+            "description": "Phone number.",
+            "type": "string"
+          },
+          "platformId": {
+            "description": "Required. Platform-side user id (e.g. the Telegram user id). Must be unique within the bot.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "status": {
+            "description": "Initial subscription status. Defaults to \"subscribed\".",
+            "enum": [
+              "subscribed",
+              "unsubscribed"
+            ],
+            "type": "string"
+          },
+          "username": {
+            "description": "Platform username, without @.",
+            "type": "string"
+          },
+          "variables": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Contact variable values to set, as { \"variableName\": \"value\" }. Keys are variable NAMES or full folder paths (not ids); an unknown or ambiguous name fails the whole call before the contact is created.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "platformId"
+        ],
+        "type": "object"
+      },
+      "name": "create_contact"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Update contact"
+      },
+      "description": "Update a contact's profile fields and/or contact-variable values. Requires the manage_broadcasts permission. Only the fields you pass are changed — omitted fields keep their current value — so the call is idempotent. The variables map takes variable NAMES (or full folder paths when a name is ambiguous), not ids; an unknown name fails with 422 before anything is written. Variable writes propagate to the live bot immediately (the runtime's cached values are invalidated). Setting status to \"unsubscribed\" stops broadcasts and sequences for the contact.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          },
+          "contactId": {
+            "description": "Required. Contact id, as returned by list_contacts.",
+            "type": "string"
+          },
+          "email": {
+            "description": "New email. Omit to leave unchanged; empty string clears it.",
+            "type": "string"
+          },
+          "firstName": {
+            "description": "New first name. Omit to leave unchanged; empty string clears it.",
+            "type": "string"
+          },
+          "lastName": {
+            "description": "New last name. Omit to leave unchanged; empty string clears it.",
+            "type": "string"
+          },
+          "phone": {
+            "description": "New phone. Omit to leave unchanged; empty string clears it.",
+            "type": "string"
+          },
+          "status": {
+            "description": "New subscription status (\"subscribed\" or \"unsubscribed\"). Omit to leave unchanged.",
+            "enum": [
+              "subscribed",
+              "unsubscribed"
+            ],
+            "type": "string"
+          },
+          "username": {
+            "description": "New platform username. Omit to leave unchanged; empty string clears it.",
+            "type": "string"
+          },
+          "variables": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Contact variable values to set, as { \"variableName\": \"value\" }. Keys are variable NAMES or full folder paths (not ids). Only the listed variables change.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "contactId"
+        ],
+        "type": "object"
+      },
+      "name": "update_contact"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List broadcasts"
+      },
+      "description": "List broadcasts in the application with status, schedule, and delivery counts. Read-only. Filters combine as AND. Note that delivery counts report messages attempted, not confirmed deliveries. Use get_broadcast_details for one broadcast's full breakdown. To CREATE or SEND a broadcast use apply_actions: create_broadcast makes a draft, update_broadcast (status SCHEDULED) schedules/sends it — see get_action_schema under `broadcasts`.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          },
+          "botId": {
+            "description": "Only broadcasts belonging to this bot. Omit for all bots in the application.",
+            "type": "string"
+          },
+          "isRecurring": {
+            "description": "True for recurring broadcasts only, false for one-off only. Omit for both.",
+            "type": "boolean"
+          },
+          "limit": {
+            "description": "Broadcasts per page, between 1 and 100.",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "number"
+          },
+          "page": {
+            "description": "1-based page number. Defaults to 1.",
+            "minimum": 1,
+            "type": "number"
+          },
+          "status": {
+            "description": "Only broadcasts in this lifecycle state. Omit for all states.",
+            "enum": [
+              "DRAFT",
+              "SCHEDULED",
+              "QUEUED",
+              "SENDING",
+              "SENT",
+              "PAUSED",
+              "CANCELLED"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_broadcasts"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get broadcast details"
+      },
+      "description": "Return full details for a single broadcast: status, schedule, recurrence rule, linked flow, and delivery breakdown by status. Read-only. Call list_broadcasts first to find the broadcastId. For per-message-block engagement stats use get_broadcast_analytics instead.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          },
+          "broadcastId": {
+            "description": "Required. Broadcast id, as returned by list_broadcasts.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "broadcastId"
+        ],
+        "type": "object"
+      },
+      "name": "get_broadcast_details"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get broadcast analytics"
+      },
+      "description": "Return engagement analytics for a broadcast: delivery breakdown by status plus per-message-block sent and clicked counts for its flow, over an optional date window. Read-only. Sent counts reflect messages attempted, not confirmed deliveries.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "applicationId": {
+            "description": "Application (workspace) id. Optional: an application-scoped key (app_...) defaults to its own application, but a personal key (usr_...) has no default and omitting it fails with MCP_APPLICATION_REQUIRED. Call list_applications to get the id.",
+            "type": "string"
+          },
+          "broadcastId": {
+            "description": "Required. Broadcast id, as returned by list_broadcasts.",
+            "type": "string"
+          },
+          "endDate": {
+            "description": "End of the reporting window, same format as startDate. Defaults to now.",
+            "type": "string"
+          },
+          "startDate": {
+            "description": "Start of the reporting window, as a date string parsable by Date (ISO 8601 such as \"2026-07-01\" or \"2026-07-01T00:00:00Z\" is safest). Defaults to the broadcast's creation time.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "broadcastId"
+        ],
+        "type": "object"
+      },
+      "name": "get_broadcast_analytics"
+    }
+  ],
+  "url": "https://api.flowcastle.ai/api/mcp"
+}

@@ -1,0 +1,1833 @@
+{
+  "canon_version": "1",
+  "full_hash": "e97ad2358ecc9194beebb6dc341b84cc65de4e22a094929131a7d0f87ca25efd",
+  "name": "ai.lumify/sports-intelligence",
+  "observed_at": "2026-08-20T09:12:04.615155Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 18,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "List supported sports with their leagues and current season. Returns each sport's id, slug, name, team-sport flag, and its leagues (each with its current_season). Use list_seasons with current_only=false for historical seasons.",
+      "inputSchema": {
+        "properties": {
+          "active_only": {
+            "default": true,
+            "description": "When true (default), omit sports with no active coverage.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_sports",
+      "outputSchema": {
+        "properties": {
+          "sports": {
+            "items": {
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "is_team_sport": {
+                  "type": "boolean"
+                },
+                "leagues": {
+                  "items": {
+                    "properties": {
+                      "current_season": {
+                        "type": [
+                          "object",
+                          "null"
+                        ]
+                      },
+                      "id": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "slug": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "slug": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "List events (schedules and live scores), paginated by id (after_id). Filter by sport, league, status, date range, season, or team_id (resolve teams via list_teams / get_team). Returns event id, name, sport/league, start time, status, and venue for each; pass include_scores to also inline participants + scores (intended for small result sets — use get_event for one event's full detail, or query_events for free-text/natural-language filters instead of structured params).",
+      "inputSchema": {
+        "properties": {
+          "after_id": {
+            "description": "Cursor: return events with id > after_id (from the previous page's next_after_id).",
+            "type": "integer"
+          },
+          "date": {
+            "description": "UTC date YYYY-MM-DD (single day).",
+            "type": "string"
+          },
+          "from": {
+            "description": "UTC start date YYYY-MM-DD.",
+            "type": "string"
+          },
+          "has_recommend": {
+            "description": "When true, only events with at least one recommended bet.",
+            "type": "boolean"
+          },
+          "include_scores": {
+            "default": false,
+            "description": "Inline participants + scores in each event (intended for small result sets).",
+            "type": "boolean"
+          },
+          "league": {
+            "description": "League slug, e.g. nfl, atp, fifa_world_cup.",
+            "type": "string"
+          },
+          "limit": {
+            "default": 25,
+            "description": "Max events to return per page.",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "season_id": {
+            "description": "Filter by season ID (from list_seasons).",
+            "type": "integer"
+          },
+          "sort": {
+            "default": "time",
+            "description": "Sort order. sort=status is incompatible with after_id.",
+            "enum": [
+              "time",
+              "status"
+            ],
+            "type": "string"
+          },
+          "sport": {
+            "description": "Sport slug, e.g. mlb, nfl, tennis, soccer.",
+            "type": "string"
+          },
+          "status": {
+            "description": "Filter to events in this status.",
+            "enum": [
+              "scheduled",
+              "inprogress",
+              "final",
+              "postponed",
+              "cancelled",
+              "suspended",
+              "delayed",
+              "walkover"
+            ],
+            "type": "string"
+          },
+          "team_id": {
+            "description": "Filter to events where this team participates. Resolve ids via list_teams.",
+            "type": "integer"
+          },
+          "to": {
+            "description": "UTC end date YYYY-MM-DD (inclusive).",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_events",
+      "outputSchema": {
+        "$defs": {
+          "EventSummary": {
+            "properties": {
+              "clock": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "type": "integer"
+              },
+              "league": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "period": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "season_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "sport": {
+                "type": "string"
+              },
+              "starts_at": {
+                "description": "ISO-8601 UTC start time.",
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "venue": {
+                "type": [
+                  "object",
+                  "null"
+                ]
+              }
+            },
+            "type": "object"
+          }
+        },
+        "properties": {
+          "events": {
+            "items": {
+              "$ref": "#/$defs/EventSummary"
+            },
+            "type": "array"
+          },
+          "next_after_id": {
+            "description": "Pass as after_id to fetch the next page; null on the last page.",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Get a single event with participants and venue. Optionally inline current odds and/or bet intelligence (+1 credit each, only charged when that data is actually available). Raises a not-found error if event_id doesn't exist. Use list_events / query_events to discover ids first, or batch_get_events to fetch several ids in one call.",
+      "inputSchema": {
+        "properties": {
+          "bookmaker": {
+            "description": "Bookmaker for inlined odds and intelligence market prices. Defaults to pinnacle. Valid: pinnacle, fanduel, draftkings, betmgm, caesars, bet365, circa, hardrock, betonline, all.",
+            "type": "string"
+          },
+          "event_id": {
+            "description": "Event id, from list_events, query_events, or search results.",
+            "type": "integer"
+          },
+          "include_intelligence": {
+            "default": false,
+            "description": "Inline bet intelligence (+1 credit when available).",
+            "type": "boolean"
+          },
+          "include_odds": {
+            "default": false,
+            "description": "Inline current odds scoped by bookmaker (default: pinnacle). +1 credit for a single book when available; +2 for bookmaker=all or a comma-separated list.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "event_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_event",
+      "outputSchema": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "league": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "participants": {
+            "items": {
+              "properties": {
+                "is_winner": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "participant_id": {
+                  "type": "integer"
+                },
+                "player": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "role": {
+                  "type": "string"
+                },
+                "score": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "team": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "sport": {
+            "type": "string"
+          },
+          "starts_at": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "venue": {
+            "type": [
+              "object",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Get multiple events by id in one call — for agents that already have a list of ids and want full detail for each without one call per event. Max 25 ids. Returns full detail for every id that exists plus a not_found list for any that don't (never billed). Use get_event for a single id, or list_events / query_events to discover ids first.",
+      "inputSchema": {
+        "properties": {
+          "bookmaker": {
+            "description": "Bookmaker for inlined odds and intelligence market prices. Defaults to pinnacle. Valid: pinnacle, fanduel, draftkings, betmgm, caesars, bet365, circa, hardrock, betonline, all.",
+            "type": "string"
+          },
+          "event_ids": {
+            "description": "Event ids to fetch (max 25); duplicates are billed once.",
+            "items": {
+              "type": "integer"
+            },
+            "maxItems": 25,
+            "type": "array"
+          },
+          "include_intelligence": {
+            "default": false,
+            "description": "Inline bet intelligence on each event (+1 credit per event when available).",
+            "type": "boolean"
+          },
+          "include_odds": {
+            "default": false,
+            "description": "Inline current odds scoped by bookmaker (default: pinnacle). +1 credit per event for a single book when available; +2 for bookmaker=all or a comma-separated list.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "event_ids"
+        ],
+        "type": "object"
+      },
+      "name": "batch_get_events",
+      "outputSchema": {
+        "properties": {
+          "events": {
+            "description": "Full event detail (same shape as get_event) for every found id.",
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "not_found": {
+            "description": "Requested event_ids that don't exist. Never billed.",
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Search events with a natural-language query instead of structured filters — e.g. 'live nfl games today' or 'college basketball this week'. Rule-based (not an LLM): recognizes sport (nfl/nba/mlb/nhl/tennis/soccer/ncaaf/ncaab + aliases like hockey, american football, college basketball), status (live/final/upcoming/…), dates (today/tomorrow, this week, next N days, YYYY-MM-DD ranges). Bare 'football' is ambiguous and left unrecognized. Response includes interpreted filters, equivalent REST call, and unrecognized_terms. Prefer list_events when you already know the structured filters you want.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "Overrides any limit parsed from the query text. Max 100.",
+            "type": "integer"
+          },
+          "query": {
+            "description": "Free text, e.g. 'live nfl games today'.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "query_events",
+      "outputSchema": {
+        "properties": {
+          "equivalent_request": {
+            "description": "The literal GET /v1/events request this query was translated to.",
+            "type": "string"
+          },
+          "events": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "interpreted": {
+            "description": "The list_events-equivalent filters parsed from the query text (sport, status, date, from, to, limit).",
+            "type": "object"
+          },
+          "next_after_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "query": {
+            "description": "The original natural-language query text.",
+            "type": "string"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "unrecognized_terms": {
+            "description": "Query words that didn't map to a known filter.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Get a lightweight live score snapshot for an event: status, period, clock, per-participant score and period-by-period scores, and last-updated time. Cheaper and faster than get_event when you only need the score, not participants or venue. Raises a not-found error if event_id doesn't exist.",
+      "inputSchema": {
+        "properties": {
+          "event_id": {
+            "description": "Event id, from list_events, query_events, or search results.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "event_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_live_score",
+      "outputSchema": {
+        "properties": {
+          "clock": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "event_id": {
+            "type": "integer"
+          },
+          "finished": {
+            "type": "boolean"
+          },
+          "period": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "scores": {
+            "items": {
+              "properties": {
+                "abbreviation": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "is_winner": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "period_scores": {
+                  "items": {
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "role": {
+                  "type": "string"
+                },
+                "score": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "status": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Get current betting odds for an event: per-bookmaker lines and last-updated time. bookmaker defaults to pinnacle (1 credit). Use 'all' or a comma-separated list for multiple books (2 credits). Default is main lines (is_main=true); set include_alts for alternate spread/total rungs. Final events include result (won/lost/push/void) graded from the stored score. MLB, tennis, and migrated soccer mains also include fair_price and consensus mirrored from published assessments. Returns available:false with no charge if odds aren't posted for this event yet. Use get_odds_history for line movement over time.",
+      "inputSchema": {
+        "properties": {
+          "bookmaker": {
+            "description": "Bookmaker slug. Defaults to pinnacle. Valid: pinnacle, fanduel, draftkings, betmgm, caesars, bet365, circa, hardrock, betonline, all, or a comma-separated list.",
+            "type": "string"
+          },
+          "event_id": {
+            "description": "Event id, from list_events, query_events, or search results.",
+            "type": "integer"
+          },
+          "include_alts": {
+            "description": "Include alternate spread/total rungs. Default false (mains only).",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "event_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_odds",
+      "outputSchema": {
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "bookmakers": {
+            "description": "Per-book markets. Outcomes include is_main; final events add result (won/lost/push/void) and close on graded points.",
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "event_id": {
+            "type": "integer"
+          },
+          "last_updated": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Get line-movement history for an event: a list of past odds snapshots (movements), each with its own timestamp, up to limit entries. bookmaker defaults to pinnacle. Use get_odds instead if you only need the current line.",
+      "inputSchema": {
+        "properties": {
+          "bookmaker": {
+            "description": "Bookmaker slug. Defaults to pinnacle. Valid: pinnacle, fanduel, draftkings, betmgm, caesars, bet365, circa, hardrock, betonline, all, or a comma-separated list.",
+            "type": "string"
+          },
+          "event_id": {
+            "description": "Event id, from list_events, query_events, or search results.",
+            "type": "integer"
+          },
+          "limit": {
+            "default": 50,
+            "description": "Max line-movement entries to return. Default 50.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "event_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_odds_history",
+      "outputSchema": {
+        "properties": {
+          "event_id": {
+            "type": "integer"
+          },
+          "movements": {
+            "description": "Odds snapshots over time; each entry carries its own timestamp.",
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Get raw, deterministic team/player and match statistics for a soccer, MLB, tennis, NFL, NCAAF, NBA, NCAAB, or NHL event — no market/odds data (use get_odds for that) and no scoring, weighting, confidence, or narrative attached; use get_intelligence for Lumify's judgment layer. The payload shape is sport-specific — soccer/MLB/NFL/NCAAF/NBA/NCAAB/NHL use teams.home/away; tennis uses players.player_1/player_2 + match.scoreboard; never share field names across sports. Soccer: team strength (league-table PPG or FIFA rank), recent form, head-to-head history, rest days, home/away splits, and boxscore rates (shots/SoT for & against, possession, corners, cards, saves/save rate, plus Phase 1C offsides/tackles/interceptions/blocked_shots/assists — team assists is summed from ESPN's per-player goalAssists, since ESPN has no team-level assists stat) over explicit windows rates_l5/rates_season. Shot location is not on ESPN's team box — not exposed. MLB: season-to-date W/L record + run differential, recent form (runs scored/allowed), H2H, rest days, team batting/pitching rates (rates_l5/rates_season — AVG/OBP/SLG/OPS/ERA/WHIP/K9/BB9 plus RBI/TB/triples), starting pitcher's own season ERA/WHIP/K9/BB9 once the post-final box lineup lands (pregame probable SP stays on get_intelligence), lineup from completed-game box scores, and this event's player_box (per-player batting/pitching counting stats — no per-player AVG/ERA; settleables stay on player-props). Tennis (main-draw singles only): Stage-1 FlashLive history (match context, rankings, set scoreboard, rest days, recent/surface form, tour lookback record, H2H) plus Stage-2 career_rates / career_surface from persisted Tennis API aggregates (serve/return, break points, match-surface W/L) — request path is DB-only. NFL Stage-1: season W/L + point differential, recent form (points scored/allowed), H2H, rest days, and team offense/defense rates (total/passing/rushing yards, attempts, turnovers, third_down_pct) from persisted ESPN team boxes — no per-player block on this endpoint (player game stats are persisted for a future player-props surface). NCAAF Stage-1: same football-native shape as NFL (season W/L + point differential, form, H2H, rest, offense/defense rates from ESPN college-football team boxes) — scoped to sport=ncaaf so rates never mix with NFL. NBA Stage-1: season W/L + point differential, recent form (points scored/allowed), H2H, rest days, and team box rates (rebounds/assists/steals/blocks/turnovers/fouls per game plus fg_pct/three_point_pct/free_throw_pct as ratio-of-sums over persisted made/attempt pairs) — no per-player block, same player-props deferral as NFL. NCAAB Stage-1: same basketball-native shape as NBA from ESPN mens-college-basketball team boxes — scoped to sport=ncaab. NHL Stage-1: season W/L + goal differential (OT/shootout losses count as losses), recent form (goals scored/allowed), H2H, rest days, and team box rates (shots_on_goal/hits/penalty_minutes/power_play_goals/giveaways/takeaways/blocked_shots per game) from the NHL Web API boxscore endpoint — no per-skater/goalie block, same player-props deferral as NFL/NBA. NFL/NCAAF/NBA/NCAAB preseason games are excluded from form/rates/record/H2H via lumify_events.season_type; NHL never ingests preseason games at all, so no filter is needed there. Form/record/rest/H2H count status final/complete only (walkovers excluded as unplayed; retirements count). Returns available:false with no charge if participants haven't resolved, or tennis draw_type is not exactly 'singles' (doubles and qualifying are out of scope, same as the tennis predictive stack).",
+      "inputSchema": {
+        "properties": {
+          "event_id": {
+            "description": "Event id, from list_events, query_events, or search results.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "event_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_stats",
+      "outputSchema": {
+        "properties": {
+          "available": {
+            "description": "False when participants haven't resolved, or tennis draw_type is not exactly 'singles' (doubles/qualifying out of scope); every other field is omitted and the call isn't billed.",
+            "type": "boolean"
+          },
+          "draw_type": {
+            "description": "Tennis only. Always 'singles' when available is true. Values other than 'singles' (including 'doubles' and 'qualifying') return available:false.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "event_id": {
+            "description": "Lumify event ID.",
+            "type": "integer"
+          },
+          "head_to_head": {
+            "description": "Past meetings: {window, meetings, total}. Soccer: {home_goals, away_goals}. MLB: {home_runs, away_runs}. NFL/NCAAF/NBA/NCAAB: {home_points, away_points}. NHL: {home_goals, away_goals}. Tennis: {event_id, starts_at, surface, winner_role, sets_won} relative to this fixture's player_1/player_2 (walkovers excluded).",
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "league_context": {
+            "description": "Soccer only. {avg_goals_per_team}: league-wide baseline goals/team/game, used by get_intelligence's attack/defense scoring. Null for fixed-baseline competitions.",
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "league_slug": {
+            "description": "League/tour slug, e.g. 'mls', 'mlb', 'nfl', 'atp', 'wta'.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "match": {
+            "description": "Tennis only. Match context: surface, competition_id/name, tier, round (ingested labels like 'Round of 16'/'Quarterfinal'/'Final', not 'R16'), court (not currently populated), status, result_type, scoreboard (sets_won + per-set games; tiebreak_score not currently populated).",
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "neutral_site": {
+            "description": "Soccer only. Whether this fixture is at a neutral venue. Informational here; factored into home-advantage scoring on get_intelligence.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "players": {
+            "description": "Tennis only (player_1/player_2). Each side: player_id, name, country_code, ranking, ranking_points, rest_days, recent_form, surface_form, record (tour_lookback wins/losses), career_rates (Stage-2 serve/return percentages; null until ingest), career_surface (Stage-2 match-surface W/L over windows.career_surface_years; null when empty). History windows exclude walkovers (unplayed) and include retirements.",
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "profile": {
+            "description": "Soccer only. 'world_cup' or 'club'.",
+            "type": "string"
+          },
+          "teams": {
+            "description": "Soccer/MLB/NFL/NCAAF/NBA/NCAAB/NHL only (home/away). Soccer: recent_form, team_strength, venue, rest_days, sos, lineup, rates_l5, rates_season. MLB: record, recent_form, rest_days, rates_l5/rates_season (incl. OBP/SLG/OPS/RBI/TB), starting_pitcher (post-box only), lineup, player_box (this event's per-player batting/pitching counting stats). NFL/NCAAF Stage-1: record (points_for/against), recent_form (points_scored/allowed), rest_days, rates_l5/rates_season (total/passing/rushing yards, attempts, turnovers, third_down_pct) — no per-player block. NBA/NCAAB Stage-1: record (points_for/against), recent_form (points_scored/allowed), rest_days, rates_l5/rates_season (rebounds/assists/steals/blocks/turnovers/fouls, fg_pct/three_point_pct/free_throw_pct as ratio-of-sums) — no per-player block. NHL Stage-1: record (goals_for/against), recent_form (goals_scored/allowed), rest_days, rates_l5/rates_season (shots_on_goal/hits/penalty_minutes/power_play_goals/giveaways/takeaways/blocked_shots) — no per-skater/goalie block. Absent on tennis responses — use players instead.",
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "windows": {
+            "description": "Explicit sample depths. Soccer: recent_form (5), rates_l5 (5), rates_season ('season'), head_to_head (10), sos (5). MLB/NFL/NCAAF/NBA/NCAAB/NHL: recent_form (5), rates_l5 (5), rates_season ('season'), head_to_head (10). Tennis: recent_form (10), surface_form (10), head_to_head (10), record_lookback_days (365), career_surface_years (3).",
+            "type": [
+              "object",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Get public betting splits (bets% and handle%) for an event: a consensus split plus a per-bookmaker breakdown (bookmakers[].bookmaker uses the same odds slugs as get_odds, e.g. draftkings — not upstream short keys like dk), with a captured_at timestamp. Available for MLB, NBA, NHL, and NFL. Not available for tennis, soccer, or NCAAF (upstream does not expose splits). Returns available:false with no charge if splits haven't been captured for this event yet or the sport is unsupported.",
+      "inputSchema": {
+        "properties": {
+          "event_id": {
+            "description": "Event id, from list_events, query_events, or search results.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "event_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_splits",
+      "outputSchema": {
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "bookmakers": {
+            "description": "Per-bookmaker splits. Each item has bookmaker (odds slug), name, moneyline, spread, total.",
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "captured_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "consensus": {
+            "description": "Aggregate bets%/handle% across bookmakers.",
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "event_id": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Get AI bet intelligence for an event. Branch on sport/league and on the presence of probability (probability model) vs. confidence_score (points model). Probability customer surface (MLB, soccer/MLS, tennis): probability, interval, fair_price, market, edge, tier, plus Price fair/edges_by_book/best — framework plumbing (p_model, p_market, blend_w, sufficiency, phase, model_version, drivers, alignment) is omitted. edge/tier null and has_recommend false today — fair-price + line-shopping, not picks; price gap ≠ EV. Predictive MLB may also return a Search-backed match_overview + top-level rationale[] (context overlay, not a pick) generated on first request and reused after — distinct from bets[].rationale on points sports. Points model (NFL, NCAAF, unmigrated soccer): confidence scores, signals, bets[].rationale, narratives. Match-level tokens (OVER, UNDER, ML_DRAW) have null player_role/player_id/team_id/player_name. bookmaker defaults to pinnacle and is a no-op for probability-model sports. Returns available:false with no charge if intelligence hasn't been computed yet.",
+      "inputSchema": {
+        "properties": {
+          "bookmaker": {
+            "description": "Bookmaker slug for market prices on recommended bets. Defaults to pinnacle. Valid: pinnacle, fanduel, draftkings, betmgm, caesars, bet365, circa, hardrock, betonline. No effect for probability-model sports (MLS soccer and MLB), which report the book their assessment was priced against.",
+            "type": "string"
+          },
+          "event_id": {
+            "description": "Event id, from list_events, query_events, or search results.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "event_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_intelligence",
+      "outputSchema": {
+        "properties": {
+          "available": {
+            "description": "False when no intelligence has been computed for this event yet — every other field is then null/empty and the request is not charged.",
+            "type": "boolean"
+          },
+          "bets": {
+            "items": {
+              "properties": {
+                "alignment": {
+                  "description": "Internal — omitted from customer payloads (MLB/soccer/tennis).",
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "attribution": {
+                  "description": "Attribution keys backing rationale, same order. Points-model sports only.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "best": {
+                  "description": "Highest price-gap pick across edges_by_book: {book, price, edge, quote_age_seconds}. Price gap ≠ EV; Tier C informational line-shopping.",
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "bet_type": {
+                  "description": "Canonical bet token, e.g. ML_HOME/ML_AWAY/ML_DRAW (soccer), ML_P1/ML_P2 (head-to-head sports), SPREAD_HOME/SPREAD_AWAY, OVER, UNDER.",
+                  "type": "string"
+                },
+                "blend_w": {
+                  "description": "Internal — omitted from customer payloads (MLB/soccer/tennis).",
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "computed_at": {
+                  "description": "ISO-8601 UTC time this bet's numbers last materially changed — not when last checked. Rows are only rewritten when price, line, or probability moves beyond a tolerance, so an older value means 'unchanged since', not 'stale'. Differs between bets on one event because markets move independently.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "confidence_score": {
+                  "description": "Points-engine score, 0-1, not a calibrated probability. Points-model sports only.",
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "coverage": {
+                  "description": "Signal-coverage fraction, 0-1. Points-model sports only.",
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "drivers": {
+                  "description": "Internal — omitted from customer payloads (MLB/soccer/tennis).",
+                  "items": {
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "edge": {
+                  "description": "Expected profit per 1 unit staked at market.price. Null while no model-backed edge is published (Stage 1). Present on customer surface for recommend gating.",
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "edges_by_book": {
+                  "description": "Price gap versus fair.probability per soft book (fair.probability × decimal_odds − 1). Line-shopping only, NOT EV / NOT a recommend.",
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "fair": {
+                  "description": "Sharp-consensus fair: {probability, books, n_books, is_consensus}. MLB: Pinnacle+Circa; MLS/tennis: Pinnacle. Price-gap reference for edges_by_book/best — not EV.",
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "fair_price": {
+                  "description": "American-odds fair price implied by probability — the vig-free line. Compare to market.price for the book's margin on this side.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "interval": {
+                  "description": "[lo, hi] band around probability — how much evidence backs the number, not a statistical confidence interval.",
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": [
+                    "array",
+                    "null"
+                  ]
+                },
+                "market": {
+                  "description": "Market quote: {price: American odds, line: handicap/total line or null for moneyline, book: bookmaker slug when known (always set for probability-model sports)}.",
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "model_version": {
+                  "description": "Internal — omitted from customer payloads (MLB/soccer/tennis).",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "narrative": {
+                  "description": "Per-bet narrative sentence. Points-model sports only.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "p_market": {
+                  "description": "Internal — omitted from customer payloads (MLB/soccer/tennis). Use probability/fair_price.",
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "p_model": {
+                  "description": "Internal — omitted from customer payloads (MLB/soccer/tennis).",
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "phase": {
+                  "description": "Internal — omitted from customer payloads (MLB/soccer/tennis).",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "player_id": {
+                  "description": "Set when this bet is about an individual player. Null for team bets and match-level tokens.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "player_name": {
+                  "description": "Display name of the player or team this bet is about. Null for match-level tokens. Duplicates players[player_role].name.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "player_role": {
+                  "description": "'home'/'away' or 'p1'/'p2'. Null for match-level tokens (OVER, UNDER, ML_DRAW).",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "probability": {
+                  "description": "Published probability for this outcome, 0-1. Outcomes of one market sum to 1. Customer surface for MLB, soccer, tennis.",
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "rationale": {
+                  "description": "Per-bet signal-strength bullets. Points-model sports only. Distinct from top-level rationale (event-level context chips).",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "signals": {
+                  "description": "Per-signal point breakdown. Points-model sports only.",
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "sufficiency": {
+                  "description": "Internal — omitted from customer payloads (MLB/soccer/tennis).",
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "team_id": {
+                  "description": "Set when this bet is about a team. Null for match-level tokens (OVER, UNDER, ML_DRAW) — a draw is not a bet on either team, so summing exposure by team_id never double-counts it.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "tier": {
+                  "description": "Confidence tier: 'very_high', 'strong', 'moderate', or 'avoid'. Null whenever edge is null. Present on MLB customer surface and all other shapes.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "validator": {
+                  "description": "Qualitative-validator verdict: {stance, confidence, delta, validated_at}. Points-model sports only.",
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "event_id": {
+            "description": "Lumify event ID this intelligence describes.",
+            "type": "integer"
+          },
+          "has_recommend": {
+            "description": "True when at least one bet meets the recommendation threshold; null when intelligence has not been computed. False while Edge is not published (current MLB/soccer/tennis Stage 1) — a recommendation requires a non-null tier derived from edge.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "intelligence_updated_at": {
+            "description": "ISO-8601 UTC timestamp of the most recent change anywhere in this payload (max of per-bet computed_at). Use per-bet computed_at to reason about a specific bet.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "league": {
+            "description": "League slug for this event, if any.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "match_overview": {
+            "description": "Natural-language matchup preview — form, context, what to watch. On predictive MLB may be a Search-backed context overlay (not a recommendation). Null when no narrative has been generated.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "matchup": {
+            "description": "Legacy points-engine probable-starter context. Not returned on the MLB predictive customer surface — use get_stats for pitcher/lineup Data.",
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "odds_source": {
+            "description": "Bookmaker bets[].market prices were sourced from. For probability-model sports this is the book the assessment was priced against, not a bookmaker overlay; per-bet market.book is authoritative if they ever differ.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "players": {
+            "description": "Home/away (or p1/p2) participant identification, keyed by role: {role: {name, player_id, team_id}}.",
+            "type": "object"
+          },
+          "rationale": {
+            "description": "Event-level factual matchup chips (starting pitchers, injuries, form). Context overlay only — not a pick. Distinct from bets[].rationale on points-model sports. Predictive MLB may populate on first get_intelligence; later calls reuse the stored row.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "sport": {
+            "description": "Sport slug for this event.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "List teams, paginated by id (after_id). Filter by sport, league, conference, division, country, active status, or name (q, partial match). Returns each team's id, slug, name, city, conference/division, and venue. Use get_team for full detail on one id once resolved here.",
+      "inputSchema": {
+        "properties": {
+          "active": {
+            "description": "Filter by active status.",
+            "type": "boolean"
+          },
+          "after_id": {
+            "description": "Cursor: last team id from the previous page's next_after_id.",
+            "type": "integer"
+          },
+          "conference": {
+            "description": "Conference name, e.g. AFC, Eastern.",
+            "type": "string"
+          },
+          "country": {
+            "description": "ISO country code, e.g. USA.",
+            "type": "string"
+          },
+          "division": {
+            "description": "Division name, e.g. AFC East.",
+            "type": "string"
+          },
+          "league": {
+            "description": "League slug, e.g. nfl, mls.",
+            "type": "string"
+          },
+          "limit": {
+            "default": 25,
+            "description": "Max teams to return per page.",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "q": {
+            "description": "Team name search (partial match).",
+            "type": "string"
+          },
+          "sport": {
+            "description": "Sport slug, e.g. nfl, nba, soccer.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_teams",
+      "outputSchema": {
+        "$defs": {
+          "Team": {
+            "properties": {
+              "abbreviation": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "city": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "conference": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "country_code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "division": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "type": "integer"
+              },
+              "is_active": {
+                "type": "boolean"
+              },
+              "league": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "name": {
+                "type": "string"
+              },
+              "short_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "slug": {
+                "type": "string"
+              },
+              "sport": {
+                "type": "string"
+              },
+              "state": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "venue": {
+                "type": [
+                  "object",
+                  "null"
+                ]
+              }
+            },
+            "type": "object"
+          }
+        },
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/$defs/Team"
+            },
+            "type": "array"
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "next_after_id": {
+            "description": "Pass as after_id to fetch the next page; null on the last page.",
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Search players by name, sport, country, ranking, or active status, paginated by id (after_id). Returns each player's id, name, position, current team, and tennis ranking if applicable. Use get_player for full detail on one id, or get_player_events for a player's schedule/results.",
+      "inputSchema": {
+        "properties": {
+          "active": {
+            "description": "Filter by active status.",
+            "type": "boolean"
+          },
+          "after_id": {
+            "description": "Cursor: last player id from the previous page's next_after_id.",
+            "type": "integer"
+          },
+          "country": {
+            "description": "ISO 3166-1 alpha-3 country code, e.g. USA.",
+            "type": "string"
+          },
+          "limit": {
+            "default": 25,
+            "description": "Max players to return per page.",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "q": {
+            "description": "Name search (partial match).",
+            "type": "string"
+          },
+          "ranked": {
+            "description": "If true, only players with a tennis ranking.",
+            "type": "boolean"
+          },
+          "sport": {
+            "description": "Sport slug, e.g. tennis, nba.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "search_players",
+      "outputSchema": {
+        "$defs": {
+          "Player": {
+            "properties": {
+              "birthdate": {
+                "description": "YYYY-MM-DD.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "country_code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "current_team_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "current_team_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "full_name": {
+                "type": "string"
+              },
+              "id": {
+                "type": "integer"
+              },
+              "is_active": {
+                "type": "boolean"
+              },
+              "position": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "slug": {
+                "type": "string"
+              },
+              "sport": {
+                "type": "string"
+              },
+              "tennis_ranking": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              }
+            },
+            "type": "object"
+          }
+        },
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/$defs/Player"
+            },
+            "type": "array"
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "next_after_id": {
+            "description": "Pass as after_id to fetch the next page; null on the last page.",
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Get a single team profile with its home venue. Raises a not-found error if team_id doesn't exist. Resolve ids via list_teams.",
+      "inputSchema": {
+        "properties": {
+          "team_id": {
+            "description": "Team id, from list_teams.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "team_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_team",
+      "outputSchema": {
+        "properties": {
+          "abbreviation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "city": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "conference": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "division": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "integer"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "league": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "sport": {
+            "type": "string"
+          },
+          "venue": {
+            "type": [
+              "object",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Get a single player profile: name, sport, country, position/handedness, physical stats, current team, and tennis ranking if applicable. Raises a not-found error if player_id doesn't exist. Resolve ids via search_players.",
+      "inputSchema": {
+        "properties": {
+          "player_id": {
+            "description": "Player id, from search_players.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "player_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_player",
+      "outputSchema": {
+        "properties": {
+          "birthdate": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "country_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "current_team_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "current_team_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "full_name": {
+            "type": "string"
+          },
+          "handedness": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "height_cm": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "integer"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "position": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "slug": {
+            "type": "string"
+          },
+          "sport": {
+            "type": "string"
+          },
+          "tennis_ranking": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "weight_kg": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "List a player's events (schedule/results), paginated by id (after_id). Defaults to ±30 days around today when no date filter is given. Resolve player_id via search_players first.",
+      "inputSchema": {
+        "properties": {
+          "after_id": {
+            "description": "Cursor: last event id from the previous page's next_after_id.",
+            "type": "integer"
+          },
+          "from": {
+            "description": "Start date YYYY-MM-DD.",
+            "type": "string"
+          },
+          "limit": {
+            "default": 25,
+            "description": "Max events to return per page.",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "player_id": {
+            "description": "Player id, from search_players.",
+            "type": "integer"
+          },
+          "status": {
+            "description": "Filter to events in this status.",
+            "enum": [
+              "scheduled",
+              "inprogress",
+              "final",
+              "postponed",
+              "cancelled",
+              "suspended",
+              "delayed",
+              "walkover"
+            ],
+            "type": "string"
+          },
+          "to": {
+            "description": "End date YYYY-MM-DD.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "player_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_player_events",
+      "outputSchema": {
+        "properties": {
+          "data": {
+            "description": "Events in the same shape as list_events' EventSummary.",
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "next_after_id": {
+            "description": "Pass as after_id to fetch the next page; null on the last page.",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "player_id": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "List seasons per sport/league. By default returns only currently active seasons; pass current_only=false to include historical seasons. Optionally filter by sport. Returns each season's id, year, phase, start/end dates, and whether it is_current. Use list_sports for just each sport's current season.",
+      "inputSchema": {
+        "properties": {
+          "current_only": {
+            "default": true,
+            "description": "Return only currently active seasons (default true). Pass false for historical seasons.",
+            "type": "boolean"
+          },
+          "sport": {
+            "description": "Filter by sport slug, e.g. nhl, nba, soccer.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_seasons",
+      "outputSchema": {
+        "properties": {
+          "seasons": {
+            "items": {
+              "properties": {
+                "end_date": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "type": "integer"
+                },
+                "is_current": {
+                  "type": "boolean"
+                },
+                "league": {
+                  "type": "object"
+                },
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "phase": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "sport": {
+                  "type": "object"
+                },
+                "start_date": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "year": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Estimate the credit cost of one or more planned tool calls before making them — no credits are spent. Costs are data-dependent (e.g. odds/intelligence/splits not yet ingested for an event are free, and batch_get_events ids that don't exist cost nothing), so this returns a [min_credits, max_credits] range per call rather than a single number. Pass the exact tool name and arguments you're considering, e.g. {\"tool\": \"get_event\", \"arguments\": {\"event_id\": 123, \"include_odds\": true}}.",
+      "inputSchema": {
+        "properties": {
+          "calls": {
+            "items": {
+              "properties": {
+                "arguments": {
+                  "description": "Same arguments you'd pass to that tool.",
+                  "type": "object"
+                },
+                "tool": {
+                  "description": "Tool name to estimate, e.g. get_event, batch_get_events, get_odds.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "tool"
+              ],
+              "type": "object"
+            },
+            "maxItems": 50,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "calls"
+        ],
+        "type": "object"
+      },
+      "name": "estimate_cost",
+      "outputSchema": {
+        "properties": {
+          "estimates": {
+            "items": {
+              "properties": {
+                "max_credits": {
+                  "type": "integer"
+                },
+                "min_credits": {
+                  "type": "integer"
+                },
+                "note": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "tool": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "total_max_credits": {
+            "type": "integer"
+          },
+          "total_min_credits": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      }
+    }
+  ],
+  "url": "https://lumify.ai/mcp"
+}

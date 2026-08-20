@@ -1,0 +1,1604 @@
+{
+  "canon_version": "1",
+  "full_hash": "1d87a8df10472e63a6fef94e12d60494b1b704d082ae78674fc5174a5765e8b6",
+  "name": "ai.agentplaybooks/agentplaybooks",
+  "observed_at": "2026-08-20T09:11:19.657808Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 47,
+  "tools": [
+    {
+      "description": "List playbooks owned by or shared with the authenticated user, including access role and content counts.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_playbooks"
+    },
+    {
+      "description": "Create a new playbook. A playbook is a container for personas (AI personalities), skills (capabilities), and memory (persistent storage).",
+      "inputSchema": {
+        "properties": {
+          "description": {
+            "description": "Description of what the playbook is for",
+            "type": "string"
+          },
+          "instructions": {
+            "description": "Always-on project instructions (the AGENTS.md / CLAUDE.md content). Separate from the persona: the persona is who the agent is, these are the rules of this project.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name of the playbook",
+            "type": "string"
+          },
+          "persona_metadata": {
+            "description": "Initial persona metadata",
+            "type": "object"
+          },
+          "persona_name": {
+            "description": "Initial persona name",
+            "type": "string"
+          },
+          "persona_system_prompt": {
+            "description": "Initial persona/system prompt",
+            "type": "string"
+          },
+          "tags": {
+            "description": "Discovery and organization tags",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "visibility": {
+            "default": "private",
+            "description": "Visibility of the playbook",
+            "enum": [
+              "public",
+              "private",
+              "unlisted"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "create_playbook"
+    },
+    {
+      "description": "Get a playbook with its singleton persona, skills, connected MCP servers, and memory.",
+      "inputSchema": {
+        "properties": {
+          "playbook_id": {
+            "description": "UUID of the playbook",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_playbook"
+    },
+    {
+      "description": "Delete a playbook and all its contents (personas, skills, memory, API keys). This action cannot be undone!",
+      "inputSchema": {
+        "properties": {
+          "playbook_id": {
+            "description": "UUID of the playbook to delete",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id"
+        ],
+        "type": "object"
+      },
+      "name": "delete_playbook"
+    },
+    {
+      "description": "Set the singleton persona (AI identity and system prompt) for a playbook. Backward-compatible alias for updating persona fields.",
+      "inputSchema": {
+        "properties": {
+          "metadata": {
+            "description": "Optional metadata",
+            "type": "object"
+          },
+          "name": {
+            "description": "Name of the persona",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID of the playbook",
+            "type": "string"
+          },
+          "system_prompt": {
+            "description": "The system prompt that defines this persona's behavior",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "name",
+          "system_prompt"
+        ],
+        "type": "object"
+      },
+      "name": "create_persona"
+    },
+    {
+      "description": "Update a persona's name, system prompt, or metadata.",
+      "inputSchema": {
+        "properties": {
+          "metadata": {
+            "description": "New metadata",
+            "type": "object"
+          },
+          "name": {
+            "description": "New name",
+            "type": "string"
+          },
+          "persona_id": {
+            "description": "UUID of the persona",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID of the playbook",
+            "type": "string"
+          },
+          "system_prompt": {
+            "description": "New system prompt",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "persona_id"
+        ],
+        "type": "object"
+      },
+      "name": "update_persona"
+    },
+    {
+      "description": "Reset the singleton persona to the default assistant. The playbook always retains one logical persona.",
+      "inputSchema": {
+        "properties": {
+          "persona_id": {
+            "description": "UUID of the persona to delete",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID of the playbook",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "persona_id"
+        ],
+        "type": "object"
+      },
+      "name": "delete_persona"
+    },
+    {
+      "description": "List all skills (capabilities/rules) in this playbook Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id"
+        ],
+        "type": "object"
+      },
+      "name": "list_skills"
+    },
+    {
+      "description": "Get detailed information about a specific skill Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "skill_id": {
+            "description": "Skill ID or name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "skill_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_skill"
+    },
+    {
+      "description": "Read a specific memory entry by key. Automatically increments access count. Memory supports 3 tiers: 'working' (active scratch pad), 'contextual' (recent context), 'longterm' (archived). Use 'hierarchical' memory_type for complex task graphs with parallel threads. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "key": {
+            "description": "Memory key to read",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "key"
+        ],
+        "type": "object"
+      },
+      "name": "read_memory"
+    },
+    {
+      "description": "Search memories by text, tags, tier, or type. Returns summaries for large memories. Use tags for categorical search; use tier to focus on active vs archived data; use memory_type to find task graphs. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "include_children": {
+            "default": false,
+            "description": "Include child memories in results",
+            "type": "boolean"
+          },
+          "memory_type": {
+            "description": "Filter by memory type",
+            "enum": [
+              "flat",
+              "hierarchical"
+            ],
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "search": {
+            "description": "Search in keys, descriptions, and summaries",
+            "type": "string"
+          },
+          "status": {
+            "description": "Filter by task status (hierarchical only)",
+            "enum": [
+              "pending",
+              "running",
+              "completed",
+              "failed",
+              "blocked"
+            ],
+            "type": "string"
+          },
+          "tags": {
+            "description": "Filter by tags (any match)",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "tier": {
+            "description": "Filter by memory tier",
+            "enum": [
+              "working",
+              "contextual",
+              "longterm"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id"
+        ],
+        "type": "object"
+      },
+      "name": "search_memory"
+    },
+    {
+      "description": "Write a memory entry. Use tier='working' for active tasks, 'contextual' for background context, 'longterm' for completed work. Set memory_type='hierarchical' and parent_key to build task graphs. Use status to track task progress in parallel workflows. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "description": {
+            "description": "Human-readable description",
+            "type": "string"
+          },
+          "key": {
+            "description": "Memory key",
+            "type": "string"
+          },
+          "memory_type": {
+            "description": "flat (default) or hierarchical for task graphs",
+            "enum": [
+              "flat",
+              "hierarchical"
+            ],
+            "type": "string"
+          },
+          "metadata": {
+            "description": "Graph metadata: dependencies, thread assignment, progress, etc.",
+            "type": "object"
+          },
+          "parent_key": {
+            "description": "Parent memory key for hierarchical organization",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "priority": {
+            "description": "Priority 1-100 (default: 50)",
+            "type": "number"
+          },
+          "status": {
+            "description": "Task status (for hierarchical task tracking)",
+            "enum": [
+              "pending",
+              "running",
+              "completed",
+              "failed",
+              "blocked"
+            ],
+            "type": "string"
+          },
+          "summary": {
+            "description": "Compact summary for context views",
+            "type": "string"
+          },
+          "tags": {
+            "description": "Tags for categorization",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "tier": {
+            "description": "Memory tier (default: contextual)",
+            "enum": [
+              "working",
+              "contextual",
+              "longterm"
+            ],
+            "type": "string"
+          },
+          "value": {
+            "description": "Value to store",
+            "type": "object"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "key",
+          "value"
+        ],
+        "type": "object"
+      },
+      "name": "write_memory"
+    },
+    {
+      "description": "Delete a memory entry (requires API key) Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "key": {
+            "description": "Memory key to delete",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "key"
+        ],
+        "type": "object"
+      },
+      "name": "delete_memory"
+    },
+    {
+      "description": "Consolidate multiple related memories into a parent memory with summary. Reduces context size while preserving detail access via children. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "archive_children": {
+            "default": true,
+            "description": "Move children to longterm tier",
+            "type": "boolean"
+          },
+          "memory_keys": {
+            "description": "Keys of memories to consolidate",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "parent_key": {
+            "description": "New parent memory key",
+            "type": "string"
+          },
+          "parent_tags": {
+            "description": "Tags for parent memory",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "summary": {
+            "description": "Summary of consolidated memories",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "memory_keys",
+          "parent_key",
+          "summary"
+        ],
+        "type": "object"
+      },
+      "name": "consolidate_memories"
+    },
+    {
+      "description": "Promote a memory to a higher tier or boost its priority for active use. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "key": {
+            "description": "Memory key to promote",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "priority_boost": {
+            "default": 10,
+            "description": "Amount to increase priority (0-50)",
+            "type": "number"
+          },
+          "target_tier": {
+            "description": "Target tier (cannot demote with this tool)",
+            "enum": [
+              "working",
+              "contextual"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "key"
+        ],
+        "type": "object"
+      },
+      "name": "promote_memory"
+    },
+    {
+      "description": "Get a context-optimized view of memories. Returns full working memory, summaries for contextual, and keys only for longterm. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "expand_keys": {
+            "description": "Keys to show full content regardless of tier",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "include_tiers": {
+            "description": "Tiers to include (default: working, contextual)",
+            "items": {
+              "enum": [
+                "working",
+                "contextual",
+                "longterm"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "max_items": {
+            "default": 20,
+            "description": "Maximum items per tier",
+            "type": "number"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "tags_filter": {
+            "description": "Only include memories with these tags",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "playbook_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_memory_context"
+    },
+    {
+      "description": "Archive memories from working/contextual to longterm tier. Useful for cleaning up after completing tasks. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "from_tier": {
+            "description": "Only archive from this tier",
+            "enum": [
+              "working",
+              "contextual"
+            ],
+            "type": "string"
+          },
+          "generate_summaries": {
+            "default": false,
+            "description": "Auto-generate summaries if missing",
+            "type": "boolean"
+          },
+          "keys": {
+            "description": "Specific keys to archive",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "older_than_hours": {
+            "description": "Archive memories older than X hours",
+            "type": "number"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "tags": {
+            "description": "Only archive memories with these tags",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "playbook_id"
+        ],
+        "type": "object"
+      },
+      "name": "archive_memories"
+    },
+    {
+      "description": "Get hierarchical tree view of memories showing parent-child relationships. Use this to visualize task graphs and track parallel operations. Includes status for each node. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "include_values": {
+            "default": false,
+            "description": "Include full values (false = summaries only)",
+            "type": "boolean"
+          },
+          "max_depth": {
+            "default": 3,
+            "description": "Maximum tree depth",
+            "type": "number"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "root_key": {
+            "description": "Start from this key (omit for all roots)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_memory_tree"
+    },
+    {
+      "description": "Create a hierarchical task plan in one call. Creates a parent 'plan' memory with children for each subtask. Use this for complex multi-threaded work that agent swarms can coordinate on. Each subtask gets its own memory node with status tracking. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "plan_key": {
+            "description": "Key for the root plan memory",
+            "type": "string"
+          },
+          "plan_summary": {
+            "description": "High-level summary of the entire plan",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "tags": {
+            "description": "Tags for the plan",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "tasks": {
+            "description": "List of subtasks to create",
+            "items": {
+              "properties": {
+                "depends_on": {
+                  "description": "Keys of tasks this depends on",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "description": {
+                  "description": "What this task does",
+                  "type": "string"
+                },
+                "key": {
+                  "description": "Task key (will be prefixed with plan_key/)",
+                  "type": "string"
+                },
+                "tags": {
+                  "description": "Task tags",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "value": {
+                  "description": "Task data (instructions, params, etc.)",
+                  "type": "object"
+                }
+              },
+              "required": [
+                "key",
+                "description"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "plan_key",
+          "plan_summary",
+          "tasks"
+        ],
+        "type": "object"
+      },
+      "name": "create_task_graph"
+    },
+    {
+      "description": "Update the status of a task node in a hierarchical plan. When all children of a parent are 'completed', the parent is auto-updated. Returns the current subtree state. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "key": {
+            "description": "Task memory key to update",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "result": {
+            "description": "Task result data to store in value",
+            "type": "object"
+          },
+          "status": {
+            "description": "New status",
+            "enum": [
+              "pending",
+              "running",
+              "completed",
+              "failed",
+              "blocked"
+            ],
+            "type": "string"
+          },
+          "summary": {
+            "description": "Updated summary with results",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "key",
+          "status"
+        ],
+        "type": "object"
+      },
+      "name": "update_task_status"
+    },
+    {
+      "description": "List canvas documents in a workflow run. Canvas documents are collaborative markdown files that multiple agents can edit in parallel. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "run_id": {
+            "description": "Workflow run UUID. Omit to list documents across all runs.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id"
+        ],
+        "type": "object"
+      },
+      "name": "list_canvas"
+    },
+    {
+      "description": "Read a canvas document. Returns full content, sections structure, and metadata. Optionally read a specific section by ID. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "run_id": {
+            "description": "Workflow run UUID",
+            "type": "string"
+          },
+          "section_id": {
+            "description": "Optional: read only this section",
+            "type": "string"
+          },
+          "slug": {
+            "description": "Document slug",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "run_id",
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "read_canvas"
+    },
+    {
+      "description": "Create or fully replace a canvas document. Markdown headings are auto-parsed into sections for parallel editing. Use patch_canvas_section for partial updates. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "content": {
+            "description": "Full markdown content",
+            "type": "string"
+          },
+          "metadata": {
+            "description": "Custom document metadata",
+            "type": "object"
+          },
+          "name": {
+            "description": "Document title",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "run_id": {
+            "description": "Workflow run UUID",
+            "type": "string"
+          },
+          "slug": {
+            "description": "URL-friendly document identifier",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "run_id",
+          "slug",
+          "name",
+          "content"
+        ],
+        "type": "object"
+      },
+      "name": "write_canvas"
+    },
+    {
+      "description": "Edit a specific section of a canvas document. Parallel-safe: only updates the targeted section. Lock the section first for safety in multi-agent scenarios. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "content": {
+            "description": "New section content (markdown)",
+            "type": "string"
+          },
+          "heading": {
+            "description": "Optional: new heading text",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "run_id": {
+            "description": "Workflow run UUID",
+            "type": "string"
+          },
+          "section_id": {
+            "description": "Section ID from get_canvas_toc",
+            "type": "string"
+          },
+          "slug": {
+            "description": "Document slug",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "run_id",
+          "slug",
+          "section_id",
+          "content"
+        ],
+        "type": "object"
+      },
+      "name": "patch_canvas_section"
+    },
+    {
+      "description": "Get the table of contents for a canvas document. Returns section IDs, headings, and levels for navigation and patch_canvas_section. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "run_id": {
+            "description": "Workflow run UUID",
+            "type": "string"
+          },
+          "slug": {
+            "description": "Document slug",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "run_id",
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_canvas_toc"
+    },
+    {
+      "description": "Lock a section for exclusive editing. Prevents other agents from modifying it. Remember to unlock when done. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "locked_by": {
+            "description": "Agent identifier",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "run_id": {
+            "description": "Workflow run UUID",
+            "type": "string"
+          },
+          "section_id": {
+            "description": "Section ID to lock",
+            "type": "string"
+          },
+          "slug": {
+            "description": "Document slug",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "run_id",
+          "slug",
+          "section_id",
+          "locked_by"
+        ],
+        "type": "object"
+      },
+      "name": "lock_canvas_section"
+    },
+    {
+      "description": "Unlock a previously locked section so other agents can edit it. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "run_id": {
+            "description": "Workflow run UUID",
+            "type": "string"
+          },
+          "section_id": {
+            "description": "Section ID to unlock",
+            "type": "string"
+          },
+          "slug": {
+            "description": "Document slug",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "run_id",
+          "slug",
+          "section_id"
+        ],
+        "type": "object"
+      },
+      "name": "unlock_canvas_section"
+    },
+    {
+      "description": "Create a new skill for this playbook. Use this to expand capabilities. Requires full or skills:write permission. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "content": {
+            "description": "The instructions/prompt/code for the skill",
+            "type": "string"
+          },
+          "description": {
+            "description": "What the skill does and when the agent should use it",
+            "type": "string"
+          },
+          "name": {
+            "description": "Agent Skills-compatible name (lowercase kebab-case, e.g. data-analyzer)",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "priority": {
+            "description": "Priority level (default 50)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "name",
+          "content"
+        ],
+        "type": "object"
+      },
+      "name": "create_skill"
+    },
+    {
+      "description": "Update an existing skill in this playbook. Requires full or skills:write permission. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "content": {
+            "description": "New content/instructions",
+            "type": "string"
+          },
+          "description": {
+            "description": "New description",
+            "type": "string"
+          },
+          "name": {
+            "description": "New name",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "priority": {
+            "description": "New priority level",
+            "type": "number"
+          },
+          "skill_id": {
+            "description": "ID or name of the skill to update",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "skill_id"
+        ],
+        "type": "object"
+      },
+      "name": "update_skill"
+    },
+    {
+      "description": "Delete a skill from this playbook. Requires full or skills:write permission. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "skill_id": {
+            "description": "ID or name of the skill to delete",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "skill_id"
+        ],
+        "type": "object"
+      },
+      "name": "delete_skill"
+    },
+    {
+      "description": "List historical versions of a skill for auditing or rollback. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "Max versions to return (default 10)",
+            "type": "number"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "skill_id": {
+            "description": "ID or name of the skill",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "skill_id"
+        ],
+        "type": "object"
+      },
+      "name": "list_skill_versions"
+    },
+    {
+      "description": "Rollback a skill to a previous version. Requires full or skills:write permission. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "version_id": {
+            "description": "The specific version ID from list_skill_versions to rollback to",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "version_id"
+        ],
+        "type": "object"
+      },
+      "name": "rollback_skill"
+    },
+    {
+      "description": "Update the persona/system prompt or the project instructions of this playbook. Handle with extreme care! Requires full or playbooks:write permission. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "config": {
+            "description": "Replacement playbook configuration",
+            "type": "object"
+          },
+          "description": {
+            "description": "New playbook description",
+            "type": "string"
+          },
+          "instructions": {
+            "description": "New always-on project instructions (the AGENTS.md / CLAUDE.md content). Kept separate from the persona: the persona is who the agent is, these are the rules of this project.",
+            "type": "string"
+          },
+          "name": {
+            "description": "New playbook name",
+            "type": "string"
+          },
+          "persona_metadata": {
+            "description": "New metadata JSON",
+            "type": "object"
+          },
+          "persona_name": {
+            "description": "New persona name",
+            "type": "string"
+          },
+          "persona_system_prompt": {
+            "description": "New core system instructions",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "tags": {
+            "description": "Replacement discovery tags",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "visibility": {
+            "description": "New visibility",
+            "enum": [
+              "public",
+              "private",
+              "unlisted"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id"
+        ],
+        "type": "object"
+      },
+      "name": "update_playbook"
+    },
+    {
+      "description": "List the MCP and OpenAPI servers connected to this playbook, including transport metadata and discovered capability counts. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id"
+        ],
+        "type": "object"
+      },
+      "name": "list_mcp_servers"
+    },
+    {
+      "description": "Call a tool on one of this playbook's connected MCP servers. This stable wrapper lets the user control plane apply newly created playbooks without dynamically changing its own tool list. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "arguments": {
+            "description": "Arguments passed to the connected tool",
+            "type": "object"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "server_id": {
+            "description": "Connected server UUID or name",
+            "type": "string"
+          },
+          "tool_name": {
+            "description": "Tool name exposed by the connected server",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "server_id",
+          "tool_name"
+        ],
+        "type": "object"
+      },
+      "name": "call_connected_tool"
+    },
+    {
+      "description": "Connect an MCP or OpenAPI server to this playbook. Requires playbooks:write or full permission. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "description": {
+            "description": "What this server provides",
+            "type": "string"
+          },
+          "name": {
+            "description": "Display name of the connected server",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "resources": {
+            "description": "Known resource definitions, if already discovered",
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "tools": {
+            "description": "Known tool definitions, if already discovered",
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "transport_config": {
+            "description": "Transport-specific configuration. Do not put plaintext secrets here.",
+            "type": "object"
+          },
+          "transport_type": {
+            "description": "Connection type (default: http)",
+            "enum": [
+              "stdio",
+              "http",
+              "sse",
+              "openapi"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "create_mcp_server"
+    },
+    {
+      "description": "Update a connected MCP or OpenAPI server. Requires playbooks:write or full permission. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "description": {
+            "description": "New description",
+            "type": "string"
+          },
+          "name": {
+            "description": "New display name",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "resources": {
+            "description": "Updated resource definitions",
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "server_id": {
+            "description": "Connected server UUID",
+            "type": "string"
+          },
+          "tools": {
+            "description": "Updated tool definitions",
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "transport_config": {
+            "description": "Updated transport-specific configuration",
+            "type": "object"
+          },
+          "transport_type": {
+            "description": "Connection type",
+            "enum": [
+              "stdio",
+              "http",
+              "sse",
+              "openapi"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "server_id"
+        ],
+        "type": "object"
+      },
+      "name": "update_mcp_server"
+    },
+    {
+      "description": "Disconnect an MCP or OpenAPI server from this playbook. Requires playbooks:write or full permission. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "server_id": {
+            "description": "Connected server UUID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "server_id"
+        ],
+        "type": "object"
+      },
+      "name": "delete_mcp_server"
+    },
+    {
+      "description": "List workflow runs for this playbook. Runs isolate canvas artifacts and execution context. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id"
+        ],
+        "type": "object"
+      },
+      "name": "list_runs"
+    },
+    {
+      "description": "Create a workflow run so this playbook can be applied immediately with isolated context and canvas artifacts. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "context": {
+            "description": "Initial execution context",
+            "type": "object"
+          },
+          "name": {
+            "description": "Human-readable run name",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "create_run"
+    },
+    {
+      "description": "Update a workflow run's name, status, or context. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "context": {
+            "description": "Replacement execution context",
+            "type": "object"
+          },
+          "name": {
+            "description": "New run name",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "run_id": {
+            "description": "Workflow run UUID",
+            "type": "string"
+          },
+          "status": {
+            "description": "New run status",
+            "enum": [
+              "active",
+              "completed",
+              "archived"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "run_id"
+        ],
+        "type": "object"
+      },
+      "name": "update_run"
+    },
+    {
+      "description": "Delete a workflow run and its isolated canvas artifacts. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "run_id": {
+            "description": "Workflow run UUID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "run_id"
+        ],
+        "type": "object"
+      },
+      "name": "delete_run"
+    },
+    {
+      "description": "List all secret names and metadata in this playbook. Does NOT return values — secret values are never exposed to agents. Requires secrets:read permission. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "category": {
+            "description": "Filter by category",
+            "enum": [
+              "api_key",
+              "password",
+              "token",
+              "certificate",
+              "connection_string",
+              "general"
+            ],
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id"
+        ],
+        "type": "object"
+      },
+      "name": "list_secrets"
+    },
+    {
+      "description": "Make an HTTP request with a secret injected as a header. The secret value is NEVER returned to the agent — it is decrypted and used server-side only. Use this to authenticate API calls without exposing credentials. Example: use_secret({secret_name: 'OPENAI_API_KEY', url: 'https://api.openai.com/v1/models'}) sends GET with 'Authorization: Bearer <key>'. Requires secrets:read permission. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "body": {
+            "description": "JSON request body (for POST/PUT/PATCH)",
+            "type": "object"
+          },
+          "extra_headers": {
+            "description": "Additional headers (e.g. {\"Content-Type\": \"application/json\"})",
+            "type": "object"
+          },
+          "header_name": {
+            "description": "Header name to inject the secret into (default: Authorization)",
+            "type": "string"
+          },
+          "header_prefix": {
+            "description": "Prefix before the secret value (default: 'Bearer '). Use empty string for raw value.",
+            "type": "string"
+          },
+          "method": {
+            "description": "HTTP method (default: GET)",
+            "enum": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ],
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "secret_name": {
+            "description": "Name of the secret to use (e.g. OPENAI_API_KEY)",
+            "type": "string"
+          },
+          "timeout_ms": {
+            "description": "Request timeout in milliseconds (default: 30000, max: 60000)",
+            "type": "number"
+          },
+          "url": {
+            "description": "The URL to send the HTTP request to",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "secret_name",
+          "url"
+        ],
+        "type": "object"
+      },
+      "name": "use_secret"
+    },
+    {
+      "description": "Store a new encrypted secret. The value is encrypted with AES-256-GCM using a per-user derived key and never stored or returned in plaintext. Requires secrets:write permission. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "category": {
+            "description": "Secret type (default: general)",
+            "enum": [
+              "api_key",
+              "password",
+              "token",
+              "certificate",
+              "connection_string",
+              "general"
+            ],
+            "type": "string"
+          },
+          "description": {
+            "description": "What this secret is used for",
+            "type": "string"
+          },
+          "expires_at": {
+            "description": "ISO 8601 expiration date (optional)",
+            "type": "string"
+          },
+          "name": {
+            "description": "Secret name (letters, numbers, hyphens, underscores)",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "value": {
+            "description": "The secret value to encrypt and store",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "name",
+          "value"
+        ],
+        "type": "object"
+      },
+      "name": "store_secret"
+    },
+    {
+      "description": "Rotate (update) an existing secret with a new value. The old value is permanently replaced and cannot be recovered. Requires secrets:write permission. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "name": {
+            "description": "Secret name to rotate",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "value": {
+            "description": "New secret value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "name",
+          "value"
+        ],
+        "type": "object"
+      },
+      "name": "rotate_secret"
+    },
+    {
+      "description": "Permanently delete a secret. Cannot be undone. Requires secrets:write permission. Target a playbook with playbook_id.",
+      "inputSchema": {
+        "properties": {
+          "name": {
+            "description": "Secret name to delete",
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "delete_secret"
+    }
+  ],
+  "url": "https://agentplaybooks.ai/api/mcp/manage"
+}

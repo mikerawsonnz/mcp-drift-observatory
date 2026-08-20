@@ -1,0 +1,729 @@
+{
+  "canon_version": "1",
+  "full_hash": "1f233ec90ec1879398cf444c5de8c4cec707d154384782a56ba51a766c00d321",
+  "name": "ai.example4/xmp4",
+  "observed_at": "2026-08-20T09:11:45.348332Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 16,
+  "tools": [
+    {
+      "description": "Find direct callees (methods called by) a symbol in a project. Navigate step-by-step by calling xmp4_callees again on interesting results.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "docs": {
+            "description": "Include docs: none (default) | summary | full (xmp4_info only)",
+            "nullable": true,
+            "type": "string"
+          },
+          "file_path": {
+            "description": "File path to disambiguate",
+            "nullable": true,
+            "type": "string"
+          },
+          "output_format": {
+            "description": "Output format: Compact (default) or Verbose",
+            "nullable": true,
+            "type": "string"
+          },
+          "page": {
+            "default": null,
+            "description": "Page number (1-based, default 1; ignored by xmp4_info/xmp4_source)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "page_size": {
+            "default": null,
+            "description": "Results per page (default 20, max 100)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "project": {
+            "description": "Project id: 'repo/project' or 'repo/project/language'. Case-insensitive prefix match. Append '/Python'|'/CSharp'|'/Java'|etc. only to disambiguate multi-language projects (e.g. 'django/Django/Python' vs 'django/Django/JavaScript'). 1 match → proceeds; N → warning lists candidates; 0 → do NOT iterate guesses, call xmp4_projects(query=...) once then retry.",
+            "type": "string"
+          },
+          "symbol_name": {
+            "description": "Symbol name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project",
+          "symbol_name"
+        ],
+        "title": "SymbolParams",
+        "type": "object"
+      },
+      "name": "xmp4_callees"
+    },
+    {
+      "description": "Find direct callers of a symbol in a project. Navigate step-by-step by calling xmp4_callers again on interesting results.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "docs": {
+            "description": "Include docs: none (default) | summary | full (xmp4_info only)",
+            "nullable": true,
+            "type": "string"
+          },
+          "file_path": {
+            "description": "File path to disambiguate",
+            "nullable": true,
+            "type": "string"
+          },
+          "output_format": {
+            "description": "Output format: Compact (default) or Verbose",
+            "nullable": true,
+            "type": "string"
+          },
+          "page": {
+            "default": null,
+            "description": "Page number (1-based, default 1; ignored by xmp4_info/xmp4_source)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "page_size": {
+            "default": null,
+            "description": "Results per page (default 20, max 100)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "project": {
+            "description": "Project id: 'repo/project' or 'repo/project/language'. Case-insensitive prefix match. Append '/Python'|'/CSharp'|'/Java'|etc. only to disambiguate multi-language projects (e.g. 'django/Django/Python' vs 'django/Django/JavaScript'). 1 match → proceeds; N → warning lists candidates; 0 → do NOT iterate guesses, call xmp4_projects(query=...) once then retry.",
+            "type": "string"
+          },
+          "symbol_name": {
+            "description": "Symbol name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project",
+          "symbol_name"
+        ],
+        "title": "SymbolParams",
+        "type": "object"
+      },
+      "name": "xmp4_callers"
+    },
+    {
+      "description": "List external dependencies of a project.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "output_format": {
+            "description": "Output format: Compact (default) or Verbose",
+            "nullable": true,
+            "type": "string"
+          },
+          "page": {
+            "default": null,
+            "description": "Page number (1-based, default 1)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "page_size": {
+            "default": null,
+            "description": "Results per page (default 20, max 100)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "project": {
+            "description": "Project id: 'repo/project' or 'repo/project/language'. Case-insensitive prefix match. Append '/Python'|'/CSharp'|'/Java'|etc. only to disambiguate multi-language projects (e.g. 'django/Django/Python' vs 'django/Django/JavaScript'). 1 match → proceeds; N → warning lists candidates; 0 → do NOT iterate guesses, call xmp4_projects(query=...) once then retry.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project"
+        ],
+        "title": "RepoParams",
+        "type": "object"
+      },
+      "name": "xmp4_deps"
+    },
+    {
+      "description": "Server-side regex text search over indexed project source files. Free tier: requires file_path (single file). Premium tier (XMP4_PREMIUM_GREP_WALK=true): allows file_glob multi-file walk. Prefer xmp4_tests_for/xmp4_usages for SCIP symbols — grep is for text not indexed (comments, literals, config keys).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "case_sensitive": {
+            "description": "If true, search is case-sensitive (default false)",
+            "nullable": true,
+            "type": "boolean"
+          },
+          "file_glob": {
+            "description": "Optional file glob for multi-file walk (premium tier). Set XMP4_PREMIUM_GREP_WALK=true to enable.",
+            "nullable": true,
+            "type": "string"
+          },
+          "file_path": {
+            "description": "Single-file grep target, repo-relative (e.g. 'src/foo.rs'). Required in free tier.",
+            "nullable": true,
+            "type": "string"
+          },
+          "max_results": {
+            "default": null,
+            "description": "Maximum number of hits to collect before pagination (default 50, max 1000)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "page": {
+            "default": null,
+            "description": "Page number (1-based, default 1)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "page_size": {
+            "default": null,
+            "description": "Results per page (default 20, max 100)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "pattern": {
+            "description": "Regex pattern (case-insensitive by default)",
+            "type": "string"
+          },
+          "project": {
+            "description": "Project id: 'repo/project' or 'repo/project/language'. Case-insensitive prefix match. Append '/Python'|'/CSharp'|'/Java'|etc. only to disambiguate multi-language projects (e.g. 'django/Django/Python' vs 'django/Django/JavaScript'). 1 match → proceeds; N → warning lists candidates; 0 → do NOT iterate guesses, call xmp4_projects(query=...) once then retry.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project",
+          "pattern"
+        ],
+        "title": "GrepParams",
+        "type": "object"
+      },
+      "name": "xmp4_grep"
+    },
+    {
+      "description": "Usage guide for xmp4 tools — read this first to learn the correct workflow",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "xmp4_guide"
+    },
+    {
+      "description": "Get type hierarchy (base, interfaces, derived) for a symbol in a project.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "docs": {
+            "description": "Include docs: none (default) | summary | full (xmp4_info only)",
+            "nullable": true,
+            "type": "string"
+          },
+          "file_path": {
+            "description": "File path to disambiguate",
+            "nullable": true,
+            "type": "string"
+          },
+          "output_format": {
+            "description": "Output format: Compact (default) or Verbose",
+            "nullable": true,
+            "type": "string"
+          },
+          "page": {
+            "default": null,
+            "description": "Page number (1-based, default 1; ignored by xmp4_info/xmp4_source)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "page_size": {
+            "default": null,
+            "description": "Results per page (default 20, max 100)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "project": {
+            "description": "Project id: 'repo/project' or 'repo/project/language'. Case-insensitive prefix match. Append '/Python'|'/CSharp'|'/Java'|etc. only to disambiguate multi-language projects (e.g. 'django/Django/Python' vs 'django/Django/JavaScript'). 1 match → proceeds; N → warning lists candidates; 0 → do NOT iterate guesses, call xmp4_projects(query=...) once then retry.",
+            "type": "string"
+          },
+          "symbol_name": {
+            "description": "Symbol name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project",
+          "symbol_name"
+        ],
+        "title": "SymbolParams",
+        "type": "object"
+      },
+      "name": "xmp4_hierarchy"
+    },
+    {
+      "description": "Get detailed information about a symbol in a project.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "docs": {
+            "description": "Include docs: none (default) | summary | full (xmp4_info only)",
+            "nullable": true,
+            "type": "string"
+          },
+          "file_path": {
+            "description": "File path to disambiguate",
+            "nullable": true,
+            "type": "string"
+          },
+          "output_format": {
+            "description": "Output format: Compact (default) or Verbose",
+            "nullable": true,
+            "type": "string"
+          },
+          "page": {
+            "default": null,
+            "description": "Page number (1-based, default 1; ignored by xmp4_info/xmp4_source)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "page_size": {
+            "default": null,
+            "description": "Results per page (default 20, max 100)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "project": {
+            "description": "Project id: 'repo/project' or 'repo/project/language'. Case-insensitive prefix match. Append '/Python'|'/CSharp'|'/Java'|etc. only to disambiguate multi-language projects (e.g. 'django/Django/Python' vs 'django/Django/JavaScript'). 1 match → proceeds; N → warning lists candidates; 0 → do NOT iterate guesses, call xmp4_projects(query=...) once then retry.",
+            "type": "string"
+          },
+          "symbol_name": {
+            "description": "Symbol name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project",
+          "symbol_name"
+        ],
+        "title": "SymbolParams",
+        "type": "object"
+      },
+      "name": "xmp4_info"
+    },
+    {
+      "description": "Get outline (all symbols) for a file in a project.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "file_path": {
+            "description": "File path",
+            "type": "string"
+          },
+          "output_format": {
+            "description": "Output format: Compact (default) or Verbose",
+            "nullable": true,
+            "type": "string"
+          },
+          "page": {
+            "default": null,
+            "description": "Page number (1-based, default 1)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "page_size": {
+            "default": null,
+            "description": "Results per page (default 20, max 100)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "project": {
+            "description": "Project id: 'repo/project' or 'repo/project/language'. Case-insensitive prefix match. Append '/Python'|'/CSharp'|'/Java'|etc. only to disambiguate multi-language projects (e.g. 'django/Django/Python' vs 'django/Django/JavaScript'). 1 match → proceeds; N → warning lists candidates; 0 → do NOT iterate guesses, call xmp4_projects(query=...) once then retry.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project",
+          "file_path"
+        ],
+        "title": "OutlineParams",
+        "type": "object"
+      },
+      "name": "xmp4_outline"
+    },
+    {
+      "description": "Search and browse projects by language and name. Use this first to discover projects, then use other tools with the repo name.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "language": {
+            "description": "Filter by language (e.g., Python, TypeScript, CSharp)",
+            "nullable": true,
+            "type": "string"
+          },
+          "page": {
+            "default": null,
+            "description": "Page number (1-based, default 1)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "page_size": {
+            "default": null,
+            "description": "Results per page (default 20, max 100)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "query": {
+            "description": "Search by project name (case-insensitive contains)",
+            "nullable": true,
+            "type": "string"
+          },
+          "repo": {
+            "description": "Filter by repository name",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "title": "ProjectsParams",
+        "type": "object"
+      },
+      "name": "xmp4_projects"
+    },
+    {
+      "description": "Search symbols in a project. Use xmp4_projects first to find the project identifier.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "kind": {
+            "description": "Filter by kind: Class, Method, Function, etc.",
+            "nullable": true,
+            "type": "string"
+          },
+          "max_results": {
+            "default": null,
+            "description": "Maximum results to return (default: 50). Kept as per-page upper bound alongside page_size.",
+            "format": "uint",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "output_format": {
+            "description": "Output format: Compact (default) or Verbose",
+            "nullable": true,
+            "type": "string"
+          },
+          "page": {
+            "default": null,
+            "description": "Page number (1-based, default 1)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "page_size": {
+            "default": null,
+            "description": "Results per page (default 20, max 100)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "project": {
+            "description": "Project id: 'repo/project' or 'repo/project/language'. Case-insensitive prefix match. Append '/Python'|'/CSharp'|'/Java'|etc. only to disambiguate multi-language projects (e.g. 'django/Django/Python' vs 'django/Django/JavaScript'). 1 match → proceeds; N → warning lists candidates; 0 → do NOT iterate guesses, call xmp4_projects(query=...) once then retry.",
+            "type": "string"
+          },
+          "query": {
+            "description": "Search query (symbol name or pattern)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project",
+          "query"
+        ],
+        "title": "SearchParams",
+        "type": "object"
+      },
+      "name": "xmp4_search"
+    },
+    {
+      "description": "Get server information, version, and capabilities",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "xmp4_server"
+    },
+    {
+      "description": "Extract source code for a symbol in a project.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "docs": {
+            "description": "Include docs: none (default) | summary | full (xmp4_info only)",
+            "nullable": true,
+            "type": "string"
+          },
+          "file_path": {
+            "description": "File path to disambiguate",
+            "nullable": true,
+            "type": "string"
+          },
+          "output_format": {
+            "description": "Output format: Compact (default) or Verbose",
+            "nullable": true,
+            "type": "string"
+          },
+          "page": {
+            "default": null,
+            "description": "Page number (1-based, default 1; ignored by xmp4_info/xmp4_source)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "page_size": {
+            "default": null,
+            "description": "Results per page (default 20, max 100)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "project": {
+            "description": "Project id: 'repo/project' or 'repo/project/language'. Case-insensitive prefix match. Append '/Python'|'/CSharp'|'/Java'|etc. only to disambiguate multi-language projects (e.g. 'django/Django/Python' vs 'django/Django/JavaScript'). 1 match → proceeds; N → warning lists candidates; 0 → do NOT iterate guesses, call xmp4_projects(query=...) once then retry.",
+            "type": "string"
+          },
+          "symbol_name": {
+            "description": "Symbol name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project",
+          "symbol_name"
+        ],
+        "title": "SymbolParams",
+        "type": "object"
+      },
+      "name": "xmp4_source"
+    },
+    {
+      "description": "LSP-style position→symbol lookup. Given (file_path, line, column) returns the symbol whose occurrence covers that cursor position. line is 1-based; column is 0-based. Use after xmp4_outline/xmp4_view when you know coordinates and want the canonical symbol.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "column": {
+            "default": null,
+            "description": "Column number (0-based, default 0 = beginning of line)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "file_path": {
+            "description": "File path inside the project, relative to repo root",
+            "type": "string"
+          },
+          "line": {
+            "default": null,
+            "description": "Line number (1-based)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "project": {
+            "description": "Project id: 'repo/project' or 'repo/project/language'. Case-insensitive prefix match. Append '/Python'|'/CSharp'|'/Java'|etc. only to disambiguate multi-language projects (e.g. 'django/Django/Python' vs 'django/Django/JavaScript'). 1 match → proceeds; N → warning lists candidates; 0 → do NOT iterate guesses, call xmp4_projects(query=...) once then retry.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project",
+          "file_path"
+        ],
+        "title": "SymbolAtParams",
+        "type": "object"
+      },
+      "name": "xmp4_symbol_at"
+    },
+    {
+      "description": "Find direct tests that exercise a given symbol (direct callers filtered to test-file candidates per language pattern: CSharp/Java/PHP: *Test(s).<ext>; Python: test_*.py / *_test.py; TypeScript/JavaScript: *.spec/test.{ts,js}; Rust: *_tests.rs / tests/; etc.).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "docs": {
+            "description": "Include docs: none (default) | summary | full (xmp4_info only)",
+            "nullable": true,
+            "type": "string"
+          },
+          "file_path": {
+            "description": "File path to disambiguate",
+            "nullable": true,
+            "type": "string"
+          },
+          "output_format": {
+            "description": "Output format: Compact (default) or Verbose",
+            "nullable": true,
+            "type": "string"
+          },
+          "page": {
+            "default": null,
+            "description": "Page number (1-based, default 1; ignored by xmp4_info/xmp4_source)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "page_size": {
+            "default": null,
+            "description": "Results per page (default 20, max 100)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "project": {
+            "description": "Project id: 'repo/project' or 'repo/project/language'. Case-insensitive prefix match. Append '/Python'|'/CSharp'|'/Java'|etc. only to disambiguate multi-language projects (e.g. 'django/Django/Python' vs 'django/Django/JavaScript'). 1 match → proceeds; N → warning lists candidates; 0 → do NOT iterate guesses, call xmp4_projects(query=...) once then retry.",
+            "type": "string"
+          },
+          "symbol_name": {
+            "description": "Symbol name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project",
+          "symbol_name"
+        ],
+        "title": "SymbolParams",
+        "type": "object"
+      },
+      "name": "xmp4_tests_for"
+    },
+    {
+      "description": "Find all usages/references of a symbol in a project.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "docs": {
+            "description": "Include docs: none (default) | summary | full (xmp4_info only)",
+            "nullable": true,
+            "type": "string"
+          },
+          "file_path": {
+            "description": "File path to disambiguate",
+            "nullable": true,
+            "type": "string"
+          },
+          "output_format": {
+            "description": "Output format: Compact (default) or Verbose",
+            "nullable": true,
+            "type": "string"
+          },
+          "page": {
+            "default": null,
+            "description": "Page number (1-based, default 1; ignored by xmp4_info/xmp4_source)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "page_size": {
+            "default": null,
+            "description": "Results per page (default 20, max 100)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "project": {
+            "description": "Project id: 'repo/project' or 'repo/project/language'. Case-insensitive prefix match. Append '/Python'|'/CSharp'|'/Java'|etc. only to disambiguate multi-language projects (e.g. 'django/Django/Python' vs 'django/Django/JavaScript'). 1 match → proceeds; N → warning lists candidates; 0 → do NOT iterate guesses, call xmp4_projects(query=...) once then retry.",
+            "type": "string"
+          },
+          "symbol_name": {
+            "description": "Symbol name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project",
+          "symbol_name"
+        ],
+        "title": "SymbolParams",
+        "type": "object"
+      },
+      "name": "xmp4_usages"
+    },
+    {
+      "description": "Read a raw file excerpt from an indexed project by line range. Use after xmp4_search/xmp4_outline locates the region of interest, or to expand a truncated xmp4_source snippet. Hard cap of 500 lines per call.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "file_path": {
+            "description": "File path inside the project, relative to repo root",
+            "type": "string"
+          },
+          "from_line": {
+            "default": null,
+            "description": "Starting line (1-based, default 1)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "project": {
+            "description": "Project id: 'repo/project' or 'repo/project/language'. Case-insensitive prefix match. Append '/Python'|'/CSharp'|'/Java'|etc. only to disambiguate multi-language projects (e.g. 'django/Django/Python' vs 'django/Django/JavaScript'). 1 match → proceeds; N → warning lists candidates; 0 → do NOT iterate guesses, call xmp4_projects(query=...) once then retry.",
+            "type": "string"
+          },
+          "to_line": {
+            "default": null,
+            "description": "Ending line (inclusive, default from_line+49, hard cap 500 lines per call)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "project",
+          "file_path"
+        ],
+        "title": "ViewParams",
+        "type": "object"
+      },
+      "name": "xmp4_view"
+    }
+  ],
+  "url": "https://mcp.example4.ai/mcp"
+}

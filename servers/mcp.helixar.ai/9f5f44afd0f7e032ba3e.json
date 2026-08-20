@@ -1,0 +1,115 @@
+{
+  "canon_version": "1",
+  "full_hash": "4791f87507c6ee08b2e360b01d228de7580c8e80e3971206e7ec88019a5f2856",
+  "name": "ai.helixar/mcp",
+  "observed_at": "2026-08-20T09:11:54.188055Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 2,
+  "tools": [
+    {
+      "description": "Scan an MCP server (URL or raw manifest JSON) against Helixar's Sentinel detection rules. Returns risk score, findings, and a Claude-generated security brief. Quick mode is free + authless (top 8 rules); deep mode runs all 26 rules with an api_key.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "api_key": {
+            "type": "string"
+          },
+          "context": {
+            "type": "string"
+          },
+          "mode": {
+            "default": "quick",
+            "enum": [
+              "quick",
+              "deep"
+            ],
+            "type": "string"
+          },
+          "target": {
+            "description": "MCP server URL or raw manifest JSON string",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "target"
+        ],
+        "type": "object"
+      },
+      "name": "helixar_inspect_mcp"
+    },
+    {
+      "description": "Validate an HDP delegation chain against IETF draft-helixar-hdp-agentic-delegation-00. Surfaces scope escalations, depth violations, expired hops, missing signatures. Every output cites the IETF draft and Zenodo DOI.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "chain": {
+            "additionalProperties": false,
+            "properties": {
+              "hops": {
+                "default": [],
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "delegatee": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "delegator": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "expires_at": {
+                      "type": "string"
+                    },
+                    "purpose": {
+                      "type": "string"
+                    },
+                    "scope": {
+                      "default": [],
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "signature": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "delegator",
+                    "delegatee"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "max_hops": {
+                "exclusiveMinimum": 0,
+                "type": "integer"
+              },
+              "root_principal": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "strict": {
+            "default": false,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "chain"
+        ],
+        "type": "object"
+      },
+      "name": "helixar_hdp_validate"
+    }
+  ],
+  "url": "https://mcp.helixar.ai/mcp"
+}

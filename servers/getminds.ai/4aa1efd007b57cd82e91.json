@@ -1,0 +1,1559 @@
+{
+  "canon_version": "1",
+  "full_hash": "d03f057d0015511ee8fa42a3714603a3d3a4b1540b30f4c8afdea5fbdf829d59",
+  "name": "ai.getminds/minds",
+  "observed_at": "2026-08-20T18:45:56.890573Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 18,
+  "tools": [
+    {
+      "_meta": {
+        "openai/toolInvocation/invoked": "Panel created!",
+        "openai/toolInvocation/invoking": "Building your panel..."
+      },
+      "annotations": {
+        "confirmationHint": false,
+        "costHint": "low",
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "timeoutHint": 30000,
+        "title": "Create a Panel"
+      },
+      "description": "Creates a new research Panel from existing Groups or inline Group configurations when the intended outcome is a new Panel. Follow-up research on an existing Panel does not require creation. Composite creation is atomic and rolls back partial Group failures. Panels are private by default; enabling link sharing also publishes the attached Groups and Minds.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "groupConfigs": {
+            "description": "New groups to create inline. Each group needs mindIds (legacy: sparkIds); name is optional and defaults to \"Group N\".",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "mindIds": {
+                  "description": "Mind IDs to add to this group — use list_minds to find IDs",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "name": {
+                  "description": "Group name (optional — defaults to \"Group N\"). E.g., \"Gen Z Consumers\", \"Marketing Experts\"",
+                  "type": "string"
+                },
+                "sparkIds": {
+                  "description": "Legacy alias for mindIds. Accepted for back-compat.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "groupIds": {
+            "description": "Existing group IDs to attach — use list_groups to find IDs",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "isLinkSharingEnabled": {
+            "default": false,
+            "description": "Set true ONLY when the user explicitly asked for a public/shareable panel link. Defaults to false: the panel is private to its owner and no share URL is generated. Enabling this ALSO publishes every attached group and every Mind inside them at world-readable URLs — including pre-existing groups passed via groupIds. Do not enable it to \"be helpful\".",
+            "type": "boolean"
+          },
+          "name": {
+            "description": "Name for the panel (e.g., \"Brand Perception Study\", \"Q4 Market Research\")",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "create_panel",
+      "title": "Create a Panel"
+    },
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://widget/response.html",
+        "ui": {
+          "resourceUri": "ui://widget/response.html"
+        },
+        "ui/resourceUri": "ui://widget/response.html"
+      },
+      "annotations": {
+        "confirmationHint": false,
+        "costHint": "medium",
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "timeoutHint": 15000,
+        "title": "Ask a Panel"
+      },
+      "description": "Submits one respondent-visible question to an existing Panel and starts asynchronous responses from its Minds. Follow-up questions remain within the existing Panel; this operation does not create or enumerate Panels. The full question value may reach respondents and is not planner-only metadata. Scale, categorical, and qualitative questions are classified automatically, and the response includes status and workspace links.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "attachments": {
+            "description": "Files/images (e.g. a pitch deck PDF) processed once and given to every panelist as context. Each entry needs a url or path.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "description": "File name",
+                  "type": "string"
+                },
+                "path": {
+                  "description": "Storage path of an already-uploaded file",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "MIME type when known",
+                  "type": "string"
+                },
+                "url": {
+                  "description": "Public or signed URL of an uploaded/remote file",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "groupIds": {
+            "description": "Only survey specific groups (defaults to all)",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "historyMode": {
+            "description": "**Control cross-item carryover.** Defaults to none: every question is an independent measurement and the run processes them in parallel. **Use last5 only when the panel is a conversation** or when a respondent staying coherent across items is what the customer is buying; it costs roughly 2.4x wall-clock for about 0.6pp of accuracy. followup_only carries history for conversational turns but not questionnaire items.",
+            "enum": [
+              "last5",
+              "followup_only",
+              "none"
+            ],
+            "type": "string"
+          },
+          "panelId": {
+            "description": "Panel ID (UUID). Omit both panelId and panelName only when continuing the active panel from this MCP session.",
+            "type": "string"
+          },
+          "panelName": {
+            "description": "Panel name (fuzzy matched). Omit both panelName and panelId only when continuing the active panel from this MCP session.",
+            "type": "string"
+          },
+          "question": {
+            "description": "Respondent-visible research input for every selected Mind. The system may classify or reformat it, but any text in this field can reach the Minds and influence their answers. Include only the concept, question, and instructions the Minds should receive. Never place planner-only or MCP-client orchestration instructions here.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "sourcePolicy": {
+            "description": "Use knowledge_only to forbid web/request sources and require every answer to be grounded in processed Mind knowledge.",
+            "enum": [
+              "auto",
+              "knowledge_only"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "type": "object"
+      },
+      "name": "ask_panel",
+      "title": "Ask a Panel"
+    },
+    {
+      "_meta": {
+        "openai/toolInvocation/invoked": "Report ready!",
+        "openai/toolInvocation/invoking": "Exporting panel report..."
+      },
+      "annotations": {
+        "confirmationHint": false,
+        "costHint": "high",
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "timeoutHint": 120000,
+        "title": "Export Panel Report"
+      },
+      "description": "Starts an asynchronous export of Panel results and returns an export job ID. Supports executive briefs, full reports, and raw data in PDF, HTML, PNG ZIP, DOCX, PPTX, Markdown, CSV, XLS, or SPSS SAV formats, subject to report-kind compatibility.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "force": {
+            "description": "Regenerate instead of returning a cached artifact.",
+            "type": "boolean"
+          },
+          "format": {
+            "description": "Export format: \"pdf\" (default), \"html\" or \"png\" for executive summaries, \"docx\", \"pptx\", \"csv\", \"xls\", \"sav\", or \"md\" (also accepts \"markdown\"). Executive-summary PPTX exports use a slide-native 16:9 layout.",
+            "enum": [
+              "pdf",
+              "html",
+              "png",
+              "docx",
+              "pptx",
+              "csv",
+              "xls",
+              "sav",
+              "md",
+              "markdown"
+            ],
+            "type": "string"
+          },
+          "kind": {
+            "description": "Report kind. Defaults to full_report, except CSV/XLS/SAV which default to raw_data.",
+            "enum": [
+              "executive_brief",
+              "full_report",
+              "raw_data"
+            ],
+            "type": "string"
+          },
+          "length": {
+            "description": "Requested report detail for executive_brief and full_report exports.",
+            "enum": [
+              "brief",
+              "standard",
+              "detailed"
+            ],
+            "type": "string"
+          },
+          "panelId": {
+            "description": "Panel ID (UUID). Omit both panelId and panelName only when exporting the active panel from this MCP session.",
+            "type": "string"
+          },
+          "panelName": {
+            "description": "Panel name (fuzzy matched). Omit both panelName and panelId only when exporting the active panel from this MCP session.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "export_panel",
+      "title": "Export Panel Report"
+    },
+    {
+      "_meta": {
+        "openai/toolInvocation/invoked": "Profile ready!",
+        "openai/toolInvocation/invoking": "Exporting Mind profile..."
+      },
+      "annotations": {
+        "confirmationHint": false,
+        "costHint": "high",
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "timeoutHint": 120000,
+        "title": "Export Mind Persona Profile"
+      },
+      "description": "Generates a branded profile for one existing Mind, identified by exact ID or fuzzy name. Markdown is returned inline by default; PDF, DOCX, and PPTX artifacts are returned as base64 with a workspace link.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "force": {
+            "description": "Regenerate instead of returning a cached artifact.",
+            "type": "boolean"
+          },
+          "format": {
+            "description": "Export format: \"md\" (default) markdown persona profile (returned inline), \"pdf\" portrait branded profile, \"docx\" Word document, \"pptx\" editable branded deck",
+            "enum": [
+              "md",
+              "markdown",
+              "pdf",
+              "docx",
+              "pptx"
+            ],
+            "type": "string"
+          },
+          "mindId": {
+            "description": "Mind ID (UUID)",
+            "type": "string"
+          },
+          "mindName": {
+            "description": "Mind name (fuzzy matched)",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "export_mind",
+      "title": "Export Mind Persona Profile"
+    },
+    {
+      "_meta": {
+        "openai/scopes": [
+          "sparks:read"
+        ],
+        "openai/toolInvocation/invoked": "Group brief ready!",
+        "openai/toolInvocation/invoking": "Exporting group brief..."
+      },
+      "annotations": {
+        "confirmationHint": false,
+        "costHint": "high",
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "timeoutHint": 120000,
+        "title": "Export Group Brief"
+      },
+      "description": "Export a group brief through the same unified branded renderer used by the web app. Supports Markdown, PDF, DOCX, and PPTX. Binary artifacts are returned as base64.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "force": {
+            "description": "Regenerate instead of returning a cached artifact.",
+            "type": "boolean"
+          },
+          "format": {
+            "description": "Export format: \"md\" (default), \"pdf\", \"docx\", or \"pptx\"",
+            "enum": [
+              "md",
+              "markdown",
+              "pdf",
+              "docx",
+              "pptx"
+            ],
+            "type": "string"
+          },
+          "groupId": {
+            "description": "Group ID (UUID)",
+            "type": "string"
+          },
+          "groupName": {
+            "description": "Group name (fuzzy matched)",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "export_group",
+      "title": "Export Group Brief"
+    },
+    {
+      "_meta": {
+        "openai/scopes": [
+          "flows:read"
+        ],
+        "openai/toolInvocation/invoked": "Heatmap archive ready!",
+        "openai/toolInvocation/invoking": "Exporting website heatmap..."
+      },
+      "annotations": {
+        "confirmationHint": false,
+        "costHint": "high",
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "timeoutHint": 120000,
+        "title": "Export Website Heatmap"
+      },
+      "description": "Export a completed website heatmap from a panel message, identified by the message ID that the panel reports on its completed results. Returns the same ZIP archive as the web app, including its unified-renderer PDF report, Markdown, images, and metadata.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "force": {
+            "description": "Regenerate the ZIP archive instead of returning the cached artifact.",
+            "type": "boolean"
+          },
+          "messageId": {
+            "description": "ID of the completed panel message containing the website heatmap. Completed panel results report this identifier when the answer carries a heatmap.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "panelId": {
+            "description": "Panel ID (UUID)",
+            "type": "string"
+          },
+          "panelName": {
+            "description": "Panel name (fuzzy matched)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "messageId"
+        ],
+        "type": "object"
+      },
+      "name": "export_heatmap",
+      "title": "Export Website Heatmap"
+    },
+    {
+      "_meta": {
+        "openai/scopes": [
+          "flows:read"
+        ],
+        "openai/visibility": "public"
+      },
+      "annotations": {
+        "confirmationHint": false,
+        "costHint": "low",
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "timeoutHint": 10000,
+        "title": "List Panels"
+      },
+      "description": "Lists the authenticated user's Panels with their Groups, Minds, status, sharing state, and workspace or shared links. Accepts an optional fuzzy name search. Panels may also be described as studies, surveys, research projects, focus groups, or research conversations.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "searchQuery": {
+            "description": "Search for a panel by name (fuzzy matching supported)",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_panels",
+      "title": "List Panels"
+    },
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://widget/response.html",
+        "openai/scopes": [
+          "flows:read"
+        ],
+        "openai/visibility": "public",
+        "ui": {
+          "resourceUri": "ui://widget/response.html"
+        },
+        "ui/resourceUri": "ui://widget/response.html"
+      },
+      "annotations": {
+        "confirmationHint": false,
+        "costHint": "low",
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "timeoutHint": 15000,
+        "title": "Get Panel Status"
+      },
+      "description": "Returns current Panel state, live progress for in-flight questions, completed per-Group results, linked Minds, Panel links, and the status of a specific asynchronous export job when export identifiers are supplied.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "exportFormat": {
+            "description": "Asynchronous export format whose status should be returned (defaults to pdf).",
+            "enum": [
+              "pdf",
+              "html",
+              "png",
+              "docx",
+              "pptx",
+              "csv",
+              "xls",
+              "sav",
+              "md"
+            ],
+            "type": "string"
+          },
+          "exportJobId": {
+            "description": "Export job ID returned by export_panel. Pass it with exportKind and exportFormat to poll that exact artifact.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "exportKind": {
+            "description": "Asynchronous export kind whose status should be returned (defaults to full_report).",
+            "enum": [
+              "executive_brief",
+              "full_report",
+              "raw_data"
+            ],
+            "type": "string"
+          },
+          "panelId": {
+            "description": "Panel ID (UUID). Omit both panelId and panelName only for the active panel from this MCP session.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "panelName": {
+            "description": "Panel name (fuzzy matched). Omit both panelName and panelId only for the active panel from this MCP session.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_panel_status",
+      "title": "Get Panel Status"
+    },
+    {
+      "_meta": {
+        "openai/scopes": [
+          "sparks:read"
+        ],
+        "openai/visibility": "public"
+      },
+      "annotations": {
+        "confirmationHint": false,
+        "costHint": "low",
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "timeoutHint": 10000,
+        "title": "List Groups"
+      },
+      "description": "Lists the authenticated user's Groups, including member Minds, sharing state, and workspace or shared links. Accepts an optional fuzzy name search. Groups may also be described as audiences, segments, cohorts, target groups, or persona collections.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "searchQuery": {
+            "description": "Search for a group by name (fuzzy matching supported)",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_groups",
+      "title": "List Groups"
+    },
+    {
+      "_meta": {
+        "openai/scopes": [
+          "sparks:write"
+        ],
+        "openai/visibility": "public"
+      },
+      "annotations": {
+        "confirmationHint": false,
+        "costHint": "medium",
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "timeoutHint": 900000,
+        "title": "Create a Grounded Group from a Brief"
+      },
+      "description": "Creates a grounded Group of synthetic Minds from a population or audience brief. It can combine authoritative web research, supplied sources, research files, and reviewed spreadsheet distributions; persists provenance and allocation audits; supports balanced, segment-coverage, and benchmark-depth sizing; is idempotent for identical inputs; and keeps the Group private unless link sharing is enabled.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "brief": {
+            "description": "Free-text brief describing the population the group should represent. E.g. \"California high school students grades 9-12\", \"Berlin Späti customers\", \"Spanish lawyers\", \"management team of Coca Cola\". The server runs deep web research on this brief to find demographic / psychographic distributions from authoritative sources, then generates personas that proportionally reflect those distributions.",
+            "maxLength": 4000,
+            "minLength": 3,
+            "type": "string"
+          },
+          "cohortAllocation": {
+            "additionalProperties": false,
+            "description": "Deterministic allocation controls. Reviewed respondent datasets default to observed, which preserves the strongest privacy-safe structural relationships while keeping exact marginals; other sources default to independence. Use distributionNames/maxDistributions to choose axes, minSegmentCount for a feasible floor, and seed for reproducible external runs.",
+            "properties": {
+              "distributionNames": {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "includeProfilesInResponse": {
+                "type": "boolean"
+              },
+              "jointStrategy": {
+                "enum": [
+                  "independent",
+                  "aligned",
+                  "observed"
+                ],
+                "type": "string"
+              },
+              "maxDistributions": {
+                "maximum": 200,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "minSegmentCount": {
+                "maximum": 20,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "seed": {
+                "maxLength": 200,
+                "type": "string"
+              },
+              "targetOverrides": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "distribution": {
+                      "type": "string"
+                    },
+                    "segments": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "label": {
+                            "type": "string"
+                          },
+                          "pct": {
+                            "maximum": 100,
+                            "minimum": 0,
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "label",
+                          "pct"
+                        ],
+                        "type": "object"
+                      },
+                      "maxItems": 50,
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "distribution",
+                    "segments"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 200,
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "datasetSegmentation": {
+            "additionalProperties": false,
+            "description": "Reviewed variable roles, distributions, and privacy-safe pairwise relationships returned by preview_group_dataset_segmentation. Requires groupCreationMode=\"benchmark_depth\". Structural variables shape one generalizable representative cohort; outcomes remain held out and joint combinations remain audit evidence only. Copy `respondentCount` and `recommendedMindCount` through from the preview — they cap the cohort size.",
+            "properties": {
+              "columns": {
+                "description": "Column-level distributions from the preview. Used when `variables` is absent.",
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "distribution": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "respondentCount": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "sharePct": {
+                            "minimum": 0,
+                            "type": "number"
+                          },
+                          "value": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "value",
+                          "respondentCount",
+                          "sharePct"
+                        ],
+                        "type": "object"
+                      },
+                      "maxItems": 30,
+                      "type": "array"
+                    },
+                    "key": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "otherRespondentCount": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "validRespondentCount": {
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "label",
+                    "distribution"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 200,
+                "type": "array"
+              },
+              "combinations": {
+                "description": "Observed joint profiles as audit counts. Copy the ids and counts from the preview; per-cell values are not needed.",
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "respondentCount": {
+                      "exclusiveMinimum": 0,
+                      "type": "integer"
+                    },
+                    "sharePct": {
+                      "minimum": 0,
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "respondentCount",
+                    "sharePct"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 5000,
+                "type": "array"
+              },
+              "fileName": {
+                "type": "string"
+              },
+              "recommendedMindCount": {
+                "description": "Preview-recommended cohort size. Caps how many Minds the benchmark run creates.",
+                "exclusiveMinimum": 0,
+                "type": "integer"
+              },
+              "respondentCount": {
+                "description": "Total respondent rows in the reviewed sheet, copied from the preview.",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "retainedCombinationIds": {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 5000,
+                "type": "array"
+              },
+              "segmentationColumns": {
+                "description": "Keys of the variables the user kept after review. These are the only ones that shape the cohort.",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 200,
+                "minItems": 1,
+                "type": "array"
+              },
+              "sheetName": {
+                "type": "string"
+              },
+              "variables": {
+                "description": "Variable-level distributions from the preview (preferred over `columns` when present).",
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "distribution": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "respondentCount": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "sharePct": {
+                            "minimum": 0,
+                            "type": "number"
+                          },
+                          "value": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "value",
+                          "respondentCount",
+                          "sharePct"
+                        ],
+                        "type": "object"
+                      },
+                      "maxItems": 30,
+                      "type": "array"
+                    },
+                    "key": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "otherRespondentCount": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "validRespondentCount": {
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "label",
+                    "distribution"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 200,
+                "type": "array"
+              }
+            },
+            "required": [
+              "fileName",
+              "segmentationColumns",
+              "combinations"
+            ],
+            "type": "object"
+          },
+          "files": {
+            "description": "Optional already-uploaded research files. The server analyzes these through the same extended screener/questionnaire path as the in-app New Group uploader, including study roles, screening and quota rules, review distributions, and grounding provenance.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "description": "File name",
+                  "type": "string"
+                },
+                "url": {
+                  "description": "Public or signed URL of an already-uploaded file",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "url"
+              ],
+              "type": "object"
+            },
+            "maxItems": 10,
+            "type": "array"
+          },
+          "groupCreationMode": {
+            "description": "Group creation mode. \"balanced\" (default): compact, representative group for everyday research. \"segment_coverage\": two representatives per limiting grounded audience cell, with a 10-Mind evidence floor and 50-Mind mode ceiling. \"benchmark_depth\": repeated representation of limiting grounded audience cells for validation-ready benchmark / survey-style segmentation, with the paid allowance as its ceiling. The deeper modes require a Team (enterprise) plan — on other plans the server SILENTLY downgrades to \"balanced\" and echoes the effective mode in the response (structuredContent.group.groupCreationMode).",
+            "enum": [
+              "balanced",
+              "segment_coverage",
+              "benchmark_depth"
+            ],
+            "type": "string"
+          },
+          "includeWebSearch": {
+            "default": true,
+            "description": "Set false to skip Exa web search and extraction completely. The group is then grounded only on the brief and supplied files, links, keywords, and structurally parsed respondent data.",
+            "type": "boolean"
+          },
+          "isLinkSharingEnabled": {
+            "default": false,
+            "description": "Set true ONLY when the user explicitly asked for a public/shareable link. Defaults to false: the group is private to its owner and no share URL is generated. Enabling this publishes the group — including its grounding, sources and personas — at a world-readable URL that needs no login. Do not enable it to \"be helpful\".",
+            "type": "boolean"
+          },
+          "keywords": {
+            "description": "Optional Exa web-search seeds added alongside the brief.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "type": "array"
+          },
+          "links": {
+            "description": "Optional URLs scraped server-side for additional context (e.g. an article describing the population).",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "type": "array"
+          },
+          "memberCount": {
+            "description": "Exact number of Minds to create in the group. Pass this whenever the user states a size (\"exactly 50 per region\", \"genau 50 Minds je Zelle\") instead of relying on the server to parse the number out of the brief prose. When omitted, the size is inferred from the brief and, failing that, from the creation mode's evidence-based automatic sizing. Rejected with 403 PLAN_LIMIT when it exceeds the plan's per-group cap; the group is never created at a partial size.",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "name": {
+            "description": "Optional group name override. When omitted, the server names the group from the brief or the LLM detection result.",
+            "maxLength": 100,
+            "type": "string"
+          },
+          "text": {
+            "description": "Legacy alias for `brief`. Accepted for back-compat.",
+            "maxLength": 4000,
+            "minLength": 3,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "create_group_from_brief",
+      "title": "Create a Grounded Group from a Brief"
+    },
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://widget/response.html",
+        "ui": {
+          "resourceUri": "ui://widget/response.html"
+        },
+        "ui/resourceUri": "ui://widget/response.html"
+      },
+      "annotations": {
+        "confirmationHint": false,
+        "costHint": "medium",
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "timeoutHint": 15000,
+        "title": "Ask a Group"
+      },
+      "description": "Submits one respondent-visible question to a single existing Group. The Group may be identified by exact ID or fuzzy name. The operation creates a private one-Group Panel, starts asynchronous responses from its Minds, and returns the Panel identifier and links for status retrieval.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "attachments": {
+            "description": "Files/images (e.g. a pitch deck PDF) processed once and given to every group member as context. Each entry needs a url or path.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "description": "File name",
+                  "type": "string"
+                },
+                "path": {
+                  "description": "Storage path of an already-uploaded file",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "MIME type when known",
+                  "type": "string"
+                },
+                "url": {
+                  "description": "Public or signed URL of an uploaded/remote file",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "groupId": {
+            "description": "The group ID (UUID). Preferred when known.",
+            "type": "string"
+          },
+          "groupName": {
+            "description": "Group name to resolve via fuzzy match against all of the user's groups. Use when the user refers to a group by name.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Optional name for the panel created to run this survey. Defaults to the group name.",
+            "type": "string"
+          },
+          "question": {
+            "description": "Respondent-visible research input for every Mind in the group. The system may classify or reformat it, but any text in this field can reach the Minds and influence their answers. Include only the concept, question, and instructions the Minds should receive. Never place planner-only or MCP-client orchestration instructions here.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "type": "object"
+      },
+      "name": "ask_group",
+      "title": "Ask a Group"
+    },
+    {
+      "annotations": {
+        "confirmationHint": false,
+        "costHint": "medium",
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "timeoutHint": 60000,
+        "title": "Plan a Panel Study"
+      },
+      "description": "Creates or revises a non-executing draft for a multi-question or structured Panel study. The draft records intent, respondent-visible stimulus and questions, response formats, locale, method, outputs, confirmation questions, and revision metadata. It does not start research.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "answers": {
+            "description": "Answers to the draft confirmation questions.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "answer": {
+                  "description": "The user's answer to that confirmation question.",
+                  "type": "string"
+                },
+                "questionId": {
+                  "description": "Confirmation question ID from the latest draft.",
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "questionId",
+                "answer"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "draftPlanId": {
+            "description": "Existing draft ID to revise after the user answers a confirmation question.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "panelId": {
+            "description": "Panel ID (preferred). Omit both panelId and panelName only to continue the active panel from this MCP session.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "panelName": {
+            "description": "Panel name for fuzzy matching. Omit both panelName and panelId only to continue the active panel from this MCP session.",
+            "type": "string"
+          },
+          "questionResponses": {
+            "description": "Explicit response-format edits, one entry per question. Each entry needs questionId (from the latest draft) plus type qualitative, categorical, multiselect, or scale with an inclusive integer scaleRange.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "categoricalOptions": {
+                  "description": "Predefined answer choices; only valid for categorical or multiselect responses.",
+                  "items": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 100,
+                  "minItems": 2,
+                  "type": "array"
+                },
+                "maxSelections": {
+                  "description": "Maximum choices a respondent may select; only valid for multiselect responses.",
+                  "maximum": 100,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "questionId": {
+                  "description": "Question ID from the latest draft plan.",
+                  "maxLength": 80,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "scaleRange": {
+                  "description": "Inclusive integer response range as [minimum, maximum]; required for scale responses.",
+                  "items": {
+                    "maximum": 100,
+                    "minimum": -100,
+                    "type": "integer"
+                  },
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "type": "array"
+                },
+                "type": {
+                  "enum": [
+                    "qualitative",
+                    "categorical",
+                    "multiselect",
+                    "scale"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "questionId",
+                "type"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "refinement": {
+            "description": "How the user wants the existing draft changed.",
+            "type": "string"
+          },
+          "request": {
+            "description": "Planner input containing the research objective, question set, audit request, or analysis request. Required for a new draft. This request is not sent verbatim to Minds; the exact proposed respondent-visible questions are returned in the draft for review.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "revision": {
+            "description": "Current draft revision; required with draftPlanId.",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "source": {
+            "additionalProperties": false,
+            "description": "The one main source this study is about. When Minds must evaluate pasted text, use kind prompt and put the exact respondent-visible material in content. Keep research objectives, requested questions, and planner-only instructions in request.",
+            "properties": {
+              "content": {
+                "description": "Exact respondent-visible pasted text. Use only with kind prompt when Minds must evaluate a concept, message, description, or other text. Do not include planner-only instructions.",
+                "maxLength": 20000,
+                "minLength": 1,
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "prompt",
+                  "website",
+                  "image",
+                  "video",
+                  "document",
+                  "questionnaire",
+                  "other"
+                ],
+                "type": "string"
+              },
+              "label": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "mimeType": {
+                "type": "string"
+              },
+              "url": {
+                "format": "uri",
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "label"
+            ],
+            "type": "object"
+          },
+          "studyLocale": {
+            "description": "Language for the plan, questions, responses, labels, and summary. Set this explicitly when the user requests a language.",
+            "enum": [
+              "en",
+              "es",
+              "fr",
+              "de",
+              "zh",
+              "tr",
+              "ar",
+              "ja",
+              "ko"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "plan_panel_study",
+      "title": "Plan a Panel Study"
+    },
+    {
+      "annotations": {
+        "confirmationHint": true,
+        "costHint": "high",
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "timeoutHint": 15000,
+        "title": "Confirm and Run a Panel Study"
+      },
+      "description": "Executes an exact stored Panel-study draft revision after explicit confirmation. The server reloads and validates the revision, method availability, runner configuration, reviewed capabilities, optional advanced-method consent, and idempotency key before queuing durable research.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "advancedMethodOptIn": {
+            "description": "Explicit opt-in for an advanced method. Omit or false to keep simple methods.",
+            "type": "boolean"
+          },
+          "confirmed": {
+            "const": true,
+            "description": "Must be true only after the user explicitly confirms this exact draft revision.",
+            "type": "boolean"
+          },
+          "draftPlanId": {
+            "description": "Exact draft plan ID returned by plan_panel_study.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "groupIds": {
+            "description": "Optional subset of panel groups to include.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "idempotencyKey": {
+            "description": "Stable UUID for safe retries.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "panelId": {
+            "description": "Panel ID (preferred). Omit both panelId and panelName only to run the confirmed draft on the active panel from this MCP session.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "panelName": {
+            "description": "Panel name for fuzzy matching. Omit both panelName and panelId only to run the confirmed draft on the active panel from this MCP session.",
+            "type": "string"
+          },
+          "revision": {
+            "description": "Exact draft revision the user reviewed.",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "draftPlanId",
+          "revision",
+          "confirmed"
+        ],
+        "type": "object"
+      },
+      "name": "run_panel_study",
+      "title": "Confirm and Run a Panel Study"
+    },
+    {
+      "annotations": {
+        "confirmationHint": false,
+        "costHint": "low",
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "timeoutHint": 10000,
+        "title": "Get Panel Study Status"
+      },
+      "description": "Returns durable progress or results for a Panel study, including its immutable confirmed plan, server-prepared execution plan, respondent-visible question audit, question progress, response artifacts, deterministic method calculations, and stage readiness.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "panelId": {
+            "description": "Panel ID (preferred). Omit both panelId and panelName only for the active panel from this MCP session.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "panelName": {
+            "description": "Panel name for fuzzy matching. Omit both panelName and panelId only for the active panel from this MCP session.",
+            "type": "string"
+          },
+          "studyId": {
+            "description": "Study ID returned by run_panel_study.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "studyId"
+        ],
+        "type": "object"
+      },
+      "name": "get_panel_study",
+      "title": "Get Panel Study Status"
+    },
+    {
+      "annotations": {
+        "confirmationHint": false,
+        "costHint": "low",
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "timeoutHint": 10000,
+        "title": "List Research Methods"
+      },
+      "description": "Lists Minds research methods with availability, complexity, executable status, and fallback metadata. Results distinguish currently executable methods from experimental or planned methods.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "includePlanned": {
+            "default": true,
+            "description": "Include methods that are currently planned/non-executable so the model can explain framework compatibility. Availability is dynamic; only entries with executable:true can run.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_research_methods",
+      "title": "List Research Methods"
+    },
+    {
+      "annotations": {
+        "confirmationHint": false,
+        "costHint": "low",
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "timeoutHint": 10000,
+        "title": "List Study Drafts"
+      },
+      "description": "Lists durable unfinished study drafts, or returns the complete saved planning state for one exact draft ID. Draft records are distinct from running or completed studies.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "draftId": {
+            "description": "Exact study draft ID to retrieve. Omit to list all resumable study drafts owned by the authenticated user.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_study_drafts",
+      "title": "List Study Drafts"
+    },
+    {
+      "annotations": {
+        "confirmationHint": false,
+        "costHint": "low",
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "timeoutHint": 10000,
+        "title": "Save Study Draft"
+      },
+      "description": "Creates or checkpoints an unfinished Quick or Custom Study draft without starting research. It saves the objective, context, selected Audiences, method, questions, sources, and current planner step. Revisions require the exact draft ID and expected revision, and stale writes are rejected.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "currentStep": {
+            "default": "context",
+            "description": "Exact planner step to reopen, such as context, groups, method, questions, or confirm.",
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "draftId": {
+            "description": "Existing Study draft ID to revise. Omit to create a new durable draft.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "expectedRevision": {
+            "description": "Exact current revision. Required with draftId so stale updates cannot overwrite newer planning state.",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "groupIds": {
+            "default": [],
+            "description": "Existing Audience group IDs selected for the Study.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "methodId": {
+            "default": "guided-research",
+            "description": "Research method selected for the draft. Use list_research_methods as the availability authority.",
+            "enum": [
+              "guided-research",
+              "single-question",
+              "questionnaire",
+              "guided-qualitative-exploration",
+              "ranked-preferences",
+              "segment-comparison",
+              "visual-asset-analysis",
+              "recommendation-synthesis",
+              "maxdiff",
+              "conjoint",
+              "nps",
+              "top-box",
+              "key-drivers",
+              "turf",
+              "gabor-granger",
+              "van-westendorp",
+              "kano"
+            ],
+            "type": "string"
+          },
+          "mode": {
+            "default": "custom",
+            "description": "Planning mode to restore. Defaults to custom for agent-authored planning state.",
+            "enum": [
+              "quick",
+              "custom"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "description": "Sidebar name for the Study draft.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "notes": {
+            "description": "Additional research context or constraints.",
+            "type": "string"
+          },
+          "objective": {
+            "description": "Research objective or intent captured so far.",
+            "type": "string"
+          },
+          "questions": {
+            "default": [],
+            "description": "Manual research questions in their intended order.",
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "sourceUrls": {
+            "default": [],
+            "description": "Ordered source URLs supplied as Study context.",
+            "items": {
+              "format": "uri",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "website": {
+            "description": "Primary website associated with the research context.",
+            "format": "uri",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "save_study_draft",
+      "title": "Save Study Draft"
+    },
+    {
+      "annotations": {
+        "confirmationHint": false,
+        "costHint": "medium",
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "timeoutHint": 60000,
+        "title": "Get Panel Semantic Summary"
+      },
+      "description": "Returns or refreshes a semantic summary for a Panel study as Markdown plus flexible evidence blocks. Website, image, and video analyses retain heatmap-compatible block metadata.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "force": {
+            "default": false,
+            "description": "Regenerate even when the covered message range is unchanged.",
+            "type": "boolean"
+          },
+          "length": {
+            "default": "standard",
+            "enum": [
+              "short",
+              "standard",
+              "detailed"
+            ],
+            "type": "string"
+          },
+          "panelId": {
+            "description": "Panel ID (preferred). Omit both panelId and panelName only for the active panel from this MCP session.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "panelName": {
+            "description": "Panel name for fuzzy matching. Omit both panelName and panelId only for the active panel from this MCP session.",
+            "type": "string"
+          },
+          "refresh": {
+            "default": false,
+            "description": "Generate or refresh the summary instead of only reading the persisted summary.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_panel_summary",
+      "title": "Get Panel Semantic Summary"
+    }
+  ],
+  "url": "https://getminds.ai/mcp"
+}

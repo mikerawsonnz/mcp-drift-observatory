@@ -1,0 +1,196 @@
+{
+  "canon_version": "1",
+  "full_hash": "4750ec90c571751ff90e8c08421a29e962d9293d84ff66e86958e7b07b60cd9c",
+  "name": "ai.llmintel/model-lifecycle",
+  "observed_at": "2026-08-20T09:12:04.112086Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 5,
+  "tools": [
+    {
+      "annotations": {
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Check whether an LLM model id is safe to use, deprecated, or retired, and what to migrate to. Accepts the exact string used in code (e.g. 'gpt-4o', 'claude-sonnet-4-5-20250929', 'anthropic/claude-opus-4-1'). Call this before writing or changing any hardcoded model id.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "model": {
+            "description": "Model id or alias exactly as it appears in code, e.g. 'gpt-4o'.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "model"
+        ],
+        "type": "object"
+      },
+      "name": "check_model",
+      "title": "Check a model's lifecycle status"
+    },
+    {
+      "annotations": {
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "List tracked models scheduled to retire within a time window, soonest first. Use this to audit a codebase or plan migration work.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "provider": {
+            "description": "Restrict to one provider. Omit for all providers.",
+            "enum": [
+              "openai",
+              "anthropic",
+              "azure",
+              "bedrock",
+              "google",
+              "cohere",
+              "mistral"
+            ],
+            "type": "string"
+          },
+          "withinDays": {
+            "default": 180,
+            "description": "Only include models retiring within this many days. Defaults to 180.",
+            "exclusiveMinimum": 0,
+            "maximum": 1095,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_retiring_models",
+      "title": "List models retiring soon"
+    },
+    {
+      "annotations": {
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Given a deprecated or retiring model, return the provider's recommended replacement(s) and, when none is published, active models from the same provider to consider.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "model": {
+            "description": "Model id or alias to find a replacement for.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "model"
+        ],
+        "type": "object"
+      },
+      "name": "suggest_replacement",
+      "title": "Suggest a replacement for a model"
+    },
+    {
+      "annotations": {
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "List tracked models, optionally filtered by provider and lifecycle state. Use this to discover what is currently available from a provider.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "default": 50,
+            "description": "Maximum results.",
+            "exclusiveMinimum": 0,
+            "maximum": 200,
+            "type": "integer"
+          },
+          "provider": {
+            "description": "Filter by provider.",
+            "enum": [
+              "openai",
+              "anthropic",
+              "azure",
+              "bedrock",
+              "google",
+              "cohere",
+              "mistral"
+            ],
+            "type": "string"
+          },
+          "state": {
+            "description": "Filter by canonical lifecycle state, e.g. 'active' or 'deprecated'.",
+            "enum": [
+              "announced",
+              "active",
+              "legacy",
+              "deprecated",
+              "retiring",
+              "retired"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "search_models",
+      "title": "Search the model catalog"
+    },
+    {
+      "annotations": {
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Lifecycle state changes across all tracked providers, newest first. Use this to answer 'what model deprecations happened recently?'.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "provider": {
+            "description": "Restrict to one provider.",
+            "enum": [
+              "openai",
+              "anthropic",
+              "azure",
+              "bedrock",
+              "google",
+              "cohere",
+              "mistral"
+            ],
+            "type": "string"
+          },
+          "sinceDays": {
+            "default": 30,
+            "description": "Look back this many days. Defaults to 30.",
+            "exclusiveMinimum": 0,
+            "maximum": 365,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "recent_lifecycle_changes",
+      "title": "Recent lifecycle changes"
+    }
+  ],
+  "url": "https://llmintel.ai/v1/mcp"
+}

@@ -1,0 +1,1020 @@
+{
+  "canon_version": "1",
+  "full_hash": "1d401bed1f31ad4de6ff817e9a38a29e09bfa16b9c7d58215f0592bbf1979352",
+  "name": "ai.palmyr/palmyr",
+  "observed_at": "2026-08-20T09:12:23.836894Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 33,
+  "tools": [
+    {
+      "description": "List every paid Palmyr capability and its live x402 price (USDC on Solana/Base). Free — no payment required.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "palmyr_pricing",
+      "title": "Palmyr pricing"
+    },
+    {
+      "description": "List the i402 capabilities Palmyr can plan and execute (the intent-resolver catalog). Free — no payment required.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "palmyr_capabilities",
+      "title": "Palmyr capabilities"
+    },
+    {
+      "description": "State an intent, get a priced execution plan. The i402 orchestrator turns a natural-language outcome into an ordered list of x402 calls your agent signs and runs. Costs 0.10 USDC per plan, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "allow_budget_exceeded": {
+            "description": "Return an executable plan even if it exceeds budget_usdc",
+            "type": "boolean"
+          },
+          "budget_usdc": {
+            "description": "Max total USDC to spend across the whole plan",
+            "type": "number"
+          },
+          "constraints": {
+            "additionalProperties": {},
+            "type": "object"
+          },
+          "deadline_seconds": {
+            "type": "number"
+          },
+          "intent": {
+            "description": "Natural-language outcome, e.g. 'register a .com and set up email on it'",
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": {},
+            "description": "Optional structured parameters for the intent",
+            "type": "object"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          },
+          "quality": {
+            "description": "Optional quality hint, e.g. 'fast' | 'best'",
+            "type": "string"
+          }
+        },
+        "required": [
+          "intent",
+          "budget_usdc"
+        ],
+        "type": "object"
+      },
+      "name": "i402_plan",
+      "title": "i402 plan (intent resolver)"
+    },
+    {
+      "description": "Buy a USA prepaid Visa card loaded with EXACTLY the requested balance ($5–$1000). Dynamic x402 price = amount + fee (3% min 0.50 USDC) — the 402 instructions carry the exact total. Returns 202 with an operation_id: poll card_status until ready (~10s), then fetch the number with card_get. US merchants only; non-reloadable (spend across transactions until depleted); max 6 cards per agent per rolling 24h (issuer limit).",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "description": "USD balance to load on the card (min $5, max $1000, whole cents)",
+            "type": "number"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          }
+        },
+        "required": [
+          "amount"
+        ],
+        "type": "object"
+      },
+      "name": "card_buy",
+      "title": "Buy prepaid Visa card"
+    },
+    {
+      "description": "Poll a card purchase started by card_buy (free). done=true when status is 'ready' (fetch details with card_get) or 'failed' (payment auto-refunded — see refund_status).",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "card_id": {
+            "description": "operation_id / card_id returned by card_buy",
+            "type": "string"
+          }
+        },
+        "required": [
+          "card_id"
+        ],
+        "type": "object"
+      },
+      "name": "card_status",
+      "title": "Check card purchase status"
+    },
+    {
+      "description": "Retrieve a prepaid card you own: full card number, CVV, expiry, live balance. Owner-verified (0.01 USDC ownership proof; the paying wallet must be the card's buyer).",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "card_id": {
+            "description": "card_id returned by card_buy",
+            "type": "string"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          }
+        },
+        "required": [
+          "card_id"
+        ],
+        "type": "object"
+      },
+      "name": "card_get",
+      "title": "Get card number/CVV"
+    },
+    {
+      "description": "List cards owned by the paying wallet: status, last4, balance (never full numbers — those are per-card via card_get). 0.01 USDC ownership proof.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "card_list",
+      "title": "List your prepaid cards"
+    },
+    {
+      "description": "Provision an email inbox at {name}@palmyr.ai (or a custom domain you own), keyed to your wallet. Costs 2.00 USDC, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "description": "A Namecheap-registered domain you own; auto-sets MX/SPF/DKIM",
+            "type": "string"
+          },
+          "name": {
+            "description": "Local part of the address; inbox becomes {name}@palmyr.ai",
+            "type": "string"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          },
+          "solanaPublicKey": {
+            "type": "string"
+          },
+          "walletAddress": {
+            "description": "Solana pubkey to enable E2E encryption (defaults to the payer)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "email_create_inbox",
+      "title": "Create email inbox"
+    },
+    {
+      "description": "Provision a cheap, disposable, receive-only email inbox — ideal for receiving a one-off verification or order-confirmation email during a checkout/signup flow. The address (a natural-looking handle on a dedicated inbox domain) is returned in the response. Auto-expires (default 24h). Reads return plaintext to the owning wallet (no E2E key to manage). Costs 0.50 USDC, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          },
+          "ttl_seconds": {
+            "description": "Lifetime in seconds before the inbox auto-expires (default 86400 = 24h, min 300, max 604800)",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "name": "email_create_temp",
+      "title": "Create disposable temp inbox"
+    },
+    {
+      "description": "Rent another 7 days on a live disposable temp inbox — each call pushes expires_at exactly 7 days further (fixed, stackable, no cap). Owner-only; expired temp inboxes cannot be revived (buy a new one via email_create_temp). Costs 0.50 USDC, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "inbox_id": {
+            "description": "Temp inbox id returned by email_create_temp",
+            "type": "string"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          }
+        },
+        "required": [
+          "inbox_id"
+        ],
+        "type": "object"
+      },
+      "name": "email_extend_temp",
+      "title": "Extend disposable temp inbox"
+    },
+    {
+      "description": "Send an email from an inbox you own. Costs 0.08 USDC, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "html": {
+            "type": "string"
+          },
+          "inbox_id": {
+            "description": "Inbox id returned by email_create_inbox",
+            "type": "string"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "to": {
+            "description": "Recipient email address",
+            "type": "string"
+          }
+        },
+        "required": [
+          "inbox_id",
+          "to",
+          "subject",
+          "body"
+        ],
+        "type": "object"
+      },
+      "name": "email_send",
+      "title": "Send email"
+    },
+    {
+      "description": "Read decrypted messages from an inbox you own (payment wallet must match the inbox). Costs 0.02 USDC, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "description": "id of the last message from the previous page",
+            "type": "string"
+          },
+          "inbox_id": {
+            "description": "Inbox id returned by email_create_inbox",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Page size (default 50, max 200)",
+            "type": "number"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          }
+        },
+        "required": [
+          "inbox_id"
+        ],
+        "type": "object"
+      },
+      "name": "email_read_messages",
+      "title": "Read email messages"
+    },
+    {
+      "description": "Provision a real phone number (SMS + voice) for your agent. Costs 3.00 USDC, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "areaCode": {
+            "type": "string"
+          },
+          "country": {
+            "description": "ISO-2 country code, e.g. 'US'",
+            "type": "string"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          }
+        },
+        "required": [
+          "country"
+        ],
+        "type": "object"
+      },
+      "name": "phone_buy_number",
+      "title": "Buy phone number"
+    },
+    {
+      "description": "Send an SMS from a phone number you own. Costs 0.05 USDC, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "number_id": {
+            "description": "Phone number id returned by phone_buy_number",
+            "type": "string"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          },
+          "to": {
+            "description": "Recipient number in E.164, e.g. '+15551234567'",
+            "type": "string"
+          }
+        },
+        "required": [
+          "number_id",
+          "to",
+          "body"
+        ],
+        "type": "object"
+      },
+      "name": "phone_send_sms",
+      "title": "Send SMS"
+    },
+    {
+      "description": "Read SMS messages received on a phone number you own. Costs 0.02 USDC, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "number_id": {
+            "description": "Phone number id returned by phone_buy_number",
+            "type": "string"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          }
+        },
+        "required": [
+          "number_id"
+        ],
+        "type": "object"
+      },
+      "name": "phone_read_messages",
+      "title": "Read SMS messages"
+    },
+    {
+      "description": "Wait for an SMS verification code / OTP to arrive on a Palmyr phone number you own, and return the parsed code. Blocks up to timeout_s (default 60, max 90) checking every ~2s — one call replaces hand-rolled polling of phone_read_messages during account signups and 2FA flows. Messages that arrived up to lookback_s seconds (default 10) BEFORE the call also match, so a code that landed early is not missed — pass lookback_s=0 when reusing a number across signups so a stale code can't be re-served. Default extraction handles standalone 4-8 digit codes, 'code is/code:' tokens, and Google-style G-XXXXXX; pass pattern to override (max 256 chars; a pattern that blows its per-match budget is dropped mid-wait and pattern_timeout: true is reported). Returns { found: true, code, message_text } on a hit or { found: false, waited_s } on timeout (not an error — just call again). Costs 0.02 USDC, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "lookback_s": {
+            "description": "Also match messages received up to this many seconds before the call (default 10; use 0 for reused numbers)",
+            "type": "number"
+          },
+          "number_id": {
+            "description": "Phone number id returned by phone_buy_number",
+            "type": "string"
+          },
+          "pattern": {
+            "description": "Custom extraction regex overriding the default OTP formats (first capture group wins, else the full match; max 256 chars)",
+            "type": "string"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          },
+          "timeout_s": {
+            "description": "Seconds to block waiting (default 60, max 90)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "number_id"
+        ],
+        "type": "object"
+      },
+      "name": "wait_for_otp",
+      "title": "Wait for SMS verification code (OTP)"
+    },
+    {
+      "description": "Lease a cheap, instant, receive-only US phone number from a pool to receive one SMS verification code — the phone analogue of a disposable temp email inbox. $0.20 for 30 min (ttl_seconds, clamped 300–1800), returned to the pool at expiry; call wait_for_otp to catch the code. Good for one-time SMS verification and phone-gated signups. Works with major sites like Google, X, and Discord; some (Telegram, WhatsApp, OpenAI) may reject it as a VoIP number — for strict sites, buy a dedicated number with phone_buy_number. Pool numbers are recycled after the lease, so use them for one-time codes only, not long-term 2FA. Costs 0.20 USDC, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          },
+          "ttl_seconds": {
+            "description": "Lease lifetime in seconds before auto-expiry (default 1800 = 30min, min 300, max 1800)",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "name": "phone_temp_number",
+      "title": "Lease disposable temp phone number"
+    },
+    {
+      "description": "Rent another 30 minutes on a live disposable temp number — each call pushes expires_at 30 min further (stackable up to 24h total lease). Owner-only; expired temp leases cannot be revived (lease a fresh one via phone_temp_number). Costs 0.20 USDC, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "number_id": {
+            "description": "Temp number lease id returned by phone_temp_number",
+            "type": "string"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          }
+        },
+        "required": [
+          "number_id"
+        ],
+        "type": "object"
+      },
+      "name": "phone_extend_temp",
+      "title": "Extend disposable temp phone number"
+    },
+    {
+      "description": "Post a tweet from an X account you control (via injected session cookies). Costs 0.001 USDC, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "description": "Your identifier for the X account",
+            "type": "string"
+          },
+          "community_id": {
+            "type": "string"
+          },
+          "cookies": {
+            "description": "Non-empty array of session cookies for the X account",
+            "type": "array"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          },
+          "proxy_session_id": {
+            "type": "string"
+          },
+          "text": {
+            "description": "Tweet text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "account_id",
+          "cookies",
+          "text"
+        ],
+        "type": "object"
+      },
+      "name": "twitter_post",
+      "title": "Post to X (Twitter)"
+    },
+    {
+      "description": "Post a video to a TikTok account you control (from video_base64 or video_url), immediately or scheduled. Async: returns an operation to poll with tiktok_operation_status. Costs 0.01 USDC, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "description": "Your identifier for the TikTok account",
+            "type": "string"
+          },
+          "caption": {
+            "type": "string"
+          },
+          "cookies": {
+            "description": "Session cookies for the TikTok account. Omit for an account connected with tiktok_connect — its session lives in that account's own browser profile on the server, so there is no jar to send.",
+            "type": "array"
+          },
+          "country": {
+            "type": "string"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          },
+          "privacy": {
+            "type": "string"
+          },
+          "proxy_session_id": {
+            "type": "string"
+          },
+          "schedule_at": {
+            "description": "ISO-8601 datetime to publish at. Uses TikTok's OWN scheduler, which accepts only ~15 minutes to ~10 days ahead — a time outside that window is rejected and refunded, and there is no way to schedule further out. Omit to post immediately. A scheduled post returns its video_id/video_url plus scheduled_at and pending_publish:true — the video exists immediately but its URL is NOT publicly reachable until it publishes.",
+            "type": "string"
+          },
+          "video_base64": {
+            "description": "Base64 video bytes — only fits tiny clips (the MCP transport caps request bodies at 1mb); prefer video_url",
+            "type": "string"
+          },
+          "video_url": {
+            "description": "Public URL to the video (preferred; no size limit)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "account_id",
+          "caption"
+        ],
+        "type": "object"
+      },
+      "name": "tiktok_post",
+      "title": "Post to TikTok"
+    },
+    {
+      "description": "Poll an async TikTok operation started by tiktok_post / tiktok_analytics / tiktok_cancel_scheduled (free). done=true when status is 'posted' / 'done' (carries video_url or the op's result) or 'failed' (payment auto-refunded — see refund_status).",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "operation_id": {
+            "description": "operation_id returned by the tool that started the operation",
+            "type": "string"
+          }
+        },
+        "required": [
+          "operation_id"
+        ],
+        "type": "object"
+      },
+      "name": "tiktok_operation_status",
+      "title": "Check TikTok operation status"
+    },
+    {
+      "description": "Attach a TikTok account by logging in ON THE SERVER, into that account's own persistent browser profile: returns a connect_url to hand a human, who scans the QR in the TikTok app. The recommended path — the browser that authenticates is the browser that later acts, and every other TikTok tool then works with `cookies` omitted (no jar to move). The paying wallet becomes the account's owner. Async: poll tiktok_connect_status with the returned token. Costs 0.01 USDC, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "description": "Your identifier for the TikTok account (1-64 chars of A-Z a-z 0-9 . _ -)",
+            "type": "string"
+          },
+          "country": {
+            "description": "ISO-2 country the login browser should exit from, e.g. 'US' — TikTok reads a scan from the wrong country as phishing",
+            "type": "string"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          },
+          "proxy_session_id": {
+            "type": "string"
+          },
+          "tag": {
+            "description": "Label grouping accounts (a niche, a client); tiktok_accounts and tiktok_hooks can scope to it",
+            "type": "string"
+          }
+        },
+        "required": [
+          "account_id"
+        ],
+        "type": "object"
+      },
+      "name": "tiktok_connect",
+      "title": "Connect a TikTok account (server-side login)"
+    },
+    {
+      "description": "Poll a server-side login started by tiktok_connect (free). done=true when state is 'completed' (the account is live and usable with cookies omitted) or 'failed'.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "token": {
+            "description": "Connect token returned by tiktok_connect",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "type": "object"
+      },
+      "name": "tiktok_connect_status",
+      "title": "Check TikTok connect status"
+    },
+    {
+      "description": "List the TikTok accounts the paying wallet owns, with session health (status, profile_present, hours_since_success, last_error_code) — i.e. which of your accounts are still logged in. Costs 0.001 USDC, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          },
+          "tag": {
+            "description": "Only accounts carrying this tag",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "tiktok_accounts",
+      "title": "List your TikTok accounts"
+    },
+    {
+      "description": "Scrape per-post analytics (views, likes, comments, shares) for a TikTok account you control, and record a sample so tiktok_series can answer 'is it still growing'. Async: returns an operation to poll with tiktok_operation_status. Costs 0.005 USDC, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "description": "Your identifier for the TikTok account",
+            "type": "string"
+          },
+          "cookies": {
+            "description": "Session cookies for the TikTok account. Omit for an account connected with tiktok_connect — its session lives in that account's own browser profile on the server, so there is no jar to send.",
+            "type": "array"
+          },
+          "country": {
+            "type": "string"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          },
+          "proxy_session_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "account_id"
+        ],
+        "type": "object"
+      },
+      "name": "tiktok_analytics",
+      "title": "Fetch TikTok analytics"
+    },
+    {
+      "description": "Read the stored per-post history for an account you own: the full time series for one video (video_id), per-video growth over a window (hours), or the latest sample per video (neither). Samples come from tiktok_analytics runs, so history exists only for what you have scraped. Costs 0.001 USDC, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "description": "Your identifier for the TikTok account",
+            "type": "string"
+          },
+          "hours": {
+            "description": "Return per-video growth over the last N hours",
+            "type": "number"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          },
+          "video_id": {
+            "description": "Return the full sample series for this one video",
+            "type": "string"
+          }
+        },
+        "required": [
+          "account_id"
+        ],
+        "type": "object"
+      },
+      "name": "tiktok_series",
+      "title": "Read TikTok engagement history"
+    },
+    {
+      "description": "Which caption openings actually earn views. Pass account_id or tag to measure YOUR accounts against their own median (0.001 USDC). Pass niche to report what is working in that niche across TikTok, needing no posting history — the answer for a brand-new account (0.05 USDC; tiktok_niches lists them, free). The two are never blended. Pass caption to classify a draft before posting. Paid per-action via x402 — the 402 challenge carries the exact price for the arguments you sent.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "description": "Measure this account you own (0.001 USDC)",
+            "type": "string"
+          },
+          "caption": {
+            "description": "Classify this draft caption against the patterns in scope instead of returning the full report",
+            "type": "string"
+          },
+          "maturity_days": {
+            "description": "Only count posts at least this old, so young posts don't drag the median",
+            "type": "number"
+          },
+          "niche": {
+            "description": "Report the niche across TikTok — any word, resolved to the nearest known niche (0.05 USDC)",
+            "type": "string"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          },
+          "recency_days": {
+            "description": "Widen or narrow the recency window (hooks decay; more sample, staler signal)",
+            "type": "number"
+          },
+          "tag": {
+            "description": "Pool every account you own carrying this tag (0.001 USDC)",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "tiktok_hooks",
+      "title": "TikTok hook analysis"
+    },
+    {
+      "description": "List the niches tiktok_hooks can report on, with how fresh each corpus is. Free — an agent should not pay to learn what it may ask for.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "tiktok_niches",
+      "title": "List TikTok niches"
+    },
+    {
+      "description": "List the posts you have queued with tiktok_post(schedule_at), and whether each is still pending, due, or confirmed published. Palmyr's own record — TikTok exposes no way to read pending posts back, so edits made directly in TikTok Studio are invisible to it. Costs 0.001 USDC, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "description": "Only posts for this account",
+            "type": "string"
+          },
+          "include_done": {
+            "description": "Also return posts already published or cancelled",
+            "type": "boolean"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "tiktok_scheduled",
+      "title": "List scheduled TikTok posts"
+    },
+    {
+      "description": "Cancel a post queued with tiktok_post(schedule_at). TikTok has no 'unschedule', so this deletes the held video — the cancellation is recorded only once that succeeded. Async: returns an operation to poll with tiktok_operation_status. Costs 0.001 USDC, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "description": "Your identifier for the TikTok account holding the post",
+            "type": "string"
+          },
+          "cookies": {
+            "description": "Session cookies for the TikTok account. Omit for an account connected with tiktok_connect — its session lives in that account's own browser profile on the server, so there is no jar to send.",
+            "type": "array"
+          },
+          "country": {
+            "type": "string"
+          },
+          "operation_id": {
+            "description": "operation_id of the scheduled post (as returned by tiktok_post / listed by tiktok_scheduled)",
+            "type": "string"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          },
+          "proxy_session_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "operation_id",
+          "account_id"
+        ],
+        "type": "object"
+      },
+      "name": "tiktok_cancel_scheduled",
+      "title": "Cancel a scheduled TikTok post"
+    },
+    {
+      "description": "Check domain availability and per-TLD pricing. Pass a full domain (example.com) or a bare name to scan popular TLDs. Free — no payment required.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "description": "A full domain (example.com) or a bare name (example)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "type": "object"
+      },
+      "name": "domain_check",
+      "title": "Check domain availability"
+    },
+    {
+      "description": "Register a domain to your wallet. Priced per TLD — the exact quote is returned in the 402 challenge, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "description": "Full domain to register, e.g. 'example.com'",
+            "type": "string"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "type": "object"
+      },
+      "name": "domain_register",
+      "title": "Register domain"
+    },
+    {
+      "description": "Deploy a cloud VPS keyed to your wallet (optionally auto-installs OpenClaw/skills). Priced per server type — the exact quote is returned in the 402 challenge, paid per-action via x402.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "image": {
+            "description": "OS image (default 'ubuntu-24.04')",
+            "type": "string"
+          },
+          "install": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            ],
+            "description": "Recipe name(s) to install, e.g. 'openclaw'"
+          },
+          "location": {
+            "type": "string"
+          },
+          "name": {
+            "description": "Server name",
+            "type": "string"
+          },
+          "payment": {
+            "description": "base64 x402 payment payload (X-PAYMENT); omit on first call to receive payment instructions",
+            "type": "string"
+          },
+          "serverType": {
+            "description": "Hetzner server type, e.g. 'cx22'",
+            "type": "string"
+          },
+          "sshPublicKey": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "serverType"
+        ],
+        "type": "object"
+      },
+      "name": "compute_deploy",
+      "title": "Deploy VPS"
+    }
+  ],
+  "url": "https://palmyr.ai/mcp"
+}

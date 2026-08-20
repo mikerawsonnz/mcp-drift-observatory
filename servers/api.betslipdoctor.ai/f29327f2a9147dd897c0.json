@@ -1,0 +1,256 @@
+{
+  "canon_version": "1",
+  "full_hash": "0a989aa700ffa2a73e05fc94c5fa27766bca1a4700558c47561d0c798824ba96",
+  "name": "ai.betslipdoctor/mcp",
+  "observed_at": "2026-08-20T09:11:27.986499Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 7,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Read the authenticated user's tracked ticket trees and tracking lifecycle. Provider placement ids and sportsbook deep links are never returned.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "description": "Tickets to return (default 20).",
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_tracked_slips",
+      "title": "Tracked slips"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create or revise one of the authenticated user's ticket trees. This stores truth state only; it never places, prepares, or hands off a wager.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "client_mutation_id": {
+            "description": "Caller-generated idempotency key.",
+            "maxLength": 160,
+            "minLength": 1,
+            "type": "string"
+          },
+          "expected_revision": {
+            "description": "Required with ticket_id; stale writes fail with a conflict.",
+            "minimum": 1,
+            "type": "integer"
+          },
+          "ticket": {
+            "description": "BSD two-level BetTicketContract. SGP children stay nested under one outer pick.",
+            "type": "object"
+          },
+          "ticket_id": {
+            "description": "Server ticket id when revising an existing tracked slip.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "client_mutation_id",
+          "ticket"
+        ],
+        "type": "object"
+      },
+      "name": "track_slip",
+      "title": "Track a slip"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Live sports board: upcoming and in-play games with main-market prices (moneyline, spread, total) and the best posted price per selection across connected books. Read-only decision support; never a guarantee and never a wager.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "leagues": {
+            "description": "League labels to filter by, e.g. ['MLB','NFL']. Omit for all leagues.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "limit": {
+            "description": "Games to return (default 20, max 50). Live plus soonest first.",
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "offset": {
+            "description": "Window offset for paging (default 0).",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_todays_board",
+      "title": "Today's board (live odds)"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Submit betslip text and get BetSlip Doctor's graded second opinion: rank, score, per-leg calls, ten-dimension checkup and sourced evidence. Entertainment/decision support only. Uses the user's plan allowance exactly like grading in the app.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "anyOf": [
+          {
+            "required": [
+              "slipText"
+            ]
+          },
+          {
+            "required": [
+              "ticket"
+            ]
+          }
+        ],
+        "properties": {
+          "mode": {
+            "description": "Research depth. 'fast' (default) answers quickly; 'deep' fans out to every research provider.",
+            "enum": [
+              "fast",
+              "deep"
+            ],
+            "type": "string"
+          },
+          "slipText": {
+            "description": "The betslip as pasted text: one leg per line with odds where known.",
+            "type": "string"
+          },
+          "stake": {
+            "description": "Optional stake in dollars for payout context.",
+            "type": "number"
+          },
+          "ticket": {
+            "description": "Optional BSD two-level BetTicketContract. Use this for screenshot/manual parses and SGP trees.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "name": "grade_slip",
+      "title": "Grade a betslip"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List the authenticated user's saved diagnosis reports (newest first), or fetch one full report by id. Only ever the calling user's own reports.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "description": "Compact list size (default 10).",
+            "maximum": 25,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "report_id": {
+            "description": "Return this one report in full instead of the compact list.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_saved_reports",
+      "title": "Saved reports"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "The authenticated user's imported betting-history ledger: W-L record, stake and net over lifetime/30d/7d windows, sync freshness, and their most recent bets. Numbers come only from the user's own imported slips; nothing is fabricated.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "recent": {
+            "description": "How many recent bets to include (default 5).",
+            "maximum": 20,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_history_summary",
+      "title": "Betting history summary"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Compare posted prices across books for each leg of a slip (main markets). Reports every book's quote, the best price for the bettor, and how much the user's own line gives up. Only ever describes books with real posted data; read-only, never places a wager.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "legs": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "book": {
+                  "description": "The book the user is on (e.g. 'draftkings'), if known.",
+                  "type": "string"
+                },
+                "odds": {
+                  "description": "The american odds the user is on (e.g. -120), if known.",
+                  "type": "number"
+                },
+                "query": {
+                  "description": "Leg description, e.g. 'Yankees moneyline' or 'Brewers -1.5'.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "query"
+              ],
+              "type": "object"
+            },
+            "maxItems": 12,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "legs"
+        ],
+        "type": "object"
+      },
+      "name": "price_shop_slip",
+      "title": "Price-shop a slip"
+    }
+  ],
+  "url": "https://api.betslipdoctor.ai/api/mcp"
+}

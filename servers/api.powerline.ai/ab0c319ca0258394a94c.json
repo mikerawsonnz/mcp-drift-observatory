@@ -1,0 +1,164 @@
+{
+  "canon_version": "1",
+  "full_hash": "39ca8e457baac87ce667810e41eae27a84fe628423eb3427824bd311c9050f64",
+  "name": "ai.powerline/inbox-preview",
+  "observed_at": "2026-08-20T09:12:28.751345Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 4,
+  "tools": [
+    {
+      "description": "List the email clients this deployment can render right now, with their rendering tier, engine, and capabilities",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_clients"
+    },
+    {
+      "description": "Submit an email for rendering across email clients — full HTML, or a complete raw .eml (base64). Provide exactly one of html/eml. Returns a job ID to poll for results.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "eml": {
+            "description": "A complete raw RFC 822 message (.eml), base64-encoded — inserted verbatim (real headers, multipart, attachments). Max 10MB decoded. Provide exactly one of html or eml.",
+            "type": "string"
+          },
+          "html": {
+            "description": "The full email HTML to preview. Provide exactly one of html or eml.",
+            "type": "string"
+          },
+          "include_previews": {
+            "description": "Also capture the inbox-list row (how the message looks unread in the list) and the subject heading, returned as inbox_preview / subject_preview on each render. Default false: they cost more than the body render itself, so ask only when you need them.",
+            "type": "boolean"
+          },
+          "renders": {
+            "description": "Exactly the renders you want, one entry each (e.g. outlook light + outlook dark are two entries). Omit for the server default: every live client at its default width, light.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "client": {
+                  "description": "Client ID",
+                  "enum": [
+                    "gmail",
+                    "outlook",
+                    "yahoo"
+                  ],
+                  "type": "string"
+                },
+                "color_scheme": {
+                  "description": "Render in the client's light or dark mode (default light). Dark must be supported by the client — check color_schemes in list_clients.",
+                  "enum": [
+                    "light",
+                    "dark"
+                  ],
+                  "type": "string"
+                },
+                "images_disabled": {
+                  "description": "Render with remote images blocked (default false)",
+                  "type": "boolean"
+                },
+                "viewport_width": {
+                  "description": "Viewport width in pixels (200-2560). Defaults to the client default (1280).",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "client"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "subject": {
+            "description": "Email subject line",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "submit_preview"
+    },
+    {
+      "description": "Get the status and screenshots for a preview job. Poll until status is \"completed\".",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "job_id": {
+            "description": "The job ID returned by submit_preview",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_job"
+    },
+    {
+      "description": "Fetch a rendered screenshot. Returns the image URL for the given job, client, width, and environment (color scheme / images).",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "client": {
+            "description": "Client ID",
+            "enum": [
+              "gmail",
+              "outlook",
+              "yahoo"
+            ],
+            "type": "string"
+          },
+          "color_scheme": {
+            "default": "light",
+            "description": "The render's color scheme",
+            "enum": [
+              "light",
+              "dark"
+            ],
+            "type": "string"
+          },
+          "images_disabled": {
+            "default": false,
+            "description": "Whether the render had images blocked",
+            "type": "boolean"
+          },
+          "job_id": {
+            "description": "The job ID",
+            "type": "string"
+          },
+          "viewport_width": {
+            "description": "Viewport width of the render, matching the job (1280 when the job used client defaults)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "job_id",
+          "client",
+          "viewport_width"
+        ],
+        "type": "object"
+      },
+      "name": "get_screenshot"
+    }
+  ],
+  "url": "https://api.powerline.ai/v1/mcp"
+}

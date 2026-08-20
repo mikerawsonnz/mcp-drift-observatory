@@ -1,0 +1,367 @@
+{
+  "canon_version": "1",
+  "full_hash": "c20e8b920d96c4902a07e29df833d93380bdbb7798d1c7141f709991235d0dd7",
+  "name": "ai.ccapi/mcp",
+  "observed_at": "2026-08-20T09:11:33.854826Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 4,
+  "tools": [
+    {
+      "annotations": {
+        "idempotentHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Send a conversation to any text model available through CCAPI (Claude, GPT, Gemini, DeepSeek, GLM, MiniMax, Kimi, Qwen…) and get the reply. Useful for consulting a second model for a different perspective, running a cheap model over bulk work, or reaching a model the current client does not have configured. Responses are non-streaming.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "max_tokens": {
+            "description": "Maximum tokens to generate. Omit for the model default.",
+            "type": [
+              "null",
+              "integer"
+            ]
+          },
+          "messages": {
+            "description": "Conversation so far, oldest first. Must contain at least one message.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "content": {
+                  "description": "Message text.",
+                  "type": "string"
+                },
+                "role": {
+                  "description": "Message author: system, user or assistant.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "role",
+                "content"
+              ],
+              "type": "object"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "model": {
+            "description": "Exact model name, e.g. claude-sonnet-5 or deepseek-v4-pro. Call list_models with category 'text' if unsure.",
+            "type": "string"
+          },
+          "stop": {
+            "description": "Up to 4 sequences that stop generation.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "temperature": {
+            "description": "Sampling temperature, typically 0-2. Omit for the model default.",
+            "type": [
+              "null",
+              "number"
+            ]
+          },
+          "top_p": {
+            "description": "Nucleus sampling probability mass, 0-1. Omit for the model default.",
+            "type": [
+              "null",
+              "number"
+            ]
+          }
+        },
+        "required": [
+          "model",
+          "messages"
+        ],
+        "type": "object"
+      },
+      "name": "chat_completion",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "description": "The model's reply text.",
+            "type": "string"
+          },
+          "finish_reason": {
+            "description": "Why generation stopped, e.g. stop or length.",
+            "type": "string"
+          },
+          "model": {
+            "description": "Model that actually served the request.",
+            "type": "string"
+          },
+          "usage": {
+            "additionalProperties": false,
+            "description": "Token accounting for this call.",
+            "properties": {
+              "completion_tokens": {
+                "description": "Tokens generated.",
+                "type": "integer"
+              },
+              "prompt_tokens": {
+                "description": "Tokens consumed by the prompt.",
+                "type": "integer"
+              },
+              "total_tokens": {
+                "description": "Prompt plus completion tokens.",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "prompt_tokens",
+              "completion_tokens",
+              "total_tokens"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "content",
+          "model",
+          "usage"
+        ],
+        "type": "object"
+      },
+      "title": "Call a text model"
+    },
+    {
+      "annotations": {
+        "idempotentHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Report the remaining and used balance for this CCAPI key. Useful before starting an expensive batch of generations, or to explain a quota failure to the user.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "name": "get_balance",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "currency": {
+            "description": "Unit of the amounts above, e.g. USD.",
+            "type": "string"
+          },
+          "note": {
+            "description": "Guidance when the balance is low, unlimited, or scoped to a token.",
+            "type": "string"
+          },
+          "remaining_amount": {
+            "description": "Remaining balance, in the account's display currency. Omitted when unlimited.",
+            "type": "number"
+          },
+          "total_amount": {
+            "description": "Remaining plus used. Omitted when unlimited.",
+            "type": "number"
+          },
+          "unlimited": {
+            "description": "True when this token has no spending cap, in which case the amount fields are not meaningful.",
+            "type": "boolean"
+          },
+          "used_amount": {
+            "description": "Balance consumed to date, in the same unit.",
+            "type": "number"
+          }
+        },
+        "required": [
+          "unlimited",
+          "used_amount",
+          "currency"
+        ],
+        "type": "object"
+      },
+      "title": "Get account balance"
+    },
+    {
+      "annotations": {
+        "idempotentHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Check the status of an asynchronous generation task submitted by generate_video, generate_music, generate_lyrics, extend_music, or generate_image with async=true. Pass the platform and task_id exactly as they were returned. Status is one of queued, in_progress, completed or failed; poll every few seconds until it settles, or pass wait_seconds to have the server wait for you.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "platform": {
+            "description": "Platform the task belongs to, exactly as returned by the submit tool: image, video, suno or producer.",
+            "type": "string"
+          },
+          "task_id": {
+            "description": "Task identifier returned by the submit tool.",
+            "type": "string"
+          },
+          "wait_seconds": {
+            "description": "Poll server-side for up to this many seconds (max 240) and return once the task finishes. Omit for a single immediate status check.",
+            "type": [
+              "null",
+              "integer"
+            ]
+          }
+        },
+        "required": [
+          "platform",
+          "task_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_task",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "fail_reason": {
+            "description": "Why the task failed, when status is failed.",
+            "type": "string"
+          },
+          "note": {
+            "description": "What to do next.",
+            "type": "string"
+          },
+          "platform": {
+            "description": "Platform the task belongs to.",
+            "type": "string"
+          },
+          "progress": {
+            "description": "Progress indication, when the backend reports one.",
+            "type": "string"
+          },
+          "raw": {
+            "description": "Backend payload, for details this summary does not cover (lyrics text, per-clip metadata, seeds)."
+          },
+          "result_urls": {
+            "description": "Finished asset URLs. May expire; download anything worth keeping.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "status": {
+            "description": "One of: queued, in_progress, completed, failed, unknown.",
+            "type": "string"
+          },
+          "task_id": {
+            "description": "The task this status refers to.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id",
+          "platform",
+          "status"
+        ],
+        "type": "object"
+      },
+      "title": "Check an async task"
+    },
+    {
+      "annotations": {
+        "idempotentHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List the AI models this CCAPI key can actually call, with their capability category and the MCP tool that drives them. Call this before generating anything if you are unsure a model name is valid — availability depends on the key's group and changes over time. Never guess model names.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "description": "Filter by capability. One of: text, image, video, music, embedding, other. Omit to list every model this key can use.",
+            "type": "string"
+          },
+          "search": {
+            "description": "Case-insensitive substring match on the model name, e.g. 'claude' or 'seedance'.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_models",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "models": {
+            "description": "Models available to the calling key.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "category": {
+                  "description": "Capability category: text, image, video, music, embedding or other.",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "Human-readable description, when the platform publishes one.",
+                  "type": "string"
+                },
+                "endpoints": {
+                  "description": "API endpoint families this model supports.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": [
+                    "null",
+                    "array"
+                  ]
+                },
+                "groups": {
+                  "description": "Token groups that can reach this model.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": [
+                    "null",
+                    "array"
+                  ]
+                },
+                "name": {
+                  "description": "The exact model name to pass to other tools.",
+                  "type": "string"
+                },
+                "tool": {
+                  "description": "Which MCP tool to call for this model. Absent means no MCP tool drives it — reach it through the REST API instead.",
+                  "type": "string"
+                },
+                "vendor": {
+                  "description": "Upstream vendor, e.g. Anthropic, Google, Suno.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "category"
+              ],
+              "type": "object"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "note": {
+            "description": "Guidance about the result set.",
+            "type": "string"
+          },
+          "total": {
+            "description": "Number of models returned.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "models",
+          "total"
+        ],
+        "type": "object"
+      },
+      "title": "List available models"
+    }
+  ],
+  "url": "https://api.ccapi.ai/mcp/text"
+}

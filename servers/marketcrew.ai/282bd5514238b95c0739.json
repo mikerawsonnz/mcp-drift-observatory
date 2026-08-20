@@ -1,0 +1,745 @@
+{
+  "canon_version": "1",
+  "full_hash": "3327585d7c66542563ea390c178c62f065915f8b6417f2a83731281310441e69",
+  "name": "ai.marketcrew/market-data",
+  "observed_at": "2026-08-20T09:12:05.674489Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 15,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Price history (OHLCV)"
+      },
+      "description": "Get daily OHLCV price history for a ticker: open/high/low/close/volume. Use period_days to control how far back (default 365, max 3650).",
+      "inputSchema": {
+        "properties": {
+          "bars": {
+            "description": "how many recent sessions to return when no window is given (default 20, max 120)",
+            "type": "integer"
+          },
+          "from_date": {
+            "description": "start of the window to quote, YYYY-MM-DD",
+            "type": "string"
+          },
+          "period_days": {
+            "description": "Number of days of history (default 365, max 3650)",
+            "type": "integer"
+          },
+          "ticker": {
+            "description": "Ticker symbol, e.g. 'SPY', 'GDX', 'AAPL'",
+            "type": "string"
+          },
+          "to_date": {
+            "description": "end of the window to quote, YYYY-MM-DD",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ticker"
+        ],
+        "type": "object"
+      },
+      "name": "get_price_history",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "current": {
+            "type": "object"
+          },
+          "date_range": {
+            "type": "object"
+          },
+          "instrument_id": {
+            "type": "string"
+          },
+          "period_return_pct": {
+            "type": "number"
+          },
+          "recent_prices": {
+            "items": {},
+            "type": "array"
+          },
+          "ticker": {
+            "type": "string"
+          },
+          "total_bars": {
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Price history (OHLCV)"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Technical indicators"
+      },
+      "description": "Calculate technical indicators for a ticker: SMA(50/200), RSI(14), MACD, ATR(14), ADX(14) trend strength, Stochastic(14,3), volume (OBV trend + volume vs 20-day average), RSI/price divergence, Golden/Death Cross, and RSI regime. Computed from daily price history.",
+      "inputSchema": {
+        "properties": {
+          "ticker": {
+            "description": "Ticker symbol, e.g. 'SPY'",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ticker"
+        ],
+        "type": "object"
+      },
+      "name": "get_technical_indicators",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "close": {
+            "type": "number"
+          },
+          "date": {
+            "type": "string"
+          },
+          "indicators": {
+            "type": "object"
+          },
+          "position": {
+            "type": "object"
+          },
+          "range_52w": {
+            "type": "object"
+          },
+          "signals": {
+            "type": "object"
+          },
+          "ticker": {
+            "type": "string"
+          },
+          "weekly": {
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Technical indicators"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Relative strength (A/B)"
+      },
+      "description": "Calculate relative strength ratio between two tickers (A/B). Returns current ratio, SMA(50)/SMA(200) of ratio, RSI of ratio, trend direction. Used for inter-market analysis: e.g. GDX/GLD, HYG/LQD, XLK/SPY.",
+      "inputSchema": {
+        "properties": {
+          "period_days": {
+            "description": "Days of history (default 365, max 1825)",
+            "type": "integer"
+          },
+          "ticker_a": {
+            "description": "Numerator ticker, e.g. 'GDX'",
+            "type": "string"
+          },
+          "ticker_b": {
+            "description": "Denominator ticker, e.g. 'GLD'",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ticker_a",
+          "ticker_b"
+        ],
+        "type": "object"
+      },
+      "name": "get_relative_strength",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "current_ratio": {
+            "type": "number"
+          },
+          "data_points": {
+            "type": "number"
+          },
+          "pair": {
+            "type": "string"
+          },
+          "period_change_pct": {
+            "type": "number"
+          },
+          "ratio_rsi_14": {
+            "type": "number"
+          },
+          "ratio_sma200": {
+            "type": "number"
+          },
+          "ratio_sma50": {
+            "type": "number"
+          },
+          "recent_values": {
+            "items": {},
+            "type": "array"
+          },
+          "signals": {
+            "type": "object"
+          },
+          "trend": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Relative strength (A/B)"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Key price levels"
+      },
+      "description": "Compute key price levels for a ticker: support/resistance zones (clustered swing highs/lows with touch counts = how often price reacted there), nearby round numbers, 50/200-day moving averages, and the 52-week high/low. Returns nearest levels above (resistance) and below (support) with distance %. Use these for concrete trigger/target/invalidation levels.",
+      "inputSchema": {
+        "properties": {
+          "ticker": {
+            "description": "Ticker symbol, e.g. 'SPY'",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ticker"
+        ],
+        "type": "object"
+      },
+      "name": "get_key_levels",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "close": {
+            "type": "number"
+          },
+          "date": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "resistance": {
+            "items": {},
+            "type": "array"
+          },
+          "support": {
+            "items": {},
+            "type": "array"
+          },
+          "ticker": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Key price levels"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Intermarket compass"
+      },
+      "description": "Intermarket compass — a first-pass read of the market environment through price-ratio lenses: asset-class rotation (bonds vs stocks, commodities), risk appetite (high-yield vs investment-grade credit, small vs large caps, cyclicals vs defensives), defensive flows (gold, utilities, yield-curve proxy) and the dollar. Each lens reports rising/falling vs its 50-day average plus the 20-day change; overall posture is risk_on, risk_off or mixed. Optional focus= ('gold'|'bonds'|'tech'|'commodities'|'equity'|'crypto') adds lenses specific to that asset class.",
+      "inputSchema": {
+        "properties": {
+          "focus": {
+            "description": "Asset class being analysed — adds its specific lenses",
+            "enum": [
+              "gold",
+              "bonds",
+              "tech",
+              "commodities",
+              "equity"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_intermarket",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "focus": {
+            "type": "object"
+          },
+          "note": {
+            "type": "string"
+          },
+          "overall": {
+            "type": "string"
+          },
+          "questions": {
+            "items": {},
+            "type": "array"
+          },
+          "votes": {
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Intermarket compass"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Market breadth (S&P 500)"
+      },
+      "description": "S&P 500 market breadth: the percentage of index members above their 50-day and 200-day moving averages, with RSI, trend and 52-week range for each breadth series. A gauge of how broad the current advance or decline is.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_market_breadth",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "pct_above_200d_ma": {
+            "type": "object"
+          },
+          "pct_above_50d_ma": {
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Market breadth (S&P 500)"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Market sentiment"
+      },
+      "description": "Get market sentiment indicators: CBOE Put/Call ratios (total, equity, index, VIX), AAII investor sentiment survey (bull/bear/neutral %), and VIX level. Useful for contrarian signals at extremes.",
+      "inputSchema": {
+        "properties": {
+          "type": {
+            "description": "Which data: 'all' (default), 'put_call', 'vix'",
+            "enum": [
+              "all",
+              "put_call",
+              "vix"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_sentiment_data",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "put_call": {
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Market sentiment"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Macro context"
+      },
+      "description": "Get macro market context: sector P/E ratios, sector performance, US Treasury rates (2Y/10Y/30Y), CPI inflation data. Also provides key inter-market ratios (HYG/LQD, TLT/SPY) from our price data.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_macro_context",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "inter_market_ratios": {
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Macro context"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Crypto market context"
+      },
+      "description": "Crypto market context for a technical read: BTC/ETH dominance and total/alt market cap, Fear & Greed sentiment, perp funding rate & open interest (positioning/leverage), and the Stablecoin Supply Ratio (dry powder). Use ONLY when analysing crypto assets (BTC, ETH, crypto ETFs). Background context, not the primary signal.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_crypto_context",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "etf_flows": {
+            "type": "object"
+          },
+          "liquidity": {
+            "type": "object"
+          },
+          "market_structure": {
+            "type": "object"
+          },
+          "positioning": {
+            "type": "object"
+          },
+          "sentiment": {
+            "type": "object"
+          },
+          "sources": {
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Crypto market context"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Instrument info"
+      },
+      "description": "Get current information about a financial instrument: price, price changes, market state, 52-week range, earnings date. Provide either instrument_id (UUID) or ticker (e.g. 'AAPL').",
+      "inputSchema": {
+        "properties": {
+          "instrument_id": {
+            "description": "UUID of the financial instrument",
+            "type": "string"
+          },
+          "ticker": {
+            "description": "Ticker symbol, e.g. 'AAPL'",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_instrument_info",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "currency": {
+            "type": "string"
+          },
+          "current_price": {
+            "type": "number"
+          },
+          "extended_hours_change_pct": {
+            "type": "number"
+          },
+          "extended_hours_price": {
+            "type": "number"
+          },
+          "fifty_two_week_high": {
+            "type": "number"
+          },
+          "fifty_two_week_low": {
+            "type": "number"
+          },
+          "full_name": {
+            "type": "string"
+          },
+          "industry": {
+            "type": "string"
+          },
+          "instrument_id": {
+            "type": "string"
+          },
+          "market_cap": {
+            "type": "number"
+          },
+          "market_state": {
+            "type": "string"
+          },
+          "next_earnings_date": {
+            "type": "string"
+          },
+          "price_changes": {
+            "type": "object"
+          },
+          "price_updated_at": {
+            "type": "string"
+          },
+          "sector": {
+            "type": "string"
+          },
+          "session_note": {
+            "type": "string"
+          },
+          "ticker": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Instrument info"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Event base rates"
+      },
+      "description": "Historical base rates for the technical events firing on a ticker today (e.g. RSI below 30, golden/death cross, new 52-week high/low). For each active event: the forward returns (1w/1m/3m/6m/1y) seen historically after similar events across the US universe, with the sample size and an unconditional baseline to compare against. Answers 'what usually happened after this'; small samples warrant caution.",
+      "inputSchema": {
+        "properties": {
+          "ticker": {
+            "description": "Ticker symbol, e.g. 'SPY'",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ticker"
+        ],
+        "type": "object"
+      },
+      "name": "get_event_stats",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "active_events": {
+            "items": {},
+            "type": "array"
+          },
+          "note": {
+            "type": "string"
+          },
+          "ticker": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Event base rates"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Instrument news"
+      },
+      "description": "Latest news for a ticker — headline, a short summary and a mandatory source_url to the original article (never the full third-party text). Use to ground a market read in recent, attributable news.",
+      "inputSchema": {
+        "properties": {
+          "days_back": {
+            "description": "How many days back to fetch (default 30, max 90)",
+            "type": "integer"
+          },
+          "limit": {
+            "description": "Max articles to return (default 30, max 60)",
+            "type": "integer"
+          },
+          "ticker": {
+            "description": "Ticker symbol, e.g. 'NBIS', 'AAPL', 'GDX'",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ticker"
+        ],
+        "type": "object"
+      },
+      "name": "public_instrument_news",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "results": {
+            "items": {},
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Instrument news"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "News search"
+      },
+      "description": "Semantic news search across tracked instruments — returns matching items with a short summary and a mandatory source_url (never full article text).",
+      "inputSchema": {
+        "properties": {
+          "days_back": {
+            "description": "How many days back to search (default 30, max 90)",
+            "type": "integer"
+          },
+          "limit": {
+            "description": "Max results to return (default 10, max 20)",
+            "type": "integer"
+          },
+          "min_similarity": {
+            "description": "Minimum similarity threshold 0.0-1.0 (default 0.40)",
+            "type": "number"
+          },
+          "query": {
+            "description": "Natural language search query describing ONE semantic angle, e.g. 'Nebius Meta deal contract $27 billion compute capacity'",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "public_search_news",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "results": {
+            "items": {},
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "title": "News search"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Technical analysis methodology"
+      },
+      "description": "Look up MarketCrew's distilled technical-analysis methodology — our own synthesized notes on how to read indicators, structure, levels and regime — to ground an answer in a consistent framework. Returns short passages in our words with relevance scores.",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "description": "What you want the methodology on, e.g. 'reading RSI in a trend'",
+            "type": "string"
+          },
+          "top_k": {
+            "description": "How many passages to return (default 6)",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "get_ta_methodology",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Technical analysis methodology"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Monitoring options"
+      },
+      "description": "Returns available options for ongoing monitoring — price alerts, idea tracking, watchlist monitoring, scheduled digests — with setup instructions and channels (email/Telegram). Call only when the user asks for ongoing monitoring or notifications; never needed to answer a question.",
+      "inputSchema": {
+        "properties": {
+          "intent": {
+            "description": "Which monitoring the user asked for.",
+            "enum": [
+              "alert",
+              "track_idea",
+              "watchlist",
+              "digest",
+              "memory"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_monitoring_options",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "channels": {
+            "items": {},
+            "type": "array"
+          },
+          "intent": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "register_url": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Monitoring options"
+    }
+  ],
+  "url": "https://marketcrew.ai/mcp"
+}

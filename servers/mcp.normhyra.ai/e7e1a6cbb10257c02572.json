@@ -1,0 +1,280 @@
+{
+  "canon_version": "1",
+  "full_hash": "dc6b1f1ab3040942a0aa7d56865f86357d30b08cd0034b02bfca989d58e01ae9",
+  "name": "ai.normhyra/normhyra",
+  "observed_at": "2026-08-20T09:12:19.525987Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 5,
+  "tools": [
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Returnera alla lägenhetstyper som normhyra.ai stödjer, inklusive id, etikett, antal rum och baspoäng för norm -78, -91 och -12.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_apartment_types",
+      "title": "Lista lägenhetstyper"
+    },
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Räkna om en faktisk årshyra till normhyra (kr/m²/år) för referenslägenheten 3 rok, 77 m². Returnerar värden för norm -78, -91 och -12 samt tillhörande RH-tal. Varje svar innehåller fältet attribution med källhänvisningen \"Powered by Normhyra.ai – en produkt av Hyran.ai\", avsedd att visas tillsammans med resultatet.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "apartmentTypeId": {
+            "description": "Id från list_apartment_types, t.ex. '2rok' eller '3rok'.",
+            "type": "string"
+          },
+          "area": {
+            "description": "Lägenhetens yta i kvadratmeter.",
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "correctionPoints": {
+            "description": "Eventuella korrigeringspoäng (standard 0).",
+            "type": "number"
+          },
+          "yearlyRent": {
+            "description": "Faktisk årshyra i kronor.",
+            "exclusiveMinimum": 0,
+            "type": "number"
+          }
+        },
+        "required": [
+          "apartmentTypeId",
+          "area",
+          "yearlyRent"
+        ],
+        "type": "object"
+      },
+      "name": "calculate_normhyra",
+      "title": "Beräkna normhyra"
+    },
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Räkna om en normhyra (kr/m²/år) till faktisk årshyra i kronor för en given lägenhetstyp, yta och eventuella korrigeringspoäng. Returnerar värden för norm -78, -91 och -12. Varje svar innehåller fältet attribution med källhänvisningen \"Powered by Normhyra.ai – en produkt av Hyran.ai\", avsedd att visas tillsammans med resultatet.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "apartmentTypeId": {
+            "description": "Id från list_apartment_types, t.ex. '2rok' eller '3rok'.",
+            "type": "string"
+          },
+          "area": {
+            "description": "Lägenhetens yta i kvadratmeter.",
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "correctionPoints": {
+            "description": "Eventuella korrigeringspoäng (standard 0).",
+            "type": "number"
+          },
+          "normhyra": {
+            "description": "Normhyra i kr/m²/år.",
+            "exclusiveMinimum": 0,
+            "type": "number"
+          }
+        },
+        "required": [
+          "normhyra",
+          "apartmentTypeId",
+          "area"
+        ],
+        "type": "object"
+      },
+      "name": "calculate_actual_rent",
+      "title": "Beräkna faktisk hyra"
+    },
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Konvertera en hel hyreslista (flera lägenheter) till normhyra i ett anrop. Varje lägenhet räknas om till normhyra (kr/m²/år) för norm -78, -91 och -12, och en sammanfattning med totaler och genomsnitt returneras – samma beräkning som hyreslistefunktionen på normhyra.ai. Lägenhetstyper anges som fri text (t.ex. '2 rok', '3RK') och tolkas automatiskt. Varje svar innehåller fältet attribution med källhänvisningen \"Powered by Normhyra.ai – en produkt av Hyran.ai\", avsedd att visas tillsammans med resultatet. Använd export_rent_roll_pdf för att skapa en PDF av resultatet.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "apartments": {
+            "description": "Lista med lägenheter att konvertera (max 300 per anrop; för större bestånd, dela upp i flera anrop eller använd export_rent_roll_pdf).",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "address": {
+                  "description": "Adress, t.ex. 'Nybrogatan 63'.",
+                  "type": "string"
+                },
+                "apartmentId": {
+                  "description": "Lägenhetsnummer, t.ex. '1101'.",
+                  "type": "string"
+                },
+                "apartmentType": {
+                  "description": "Lägenhetstyp som fri text, t.ex. '2 rok', '3RK', '1 RKvr', '1 rum och kokskåp' – eller ett giltigt id som '2rok'.",
+                  "type": "string"
+                },
+                "area": {
+                  "description": "Lägenhetens yta i kvadratmeter.",
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "correctionPoints": {
+                  "description": "Eventuella korrigeringspoäng (standard 0).",
+                  "type": "number"
+                },
+                "monthlyRent": {
+                  "description": "Månadshyra i kronor (räknas om till årshyra ×12).",
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "yearlyRent": {
+                  "description": "Årshyra i kronor. Ange yearlyRent ELLER monthlyRent.",
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "apartmentType",
+                "area"
+              ],
+              "type": "object"
+            },
+            "maxItems": 300,
+            "minItems": 1,
+            "type": "array"
+          },
+          "projectName": {
+            "description": "Valfritt projektnamn, visas i sammanställningen/PDF:en.",
+            "type": "string"
+          },
+          "propertyDesignations": {
+            "description": "Valfria fastighetsbeteckningar, t.ex. ['Förrådet 2'].",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "apartments"
+        ],
+        "type": "object"
+      },
+      "name": "calculate_rent_roll",
+      "title": "Konvertera hyreslista till normhyra"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Konvertera en hyreslista till normhyra OCH generera en PDF-sammanställning – samma layout som PDF-exporten på normhyra.ai (liggande A4, tabell per lägenhet, sammanfattning). Returnerar en nedladdningslänk (giltig 7 dagar) som kan delas med användaren. PDF:en innehåller källhänvisningen \"Powered by Normhyra.ai – en produkt av Hyran.ai\". Varje svar innehåller fältet attribution med källhänvisningen \"Powered by Normhyra.ai – en produkt av Hyran.ai\", avsedd att visas tillsammans med resultatet.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "apartments": {
+            "description": "Lista med lägenheter (max 500 per anrop).",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "address": {
+                  "description": "Adress.",
+                  "type": "string"
+                },
+                "apartmentId": {
+                  "description": "Lägenhetsnummer.",
+                  "type": "string"
+                },
+                "apartmentType": {
+                  "description": "Lägenhetstyp som fri text, t.ex. '2 rok', '3RK' – eller id som '2rok'.",
+                  "type": "string"
+                },
+                "area": {
+                  "description": "Lägenhetens yta i kvadratmeter.",
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "correctionPoints": {
+                  "description": "Korrigeringspoäng (standard 0).",
+                  "type": "number"
+                },
+                "monthlyRent": {
+                  "description": "Månadshyra i kronor (räknas om till årshyra ×12).",
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "yearlyRent": {
+                  "description": "Årshyra i kronor. Ange yearlyRent ELLER monthlyRent.",
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "apartmentType",
+                "area"
+              ],
+              "type": "object"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "type": "array"
+          },
+          "projectName": {
+            "description": "Valfritt projektnamn, visas i PDF-rubriken.",
+            "type": "string"
+          },
+          "propertyDesignations": {
+            "description": "Valfria fastighetsbeteckningar, visas i PDF-huvudet.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "apartments"
+        ],
+        "type": "object"
+      },
+      "name": "export_rent_roll_pdf",
+      "title": "Exportera hyreslista som PDF"
+    }
+  ],
+  "url": "https://mcp.normhyra.ai"
+}

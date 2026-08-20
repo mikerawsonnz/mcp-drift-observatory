@@ -1,0 +1,809 @@
+{
+  "canon_version": "1",
+  "full_hash": "01ab1e6a61cf9e9f7170dbcae1f2d737a85647d91e891e30e2299ee73d030296",
+  "name": "ai.marketintell/marketintell",
+  "observed_at": "2026-08-20T09:12:07.132944Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 17,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Chat with the MarketIntell brain"
+      },
+      "description": "Run a query through MarketIntell's brain (auto-routes to T1 fast agent or T2 CoT pipeline based on intent). Returns synthesized analysis with citations and trade setup when relevant.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "definitions": {
+          "__schema0": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              },
+              {
+                "items": {
+                  "$ref": "#/definitions/__schema0"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/definitions/__schema0"
+                },
+                "propertyNames": {
+                  "type": "string"
+                },
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "properties": {
+          "domain": {
+            "description": "Asset domain override — bypasses the auto-classifier.",
+            "enum": [
+              "crypto",
+              "us_equities",
+              "india_stocks"
+            ],
+            "type": "string"
+          },
+          "include_facts": {
+            "description": "When true, attach fact_projection (neutral Fact[] + thesis) to the result. Default off.",
+            "type": "boolean"
+          },
+          "include_portfolio": {
+            "description": "Force auto-load (true) or opt out (false) of the caller's default portfolio for this turn.",
+            "type": "boolean"
+          },
+          "portfolio_id": {
+            "description": "Explicit portfolio override for portfolio-aware chat.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "query": {
+            "description": "Natural language query, e.g. 'Should I long BTC?', 'What caused ETH to dump?'",
+            "minLength": 1,
+            "type": "string"
+          },
+          "response_format": {
+            "additionalProperties": false,
+            "description": "Structured-output control — mirrors REST /v1/chat response_format.",
+            "properties": {
+              "json_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "schema": {
+                    "additionalProperties": {
+                      "$ref": "#/definitions/__schema0"
+                    },
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  },
+                  "strict": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "type": "object"
+              },
+              "type": {
+                "enum": [
+                  "text",
+                  "json_schema",
+                  "trade_setup"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "type": "object"
+          },
+          "session_id": {
+            "description": "Optional UUID of an existing chat session to continue. Omit to start a new session.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "chat"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Deep multi-specialist analysis (T3)"
+      },
+      "description": "Run a query through MarketIntell's T3 supervisor — parallel specialists across technical/derivatives/macro/social/onchain/etc. plus synthesis. Slower (~25-40s) and costlier than `chat`. Pro tier only.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "definitions": {
+          "__schema0": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              },
+              {
+                "items": {
+                  "$ref": "#/definitions/__schema0"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/definitions/__schema0"
+                },
+                "propertyNames": {
+                  "type": "string"
+                },
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "properties": {
+          "domain": {
+            "description": "Asset domain override — bypasses the auto-classifier.",
+            "enum": [
+              "crypto",
+              "us_equities",
+              "india_stocks"
+            ],
+            "type": "string"
+          },
+          "include_facts": {
+            "description": "When true, attach fact_projection (neutral Fact[] + thesis) to the result. Default off.",
+            "type": "boolean"
+          },
+          "include_portfolio": {
+            "description": "Force auto-load (true) or opt out (false) of the caller's default portfolio for this turn.",
+            "type": "boolean"
+          },
+          "portfolio_id": {
+            "description": "Explicit portfolio override for portfolio-aware chat.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "query": {
+            "description": "Multi-perspective query, e.g. 'Full breakdown of ETH', 'Compare BTC vs ETH vs SOL across all angles'",
+            "minLength": 1,
+            "type": "string"
+          },
+          "response_format": {
+            "additionalProperties": false,
+            "description": "Structured-output control — mirrors REST /v1/chat response_format.",
+            "properties": {
+              "json_schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "schema": {
+                    "additionalProperties": {
+                      "$ref": "#/definitions/__schema0"
+                    },
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  },
+                  "strict": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "type": "object"
+              },
+              "type": {
+                "enum": [
+                  "text",
+                  "json_schema",
+                  "trade_setup"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "type": "object"
+          },
+          "session_id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "chat_deep"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "preferredFrameSize": [
+            "auto",
+            "480px"
+          ],
+          "resourceUri": "ui://marketintell/signals-feed.html"
+        },
+        "ui/resourceUri": "ui://marketintell/signals-feed.html"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Recent alpha signals"
+      },
+      "description": "Fetch recent alpha signals — automated market intelligence. Crypto signals every ~10 min; equities (Beta) every ~30 min during US market hours. Filter by domain to narrow.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "description": "Filter by asset domain. Omit to return all domains mixed.",
+            "enum": [
+              "crypto",
+              "us_equities",
+              "india_stocks"
+            ],
+            "type": "string"
+          },
+          "include_execution": {
+            "description": "When true, inline venue/precision metadata (venue, venue_symbol, max_leverage, sz_decimals) on each signal's setup so you can place an order without a second tokens lookup.",
+            "type": "boolean"
+          },
+          "limit": {
+            "default": 10,
+            "description": "Number of signals to return (1-50, default 10)",
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "alpha_signals"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "preferredFrameSize": [
+            "auto",
+            "300px"
+          ],
+          "resourceUri": "ui://marketintell/accuracy.html"
+        },
+        "ui/resourceUri": "ui://marketintell/accuracy.html"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Signal accuracy stats"
+      },
+      "description": "Realized signal accuracy — rolling 30-day win rate over CLOSED trade signals, where a win is a real take-profit / in-profit expiry (net positive after fees & leverage) and a loss is a real stop-loss / losing expiry. Win-rate is over resolved signals only; flat (break-even) and cancelled/no-fill/ambiguous signals are reported but excluded from the rate. Broken down by timeframe and direction.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "signal_performance"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Token / equity screener"
+      },
+      "description": "Token screening — find trending tokens, top gainers, and top losers. Use this to discover what's moving in the market right now.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "default": "all",
+            "description": "'trending' (hot tokens), 'gainers' (top 24h gainers), 'losers' (top 24h losers), or 'all'",
+            "enum": [
+              "trending",
+              "gainers",
+              "losers",
+              "all"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "screener"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List portfolios"
+      },
+      "description": "List all portfolios owned by the authenticated key. Returns id, name, holdings, timestamps.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "portfolio_list"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Create a portfolio"
+      },
+      "description": "Create a new portfolio for the authenticated key. Holdings are token symbol + amount (+ optional entry_price and notes).",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "holdings": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "amount": {
+                  "description": "Quantity held (positive)",
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "entry_price": {
+                  "description": "Average USD entry price (optional)",
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "notes": {
+                  "maxLength": 500,
+                  "type": "string"
+                },
+                "token": {
+                  "description": "Symbol, e.g. 'BTC', 'ETH', 'SOL'",
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "token",
+                "amount"
+              ],
+              "type": "object"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "name": {
+            "description": "Display name, e.g. 'Main', 'Tax-loss harvest'",
+            "maxLength": 120,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "holdings"
+        ],
+        "type": "object"
+      },
+      "name": "portfolio_create"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Analyze portfolio PnL + risk"
+      },
+      "description": "Compute PnL + risk assessment for a portfolio you own. Returns per-holding pnl, risk_assessment, and top_risks.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "portfolio_id": {
+            "description": "Portfolio ID returned by portfolio_create or portfolio_list",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "portfolio_id"
+        ],
+        "type": "object"
+      },
+      "name": "portfolio_analyze"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List chat sessions"
+      },
+      "description": "List the authenticated key's recent chat sessions. Useful to resume prior conversations.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "default": 20,
+            "description": "Max sessions to return (1-100)",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "sessions_list"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Billing + quota status"
+      },
+      "description": "Return the authenticated key's plan, daily quota usage, monthly LLM-cost-cents, and cap. Mirrors GET /v1/billing/status.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "billing_status"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "System health"
+      },
+      "description": "MarketIntell system health — uptime, cache stats, memory, provider circuit-breaker states.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "health"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Get a self-signup PoW challenge"
+      },
+      "description": "Step 1 of MCP self-signup. Returns a proof-of-work challenge. Solve locally (find a nonce whose sha256 has the required leading zero hex chars), then call `register` with { challenge_id, nonce, name }.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "difficulty": {
+            "description": "Optional override (1-8). Default comes from POW_DIFFICULTY env (typically 5 ≈ 5s solve).",
+            "maximum": 8,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "register_challenge"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Provision a Free-tier API key"
+      },
+      "description": "Step 2 of MCP self-signup. Submit the challenge id + solved nonce to provision a fresh Free-tier API key. The key is shown ONCE — store it. Pro upgrades go through Stripe checkout; this tool only issues Free keys.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "challenge_id": {
+            "description": "ID returned by register_challenge.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "description": "Human-readable label for the new key, e.g. 'Claude Desktop on my laptop'. Shown in the keys admin UI.",
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "nonce": {
+            "description": "Nonce that satisfies the proof-of-work constraint.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "challenge_id",
+          "nonce",
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "register"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Propose a trade intent (pending review)"
+      },
+      "description": "Propose a trade intent to the user's connected broker. Writes a pending row the user reviews + approves. Requires `trade` scope. Use this when an agent wants to act on a signal without placing the order itself.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "asset_class": {
+            "description": "Asset class — must match the broker's supportedAssetClasses",
+            "enum": [
+              "crypto_spot",
+              "crypto_perp",
+              "equity",
+              "option"
+            ],
+            "type": "string"
+          },
+          "confidence": {
+            "description": "Your confidence 0-1",
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "limit_price": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "notional_cents": {
+            "description": "USD cents notional (preferred sizing — broker converts to qty)",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991,
+            "type": "integer"
+          },
+          "order_type": {
+            "default": "bracket",
+            "enum": [
+              "market",
+              "limit",
+              "bracket"
+            ],
+            "type": "string"
+          },
+          "qty": {
+            "description": "Per-share / per-token qty (alternative to notional)",
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "reasoning": {
+            "description": "Plain-English rationale, surfaced to the user when they review the intent",
+            "maxLength": 2000,
+            "minLength": 20,
+            "type": "string"
+          },
+          "side": {
+            "description": "Direction",
+            "enum": [
+              "buy",
+              "sell"
+            ],
+            "type": "string"
+          },
+          "signal_id": {
+            "description": "MarketIntell TradeSignal ID, if this is acting on one",
+            "type": "string"
+          },
+          "stop_price": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "symbol": {
+            "description": "Ticker / token, e.g. AAPL or BTC",
+            "maxLength": 20,
+            "minLength": 1,
+            "type": "string"
+          },
+          "take_profits": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "price": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "qty_pct": {
+                  "maximum": 100,
+                  "minimum": 1,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "price",
+                "qty_pct"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "symbol",
+          "asset_class",
+          "side",
+          "reasoning",
+          "confidence"
+        ],
+        "type": "object"
+      },
+      "name": "execute_propose_intent"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Approve intent & place order"
+      },
+      "description": "Approve a pending trade intent and place the order at the broker. Returns the executed_order audit row. Requires `trade` scope.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "intent_id": {
+            "description": "UUID of a pending trade intent owned by the caller",
+            "type": "string"
+          },
+          "notional_cents": {
+            "description": "Override notional at approval time",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991,
+            "type": "integer"
+          },
+          "qty": {
+            "description": "Override qty at approval time",
+            "exclusiveMinimum": 0,
+            "type": "number"
+          }
+        },
+        "required": [
+          "intent_id"
+        ],
+        "type": "object"
+      },
+      "name": "execute_approve_intent"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List trade intents"
+      },
+      "description": "List the caller's recent trade intents (pending, executed, rejected). Requires `trade` scope.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "default": 20,
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "approved",
+              "executed",
+              "rejected",
+              "execution_failed",
+              "expired"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "execute_list_intents"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Read broker account snapshot"
+      },
+      "description": "Read the caller's connected broker account snapshot — equity, cash, buying power, open positions. Requires `trade` scope.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "broker_connection_id": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "execute_read_portfolio"
+    }
+  ],
+  "url": "https://api.marketintell.ai/mcp"
+}

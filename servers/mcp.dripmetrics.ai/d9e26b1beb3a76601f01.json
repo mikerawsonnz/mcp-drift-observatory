@@ -1,0 +1,279 @@
+{
+  "canon_version": "1",
+  "full_hash": "bc3d5efcdb94c9836dbe278228bc6969dae6328c702923149420805d9adb0e0c",
+  "name": "ai.dripmetrics/mcp",
+  "observed_at": "2026-08-20T09:11:42.637963Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 6,
+  "tools": [
+    {
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "description": "Free. Lists every DripMetrics metric endpoint with its id, family, HTTP method, USD price, and summary. Use describe_metric for parameter details and get_metric (or the compute_* tools for POST endpoints) to fetch values. Paid fetches use x402 (USDC on Base); discovery is free.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "family": {
+            "description": "Optional family filter, e.g. \"Exchange metrics\" or \"BTC options\".",
+            "enum": [
+              "BTC options",
+              "Exchange metrics",
+              "Hyperliquid",
+              "Market summary",
+              "On-chain",
+              "Orderbook",
+              "Polymarket",
+              "Portfolio risk"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_metrics",
+      "title": "List DripMetrics metrics"
+    },
+    {
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "description": "Free. Returns full details for one metric id from list_metrics: parameters, request/response schemas, price, and how to fetch it.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Metric id from list_metrics, e.g. \"metrics/vpin\" or \"options/gex\".",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "describe_metric",
+      "title": "Describe a DripMetrics metric"
+    },
+    {
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "description": "Free. Dry-runs a metric request without payment and returns the exact x402 challenge the API issues (accepted networks, asset, amount, payTo). Invalid parameters fail here before any payment.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "additionalProperties": {},
+            "description": "JSON body for POST metrics (portfolio VaR, spread greeks).",
+            "type": "object"
+          },
+          "id": {
+            "description": "Metric id from list_metrics.",
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            "description": "Query parameters for GET metrics (see describe_metric).",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_payment_requirements",
+      "title": "Get exact x402 payment requirements"
+    },
+    {
+      "_meta": {
+        "agents-x402/paymentRequired": true,
+        "agents-x402/priceUSD": 0.25
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "description": "Paid via x402 (up to $0.25 per request; exact price per metric in list_metrics). Fetches any GET metric by id with query parameters. Without payment this returns the x402 challenge in _meta[\"x402/error\"]; x402-capable clients (e.g. withX402Client) sign it and retry with _meta[\"x402/payment\"] automatically. Invalid requests fail before payment.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Metric id from list_metrics, e.g. \"metrics/vpin\".",
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            "description": "Query parameters, e.g. {\"pair\": \"BTC-USD\", \"window\": \"1h\"}. See describe_metric.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_metric",
+      "title": "Fetch a DripMetrics metric (paid)"
+    },
+    {
+      "_meta": {
+        "agents-x402/paymentRequired": true,
+        "agents-x402/priceUSD": 0.05
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "description": "Paid via x402 ($0.05 per request). Computes empirical and/or normal parametric VaR for a crypto portfolio. Provide either weights + portfolioValueUsd, or quantities. Invalid portfolios fail before payment.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "assets": {
+            "description": "Asset symbols, e.g. [\"BTC\", \"ETH\"].",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "confidence": {
+            "description": "Confidence level (default 0.95).",
+            "maximum": 0.999,
+            "minimum": 0.5,
+            "type": "number"
+          },
+          "horizon": {
+            "description": "Risk horizon, e.g. \"1d\" (default).",
+            "type": "string"
+          },
+          "methods": {
+            "description": "empirical, normal, or both (default).",
+            "enum": [
+              "empirical",
+              "normal",
+              "both"
+            ],
+            "type": "string"
+          },
+          "portfolioValueUsd": {
+            "description": "Total portfolio value in USD.",
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "quantities": {
+            "description": "Asset quantities (alternative to weights).",
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "weights": {
+            "description": "Portfolio weights (with portfolioValueUsd).",
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "window": {
+            "description": "Price history window (default 180d).",
+            "enum": [
+              "90d",
+              "180d"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "assets"
+        ],
+        "type": "object"
+      },
+      "name": "compute_portfolio_var",
+      "title": "Compute portfolio Value-at-Risk (paid)"
+    },
+    {
+      "_meta": {
+        "agents-x402/paymentRequired": true,
+        "agents-x402/priceUSD": 0.05
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "description": "Paid via x402 ($0.05 per request). Nets Black-76 greeks across up to 6 Deribit BTC option legs and returns a spot×vol scenario P&L grid. Invalid legs or unknown instruments fail before payment.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "legs": {
+            "description": "Spread legs.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "instrument": {
+                  "description": "Deribit BTC option instrument, e.g. \"BTC-26SEP26-120000-C\".",
+                  "type": "string"
+                },
+                "qty": {
+                  "description": "Signed quantity in 1 BTC contracts; negative = short.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "instrument",
+                "qty"
+              ],
+              "type": "object"
+            },
+            "maxItems": 6,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "legs"
+        ],
+        "type": "object"
+      },
+      "name": "compute_spread_greeks",
+      "title": "Compute BTC option spread greeks (paid)"
+    }
+  ],
+  "url": "https://mcp.dripmetrics.ai/mcp"
+}

@@ -1,0 +1,151 @@
+{
+  "canon_version": "1",
+  "full_hash": "e36a4ff68b66157470b69885847af5b4d4d6cbd345399259fab23afa5250af9d",
+  "name": "ai.artidrop/artidrop",
+  "observed_at": "2026-08-20T09:11:23.181959Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 4,
+  "tools": [
+    {
+      "description": "Publish HTML or Markdown content as a shareable URL. Pass `content` byte-for-byte from the source — do not retype, reformat, minify, summarize, or 'clean up' the input; even one stray character can break inline scripts on the published page. If the content is too large to copy verbatim through the model, use the REST endpoint `POST /v1/artifacts` (or `/v1/artifacts/upload` for ZIPs) instead. For Markdown, optionally include images as base64-encoded data.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "content": {
+            "description": "The HTML or Markdown content to publish. Copy this verbatim from the source file or buffer — do not modify, reformat, or regenerate it. Whitespace, emojis, comments, and exact character sequences inside <script> and <style> blocks all matter. If you cannot fit the full content unmodified in one tool call, fall back to POST /v1/artifacts via curl.",
+            "type": "string"
+          },
+          "format": {
+            "description": "Content format",
+            "enum": [
+              "html",
+              "markdown"
+            ],
+            "type": "string"
+          },
+          "images": {
+            "description": "Images referenced in the markdown content. Only used when format is 'markdown'.",
+            "items": {
+              "properties": {
+                "data": {
+                  "description": "Base64-encoded image file data",
+                  "type": "string"
+                },
+                "path": {
+                  "description": "Relative path as referenced in the markdown (e.g., 'images/demo.png')",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "data"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "title": {
+            "description": "Artifact title (default: Untitled)",
+            "type": "string"
+          },
+          "visibility": {
+            "description": "Visibility (default: unlisted)",
+            "enum": [
+              "public",
+              "unlisted"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "content",
+          "format"
+        ],
+        "type": "object"
+      },
+      "name": "publish"
+    },
+    {
+      "description": "Publish a multi-file HTML site from a base64-encoded ZIP file. The ZIP must contain an index.html at its root. For sites larger than ~10MB — or whenever you have the file on disk — prefer the REST API /v1/artifacts/upload endpoint to avoid base64 overhead and to guarantee byte-faithful upload.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "title": {
+            "description": "Site title (default: Untitled)",
+            "type": "string"
+          },
+          "visibility": {
+            "description": "Visibility (default: unlisted)",
+            "enum": [
+              "public",
+              "unlisted"
+            ],
+            "type": "string"
+          },
+          "zip_base64": {
+            "description": "Base64-encoded ZIP file containing the site files",
+            "type": "string"
+          }
+        },
+        "required": [
+          "zip_base64"
+        ],
+        "type": "object"
+      },
+      "name": "publish_site"
+    },
+    {
+      "description": "Get artifact metadata. Set include_content to true to also return the full HTML content.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "id": {
+            "description": "Artifact ID or short ID",
+            "type": "string"
+          },
+          "include_content": {
+            "description": "Include the full HTML content in the response (default: false)",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get"
+    },
+    {
+      "description": "List version history of an artifact",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "id": {
+            "description": "Artifact ID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "versions"
+    }
+  ],
+  "url": "https://artidrop.ai/mcp"
+}

@@ -1,0 +1,372 @@
+{
+  "canon_version": "1",
+  "full_hash": "0dba150088b6a262ef5f0c1445c3649bd79695d06e84050fe86621e24bd6ea4c",
+  "name": "ai.justpublish/just-publish",
+  "observed_at": "2026-08-20T09:11:58.827112Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 3,
+  "tools": [
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://just-publish/publish-moment-v1.html",
+        "openai/toolInvocation/invoked": "Your site is live",
+        "openai/toolInvocation/invoking": "Publishing your site…",
+        "openai/widgetCSP": {
+          "redirect_domains": [
+            "https://justpublish.site",
+            "https://justpublish.ai"
+          ]
+        },
+        "ui": {
+          "resourceUri": "ui://just-publish/publish-moment-v1.html"
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Publish a website"
+      },
+      "description": "Put a website live at a public URL. Use this when the user wants to publish, launch, or get a page online — e.g. 'I need a website', 'put up a page for my business', 'make this live'. Takes static files (HTML, CSS, JS, images) and returns a working URL anyone can open. No build step, no config. First call: omit site_id and edit_token — you get back a url, a site_id, and an edit_token. Keep the edit_token; it's the only way to change this site later. Later calls: pass site_id + edit_token to publish over the same site. deploy REPLACES the whole site — any file you leave out is DELETED. To change just one or a few files, use update_site_file instead. To see what's currently live before editing, use get_site_files first.",
+      "inputSchema": {
+        "properties": {
+          "edit_token": {
+            "description": "Edit token returned at create time. Required to update.",
+            "type": "string"
+          },
+          "email": {
+            "description": "Email to associate with the site. Captured unverified at first deploy; verification only required later for custom domains and recovery.",
+            "type": "string"
+          },
+          "files": {
+            "description": "Files to publish. Must include an index.html at the root.",
+            "items": {
+              "properties": {
+                "content": {
+                  "description": "File body. Text by default; binary must be base64.",
+                  "type": "string"
+                },
+                "encoding": {
+                  "description": "Defaults to utf-8 for text extensions, base64 otherwise.",
+                  "enum": [
+                    "base64",
+                    "utf-8"
+                  ],
+                  "type": "string"
+                },
+                "path": {
+                  "description": "Path under the site root, e.g. 'index.html', 'assets/logo.png'.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "content"
+              ],
+              "type": "object"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "site_id": {
+            "description": "Existing site id to update. Omit to create a new site.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "files",
+          "email"
+        ],
+        "type": "object"
+      },
+      "name": "deploy",
+      "outputSchema": {
+        "properties": {
+          "created": {
+            "description": "true if this call created a new site; false if it updated an existing one.",
+            "type": "boolean"
+          },
+          "dashboard_url": {
+            "description": "Deep link to this site in the owner's dashboard.",
+            "type": "string"
+          },
+          "edit_token": {
+            "description": "Returned ONLY on first create. Save it — it's the only way to update this site.",
+            "type": "string"
+          },
+          "email_masked": {
+            "description": "The owner email, masked for display (e.g. 'a***@example.com').",
+            "type": "string"
+          },
+          "email_verified": {
+            "description": "Whether the site's owner email is verified right now. New sites are always false.",
+            "type": "boolean"
+          },
+          "files_uploaded": {
+            "description": "Number of files written in this deploy.",
+            "type": "integer"
+          },
+          "site_id": {
+            "description": "The site's slug / id — pass back to update it later.",
+            "type": "string"
+          },
+          "total_bytes": {
+            "description": "Total size of the site in bytes after this deploy.",
+            "type": "integer"
+          },
+          "url": {
+            "description": "The live URL of the published site.",
+            "type": "string"
+          },
+          "verify_required": {
+            "description": "true when the owner still needs to verify their email (keys on !email_verified).",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "url",
+          "site_id",
+          "created",
+          "email_verified",
+          "files_uploaded",
+          "total_bytes",
+          "email_masked",
+          "verify_required",
+          "dashboard_url"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Read a published site's files"
+      },
+      "description": "Read the files of a site you already published, so you can make a targeted edit instead of rebuilding the whole site from memory. Returns a complete manifest (every file's path, size, content-type, sha256) plus the contents of the text files (HTML/CSS/JS/etc). Also returns the site's current `version` — pass it back to update_site_file so you don't overwrite a newer change. Pass `paths` to fetch only specific files; omit it to get all text files. Requires site_id + edit_token.",
+      "inputSchema": {
+        "properties": {
+          "edit_token": {
+            "description": "The edit token returned at publish time.",
+            "type": "string"
+          },
+          "paths": {
+            "description": "Optional. Specific file paths to return contents for (e.g. ['index.html','style.css']). Omit to get all text files. The manifest always lists every file regardless.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "site_id": {
+            "description": "The site id returned at publish time.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "site_id",
+          "edit_token"
+        ],
+        "type": "object"
+      },
+      "name": "get_site_files",
+      "outputSchema": {
+        "properties": {
+          "files": {
+            "description": "Inlined contents of the requested text files (default: all text files, capped for size).",
+            "items": {
+              "properties": {
+                "content": {
+                  "description": "Full text content of the file.",
+                  "type": "string"
+                },
+                "encoding": {
+                  "description": "Always 'utf-8' — only text files are inlined.",
+                  "enum": [
+                    "utf-8"
+                  ],
+                  "type": "string"
+                },
+                "path": {
+                  "description": "Path of this file under the site root.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "content",
+                "encoding"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "manifest": {
+            "description": "Every file on the site (always complete, regardless of which contents were inlined).",
+            "items": {
+              "properties": {
+                "content_type": {
+                  "description": "Stored content-type, e.g. 'text/html'.",
+                  "type": "string"
+                },
+                "is_text": {
+                  "description": "Whether the file is a text type eligible to have its content inlined.",
+                  "type": "boolean"
+                },
+                "path": {
+                  "description": "Path under the site root, e.g. 'index.html'.",
+                  "type": "string"
+                },
+                "sha256": {
+                  "description": "Hex sha256 of the file bytes; null if not recorded for this file.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "size_bytes": {
+                  "description": "File size in bytes.",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "path",
+                "size_bytes",
+                "content_type",
+                "sha256",
+                "is_text"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "site_id": {
+            "description": "The site's slug / id.",
+            "type": "string"
+          },
+          "truncated": {
+            "description": "true if some requested file contents were omitted for size — request specific paths to read them.",
+            "type": "boolean"
+          },
+          "url": {
+            "description": "The live URL of the site.",
+            "type": "string"
+          },
+          "version": {
+            "description": "The site's current version — pass as expected_version to update_site_file to avoid clobbering.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "site_id",
+          "version",
+          "url",
+          "manifest",
+          "files",
+          "truncated"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Edit specific files of a published site"
+      },
+      "description": "Change one or a few files of an already-published site, leaving every other file untouched (a merge — unlike deploy, which replaces the whole site). Ideal for small edits: fix a typo in index.html, swap a stylesheet, add one page. Best practice: call get_site_files first, edit the returned content, then call this with the files you changed and the `expected_version` from that read — if the site changed in the meantime you get a clear conflict telling you to re-read. Requires site_id + edit_token. Cannot delete files (use deploy to drop a file) and cannot remove index.html.",
+      "inputSchema": {
+        "properties": {
+          "edit_token": {
+            "description": "The edit token returned at publish time.",
+            "type": "string"
+          },
+          "expected_version": {
+            "description": "Optional but recommended. The `version` you got from get_site_files. If the site has changed since, the update is rejected with a conflict so you can re-read and re-apply. Omit to force last-writer-wins.",
+            "type": "integer"
+          },
+          "files": {
+            "description": "The files to change. Only these are written; all other files on the site survive.",
+            "items": {
+              "properties": {
+                "content": {
+                  "description": "Full new file body. Text by default; binary must be base64.",
+                  "type": "string"
+                },
+                "encoding": {
+                  "description": "Defaults to utf-8 for text, base64 otherwise.",
+                  "enum": [
+                    "base64",
+                    "utf-8"
+                  ],
+                  "type": "string"
+                },
+                "path": {
+                  "description": "Path under the site root, e.g. 'index.html'.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "content"
+              ],
+              "type": "object"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "site_id": {
+            "description": "The site id returned at publish time.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "site_id",
+          "edit_token",
+          "files"
+        ],
+        "type": "object"
+      },
+      "name": "update_site_file",
+      "outputSchema": {
+        "properties": {
+          "files_total": {
+            "description": "Total number of files on the site after the merge.",
+            "type": "integer"
+          },
+          "files_written": {
+            "description": "Paths of the files written in this update. All other files were left untouched.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "site_id": {
+            "description": "The site's slug / id.",
+            "type": "string"
+          },
+          "url": {
+            "description": "The live URL of the site.",
+            "type": "string"
+          },
+          "version": {
+            "description": "The site's new version after the merge.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "site_id",
+          "url",
+          "version",
+          "files_written",
+          "files_total"
+        ],
+        "type": "object"
+      }
+    }
+  ],
+  "url": "https://mcp.justpublish.ai"
+}

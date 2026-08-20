@@ -1,0 +1,840 @@
+{
+  "canon_version": "1",
+  "full_hash": "78567f5bb4250072fdd07298db6e9a01d2c3803006d8a4fecddaebcf96a2b987",
+  "name": "ai.partsgraph/catalog",
+  "observed_at": "2026-08-20T09:12:24.883258Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 11,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Full-text search over the demo catalogue's provenance-backed part records. Filter by category, build or role. Every attribute returned was corroborated against the manufacturer datasheet or vendor page.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "build": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "limit": {
+            "maximum": 25,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "project_context": {
+            "description": "One sentence on what you are building. Results are ranked for your project. Queries and this context are logged anonymously to power the public demo dashboard.",
+            "maxLength": 500,
+            "type": "string"
+          },
+          "query": {
+            "description": "What you are looking for",
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_parts",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "matched": {
+            "type": "number"
+          },
+          "parts": {
+            "items": {
+              "additionalProperties": {},
+              "properties": {
+                "category": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "manufacturer": {
+                  "type": "string"
+                },
+                "mpn": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "manufacturer",
+                "mpn",
+                "category",
+                "url"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "query": {
+            "type": "string"
+          },
+          "rankedForProject": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "query",
+          "matched",
+          "rankedForProject",
+          "parts"
+        ],
+        "type": "object"
+      },
+      "title": "Search the parts catalogue"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "The complete canonical record for one part: every attribute with its provenance (source, page, verbatim quote, file hash), vendors with dated indicative prices, and datasheet links.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "id": {
+            "description": "Part id, e.g. pololu-drv8833-carrier",
+            "type": "string"
+          },
+          "project_context": {
+            "description": "One sentence on what you are building. Results are ranked for your project. Queries and this context are logged anonymously to power the public demo dashboard.",
+            "maxLength": 500,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_part",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": {},
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object"
+      },
+      "title": "Get a full part record"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Every category in the catalogue with its part count.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "project_context": {
+            "description": "One sentence on what you are building. Results are ranked for your project. Queries and this context are logged anonymously to power the public demo dashboard.",
+            "maxLength": 500,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_categories",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "categories": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "parts": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "label",
+                "parts"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "categories"
+        ],
+        "type": "object"
+      },
+      "title": "List part categories"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "The catalogue's reference builds (robot, weather station, plant waterer) with their roles and candidate parts — the starting point for build_bom.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "project_context": {
+            "description": "One sentence on what you are building. Results are ranked for your project. Queries and this context are logged anonymously to power the public demo dashboard.",
+            "maxLength": 500,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_builds",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "builds": {
+            "items": {
+              "additionalProperties": {},
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "builds"
+        ],
+        "type": "object"
+      },
+      "title": "List reference builds"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Evaluates a part set against the build's engineering constraints — supply windows, stall vs peak current, shaft/wheel fit, interfaces, solar chain — with a reasoned verdict per check. Every number cited is a corroborated attribute.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "build_id": {
+            "description": "Defaults to the build these parts overlap most",
+            "type": "string"
+          },
+          "part_ids": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "project_context": {
+            "description": "One sentence on what you are building. Results are ranked for your project. Queries and this context are logged anonymously to power the public demo dashboard.",
+            "maxLength": 500,
+            "type": "string"
+          }
+        },
+        "required": [
+          "part_ids"
+        ],
+        "type": "object"
+      },
+      "name": "check_compatibility",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "build": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "summary": {
+            "type": "string"
+          },
+          "unknown": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "verdicts": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "constraint": {
+                  "type": "string"
+                },
+                "detail": {
+                  "type": "string"
+                },
+                "kind": {
+                  "type": "string"
+                },
+                "parts": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "status": {
+                  "enum": [
+                    "pass",
+                    "fail",
+                    "warn",
+                    "info"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "constraint",
+                "kind",
+                "status",
+                "detail",
+                "parts"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "build",
+          "verdicts",
+          "unknown",
+          "summary"
+        ],
+        "type": "object"
+      },
+      "title": "Check a set of parts for compatibility"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Aligned attribute-by-attribute comparison of two catalogue parts. Absence means the sources did not state a value — never that the part lacks the property.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "a": {
+            "description": "First part id",
+            "type": "string"
+          },
+          "b": {
+            "description": "Second part id",
+            "type": "string"
+          },
+          "project_context": {
+            "description": "One sentence on what you are building. Results are ranked for your project. Queries and this context are logged anonymously to power the public demo dashboard.",
+            "maxLength": 500,
+            "type": "string"
+          }
+        },
+        "required": [
+          "a",
+          "b"
+        ],
+        "type": "object"
+      },
+      "name": "compare_parts",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": {},
+        "properties": {
+          "rows": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "a": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "b": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "code": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "same": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "code",
+                "label",
+                "a",
+                "b",
+                "same"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "summary": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "rows",
+          "summary"
+        ],
+        "type": "object"
+      },
+      "title": "Compare two parts attribute by attribute"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "The receipt behind a stated value: the verbatim source quote, the page, the extraction method, and the sha-256 of the exact file it was read from — plus a ready-made citation line. Omit code for every attribute's receipt.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "code": {
+            "description": "Attribute code from get_part; omit for all",
+            "type": "string"
+          },
+          "id": {
+            "description": "Part id",
+            "type": "string"
+          },
+          "project_context": {
+            "description": "One sentence on what you are building. Results are ranked for your project. Queries and this context are logged anonymously to power the public demo dashboard.",
+            "maxLength": 500,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_provenance",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": {},
+        "properties": {
+          "part": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "part"
+        ],
+        "type": "object"
+      },
+      "title": "Get the provenance receipt for an attribute"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Composes a complete BOM for a reference build — quantities, dated indicative prices, per-line rationale, a compatibility verdict for the chosen set, and a CSV export. Override any role with choices.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "build_id": {
+            "description": "2wd-robot, weather-station or plant-waterer",
+            "type": "string"
+          },
+          "choices": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "role → part id overrides",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "project_context": {
+            "description": "One sentence on what you are building. Results are ranked for your project. Queries and this context are logged anonymously to power the public demo dashboard.",
+            "maxLength": 500,
+            "type": "string"
+          }
+        },
+        "required": [
+          "build_id"
+        ],
+        "type": "object"
+      },
+      "name": "build_bom",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": {},
+        "properties": {
+          "build": {
+            "additionalProperties": {},
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "type": "object"
+          },
+          "compatibility": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "constraint": {
+                  "type": "string"
+                },
+                "detail": {
+                  "type": "string"
+                },
+                "kind": {
+                  "type": "string"
+                },
+                "parts": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "status": {
+                  "enum": [
+                    "pass",
+                    "fail",
+                    "warn",
+                    "info"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "constraint",
+                "kind",
+                "status",
+                "detail",
+                "parts"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "csv": {
+            "type": "string"
+          },
+          "lines": {
+            "items": {
+              "additionalProperties": {},
+              "properties": {
+                "qty": {
+                  "type": "number"
+                },
+                "role": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "role",
+                "qty"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "build",
+          "lines",
+          "compatibility",
+          "csv"
+        ],
+        "type": "object"
+      },
+      "title": "Build a validated bill of materials"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Search the Partsgraph demo catalogue. Returns result ids for fetch. Alias of search_parts shaped to the search/fetch connector contract.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "query": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "results": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "url"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "results"
+        ],
+        "type": "object"
+      },
+      "title": "Search the catalogue (deep-research contract)"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Fetch the full provenance-backed record for a search result id as a citable document. Alias of get_part shaped to the search/fetch connector contract.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "fetch",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": {},
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "text",
+          "url"
+        ],
+        "type": "object"
+      },
+      "title": "Fetch one catalogue document (deep-research contract)"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://partsgraph/bom-viewer"
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Composes the BOM for a reference build and renders it as an interactive view in clients that support MCP Apps. Same data as build_bom.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "build_id": {
+            "description": "2wd-robot, weather-station or plant-waterer",
+            "type": "string"
+          },
+          "choices": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "build_id"
+        ],
+        "type": "object"
+      },
+      "name": "view_bom",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": {},
+        "properties": {
+          "build": {
+            "additionalProperties": {},
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "type": "object"
+          },
+          "lines": {
+            "items": {
+              "additionalProperties": {},
+              "properties": {
+                "qty": {
+                  "type": "number"
+                },
+                "role": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "role",
+                "qty"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "build",
+          "lines"
+        ],
+        "type": "object"
+      },
+      "title": "View a bill of materials (interactive)"
+    }
+  ],
+  "url": "https://partsgraph.ai/api/mcp"
+}

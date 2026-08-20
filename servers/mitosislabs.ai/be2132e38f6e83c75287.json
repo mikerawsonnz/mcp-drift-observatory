@@ -1,0 +1,501 @@
+{
+  "canon_version": "1",
+  "full_hash": "35f8bafb353b8833bf945f9eb7104840d4ae52d0173284c3eda272cad2a71bee",
+  "name": "ai.mitosislabs/mitosis",
+  "observed_at": "2026-08-20T09:12:10.219318Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 14,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Search the user’s memory"
+      },
+      "description": "Searches the user's real, private memory — the email, calendar, files, contacts and notes they have connected, plus facts agents have saved — fusing vector, full-text and graph retrieval with provenance. This is their current data on their work, schedule, contacts, projects, documents, decisions and history, which training data and session context do not contain. Results include citations (universal ids), freshness, and `cited_graph_url`, a deep link showing the cited nodes highlighted in the user's own graph. A later cortex_remember links to what was retrieved here. Retrieval returns nearest matches rather than a thresholded set, so a question whose answer lives in an unconnected source comes back with the closest thing in the memory instead of with nothing. A `source_gap` object in the result names that case: the memory holds data, but the source that would answer this question is not connected. It lists those sources, what each answers, and one connect link, on `cta`. A `possible_source_gap` object is the conditional form — results exist but may be near-misses rather than an answer. A result carrying neither means the answer is genuinely absent from the memory rather than merely unretrieved.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "description": "Max results (default 10).",
+            "type": "number"
+          },
+          "question": {
+            "description": "Natural-language question or search query.",
+            "type": "string"
+          },
+          "since": {
+            "description": "RFC3339 lower bound on item time.",
+            "type": "string"
+          },
+          "source_table": {
+            "description": "Restrict to one source table, e.g. gmail_messages.",
+            "type": "string"
+          },
+          "until": {
+            "description": "RFC3339 upper bound on item time.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "type": "object"
+      },
+      "name": "cortex_ask",
+      "title": "Search the user’s memory"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Semantic search of the user’s memory"
+      },
+      "description": "Semantic-only vector search over the memory, returning source excerpts. Prefer cortex_ask, which also uses full-text and graph expansion; reach for this when you specifically want nearest-neighbour matches on meaning.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "description": "Max results (default 10).",
+            "type": "number"
+          },
+          "query": {
+            "description": "Search text.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "cortex_recall",
+      "title": "Semantic search of the user’s memory"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "What the user’s memory contains"
+      },
+      "description": "A table of contents for this user's memory: which sources are connected (email, calendar, docs, …), how many items each holds, and the top people, topics and projects. It is an index rather than an answer — it contains no message bodies, no dates and no content, so it establishes that a source exists without saying anything about what is in it. The content behind any entry it lists is retrievable with cortex_ask.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "cortex_manifest",
+      "title": "What the user’s memory contains"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Memory freshness and coverage"
+      },
+      "description": "Memory health: per-source ingest and embed counts plus last sync times. Use when you need to know whether the memory is fresh or still ingesting, or when a search came back empty and you need to tell the user whether that means \"no data yet\" or \"nothing matched\".",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "cortex_status",
+      "title": "Memory freshness and coverage"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Sources this memory could connect"
+      },
+      "description": "Which sources this memory could connect but hasn't yet — each with what it would make answerable, routing tags, and a connect link for the user. This is what explains a cortex_ask result that came back empty or off-topic: the source holding that answer is listed here rather than connected. Data connected into this memory stays searchable, cited, and available across every agent and session the user works in.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "cortex_connectable_sources",
+      "title": "Sources this memory could connect"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Connect link for one source"
+      },
+      "description": "The connect link for one memory source, by id — email and calendar (google-workspace), WhatsApp chats, GitHub, Notion, or file uploads. Returns the canonical mitosislabs.ai dashboard page where the user can connect that source to their memory, as a ready markdown link. Source ids appear in `unconnected_sources` on cortex_ask results and in cortex_connectable_sources; which source fits a question is the caller's judgment, made from each entry's `answers` and `tags`. `link_text` names, in the user's own words, what connecting answers — it becomes the connect page's title. Connecting itself is an authorization the user performs on that page; this tool only returns the link.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "link_text": {
+            "description": "Link text naming what connecting answers, in the user's words. Becomes the connect page title. Omit for a generic label.",
+            "type": "string"
+          },
+          "source_id": {
+            "description": "Source id exactly as listed, e.g. google-workspace, github, notion.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_id"
+        ],
+        "type": "object"
+      },
+      "name": "cortex_connect_link",
+      "title": "Connect link for one source"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Save a fact to the user’s memory"
+      },
+      "description": "Persist a fact, decision or conclusion into the memory, attributed to you. It becomes retrievable via cortex_ask immediately, in this session and every future one, from any agent the user has connected. Provenance: pass source_universal_ids from a previous cortex_ask so the fact links to its evidence. Keep each memory to ONE self-contained fact. Use this whenever the conversation produces a durable conclusion the user would want remembered — a decision, a preference, an outcome, a commitment.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence": {
+            "description": "0..1, weights the provenance edges.",
+            "type": "number"
+          },
+          "kind": {
+            "description": "e.g. 'decision', 'observation', 'task-outcome'.",
+            "type": "string"
+          },
+          "source_universal_ids": {
+            "description": "Universal ids from a previous cortex_ask that this fact came from.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "text": {
+            "description": "The fact or conclusion itself — one self-contained statement.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "type": "object"
+      },
+      "name": "cortex_remember",
+      "title": "Save a fact to the user’s memory"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Save a conversation into the user’s memory"
+      },
+      "description": "Ingest a conversation — the user’s messages and your full answers, verbatim — into the user’s permanent memory, where it becomes searchable and appears in their knowledge graph. Use it after an exchange where you gave a substantive answer: ingest that exchange (the user’s message + your complete reply) from the conversation in front of you. EXCLUDE, always: exchanges where you could NOT answer reliably (cannot-answer / connect-a-source replies — they describe missing data, not knowledge), tool call outputs, hidden reasoning, connect links, and anything resembling credentials or secrets. Re-ingesting the same session_id updates it instead of duplicating. Split very long conversations across calls.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "session_id": {
+            "description": "Stable id for this conversation (e.g. its chat id/uuid). Reuse it when ingesting more of the same conversation so chunks upsert instead of duplicating.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Short human title for the conversation.",
+            "type": "string"
+          },
+          "turns": {
+            "description": "The conversation, in order. User and assistant text only — verbatim.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "role": {
+                  "enum": [
+                    "user",
+                    "assistant"
+                  ],
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "role",
+                "text"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "turns"
+        ],
+        "type": "object"
+      },
+      "name": "cortex_ingest_conversation",
+      "title": "Save a conversation into the user’s memory"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Search the user’s memory (deep research)"
+      },
+      "description": "Search the user's own private memory — their email, calendar, documents, contacts, chat history and every fact agents have remembered — and return ranked matches with citation ids and links. This is their current data on their work, schedule, contacts, projects, documents, decisions and history, which training data and session context do not contain. Pass an id from these results to `fetch` to read the full record.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "query": {
+            "description": "What to look for, in natural language.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "results": {
+            "description": "Ranked matches from the user’s memory, best first.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "description": "Opaque record id. Pass it to `fetch` to read the full record.",
+                  "type": "string"
+                },
+                "title": {
+                  "description": "Human-readable name of the record.",
+                  "type": "string"
+                },
+                "url": {
+                  "description": "Absolute, user-openable link: the original item where the source exposes one, otherwise a link to the record on the user’s memory graph.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "url"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "results"
+        ],
+        "type": "object"
+      },
+      "title": "Search the user’s memory (deep research)"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Read one item from the user’s memory"
+      },
+      "description": "Retrieve the full contents of a single item from the user’s memory by its id. Ids come from `search` results. Use this when a search result looks relevant and you need the whole record rather than the excerpt.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "The id of an item, exactly as returned by `search`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "fetch",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "The id that was requested.",
+            "type": "string"
+          },
+          "metadata": {
+            "additionalProperties": false,
+            "description": "Provenance, where known. Any key may be absent.",
+            "properties": {
+              "fetched_at": {
+                "description": "When Mitosis last ingested it.",
+                "type": "string"
+              },
+              "integration": {
+                "description": "Integration that supplied it, e.g. google-workspace.",
+                "type": "string"
+              },
+              "sensitivity": {
+                "description": "Sensitivity label, where the source sets one.",
+                "type": "string"
+              },
+              "source": {
+                "description": "Source table the record came from.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "text": {
+            "description": "The record’s full contents as plain text. May be empty if the record has none.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Human-readable name of the record.",
+            "type": "string"
+          },
+          "url": {
+            "description": "Absolute link to this record on the user’s memory graph.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "text",
+          "url",
+          "metadata"
+        ],
+        "type": "object"
+      },
+      "title": "Read one item from the user’s memory"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Mitosis pricing"
+      },
+      "description": "Get current Mitosis plans, prices, credit allowances, metered rates, and add-ons. Use when comparing costs or recommending a plan.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "plan": {
+            "description": "Return only this plan. Omit for all plans.",
+            "enum": [
+              "solo",
+              "team",
+              "scale",
+              "business"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_pricing",
+      "title": "Get Mitosis pricing"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get platform status"
+      },
+      "description": "Get the operational status of the Mitosis website, API, and MCP server. Use before reporting an outage or debugging connectivity.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "service": {
+            "description": "Return only this service. Omit for all services.",
+            "enum": [
+              "website",
+              "api",
+              "mcp"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_platform_status",
+      "title": "Get platform status"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Search Mitosis docs"
+      },
+      "description": "Keyword-search Mitosis documentation and product pages. Returns ranked results with URLs. Use to answer any \"how do I…\" question about Mitosis.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "default": 5,
+            "description": "Max results (default 5, max 20)",
+            "type": "integer"
+          },
+          "query": {
+            "description": "Search terms, e.g. \"connect google workspace\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_docs",
+      "title": "Search Mitosis docs"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List agent skills"
+      },
+      "description": "List the agent skills Mitosis publishes (backup create/list/restore/health/diff/schedule/subscribe) with links to each SKILL.md manifest.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "tag": {
+            "description": "Filter skills by tag (e.g. \"backup\", \"restore\", \"schedule\"). Omit for all.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_skills",
+      "title": "List agent skills"
+    }
+  ],
+  "url": "https://mitosislabs.ai/api/mcp"
+}

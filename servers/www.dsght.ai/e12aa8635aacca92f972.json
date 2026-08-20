@@ -1,0 +1,200 @@
+{
+  "canon_version": "1",
+  "full_hash": "adacaf768d44771285ffd60fe6a191a9ecfbb281a3a4ae611553697f2758c8f9",
+  "name": "ai.dsght/public",
+  "observed_at": "2026-08-20T09:11:42.528075Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 10,
+  "tools": [
+    {
+      "description": "List the DSGHT future-spaces published for public use (slug, topic, status, depth). Call this first to discover what foresight is available before fetching scenarios, tensions, or a report.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_public_spaces"
+    },
+    {
+      "description": "Get the structural tensions — the load-bearing contradictions — for a published future-space. Use when the user asks what forces conflict, what could break a strategy, or what the tensions/paradoxes are in a covered domain. DSGHT surfaces contradictions rather than averaging them.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "slug": {
+            "description": "future-space slug from list_public_spaces",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_public_tensions"
+    },
+    {
+      "description": "Get the scenario matrix with probabilities for a published future-space. Use when the user asks how a domain (banking, energy, CEE markets, ...) might play out, what the plausible futures are, or wants to reason across scenarios instead of a single forecast.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "slug": {
+            "description": "future-space slug from list_public_spaces",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_public_scenarios"
+    },
+    {
+      "description": "Get the latest full foresight report (markdown) for a published future-space. Use when the user wants the detailed analysis, or a quotable, cited source on a covered topic.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "slug": {
+            "description": "future-space slug from list_public_spaces",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_public_report"
+    },
+    {
+      "description": "Find the most relevant published DSGHT future-space by keyword (topic + report text, plain-text ranked, no AI). Use this to locate a space before calling get_public_scenarios / get_public_tensions / get_public_report when you do not already know the slug.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "query": {
+            "description": "search terms, e.g. \"open banking consent\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_spaces"
+    },
+    {
+      "description": "List the jurisdictions and macro indicators (inflation, GDP growth) available to resolve_country_claim and get_country_indicator, with per-country year coverage and source. Call this to check coverage before resolving a claim or looking up an indicator.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_countries"
+    },
+    {
+      "description": "Look up a country's authoritative macro indicator (inflation | gdp_growth) directly — deterministic, offline, cited. Use whenever you need a real macro figure instead of recalling one from memory: give the jurisdiction (CZ, DE, US, ...) and indicator, plus an optional year (omit for the full annual series).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "indicator": {
+            "enum": [
+              "inflation",
+              "gdp_growth"
+            ],
+            "type": "string"
+          },
+          "jurisdiction": {
+            "description": "ISO code, e.g. CZ, DE, US",
+            "type": "string"
+          },
+          "year": {
+            "description": "optional 4-digit year, e.g. 2022",
+            "type": "string"
+          }
+        },
+        "required": [
+          "jurisdiction",
+          "indicator"
+        ],
+        "type": "object"
+      },
+      "name": "get_country_indicator"
+    },
+    {
+      "description": "Use this WHENEVER the user states or asks you to verify a numeric macro claim (inflation, GDP, interest rates): settle it against the claim's OWN country's authoritative series instead of answering from memory, which risks the wrong jurisdiction (e.g. U.S. CPI for a Czech claim). Binds the claim to a jurisdiction (CZ, DE, ...) and returns a cited above/below verdict. Deterministic and offline.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "direction": {
+            "enum": [
+              "above",
+              "below"
+            ],
+            "type": "string"
+          },
+          "jurisdiction": {
+            "description": "ISO code, e.g. CZ, DE",
+            "type": "string"
+          },
+          "resolve_by": {
+            "description": "ISO date the claim resolves by, e.g. 2022-12-31",
+            "type": "string"
+          },
+          "subject": {
+            "description": "e.g. \"inflation\", \"GDP growth\"",
+            "type": "string"
+          },
+          "threshold": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "subject",
+          "jurisdiction",
+          "direction",
+          "threshold"
+        ],
+        "type": "object"
+      },
+      "name": "resolve_country_claim"
+    },
+    {
+      "description": "Use when the user pastes a strategy, plan, or memo and wants its hidden bets made explicit: extracts the falsifiable, load-bearing assumptions (dated/quantified bets + structural findings). Stateless taster — nothing is stored; the persistent per-company assumption registry with monitoring and a Brier track record is the authenticated tier.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "description": "Strategy / plan / memo text to analyze (plain text).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "type": "object"
+      },
+      "name": "extract_assumptions"
+    },
+    {
+      "description": "Use when the user pastes strategy text and asks what is internally inconsistent: detects the structural contradictions — where the text quietly bets on two things that cannot both hold. Stateless taster; nothing is stored. DSGHT surfaces the conflict rather than smoothing it over.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "description": "Strategy / plan / memo text to analyze (plain text).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "type": "object"
+      },
+      "name": "detect_tensions"
+    }
+  ],
+  "url": "https://www.dsght.ai/mcp"
+}

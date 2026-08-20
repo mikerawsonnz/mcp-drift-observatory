@@ -1,0 +1,271 @@
+{
+  "canon_version": "1",
+  "full_hash": "219956750caa3740b4f3c302f8a8c51ca5ff0b6d26a83e7d77f23bdd1a753205",
+  "name": "ai.aviado/health",
+  "observed_at": "2026-08-20T09:11:28.920733Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 9,
+  "tools": [
+    {
+      "description": "Find registry-classified supplements in Aviado's current graph that affect a biomarker. Excludes food_substance, prescription_drug, research_compound, research_nootropic, medical_compound, and unknown IDs. Type labels and graph_status (proven or suspected) are internal taxonomy/eligibility metadata, not independent clinical verification. Results are partial and non-exhaustive; pathway_tags are raw graph metadata, not validated mechanisms. Use dose_value with dose_unit; legacy dose_mg is populated only for literal mg rows.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "biomarker": {
+            "description": "Biomarker name, abbreviation, or LOINC code",
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "limit": {
+            "default": 25,
+            "description": "Max results (default 25, max 100)",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "biomarker"
+        ],
+        "type": "object"
+      },
+      "name": "get_supplements_for_biomarker"
+    },
+    {
+      "description": "Find mixed interventions in Aviado's current graph that affect a biomarker, labeled with the exact intervention_type value supplement, food_substance, prescription_drug, research_compound, research_nootropic, medical_compound, or unknown. graph_status is the exact internal proven/suspected eligibility label, not independent clinical validation. Coverage is partial and non-exhaustive; absence is not evidence of no effect. pathway_tags are raw graph metadata, not validated mechanisms, and dose/pathway details are suppressed for non-supplement and unknown rows. Use dose_value with dose_unit; legacy dose_mg is populated only for literal mg rows.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "biomarker": {
+            "description": "Biomarker name, abbreviation, or LOINC code",
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "limit": {
+            "default": 25,
+            "description": "Max results (default 25, max 100)",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "biomarker"
+        ],
+        "type": "object"
+      },
+      "name": "get_interventions_for_biomarker"
+    },
+    {
+      "description": "Find which biomarkers are affected by a given supplement. Returns direction (up/down), confidence, dose, and health goal mapping.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "limit": {
+            "default": 25,
+            "description": "Max results (default 25, max 100)",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "supplement": {
+            "description": "Supplement name (e.g., 'fish oil', 'curcumin', 'vitamin D3')",
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "supplement"
+        ],
+        "type": "object"
+      },
+      "name": "get_biomarkers_for_supplement"
+    },
+    {
+      "description": "Get comprehensive information about a supplement: what it is, what it does, which biomarkers it affects, mechanism of action, and safety contraindications.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "supplement": {
+            "description": "Supplement name",
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "supplement"
+        ],
+        "type": "object"
+      },
+      "name": "get_supplement_info"
+    },
+    {
+      "description": "Find supplement-supplement interactions (765 pairs from clinical evidence) and drug-supplement interactions (1,626 FDA-validated pairs). Returns synergies, antagonisms, absorption conflicts, and timing recommendations.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "include_drug_interactions": {
+            "default": true,
+            "description": "Include FDA drug-supplement interactions",
+            "type": "boolean"
+          },
+          "supplement": {
+            "description": "Supplement name",
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "supplement"
+        ],
+        "type": "object"
+      },
+      "name": "get_supplement_interactions"
+    },
+    {
+      "description": "Find the highest-quality brands for a supplement, ranked by ProofMark (Aviado's quality score: third-party testing, certifications, and quality metrics).",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "limit": {
+            "default": 5,
+            "description": "Number of results (max 20)",
+            "maximum": 20,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "supplement": {
+            "description": "Supplement name",
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "supplement"
+        ],
+        "type": "object"
+      },
+      "name": "get_top_brands"
+    },
+    {
+      "description": "Resolve a supplement identity. Use mode='supplement_retail' only for raw retail product titles; it invokes the fail-closed retail front door. Identity mode is the default.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "mode": {
+            "default": "identity",
+            "description": "Explicit routing mode; retail titles require supplement_retail",
+            "enum": [
+              "identity",
+              "supplement_retail"
+            ],
+            "type": "string"
+          },
+          "query": {
+            "description": "Supplement identity or raw retail product title",
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_supplements"
+    },
+    {
+      "description": "Search for a health condition by name with fuzzy matching. Use this to resolve ambiguous condition names before calling get_supplements_for_condition.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "query": {
+            "description": "Search query (e.g., 'sleep', 'anxiety', 'brain fog', 'joint pain')",
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_conditions"
+    },
+    {
+      "description": "Find which supplements help with a health condition or goal (e.g., 'sleep', 'anxiety', 'joint pain'). Returns evidence-graded supplement recommendations with dosages.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "condition": {
+            "description": "Health condition, symptom, or goal (e.g., 'insomnia', 'anxiety', 'brain fog', 'joint pain')",
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "limit": {
+            "default": 25,
+            "description": "Max supplements to return, ranked by evidence (default: 25, max: 50)",
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "min_grade": {
+            "default": "D",
+            "description": "Minimum evidence grade to include (default: D = all)",
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "condition"
+        ],
+        "type": "object"
+      },
+      "name": "get_supplements_for_condition"
+    }
+  ],
+  "url": "https://aviado.ai/api/mcp"
+}

@@ -1,0 +1,268 @@
+{
+  "canon_version": "1",
+  "full_hash": "f23c5122dd7cdcb16ed4ce060d835c751faa4cba35632d52707bb694b918c9f7",
+  "name": "ai.aqta/seal",
+  "observed_at": "2026-08-20T09:11:22.011387Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 10,
+  "tools": [
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://seal/receipt-card.html"
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Verify a receipt"
+      },
+      "description": "Check a receipt signature against a trusted or embedded key. No Aqta service in the check.",
+      "inputSchema": {
+        "properties": {
+          "public_key": {
+            "description": "Base64url Ed25519 key to trust. Omit to use the key embedded in the receipt, which proves internal consistency only, never provenance.",
+            "type": "string"
+          },
+          "receipt": {
+            "description": "The receipt, as a JSON object or a JSON string.",
+            "type": [
+              "object",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "receipt"
+        ],
+        "type": "object"
+      },
+      "name": "verify_receipt",
+      "title": "Verify a receipt"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Read a receipt"
+      },
+      "description": "Read a receipt field by field, with stated limits. Does not check the signature.",
+      "inputSchema": {
+        "properties": {
+          "receipt": {
+            "type": [
+              "object",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "receipt"
+        ],
+        "type": "object"
+      },
+      "name": "decode_receipt",
+      "title": "Read a receipt"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get the published signing key"
+      },
+      "description": "Fetch the published Seal signing key.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_public_key",
+      "title": "Get the published signing key"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://seal/receipt-card.html"
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get a sample receipt"
+      },
+      "description": "A genuine signed receipt from the sample workspace (demo key), for trying verification.",
+      "inputSchema": {
+        "properties": {
+          "outcome": {
+            "description": "Pick a sample with this outcome. A BLOCKED receipt was signed without the call reaching the provider.",
+            "enum": [
+              "ALLOWED",
+              "BLOCKED",
+              "SUPPRESSED"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_sample_receipt",
+      "title": "Get a sample receipt"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get an evidence pack"
+      },
+      "description": "The published sample evidence pack: fixed review question, bound receipts, disclosure.",
+      "inputSchema": {
+        "properties": {
+          "pack_id": {
+            "description": "Pack id. Only the published \"sample\" pack is available without an account.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_review_pack",
+      "title": "Get an evidence pack"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Verify a whole evidence pack"
+      },
+      "description": "Verify every receipt in a pack. Per-receipt verdicts, never an average.",
+      "inputSchema": {
+        "properties": {
+          "pack": {
+            "description": "A pack object, or \"sample\" for the published sample pack.",
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "public_key": {
+            "description": "Key to pin every receipt against. Omit to use each envelope's embedded key.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "verify_evidence_pack",
+      "title": "Verify a whole evidence pack"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Explain the receipt format"
+      },
+      "description": "The receipt format: fields, outcomes, verification commands, and what a signature does not establish. Use before describing the format.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "explain_attestation_format",
+      "title": "Explain the receipt format"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List your signed receipts"
+      },
+      "description": "List your workspace receipts filtered by outcome, policy, model, or date range. Requires your aqta_ key as Bearer.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "Max rows, default 25.",
+            "type": "number"
+          },
+          "model": {
+            "description": "Only receipts for this model.",
+            "type": "string"
+          },
+          "outcome": {
+            "description": "Only receipts with this outcome.",
+            "enum": [
+              "ALLOWED",
+              "BLOCKED",
+              "SUPPRESSED",
+              "PASSED"
+            ],
+            "type": "string"
+          },
+          "policy": {
+            "description": "Only receipts where this policy ran, e.g. pii_scan.",
+            "type": "string"
+          },
+          "since": {
+            "description": "ISO timestamp lower bound.",
+            "type": "string"
+          },
+          "until": {
+            "description": "ISO timestamp upper bound.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_my_receipts",
+      "title": "List your signed receipts"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Prove a receipt is in the log"
+      },
+      "description": "Inclusion proof plus signed tree head for one of your receipts. Requires your aqta_ key.",
+      "inputSchema": {
+        "properties": {
+          "attestation_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "attestation_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_transparency_proof",
+      "title": "Prove a receipt is in the log"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Summarise your workspace decisions"
+      },
+      "description": "Outcome, model and policy counts across your recent receipts. Requires your aqta_ key.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "How many recent receipts to summarise, default 100.",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "name": "workspace_summary",
+      "title": "Summarise your workspace decisions"
+    }
+  ],
+  "url": "https://app.aqta.ai/api/mcp"
+}

@@ -1,0 +1,477 @@
+{
+  "canon_version": "1",
+  "full_hash": "732f3c2723d24f44893a29652b4c792ee32f8e52fc89cf341b3e6539a5def5f1",
+  "name": "ai.iturri/market-data",
+  "observed_at": "2026-08-20T09:11:57.173977Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 21,
+  "tools": [
+    {
+      "description": "Free discovery: symbols, timeframes, ranges, pricing, quality legend.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "describe_catalog"
+    },
+    {
+      "description": "Quality-flagged OHLCV candles. Priced per 1,000 candles.",
+      "inputSchema": {
+        "properties": {
+          "end": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "tf": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol",
+          "tf"
+        ],
+        "type": "object"
+      },
+      "name": "get_bars"
+    },
+    {
+      "description": "Documented leakage-safe feature matrix rows. Priced per call.",
+      "inputSchema": {
+        "properties": {
+          "end": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "tf": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol",
+          "tf"
+        ],
+        "type": "object"
+      },
+      "name": "get_features"
+    },
+    {
+      "description": "Signed URL for a dataset SKU. Packs: crypto|equities ($59 each), everything ($149: both packs + all token sequences, $730 list), tokens ($18/symbol), dataset (per-symbol OHLCV, crypto $14 / equity $5), mtf (aligned multi-timeframe bundle $9, crypto only), features (feature matrix, crypto $7 / equity $4). Priced as the SKU.",
+      "inputSchema": {
+        "properties": {
+          "pack": {
+            "enum": [
+              "crypto",
+              "equities",
+              "tokens",
+              "dataset",
+              "mtf",
+              "features",
+              "everything"
+            ],
+            "type": "string"
+          },
+          "symbol": {
+            "description": "required for tokens|dataset|mtf|features",
+            "type": "string"
+          },
+          "tf": {
+            "description": "features only — crypto: 1h (default) or 15m; equity: 1d",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pack"
+        ],
+        "type": "object"
+      },
+      "name": "build_bundle"
+    },
+    {
+      "description": "Descriptive market-state label (trend/range × calm/vol quadrant) for the most recent completed bar at or before a timestamp. Not a prediction.",
+      "inputSchema": {
+        "properties": {
+          "symbol": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol",
+          "timestamp"
+        ],
+        "type": "object"
+      },
+      "name": "get_regime_label"
+    },
+    {
+      "description": "Perp funding-rate settlement history from listing date (checksummed archive).",
+      "inputSchema": {
+        "properties": {
+          "end": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol"
+        ],
+        "type": "object"
+      },
+      "name": "get_funding"
+    },
+    {
+      "description": "Hourly open interest with per-row quality flags (verified archive + flagged bridge).",
+      "inputSchema": {
+        "properties": {
+          "end": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol"
+        ],
+        "type": "object"
+      },
+      "name": "get_open_interest"
+    },
+    {
+      "description": "Context series: fear_greed_1d, VIX_1d, DXY_1d, TNX_1d, DJI_1d.",
+      "inputSchema": {
+        "properties": {
+          "end": {
+            "type": "string"
+          },
+          "series": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "series"
+        ],
+        "type": "object"
+      },
+      "name": "get_context"
+    },
+    {
+      "description": "Curated macro/crypto events (FOMC w/ surprise, halvings, incidents) in a range.",
+      "inputSchema": {
+        "properties": {
+          "end": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_events"
+    },
+    {
+      "description": "Taker buy/sell imbalance, trade counts, quote volume (1h/1d via API; denser tiers in packs). buy_ratio 0.5 = balanced.",
+      "inputSchema": {
+        "properties": {
+          "end": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "tf": {
+            "enum": [
+              "1h",
+              "1d"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol"
+        ],
+        "type": "object"
+      },
+      "name": "get_orderflow"
+    },
+    {
+      "description": "Quality report for a dataset spec before you backtest on it: coverage, per-bar quality distribution, gaps, and concrete warnings.",
+      "inputSchema": {
+        "properties": {
+          "end": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "tf": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol",
+          "tf"
+        ],
+        "type": "object"
+      },
+      "name": "validate_backtest_data"
+    },
+    {
+      "description": "FREE: submit YOUR OHLCV bars and get an accuracy verdict against the verified archive — score, worst windows, systematic-offset findings. Tells you what's wrong, not the corrected values (that's get_bars).",
+      "inputSchema": {
+        "properties": {
+          "bars": {
+            "description": "columnar arrays: t (epoch s or ISO) required; o/h/l/c optional",
+            "properties": {
+              "c": {
+                "type": "array"
+              },
+              "h": {
+                "type": "array"
+              },
+              "l": {
+                "type": "array"
+              },
+              "o": {
+                "type": "array"
+              },
+              "t": {
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "tf": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol",
+          "tf",
+          "bars"
+        ],
+        "type": "object"
+      },
+      "name": "audit_my_data"
+    },
+    {
+      "description": "FREE: submit backtest signals ({t, price}) and get an execution-feasibility verdict — impossible fills outside the bar's traded range, fills pinned at bar extremes (classic lookahead bias).",
+      "inputSchema": {
+        "properties": {
+          "signals": {
+            "items": {
+              "properties": {
+                "price": {
+                  "type": "number"
+                },
+                "side": {
+                  "type": "string"
+                },
+                "t": {}
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "tf": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol",
+          "tf",
+          "signals"
+        ],
+        "type": "object"
+      },
+      "name": "lookahead_check"
+    },
+    {
+      "description": "FREE: submit a backtest universe + window and get a survivorship-bias verdict — which of your symbols died mid-window, and which delisted symbols we cover that your universe omits.",
+      "inputSchema": {
+        "properties": {
+          "asset": {
+            "enum": [
+              "crypto",
+              "equity"
+            ],
+            "type": "string"
+          },
+          "end": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string"
+          },
+          "symbols": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "symbols"
+        ],
+        "type": "object"
+      },
+      "name": "survivorship_check"
+    },
+    {
+      "description": "Point-in-time SEC XBRL fundamentals (80 filers, incl. delisted): every restatement vintage with its filed date. Pass as_of for what was knowable then. Filter by concept (e.g. Assets, Revenues).",
+      "inputSchema": {
+        "properties": {
+          "as_of": {
+            "type": "string"
+          },
+          "concept": {
+            "type": "string"
+          },
+          "end": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol"
+        ],
+        "type": "object"
+      },
+      "name": "get_fundamentals"
+    },
+    {
+      "description": "SEC Form 4 insider transactions as filed (80 symbols, since 2016): officer/director trades with shares, price, post-trade holdings.",
+      "inputSchema": {
+        "properties": {
+          "end": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol"
+        ],
+        "type": "object"
+      },
+      "name": "get_insider"
+    },
+    {
+      "description": "Quarterly 13F institutional aggregates (81 symbols): holders, shares, value + QoQ deltas from SEC DERA structured tables.",
+      "inputSchema": {
+        "properties": {
+          "end": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol"
+        ],
+        "type": "object"
+      },
+      "name": "get_institutional"
+    },
+    {
+      "description": "Hourly CEX-vs-DEX funding spread (67 symbols): Hyperliquid funding vs Binance 1h-equivalent, from HL genesis 2023-05.",
+      "inputSchema": {
+        "properties": {
+          "end": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol"
+        ],
+        "type": "object"
+      },
+      "name": "get_funding_spread"
+    },
+    {
+      "description": "FREE daily pulse across the catalog: regime flips, funding extremes, CEX-vs-DEX spread extremes, biggest daily moves. One day of values — the history behind each number is the priced product.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_market_pulse"
+    },
+    {
+      "description": "FREE: what the daily refresh changed — dataset windows extended vs ~7 days ago, new symbols and sections, freshness per asset class.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_whats_new"
+    },
+    {
+      "description": "FREE public scoreboard: last 30 daily fresh-data audits (cross-venue in-band vs Coinbase, 1m->1h rebuild exactness, depth sanity) — failures included, not hidden.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_quality_receipts"
+    }
+  ],
+  "url": "https://iturri.ai/mcp"
+}

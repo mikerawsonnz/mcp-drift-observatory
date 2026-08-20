@@ -1,0 +1,396 @@
+{
+  "canon_version": "1",
+  "full_hash": "923e04be6c06264cc6dd0a9b05294d44a37911be614d8c2ff84889c894a5f3a6",
+  "name": "ai.gvrn/incorporation",
+  "observed_at": "2026-08-20T09:11:55.822033Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 7,
+  "tools": [
+    {
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "description": "Returns the full GVRN incorporation workflow guide: the fields collected, the email-verification steps, and the review lifecycle. Also available as the MCP resource gvrn://incorporation/guide.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_incorporation_guide",
+      "title": "Get incorporation guide"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Sends a 6-digit verification code to the given email address. The code is exchanged for a verificationToken via verify_email_otp, and that token authorizes the draft tools. Codes expire after 10 minutes and are rate-limited per email.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "description": "Email address to verify — the user's real inbox",
+            "maxLength": 320,
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "type": "object"
+      },
+      "name": "request_email_otp",
+      "title": "Request email verification code"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Verifies a 6-digit email code and returns a verificationToken valid for ~30 minutes. The draft tools require this token. Re-verifying the same email issues a fresh token that still reaches the same drafts.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "description": "The 6-digit code from the user's inbox",
+            "maxLength": 10,
+            "minLength": 4,
+            "type": "string"
+          },
+          "email": {
+            "description": "Same email the code was sent to",
+            "maxLength": 320,
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "code"
+        ],
+        "type": "object"
+      },
+      "name": "verify_email_otp",
+      "title": "Verify email code"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Creates a new incorporation request draft bound to the verified email, using any fields provided. Requires a verificationToken from verify_email_otp; every other field is optional. Returns a draftId that identifies the draft for later updates, submission, and status checks.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "alternativeCompanyNames": {
+            "description": "Fallback company names in priority order",
+            "items": {
+              "maxLength": 300,
+              "type": "string"
+            },
+            "maxItems": 10,
+            "type": "array"
+          },
+          "businessDescription": {
+            "description": "What the company will do",
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "companyName": {
+            "description": "Preferred company name",
+            "maxLength": 300,
+            "type": "string"
+          },
+          "currency": {
+            "description": "Share capital currency, e.g. \"USD\"",
+            "maxLength": 10,
+            "type": "string"
+          },
+          "entityType": {
+            "description": "e.g. \"LTD\", \"FOUNDATION\", \"LLC\" — free text is accepted",
+            "maxLength": 100,
+            "type": "string"
+          },
+          "founders": {
+            "description": "Founders / shareholders / directors",
+            "items": {
+              "additionalProperties": false,
+              "description": "Founder details — every field optional",
+              "properties": {
+                "email": {
+                  "description": "Founder's contact email",
+                  "maxLength": 320,
+                  "type": "string"
+                },
+                "fullName": {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                "nationality": {
+                  "description": "Nationality or citizenship, free text",
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                "role": {
+                  "description": "e.g. \"Director\", \"Shareholder\", \"CEO\"",
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                "shareAmount": {
+                  "description": "Number of shares allocated to this founder",
+                  "minimum": 0,
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "jurisdiction": {
+            "description": "Target jurisdiction, e.g. \"BVI\", \"CAYMAN\", \"PANAMA\" — free text is accepted",
+            "maxLength": 100,
+            "type": "string"
+          },
+          "notes": {
+            "description": "Anything else relevant: existing structures, PEP status, special requests",
+            "maxLength": 10000,
+            "type": "string"
+          },
+          "parValue": {
+            "description": "Par value per share",
+            "minimum": 0,
+            "type": "number"
+          },
+          "totalShares": {
+            "description": "Total shares to be issued",
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "urgency": {
+            "description": "Timeline constraints, e.g. \"needed before token launch July 1\"",
+            "maxLength": 500,
+            "type": "string"
+          },
+          "verificationToken": {
+            "description": "Token from verify_email_otp — the draft is bound to this email",
+            "type": "string"
+          }
+        },
+        "required": [
+          "verificationToken"
+        ],
+        "type": "object"
+      },
+      "name": "create_incorporation_draft",
+      "title": "Create incorporation draft"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Adds or corrects fields on an existing draft (patch semantics: only provided fields are changed; array fields are replaced whole). Requires a verificationToken for the email that created the draft. Fails once the draft has been submitted.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "alternativeCompanyNames": {
+            "description": "Fallback company names in priority order",
+            "items": {
+              "maxLength": 300,
+              "type": "string"
+            },
+            "maxItems": 10,
+            "type": "array"
+          },
+          "businessDescription": {
+            "description": "What the company will do",
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "companyName": {
+            "description": "Preferred company name",
+            "maxLength": 300,
+            "type": "string"
+          },
+          "currency": {
+            "description": "Share capital currency, e.g. \"USD\"",
+            "maxLength": 10,
+            "type": "string"
+          },
+          "draftId": {
+            "description": "Draft id returned by create_incorporation_draft",
+            "format": "uuid",
+            "type": "string"
+          },
+          "entityType": {
+            "description": "e.g. \"LTD\", \"FOUNDATION\", \"LLC\" — free text is accepted",
+            "maxLength": 100,
+            "type": "string"
+          },
+          "founders": {
+            "description": "Founders / shareholders / directors",
+            "items": {
+              "additionalProperties": false,
+              "description": "Founder details — every field optional",
+              "properties": {
+                "email": {
+                  "description": "Founder's contact email",
+                  "maxLength": 320,
+                  "type": "string"
+                },
+                "fullName": {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                "nationality": {
+                  "description": "Nationality or citizenship, free text",
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                "role": {
+                  "description": "e.g. \"Director\", \"Shareholder\", \"CEO\"",
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                "shareAmount": {
+                  "description": "Number of shares allocated to this founder",
+                  "minimum": 0,
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "jurisdiction": {
+            "description": "Target jurisdiction, e.g. \"BVI\", \"CAYMAN\", \"PANAMA\" — free text is accepted",
+            "maxLength": 100,
+            "type": "string"
+          },
+          "notes": {
+            "description": "Anything else relevant: existing structures, PEP status, special requests",
+            "maxLength": 10000,
+            "type": "string"
+          },
+          "parValue": {
+            "description": "Par value per share",
+            "minimum": 0,
+            "type": "number"
+          },
+          "totalShares": {
+            "description": "Total shares to be issued",
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "urgency": {
+            "description": "Timeline constraints, e.g. \"needed before token launch July 1\"",
+            "maxLength": 500,
+            "type": "string"
+          },
+          "verificationToken": {
+            "description": "Token from verify_email_otp for the email that created the draft",
+            "type": "string"
+          }
+        },
+        "required": [
+          "draftId",
+          "verificationToken"
+        ],
+        "type": "object"
+      },
+      "name": "update_incorporation_draft",
+      "title": "Update incorporation draft"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Submits a draft for review by the GVRN team and returns the request status. Requires a verificationToken for the email that created the draft, which becomes the contact for the request. Optional fields may be left blank. Irreversible: the draft becomes read-only and a review request is filed with the GVRN team.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "draftId": {
+            "description": "Draft id returned by create_incorporation_draft",
+            "format": "uuid",
+            "type": "string"
+          },
+          "verificationToken": {
+            "description": "Token from verify_email_otp",
+            "type": "string"
+          }
+        },
+        "required": [
+          "draftId",
+          "verificationToken"
+        ],
+        "type": "object"
+      },
+      "name": "submit_incorporation",
+      "title": "Submit incorporation request"
+    },
+    {
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "description": "Returns the current status of an incorporation request (DRAFT → QUEUED_FOR_REVIEW → UNDER_REVIEW → COMPLETED). Requires a verificationToken for the email that created the draft; requests are only visible to that email.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "draftId": {
+            "description": "Draft id returned by create_incorporation_draft",
+            "format": "uuid",
+            "type": "string"
+          },
+          "verificationToken": {
+            "description": "Token from verify_email_otp",
+            "type": "string"
+          }
+        },
+        "required": [
+          "draftId",
+          "verificationToken"
+        ],
+        "type": "object"
+      },
+      "name": "get_incorporation_status",
+      "title": "Get incorporation request status"
+    }
+  ],
+  "url": "https://core-api.gvrn.ai/incorporation-mcp"
+}

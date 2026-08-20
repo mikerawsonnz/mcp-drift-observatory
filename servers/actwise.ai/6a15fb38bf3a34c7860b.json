@@ -1,0 +1,605 @@
+{
+  "canon_version": "1",
+  "full_hash": "b935800c2a12fb89e8a760e407529e12518406c2cd1ad6dd342498441ff57ddc",
+  "name": "ai.actwise/ideation",
+  "observed_at": "2026-08-20T09:11:16.442077Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 2,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Read one canonical Actwise context resource. Before using evaluate_idea, first read actwise://capabilities/evaluate/context. Prefer packages.evaluate_session (actwise://capabilities/evaluate/packages/evaluate-session) for the short evaluation session, then call evaluate_idea and present from the loaded package. Modular child URIs remain valid for inspection. Use only registered actwise:// URIs. Resource-capable clients may use MCP resources/read instead.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "known_etag": {
+            "description": "Optional ETag of this exact resource already loaded in the current conversation.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "uri": {
+            "description": "A registered Actwise runtime resource URI.",
+            "pattern": "^actwise://",
+            "type": "string"
+          }
+        },
+        "required": [
+          "uri"
+        ],
+        "type": "object"
+      },
+      "name": "read_context_resource"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Submit a structured idea evaluation with session_id only after reading actwise://capabilities/evaluate/context and preferring packages.evaluate_session (actwise://capabilities/evaluate/packages/evaluate-session) for user_submission plus presentation. Resource-capable clients may use MCP resources/read; tools-only clients must call read_context_resource. Do not call this tool as the first step after receiving a rough idea unless the user explicitly asks to submit the current version despite known gaps. Compose arguments from this tool inputSchema and verify its digest against the context index tool_contract. Pass session_id from the context or package read; do not echo submission_context into runtime_context or supply contract_refs. After presenting a result, preserve Actwise context for follow-up questions referring to the result, review, scores, benchmark, confidence, quality, reliability, independence, usefulness or limitations. Apply the packaged evaluation-quality-assessment guidance for result-quality questions; it uses the canonical product explanation. Treat an implicit quality follow-up as Actwise context unless the user explicitly requests an outside opinion.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "evaluation_mode": {
+                  "const": "official"
+                }
+              },
+              "required": [
+                "evaluation_mode"
+              ]
+            },
+            "then": {
+              "required": [
+                "official_authorization"
+              ]
+            }
+          },
+          {
+            "if": {
+              "anyOf": [
+                {
+                  "properties": {
+                    "evaluation_mode": {
+                      "const": "preview"
+                    }
+                  },
+                  "required": [
+                    "evaluation_mode"
+                  ]
+                },
+                {
+                  "not": {
+                    "required": [
+                      "evaluation_mode"
+                    ]
+                  }
+                }
+              ]
+            },
+            "then": {
+              "properties": {
+                "official_authorization": false
+              }
+            }
+          }
+        ],
+        "properties": {
+          "canonical_payload": {
+            "additionalProperties": false,
+            "description": "Normalized idea fields used for scoring and verification.",
+            "properties": {
+              "category": {
+                "description": "Product or business-model category for segmentation and benchmarks.",
+                "enum": [
+                  "b2b-saas",
+                  "vertical-saas",
+                  "b2c-app",
+                  "marketplace",
+                  "developer-tool",
+                  "workflow-automation",
+                  "ai-agent",
+                  "data-product",
+                  "api-infrastructure",
+                  "commerce-enablement",
+                  "managed-service",
+                  "open-source",
+                  "community-product",
+                  "hardware-enabled",
+                  "other"
+                ],
+                "type": "string"
+              },
+              "industry": {
+                "description": "Primary industry taxonomy label for segmentation and benchmarks.",
+                "enum": [
+                  "fintech",
+                  "healthtech",
+                  "edtech",
+                  "ecommerce",
+                  "cybersecurity",
+                  "climate-tech",
+                  "energy",
+                  "proptech",
+                  "logistics",
+                  "mobility",
+                  "manufacturing",
+                  "agriculture-and-food",
+                  "consumer-internet",
+                  "media-and-creator",
+                  "enterprise-it",
+                  "other"
+                ],
+                "type": "string"
+              },
+              "problem": {
+                "description": "Customer problem being solved; concrete pain, not a feature list.",
+                "maxLength": 1000,
+                "minLength": 20,
+                "type": "string"
+              },
+              "solution": {
+                "description": "What you build and how it addresses the stated problem.",
+                "maxLength": 1000,
+                "minLength": 20,
+                "type": "string"
+              },
+              "stage": {
+                "description": "Current maturity of the idea or product.",
+                "enum": [
+                  "idea",
+                  "prototype",
+                  "mvp",
+                  "pilot",
+                  "early-traction",
+                  "production"
+                ],
+                "type": "string"
+              },
+              "target_customer": {
+                "description": "Who feels the pain and would buy or adopt; a segment, not everyone.",
+                "maxLength": 500,
+                "minLength": 10,
+                "type": "string"
+              },
+              "why_now": {
+                "description": "Why this is timely now versus earlier attempts.",
+                "maxLength": 500,
+                "minLength": 10,
+                "type": "string"
+              }
+            },
+            "required": [
+              "problem",
+              "target_customer",
+              "solution",
+              "why_now",
+              "industry",
+              "category",
+              "stage"
+            ],
+            "type": "object"
+          },
+          "client_runtime_sidecar": {
+            "additionalProperties": false,
+            "description": "Runtime-only client envelope fields stripped before service-side LLM prompt construction.",
+            "properties": {
+              "coaching_style_profile_delta": {
+                "additionalProperties": false,
+                "description": "Optional coaching style delta; never forwarded to scoring LLM prompts.",
+                "properties": {
+                  "changed": {
+                    "description": "True when the coaching style profile changed in this turn.",
+                    "type": "boolean"
+                  },
+                  "confidence": {
+                    "description": "Client confidence in the coaching style delta.",
+                    "enum": [
+                      "low",
+                      "medium",
+                      "high"
+                    ],
+                    "type": "string"
+                  },
+                  "patch": {
+                    "description": "Opaque patch operations describing the coaching style delta.",
+                    "items": {
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "source": {
+                    "description": "How the delta was produced: explicit, inferred, mixed, or system_default.",
+                    "enum": [
+                      "explicit",
+                      "inferred",
+                      "mixed",
+                      "system_default"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "changed",
+                  "patch",
+                  "source",
+                  "confidence"
+                ],
+                "type": "object"
+              },
+              "idea_revision_lineage": {
+                "additionalProperties": false,
+                "description": "Optional iteration lineage for preview progress comparison.",
+                "properties": {
+                  "idea_lineage_id": {
+                    "description": "Stable client id linking preview/official iterations of one idea.",
+                    "maxLength": 160,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "previous_evaluation_id": {
+                    "description": "Prior evaluation id to compare against; null on first revision.",
+                    "maxLength": 160,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "revision_summary": {
+                    "description": "Short summary of what changed since the previous evaluation.",
+                    "maxLength": 2000,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "revision_target_lens": {
+                    "description": "Dimension this revision aimed to improve; null if none.",
+                    "oneOf": [
+                      {
+                        "description": "One of the seven Actwise evaluation dimensions.",
+                        "enum": [
+                          "problem_urgency",
+                          "customer_clarity",
+                          "insight_strength",
+                          "distribution_potential",
+                          "market_potential",
+                          "timing",
+                          "moat_potential"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "idea_lineage_id"
+                ],
+                "type": "object"
+              },
+              "visibility": {
+                "const": "runtime_only_not_llm",
+                "description": "Marker that sidecar fields are runtime-only and not LLM-visible.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "evaluation_mode": {
+            "default": "preview",
+            "description": "preview: lens percentiles only, no LLM or baseline write (default). official: full verification path for end-of-ideation standing.",
+            "enum": [
+              "preview",
+              "official"
+            ],
+            "type": "string"
+          },
+          "idempotency_key": {
+            "description": "Optional key to dedupe retries of the same submission; null if unused.",
+            "maxLength": 160,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "metadata": {
+            "additionalProperties": false,
+            "description": "Submission provenance and optional display metadata.",
+            "properties": {
+              "company_id": {
+                "description": "Optional company identifier when known; null otherwise.",
+                "maxLength": 120,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "conversation_depth": {
+                "description": "Count of substantive conversation turns before submission.",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "idea_title": {
+                "description": "Optional display title for official evaluation Markdown (IMPL-26 Phase 3).",
+                "maxLength": 160,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "linkedin_connected": {
+                "description": "Whether the submitter has LinkedIn connected for profile enrichment.",
+                "type": "boolean"
+              },
+              "submission_source": {
+                "description": "Who originated the submission: user, seed, or internal test.",
+                "enum": [
+                  "user",
+                  "seed",
+                  "internal_test"
+                ],
+                "type": "string"
+              },
+              "subscriber_id": {
+                "description": "Optional subscriber identifier when known; null otherwise.",
+                "maxLength": 120,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "template_completion_score": {
+                "description": "0–1 completeness of structured template fields before submit.",
+                "maximum": 1,
+                "minimum": 0,
+                "type": "number"
+              },
+              "user_segment": {
+                "description": "Optional analytics segment label; null if unknown.",
+                "maxLength": 120,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "submission_source"
+            ],
+            "type": "object"
+          },
+          "official_authorization": {
+            "additionalProperties": false,
+            "description": "Required when evaluation_mode is official. Records why the user authorized quota consumption.",
+            "properties": {
+              "basis": {
+                "description": "Why the client is authorized to consume official evaluation quota. Completing preview alone is not authorization.",
+                "enum": [
+                  "explicit_user_request",
+                  "user_confirmed_after_quota_disclosure"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "basis"
+            ],
+            "type": "object"
+          },
+          "session_id": {
+            "description": "Opaque evaluate session from context or evaluate-session package read (IMPL-45). Required for user submissions.",
+            "maxLength": 80,
+            "minLength": 1,
+            "type": "string"
+          },
+          "submitted_scoring": {
+            "additionalProperties": false,
+            "description": "Client-composed scores and rationales verified under CT-03.",
+            "properties": {
+              "deviations": {
+                "additionalProperties": false,
+                "description": "Strongest and weakest dimensions in the submitted profile.",
+                "properties": {
+                  "strongest": {
+                    "description": "Dimension the idea is relatively strongest on.",
+                    "enum": [
+                      "problem_urgency",
+                      "customer_clarity",
+                      "insight_strength",
+                      "distribution_potential",
+                      "market_potential",
+                      "timing",
+                      "moat_potential"
+                    ],
+                    "type": "string"
+                  },
+                  "weakest": {
+                    "description": "Dimension that most limits standing; coach here first after evaluation.",
+                    "enum": [
+                      "problem_urgency",
+                      "customer_clarity",
+                      "insight_strength",
+                      "distribution_potential",
+                      "market_potential",
+                      "timing",
+                      "moat_potential"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "strongest",
+                  "weakest"
+                ],
+                "type": "object"
+              },
+              "dimension_scores": {
+                "additionalProperties": false,
+                "description": "Per-dimension scores 0–100 matching the evaluation rubric.",
+                "properties": {
+                  "customer_clarity": {
+                    "description": "How clearly the primary buyer/user and use case are defined (0–100).",
+                    "maximum": 100,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "distribution_potential": {
+                    "description": "How realistically the idea can reach customers (0–100).",
+                    "maximum": 100,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "insight_strength": {
+                    "description": "How non-obvious and defensible the insight or wedge is (0–100).",
+                    "maximum": 100,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "market_potential": {
+                    "description": "How large and reachable the opportunity looks (0–100).",
+                    "maximum": 100,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "moat_potential": {
+                    "description": "How durable competitive advantage could become (0–100).",
+                    "maximum": 100,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "problem_urgency": {
+                    "description": "How painful and time-sensitive the problem is for the target customer (0–100).",
+                    "maximum": 100,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "timing": {
+                    "description": "How favorable current market and timing conditions are (0–100).",
+                    "maximum": 100,
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "problem_urgency",
+                  "customer_clarity",
+                  "insight_strength",
+                  "distribution_potential",
+                  "market_potential",
+                  "timing",
+                  "moat_potential"
+                ],
+                "type": "object"
+              },
+              "overall_score": {
+                "description": "Optional overall score 0–100; server may recompute per contract.",
+                "maximum": 100,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "score_rationale": {
+                "additionalProperties": false,
+                "description": "Per-dimension rationale text supporting each score.",
+                "properties": {
+                  "customer_clarity": {
+                    "description": "Evidence-backed rationale for the customer_clarity score.",
+                    "maxLength": 600,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "distribution_potential": {
+                    "description": "Evidence-backed rationale for the distribution_potential score.",
+                    "maxLength": 600,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "insight_strength": {
+                    "description": "Evidence-backed rationale for the insight_strength score.",
+                    "maxLength": 600,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "market_potential": {
+                    "description": "Evidence-backed rationale for the market_potential score.",
+                    "maxLength": 600,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "moat_potential": {
+                    "description": "Evidence-backed rationale for the moat_potential score.",
+                    "maxLength": 600,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "problem_urgency": {
+                    "description": "Evidence-backed rationale for the problem_urgency score.",
+                    "maxLength": 600,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "timing": {
+                    "description": "Evidence-backed rationale for the timing score.",
+                    "maxLength": 600,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "problem_urgency",
+                  "customer_clarity",
+                  "insight_strength",
+                  "distribution_potential",
+                  "market_potential",
+                  "timing",
+                  "moat_potential"
+                ],
+                "type": "object"
+              },
+              "verdict_hints": {
+                "description": "Up to two short hints summarizing the scoring stance.",
+                "items": {
+                  "maxLength": 200,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 2,
+                "type": "array"
+              }
+            },
+            "required": [
+              "dimension_scores",
+              "deviations",
+              "verdict_hints",
+              "score_rationale"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "canonical_payload",
+          "submitted_scoring",
+          "metadata",
+          "session_id"
+        ],
+        "type": "object",
+        "x-actwise-schema-id": "evaluate-idea",
+        "x-actwise-schema-version": "SCH-01.3"
+      },
+      "name": "evaluate_idea"
+    }
+  ],
+  "url": "https://actwise.ai/ideation/mcp/v1"
+}

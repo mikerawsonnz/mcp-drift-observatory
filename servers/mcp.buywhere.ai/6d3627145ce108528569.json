@@ -1,0 +1,421 @@
+{
+  "canon_version": "1",
+  "full_hash": "a69234e37ed32a7d2062d0502306f0e9be38b5cc045b4f214652322faf4dd277",
+  "name": "ai.buywhere/catalog-api",
+  "observed_at": "2026-08-20T09:11:31.569666Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 8,
+  "tools": [
+    {
+      "description": "Search the BuyWhere product catalog by keyword. Returns a results array where each item has: id, title, price ({amount, currency}), normalized_price_usd, merchant, url, image_url, region, country_code, click_url, affiliate_redirect_url, and updated_at. Covers e-commerce platforms across Singapore, Malaysia, Indonesia, Thailand, Vietnam, and US. Use compact=true for agent-optimized responses adding structured_specs, comparison_attributes, and normalized_price_usd fields.",
+      "inputSchema": {
+        "properties": {
+          "category": {
+            "description": "Filter by product category name (e.g. \"Laptops\", \"Smartphones\", \"Televisions\"). Use to exclude accessories and get actual products.",
+            "type": "string"
+          },
+          "compact": {
+            "default": false,
+            "description": "Return agent-optimized compact shape: structured_specs, comparison_attributes, normalized_price_usd. Reduces response size ~40%. Recommended for agent tool-use.",
+            "type": "boolean"
+          },
+          "country": {
+            "description": "Alias for country_code (deprecated, use country_code)",
+            "type": "string"
+          },
+          "country_code": {
+            "description": "Filter by ISO country code. Also infers default currency for price filters (SG→SGD, US→USD, VN→VND, TH→THB, MY→MYR).",
+            "enum": [
+              "SG",
+              "US",
+              "VN",
+              "TH",
+              "MY"
+            ],
+            "type": "string"
+          },
+          "deliver_to": {
+            "description": "Buyer delivery country/market. Preferred over country_code/country when known.",
+            "type": "string"
+          },
+          "domain": {
+            "description": "Filter by merchant platform (e.g. lazada, shopee, amazon)",
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "description": "Number of results (max 100, default 20)",
+            "type": "integer"
+          },
+          "max_price": {
+            "description": "Maximum price (in currency inferred from country_code, or SGD by default)",
+            "type": "number"
+          },
+          "min_price": {
+            "description": "Minimum price (in currency inferred from country_code, or SGD by default)",
+            "type": "number"
+          },
+          "mode": {
+            "default": "hybrid",
+            "description": "Search mode: keyword=FTS only, semantic=vector only, hybrid=RRF blend of FTS+vector (default). Falls back to keyword if vector DB or GEMINI_API_KEY unavailable.",
+            "enum": [
+              "keyword",
+              "semantic",
+              "hybrid"
+            ],
+            "type": "string"
+          },
+          "offset": {
+            "default": 0,
+            "description": "Pagination offset",
+            "type": "integer"
+          },
+          "q": {
+            "description": "Keyword search query",
+            "type": "string"
+          },
+          "query": {
+            "description": "Alias for q (accepted for agent convenience; use q)",
+            "type": "string"
+          },
+          "region": {
+            "description": "Filter by region (sea, us, eu, au)",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "search_products"
+    },
+    {
+      "description": "Get a specific product by its ID, including full details and current price. Provide country_code/deliver_to to verify the product belongs to the requested market.",
+      "inputSchema": {
+        "properties": {
+          "country": {
+            "description": "Alias for country_code (deprecated, use country_code)",
+            "type": "string"
+          },
+          "country_code": {
+            "description": "Country to validate the product against. Alias: country.",
+            "enum": [
+              "SG",
+              "US",
+              "VN",
+              "TH",
+              "MY"
+            ],
+            "type": "string"
+          },
+          "deliver_to": {
+            "description": "Buyer delivery country/market. Preferred over country_code/country when known.",
+            "type": "string"
+          },
+          "id": {
+            "description": "Product UUID",
+            "type": "string"
+          },
+          "region": {
+            "description": "Alias for country_code/market (my→MY, sg→SG, us→US).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_product"
+    },
+    {
+      "description": "Compare multiple products side-by-side. Returns price, brand, rating, and category for each.",
+      "inputSchema": {
+        "properties": {
+          "ids": {
+            "description": "Array of product IDs to compare (2-10)",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "minItems": 2,
+            "type": "array"
+          }
+        },
+        "required": [
+          "ids"
+        ],
+        "type": "object"
+      },
+      "name": "compare_products"
+    },
+    {
+      "description": "Get discounted products sorted by discount percentage. Returns a results array where each item has: id, title, price ({amount, currency}), normalized_price_usd, merchant, url, image_url, region, country_code, click_url, and updated_at. Also includes original_price and discount_pct when available. Covers Singapore, Malaysia, Indonesia, Thailand, Vietnam, and US e-commerce. Supports currency, region (sea, us, eu, au) and country (SG, US, VN, MY, ...) filters.",
+      "inputSchema": {
+        "properties": {
+          "country": {
+            "description": "Alias for country_code (deprecated, use country_code)",
+            "type": "string"
+          },
+          "country_code": {
+            "description": "Filter by ISO country code. Alias: country.",
+            "enum": [
+              "SG",
+              "US",
+              "VN",
+              "TH",
+              "MY"
+            ],
+            "type": "string"
+          },
+          "currency": {
+            "default": "SGD",
+            "description": "Filter by currency code (SGD, USD, MYR, VND, THB). Defaults to SGD.",
+            "type": "string"
+          },
+          "deliver_to": {
+            "description": "Buyer delivery country/market. Preferred over country_code/country when known.",
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "description": "Number of results (max 100, default 20)",
+            "type": "integer"
+          },
+          "min_discount": {
+            "default": 10,
+            "description": "Minimum discount percentage (default 10)",
+            "type": "number"
+          },
+          "offset": {
+            "default": 0,
+            "description": "Pagination offset",
+            "type": "integer"
+          },
+          "region": {
+            "description": "Filter by region (sea, us, eu, au)",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_deals"
+    },
+    {
+      "description": "List top-level product categories available in the BuyWhere catalog.",
+      "inputSchema": {
+        "properties": {
+          "country": {
+            "description": "Alias for country_code (deprecated, use country_code)",
+            "type": "string"
+          },
+          "country_code": {
+            "description": "Filter by ISO country code. Defaults to SG.",
+            "enum": [
+              "SG",
+              "US",
+              "VN",
+              "TH",
+              "MY",
+              "GB",
+              "IN",
+              "AU"
+            ],
+            "type": "string"
+          },
+          "deliver_to": {
+            "description": "Buyer delivery country/market. Preferred over country_code/country when known.",
+            "type": "string"
+          },
+          "region": {
+            "description": "Alias for country_code/market (us→US, sg→SG, my→MY, gb→GB, in→IN, au→AU).",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_categories"
+    },
+    {
+      "description": "Use this whenever a user asks about prices, wants to find the cheapest option, or asks \"what's the best price for X\" or \"where can I buy X for the lowest price\". Returns a results array where each item has: id, title, price ({amount, currency}), normalized_price_usd, merchant, url, image_url, region, country_code, click_url, and updated_at. Results are from across all merchants. Also includes structured_specs and comparison_attributes when available.",
+      "inputSchema": {
+        "properties": {
+          "category": {
+            "description": "Category to filter by (e.g., \"electronics\", \"fashion\")",
+            "type": "string"
+          },
+          "country": {
+            "description": "Alias for country_code (deprecated, use country_code)",
+            "type": "string"
+          },
+          "country_code": {
+            "description": "Country to search in (defaults to SG). Alias: country.",
+            "enum": [
+              "SG",
+              "MY",
+              "TH",
+              "PH",
+              "VN",
+              "ID",
+              "US"
+            ],
+            "type": "string"
+          },
+          "deliver_to": {
+            "description": "Buyer delivery country/market. Preferred over country_code/country when known.",
+            "type": "string"
+          },
+          "product_name": {
+            "description": "Product name to find best price for (e.g., \"iphone 15 pro 256gb\", \"samsung galaxy s24\")",
+            "type": "string"
+          },
+          "q": {
+            "description": "Alias for product_name (deprecated, use product_name).",
+            "type": "string"
+          },
+          "region": {
+            "description": "Region filter - use \"us\" for United States or \"sea\" for Southeast Asia",
+            "enum": [
+              "us",
+              "sea"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_name"
+        ],
+        "type": "object"
+      },
+      "name": "find_best_price"
+    },
+    {
+      "description": "Find products similar to a given product using vector similarity. Returns up to 10 nearest neighbours by semantic meaning (title+description embedding). Useful for \"more like this\" recommendations. Accepts product_id directly, or product_name for automatic lookup.",
+      "inputSchema": {
+        "properties": {
+          "country_code": {
+            "description": "Country to scope product_name lookup (defaults to SG)",
+            "enum": [
+              "SG",
+              "US",
+              "VN",
+              "TH",
+              "MY"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "default": 10,
+            "description": "Number of similar products to return (1-10, default 10)",
+            "type": "integer"
+          },
+          "product_id": {
+            "description": "Catalog product id (products.id; mutually exclusive with product_name). For legacy vector rows, an exact SKU is also accepted.",
+            "type": "string"
+          },
+          "product_name": {
+            "description": "Product name to find similar items for (auto-resolves to best-matching product ID). Preferred when agent starts with a name/query.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "find_similar"
+    },
+    {
+      "description": "Ingest (upsert) a batch of products into the BuyWhere catalog. Use this to add or update product listings from any merchant/source. Requires a valid API key with ingest permissions. Accepts up to 1000 products per call with source, SKU, title, price, URL, and optional metadata.",
+      "inputSchema": {
+        "properties": {
+          "products": {
+            "description": "Array of product objects to ingest (max 1000)",
+            "items": {
+              "properties": {
+                "brand": {
+                  "description": "Brand name",
+                  "type": "string"
+                },
+                "category": {
+                  "description": "Product category",
+                  "type": "string"
+                },
+                "country_code": {
+                  "description": "ISO country code (e.g. \"SG\", \"US\")",
+                  "type": "string"
+                },
+                "currency": {
+                  "default": "SGD",
+                  "description": "Currency code (default: SGD)",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "Product description",
+                  "type": "string"
+                },
+                "image_url": {
+                  "description": "Main product image URL",
+                  "type": "string"
+                },
+                "is_active": {
+                  "description": "Whether the product is active (default: true)",
+                  "type": "boolean"
+                },
+                "is_available": {
+                  "description": "Whether the product is in stock",
+                  "type": "boolean"
+                },
+                "merchant_id": {
+                  "description": "Merchant identifier",
+                  "type": "string"
+                },
+                "metadata": {
+                  "description": "Additional product metadata",
+                  "type": "object"
+                },
+                "price": {
+                  "description": "Current price (must be >= 0)",
+                  "type": "number"
+                },
+                "region": {
+                  "description": "Region identifier (e.g. \"sea\", \"us\")",
+                  "type": "string"
+                },
+                "sku": {
+                  "description": "Unique stock keeping unit identifier",
+                  "type": "string"
+                },
+                "title": {
+                  "description": "Product title",
+                  "type": "string"
+                },
+                "url": {
+                  "description": "Product URL on the merchant site",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "sku",
+                "merchant_id",
+                "title",
+                "price",
+                "url"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "source": {
+            "description": "Data source identifier (e.g. \"shopee_sg\", \"amazon_sg\", \"lazada_sg\")",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "products"
+        ],
+        "type": "object"
+      },
+      "name": "ingest_products"
+    }
+  ],
+  "url": "https://mcp.buywhere.ai/mcp"
+}

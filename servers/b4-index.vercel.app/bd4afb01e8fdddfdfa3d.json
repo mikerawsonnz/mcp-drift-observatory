@@ -1,0 +1,273 @@
+{
+  "canon_version": "1",
+  "full_hash": "7214b0496edab56dba9d23e593c2dc86f236b0341f6382dfefee85d3d7d2f28e",
+  "name": "ai.benroberts/b4-index",
+  "observed_at": "2026-08-20T09:11:27.867638Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 5,
+  "tools": [
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Search and filter the B4 Index's 1,600+ independently scored software categories. Browse by keyword, domain, quadrant, or industry. When filtering by industry, returns all vertical categories for that industry PLUS all horizontal categories (which apply to every industry). Each row carries its banded verdict — primary, confidence word, and a near-call flag — and the quadrant filter matches the verdict at whichever lens you are reading. Verdicts are banded (B4 methodology v4.0), not point calls: each of the three quadrant dimensions carries a ±1 uncertainty band, the resulting cells are enumerated exactly, and the verdict is the quadrant holding the most probability mass. Every verdict ships with its full distribution, a confidence word — clear (≥70% of the mass), lean (50–70%), split (<50%) — and a near-call flag when the runner-up is within 15 points. An axis counts as high only when it clears the 3.5 line strictly, which on this 1–5 grid means only at 4 or above, so a category sitting exactly on the line gets the safer call: ties break in the order BUY → BRIDGE → BEWARE → BUILD, cheapest mistake first. Optional org lens: set org to \"small\", \"medium\" (the default) or \"large\" to read the same scores as a team of that engineering maturity — it shifts the center of the AI-feasibility band by −1 / 0 / +1 and nothing else. The lens is a filter the caller looks through, never a stored profile: no user attribute is saved, inferred, or asked for, and the scores themselves never change. Omit it and you get the default-lens numbers, which are the ones published on logged-out surfaces.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "description": "Filter by domain (e.g., 'Marketing Technology', 'CRM & Sales')",
+            "maxLength": 120,
+            "type": "string"
+          },
+          "industry": {
+            "description": "Filter by industry group. Returns matching vertical categories + all horizontal categories. Options: Healthcare, Financial Services, Construction & Real Estate, Education, Energy & Utilities, Government, Automotive, Agriculture, Transportation & Logistics, Media & Entertainment, Legal, Professional Services, Nonprofits & Associations, Manufacturing, Retail & Commerce, Hospitality & Food Service, Telecom",
+            "maxLength": 120,
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "description": "Max results to return (default 20, max 100)",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "org": {
+            "default": "medium",
+            "description": "Org-maturity lens: \"small\" (no dedicated engineering), \"medium\" (default — some AI capability), \"large\" (AI-mature). Shifts the AI-feasibility band center by −1/0/+1 at read time. A filter the caller looks through, never a stored profile.",
+            "enum": [
+              "small",
+              "medium",
+              "large"
+            ],
+            "type": "string"
+          },
+          "quadrant": {
+            "description": "Filter by quadrant",
+            "enum": [
+              "BUILD",
+              "BUY",
+              "BRIDGE",
+              "BEWARE"
+            ],
+            "type": "string"
+          },
+          "query": {
+            "description": "Search term to match against category names, vendors, domains, and rationales",
+            "maxLength": 200,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "b4_browse",
+      "title": "Browse the B4 Index"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Score a software category using the B4 Index. Provide a known category name to get pre-computed scores, or provide raw dimension scores (1-5 each) for a custom evaluation. Returns the banded verdict (primary, confidence, near-call flag, full distribution, tipping point), axes, urgency level, and a concise breakdown. The default result is intentionally lean — set includeEvidence: true to also get the full research trail and source URLs behind each score. Verdicts are banded (B4 methodology v4.0), not point calls: each of the three quadrant dimensions carries a ±1 uncertainty band, the resulting cells are enumerated exactly, and the verdict is the quadrant holding the most probability mass. Every verdict ships with its full distribution, a confidence word — clear (≥70% of the mass), lean (50–70%), split (<50%) — and a near-call flag when the runner-up is within 15 points. An axis counts as high only when it clears the 3.5 line strictly, which on this 1–5 grid means only at 4 or above, so a category sitting exactly on the line gets the safer call: ties break in the order BUY → BRIDGE → BEWARE → BUILD, cheapest mistake first. Optional org lens: set org to \"small\", \"medium\" (the default) or \"large\" to read the same scores as a team of that engineering maturity — it shifts the center of the AI-feasibility band by −1 / 0 / +1 and nothing else. The lens is a filter the caller looks through, never a stored profile: no user attribute is saved, inferred, or asked for, and the scores themselves never change. Omit it and you get the default-lens numbers, which are the ones published on logged-out surfaces.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "description": "Name of a known B4 category (e.g., 'Expense Management', 'CRM')",
+            "maxLength": 120,
+            "type": "string"
+          },
+          "includeEvidence": {
+            "default": false,
+            "description": "Include the full evidence trail and source URLs behind each dimension score. Off by default so the initial result stays concise; set true for deep verification.",
+            "type": "boolean"
+          },
+          "org": {
+            "default": "medium",
+            "description": "Org-maturity lens: \"small\" (no dedicated engineering), \"medium\" (default — some AI capability), \"large\" (AI-mature). Shifts the AI-feasibility band center by −1/0/+1 at read time. A filter the caller looks through, never a stored profile.",
+            "enum": [
+              "small",
+              "medium",
+              "large"
+            ],
+            "type": "string"
+          },
+          "scores": {
+            "additionalProperties": false,
+            "description": "Custom dimension scores for a tool not in the database",
+            "properties": {
+              "aiFeasibility": {
+                "description": "1-5: How feasible is AI replacement?",
+                "maximum": 5,
+                "minimum": 1,
+                "type": "number"
+              },
+              "costTrajectory": {
+                "description": "1-5: How much is build cost beating vendor cost?",
+                "maximum": 5,
+                "minimum": 1,
+                "type": "number"
+              },
+              "specificity": {
+                "description": "1-5: How company-specific is the need?",
+                "maximum": 5,
+                "minimum": 1,
+                "type": "number"
+              },
+              "strategicControl": {
+                "description": "1-5: How strategically important is owning this?",
+                "maximum": 5,
+                "minimum": 1,
+                "type": "number"
+              },
+              "vendorValue": {
+                "description": "1-5: How much vendor value are you NOT using? (higher = more waste)",
+                "maximum": 5,
+                "minimum": 1,
+                "type": "number"
+              }
+            },
+            "required": [
+              "specificity",
+              "aiFeasibility",
+              "vendorValue",
+              "strategicControl",
+              "costTrajectory"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "name": "b4_score",
+      "title": "Score a software category"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Analyze a software stack against the B4 Index. Provide a list of tool/category names, and get per-tool banded verdicts plus a portfolio summary with verdict distribution, BEWARE spend, near calls, and priority actions. Verdicts are banded (B4 methodology v4.0), not point calls: each of the three quadrant dimensions carries a ±1 uncertainty band, the resulting cells are enumerated exactly, and the verdict is the quadrant holding the most probability mass. Every verdict ships with its full distribution, a confidence word — clear (≥70% of the mass), lean (50–70%), split (<50%) — and a near-call flag when the runner-up is within 15 points. An axis counts as high only when it clears the 3.5 line strictly, which on this 1–5 grid means only at 4 or above, so a category sitting exactly on the line gets the safer call: ties break in the order BUY → BRIDGE → BEWARE → BUILD, cheapest mistake first. Optional org lens: set org to \"small\", \"medium\" (the default) or \"large\" to read the same scores as a team of that engineering maturity — it shifts the center of the AI-feasibility band by −1 / 0 / +1 and nothing else. The lens is a filter the caller looks through, never a stored profile: no user attribute is saved, inferred, or asked for, and the scores themselves never change. Omit it and you get the default-lens numbers, which are the ones published on logged-out surfaces. [B4 Agent — the free tools are b4_browse and b4_score.]",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "org": {
+            "default": "medium",
+            "description": "Org-maturity lens: \"small\" (no dedicated engineering), \"medium\" (default — some AI capability), \"large\" (AI-mature). Shifts the AI-feasibility band center by −1/0/+1 at read time. A filter the caller looks through, never a stored profile.",
+            "enum": [
+              "small",
+              "medium",
+              "large"
+            ],
+            "type": "string"
+          },
+          "tools": {
+            "description": "List of software tool or category names to audit (e.g., ['Salesforce', 'Slack', 'Expense Management']). Max 100 per call.",
+            "items": {
+              "maxLength": 120,
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "tools"
+        ],
+        "type": "object"
+      },
+      "name": "b4_audit",
+      "title": "Audit a stack"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Compare build vs buy for a specific software category. Returns side-by-side analysis with the category's banded verdict, scores, vendor options, AI replacement approach, and action steps for each path. Verdicts are banded (B4 methodology v4.0), not point calls: each of the three quadrant dimensions carries a ±1 uncertainty band, the resulting cells are enumerated exactly, and the verdict is the quadrant holding the most probability mass. Every verdict ships with its full distribution, a confidence word — clear (≥70% of the mass), lean (50–70%), split (<50%) — and a near-call flag when the runner-up is within 15 points. An axis counts as high only when it clears the 3.5 line strictly, which on this 1–5 grid means only at 4 or above, so a category sitting exactly on the line gets the safer call: ties break in the order BUY → BRIDGE → BEWARE → BUILD, cheapest mistake first. Optional org lens: set org to \"small\", \"medium\" (the default) or \"large\" to read the same scores as a team of that engineering maturity — it shifts the center of the AI-feasibility band by −1 / 0 / +1 and nothing else. The lens is a filter the caller looks through, never a stored profile: no user attribute is saved, inferred, or asked for, and the scores themselves never change. Omit it and you get the default-lens numbers, which are the ones published on logged-out surfaces. [B4 Agent — the free tools are b4_browse and b4_score.]",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "description": "Name of the software category to compare (e.g., 'Email Marketing', 'CRM')",
+            "maxLength": 120,
+            "type": "string"
+          },
+          "org": {
+            "default": "medium",
+            "description": "Org-maturity lens: \"small\" (no dedicated engineering), \"medium\" (default — some AI capability), \"large\" (AI-mature). Shifts the AI-feasibility band center by −1/0/+1 at read time. A filter the caller looks through, never a stored profile.",
+            "enum": [
+              "small",
+              "medium",
+              "large"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "category"
+        ],
+        "type": "object"
+      },
+      "name": "b4_compare",
+      "title": "Compare alternatives"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Get B4 Index recommendations from a natural language description of a software need or business context. Matches the description to relevant categories and returns top matches with scores, banded verdicts, and actionable recommendations. Verdicts are banded (B4 methodology v4.0), not point calls: each of the three quadrant dimensions carries a ±1 uncertainty band, the resulting cells are enumerated exactly, and the verdict is the quadrant holding the most probability mass. Every verdict ships with its full distribution, a confidence word — clear (≥70% of the mass), lean (50–70%), split (<50%) — and a near-call flag when the runner-up is within 15 points. An axis counts as high only when it clears the 3.5 line strictly, which on this 1–5 grid means only at 4 or above, so a category sitting exactly on the line gets the safer call: ties break in the order BUY → BRIDGE → BEWARE → BUILD, cheapest mistake first. Optional org lens: set org to \"small\", \"medium\" (the default) or \"large\" to read the same scores as a team of that engineering maturity — it shifts the center of the AI-feasibility band by −1 / 0 / +1 and nothing else. The lens is a filter the caller looks through, never a stored profile: no user attribute is saved, inferred, or asked for, and the scores themselves never change. Omit it and you get the default-lens numbers, which are the ones published on logged-out surfaces. [B4 Agent — the free tools are b4_browse and b4_score.]",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "description": "Describe the software need, business problem, or tool you're evaluating (e.g., 'We need to automate our expense reports and receipt scanning')",
+            "maxLength": 1000,
+            "type": "string"
+          },
+          "org": {
+            "default": "medium",
+            "description": "Org-maturity lens: \"small\" (no dedicated engineering), \"medium\" (default — some AI capability), \"large\" (AI-mature). Shifts the AI-feasibility band center by −1/0/+1 at read time. A filter the caller looks through, never a stored profile.",
+            "enum": [
+              "small",
+              "medium",
+              "large"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "description"
+        ],
+        "type": "object"
+      },
+      "name": "b4_recommend",
+      "title": "Build-vs-buy recommendation"
+    }
+  ],
+  "url": "https://b4-index.vercel.app/mcp"
+}

@@ -1,0 +1,1118 @@
+{
+  "canon_version": "1",
+  "full_hash": "0938dbc7ed6c5cba8faa81252e14e37ee9e8a7f8bf2fdd58aea04f1d1d7961e7",
+  "name": "ai.ccapi/mcp",
+  "observed_at": "2026-08-20T09:11:33.293803Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 11,
+  "tools": [
+    {
+      "annotations": {
+        "idempotentHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Send a conversation to any text model available through CCAPI (Claude, GPT, Gemini, DeepSeek, GLM, MiniMax, Kimi, Qwen…) and get the reply. Useful for consulting a second model for a different perspective, running a cheap model over bulk work, or reaching a model the current client does not have configured. Responses are non-streaming.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "max_tokens": {
+            "description": "Maximum tokens to generate. Omit for the model default.",
+            "type": [
+              "null",
+              "integer"
+            ]
+          },
+          "messages": {
+            "description": "Conversation so far, oldest first. Must contain at least one message.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "content": {
+                  "description": "Message text.",
+                  "type": "string"
+                },
+                "role": {
+                  "description": "Message author: system, user or assistant.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "role",
+                "content"
+              ],
+              "type": "object"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "model": {
+            "description": "Exact model name, e.g. claude-sonnet-5 or deepseek-v4-pro. Call list_models with category 'text' if unsure.",
+            "type": "string"
+          },
+          "stop": {
+            "description": "Up to 4 sequences that stop generation.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "temperature": {
+            "description": "Sampling temperature, typically 0-2. Omit for the model default.",
+            "type": [
+              "null",
+              "number"
+            ]
+          },
+          "top_p": {
+            "description": "Nucleus sampling probability mass, 0-1. Omit for the model default.",
+            "type": [
+              "null",
+              "number"
+            ]
+          }
+        },
+        "required": [
+          "model",
+          "messages"
+        ],
+        "type": "object"
+      },
+      "name": "chat_completion",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "description": "The model's reply text.",
+            "type": "string"
+          },
+          "finish_reason": {
+            "description": "Why generation stopped, e.g. stop or length.",
+            "type": "string"
+          },
+          "model": {
+            "description": "Model that actually served the request.",
+            "type": "string"
+          },
+          "usage": {
+            "additionalProperties": false,
+            "description": "Token accounting for this call.",
+            "properties": {
+              "completion_tokens": {
+                "description": "Tokens generated.",
+                "type": "integer"
+              },
+              "prompt_tokens": {
+                "description": "Tokens consumed by the prompt.",
+                "type": "integer"
+              },
+              "total_tokens": {
+                "description": "Prompt plus completion tokens.",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "prompt_tokens",
+              "completion_tokens",
+              "total_tokens"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "content",
+          "model",
+          "usage"
+        ],
+        "type": "object"
+      },
+      "title": "Call a text model"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Edit existing images according to an instruction, using the dedicated image edit endpoint. Provide at least one source image. For pure text-to-image, or for models that take references through the generation endpoint, use generate_image instead.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "aspect_ratio": {
+            "description": "Z-Image only: required output aspect ratio. Supported values: 1:1, 4:3, 3:4, 16:9, 9:16.",
+            "type": "string"
+          },
+          "async": {
+            "description": "Submit asynchronously and return a task_id instead of waiting. Use when the client times out on slow models; poll with get_task using platform 'image'.",
+            "type": "boolean"
+          },
+          "images": {
+            "description": "Optional reference images as HTTPS URLs or data URLs, for image-to-image generation. Not all models accept references.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "model": {
+            "description": "Exact model name, e.g. gpt-image-2 or nano-banana-pro. Call list_models with category 'image' if unsure.",
+            "type": "string"
+          },
+          "n": {
+            "description": "How many images to generate. Defaults to 1. Each one is billed.",
+            "type": [
+              "null",
+              "integer"
+            ]
+          },
+          "nsfw_checker": {
+            "description": "Z-Image only: enable or disable the upstream NSFW checker. Explicit false is preserved.",
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "prompt": {
+            "description": "Description of the image to generate.",
+            "type": "string"
+          },
+          "quality": {
+            "description": "Quality hint, e.g. low, medium, high or auto. Model-dependent.",
+            "type": "string"
+          },
+          "response_format": {
+            "description": "'url' (default) returns links; 'b64_json' returns base64 data, which is far larger and usually unnecessary.",
+            "type": "string"
+          },
+          "size": {
+            "description": "Output size, e.g. 1024x1024, 1536x1024, or 'auto'. Model-dependent; omit for the model default.",
+            "type": "string"
+          },
+          "wait_seconds": {
+            "description": "Only with async: poll server-side for up to this many seconds (max 240) and return the finished image if it completes in time.",
+            "type": [
+              "null",
+              "integer"
+            ]
+          }
+        },
+        "required": [
+          "model",
+          "prompt"
+        ],
+        "type": "object"
+      },
+      "name": "edit_image",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "images": {
+            "description": "Generated images, when the call completed.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "b64_json": {
+                  "description": "Base64 image data, when response_format was b64_json.",
+                  "type": "string"
+                },
+                "revised_prompt": {
+                  "description": "The prompt the model actually used, when it rewrote the input.",
+                  "type": "string"
+                },
+                "url": {
+                  "description": "Link to the generated image. May expire; download anything worth keeping.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "model": {
+            "description": "Model that served the request.",
+            "type": "string"
+          },
+          "note": {
+            "description": "What to do next.",
+            "type": "string"
+          },
+          "platform": {
+            "description": "Pass this to get_task together with task_id.",
+            "type": "string"
+          },
+          "status": {
+            "description": "One of: completed, queued, in_progress, failed.",
+            "type": "string"
+          },
+          "task_id": {
+            "description": "Task identifier, when submitted asynchronously and still running.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "model",
+          "status"
+        ],
+        "type": "object"
+      },
+      "title": "Edit an image"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Continue an existing song from a given timestamp, producing a longer version. Requires the clip_id of a previously generated song, which appears in the 'raw' payload of a completed generate_music task. Asynchronous — poll with get_task.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "clip_id": {
+            "description": "ID of the song to extend, taken from the 'raw' clip list of a completed generate_music task.",
+            "type": "string"
+          },
+          "continue_at": {
+            "description": "Timestamp in seconds within the original song to continue from.",
+            "type": "number"
+          },
+          "prompt": {
+            "description": "Lyrics for the extended section.",
+            "type": "string"
+          },
+          "provider": {
+            "description": "Music backend: 'suno' (default) or 'producer'.",
+            "type": "string"
+          },
+          "tags": {
+            "description": "Style tags for the extension.",
+            "type": "string"
+          },
+          "title": {
+            "description": "New title for the extended song.",
+            "type": "string"
+          },
+          "wait_seconds": {
+            "description": "Poll server-side for up to this many seconds (max 240).",
+            "type": [
+              "null",
+              "integer"
+            ]
+          }
+        },
+        "required": [
+          "clip_id",
+          "continue_at"
+        ],
+        "type": "object"
+      },
+      "name": "extend_music",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "audio_urls": {
+            "description": "Finished audio URLs, when the task completed within wait_seconds.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "note": {
+            "description": "What to do next.",
+            "type": "string"
+          },
+          "platform": {
+            "description": "'suno' or 'producer'. Pass to get_task.",
+            "type": "string"
+          },
+          "raw": {
+            "description": "Full result payload when completed — clip IDs, lyrics text and per-clip metadata. Clip IDs from here are what extend_music takes."
+          },
+          "status": {
+            "description": "One of: queued, in_progress, completed, failed.",
+            "type": "string"
+          },
+          "task_id": {
+            "description": "Pass this to get_task together with platform to check progress.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id",
+          "platform",
+          "status",
+          "note"
+        ],
+        "type": "object"
+      },
+      "title": "Extend a song"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Generate an image from a text prompt, optionally guided by reference images (image-to-image). Returns image URLs directly. Most models finish in 10-60 seconds; if your client times out, set async=true to get a task_id you can poll instead. This call costs money — do not retry speculatively.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "aspect_ratio": {
+            "description": "Z-Image only: required output aspect ratio. Supported values: 1:1, 4:3, 3:4, 16:9, 9:16.",
+            "type": "string"
+          },
+          "async": {
+            "description": "Submit asynchronously and return a task_id instead of waiting. Use when the client times out on slow models; poll with get_task using platform 'image'.",
+            "type": "boolean"
+          },
+          "images": {
+            "description": "Optional reference images as HTTPS URLs or data URLs, for image-to-image generation. Not all models accept references.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "model": {
+            "description": "Exact model name, e.g. gpt-image-2 or nano-banana-pro. Call list_models with category 'image' if unsure.",
+            "type": "string"
+          },
+          "n": {
+            "description": "How many images to generate. Defaults to 1. Each one is billed.",
+            "type": [
+              "null",
+              "integer"
+            ]
+          },
+          "nsfw_checker": {
+            "description": "Z-Image only: enable or disable the upstream NSFW checker. Explicit false is preserved.",
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "prompt": {
+            "description": "Description of the image to generate.",
+            "type": "string"
+          },
+          "quality": {
+            "description": "Quality hint, e.g. low, medium, high or auto. Model-dependent.",
+            "type": "string"
+          },
+          "response_format": {
+            "description": "'url' (default) returns links; 'b64_json' returns base64 data, which is far larger and usually unnecessary.",
+            "type": "string"
+          },
+          "size": {
+            "description": "Output size, e.g. 1024x1024, 1536x1024, or 'auto'. Model-dependent; omit for the model default.",
+            "type": "string"
+          },
+          "wait_seconds": {
+            "description": "Only with async: poll server-side for up to this many seconds (max 240) and return the finished image if it completes in time.",
+            "type": [
+              "null",
+              "integer"
+            ]
+          }
+        },
+        "required": [
+          "model",
+          "prompt"
+        ],
+        "type": "object"
+      },
+      "name": "generate_image",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "images": {
+            "description": "Generated images, when the call completed.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "b64_json": {
+                  "description": "Base64 image data, when response_format was b64_json.",
+                  "type": "string"
+                },
+                "revised_prompt": {
+                  "description": "The prompt the model actually used, when it rewrote the input.",
+                  "type": "string"
+                },
+                "url": {
+                  "description": "Link to the generated image. May expire; download anything worth keeping.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "model": {
+            "description": "Model that served the request.",
+            "type": "string"
+          },
+          "note": {
+            "description": "What to do next.",
+            "type": "string"
+          },
+          "platform": {
+            "description": "Pass this to get_task together with task_id.",
+            "type": "string"
+          },
+          "status": {
+            "description": "One of: completed, queued, in_progress, failed.",
+            "type": "string"
+          },
+          "task_id": {
+            "description": "Task identifier, when submitted asynchronously and still running.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "model",
+          "status"
+        ],
+        "type": "object"
+      },
+      "title": "Generate an image"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Write song lyrics from a description, without generating audio. Useful as a first step before generate_music with custom=true, so the user can approve the words before paying for audio. Asynchronous — poll with get_task.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "lyrics_model": {
+            "description": "Lyrics model: classic or remi.",
+            "type": "string"
+          },
+          "prompt": {
+            "description": "Description of the lyrics to write, e.g. 'a love song about meeting someone at a coffee shop'.",
+            "type": "string"
+          },
+          "provider": {
+            "description": "Music backend: 'suno' (default) or 'producer'.",
+            "type": "string"
+          },
+          "wait_seconds": {
+            "description": "Poll server-side for up to this many seconds (max 240). Lyrics usually finish in under 30 seconds.",
+            "type": [
+              "null",
+              "integer"
+            ]
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "type": "object"
+      },
+      "name": "generate_lyrics",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "audio_urls": {
+            "description": "Finished audio URLs, when the task completed within wait_seconds.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "note": {
+            "description": "What to do next.",
+            "type": "string"
+          },
+          "platform": {
+            "description": "'suno' or 'producer'. Pass to get_task.",
+            "type": "string"
+          },
+          "raw": {
+            "description": "Full result payload when completed — clip IDs, lyrics text and per-clip metadata. Clip IDs from here are what extend_music takes."
+          },
+          "status": {
+            "description": "One of: queued, in_progress, completed, failed.",
+            "type": "string"
+          },
+          "task_id": {
+            "description": "Pass this to get_task together with platform to check progress.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id",
+          "platform",
+          "status",
+          "note"
+        ],
+        "type": "object"
+      },
+      "title": "Generate lyrics"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Generate a song with vocals or instrumental. Two modes: simple (custom=false) where you describe the song and the model writes the lyrics, or custom (custom=true) where you supply lyrics, title and style tags. Asynchronous — returns a task_id you poll with get_task; generation usually takes 30-120 seconds and normally yields two variations.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "custom": {
+            "description": "false (default) lets the model write the lyrics from your description; true means prompt contains lyrics you wrote and you should also set title and tags.",
+            "type": "boolean"
+          },
+          "instrumental": {
+            "description": "Generate without vocals.",
+            "type": "boolean"
+          },
+          "model": {
+            "description": "Suno model version, e.g. chirp-v5 or chirp-v4-5-plus. Omit for the platform default.",
+            "type": "string"
+          },
+          "negative_tags": {
+            "description": "Styles to avoid, e.g. 'heavy metal, rap'.",
+            "type": "string"
+          },
+          "prompt": {
+            "description": "In simple mode (custom=false) a description of the song, e.g. 'a dreamy lo-fi track about late-night trains'. In custom mode (custom=true) the actual lyrics, with section markers like [Verse] and [Chorus].",
+            "type": "string"
+          },
+          "provider": {
+            "description": "Music backend: 'suno' (default) or 'producer'.",
+            "type": "string"
+          },
+          "tags": {
+            "description": "Comma-separated style tags, e.g. 'pop, upbeat, guitar'. Max 200 characters.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Song title. Used in custom mode.",
+            "type": "string"
+          },
+          "wait_seconds": {
+            "description": "Poll server-side for up to this many seconds (max 240) and return finished audio if it completes in time. Omit to return a task_id immediately.",
+            "type": [
+              "null",
+              "integer"
+            ]
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "type": "object"
+      },
+      "name": "generate_music",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "audio_urls": {
+            "description": "Finished audio URLs, when the task completed within wait_seconds.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "note": {
+            "description": "What to do next.",
+            "type": "string"
+          },
+          "platform": {
+            "description": "'suno' or 'producer'. Pass to get_task.",
+            "type": "string"
+          },
+          "raw": {
+            "description": "Full result payload when completed — clip IDs, lyrics text and per-clip metadata. Clip IDs from here are what extend_music takes."
+          },
+          "status": {
+            "description": "One of: queued, in_progress, completed, failed.",
+            "type": "string"
+          },
+          "task_id": {
+            "description": "Pass this to get_task together with platform to check progress.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id",
+          "platform",
+          "status",
+          "note"
+        ],
+        "type": "object"
+      },
+      "title": "Generate a song"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Generate a video from a text prompt, optionally driven by reference images (image-to-video, first/last frame). This is asynchronous: it returns a task_id you poll with get_task(platform='video'). Generation usually takes 30-180 seconds. Pass wait_seconds to have the server poll for you. Video generation is the most expensive capability here — confirm the prompt with the user before spending on retries.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "duration": {
+            "description": "Clip length in seconds. Model-dependent, typically 4-15; an unsupported value is rejected with a message naming the supported ones. Omit for the model default.",
+            "type": [
+              "null",
+              "integer"
+            ]
+          },
+          "generate_audio": {
+            "description": "Generate a synchronised soundtrack. Only some models support this.",
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "image_roles": {
+            "description": "Role of each entry in images, positionally: first_frame, last_frame or reference_image.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "images": {
+            "description": "Optional reference image URLs. A single image is used as the first frame; use image_roles to control multiple.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "model": {
+            "description": "Exact model name, e.g. doubao-seedance-2-0-260128, veo-3.1-quality or viduq3-pro. Call list_models with category 'video' if unsure.",
+            "type": "string"
+          },
+          "prompt": {
+            "description": "Description of the video to generate.",
+            "type": "string"
+          },
+          "ratio": {
+            "description": "Aspect ratio, e.g. 16:9, 9:16, 1:1, 21:9 or adaptive. Which values a model accepts varies; an unsupported one is rejected with a message naming the valid ones.",
+            "type": "string"
+          },
+          "resolution": {
+            "description": "Output resolution: 480p, 720p (widest compatibility) or 1080p. Model-dependent.",
+            "type": "string"
+          },
+          "wait_seconds": {
+            "description": "Poll server-side for up to this many seconds (max 240) and return the finished video if it completes in time. Omit to return a task_id immediately.",
+            "type": [
+              "null",
+              "integer"
+            ]
+          }
+        },
+        "required": [
+          "model",
+          "prompt"
+        ],
+        "type": "object"
+      },
+      "name": "generate_video",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "model": {
+            "description": "Model that accepted the request.",
+            "type": "string"
+          },
+          "note": {
+            "description": "What to do next.",
+            "type": "string"
+          },
+          "platform": {
+            "description": "Always 'video'. Pass to get_task.",
+            "type": "string"
+          },
+          "status": {
+            "description": "One of: queued, in_progress, completed, failed.",
+            "type": "string"
+          },
+          "task_id": {
+            "description": "Pass this to get_task together with platform to check progress.",
+            "type": "string"
+          },
+          "video_urls": {
+            "description": "Finished video URLs, when the task completed within wait_seconds.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          }
+        },
+        "required": [
+          "task_id",
+          "platform",
+          "status",
+          "model",
+          "note"
+        ],
+        "type": "object"
+      },
+      "title": "Generate a video"
+    },
+    {
+      "annotations": {
+        "idempotentHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Report the remaining and used balance for this CCAPI key. Useful before starting an expensive batch of generations, or to explain a quota failure to the user.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "name": "get_balance",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "currency": {
+            "description": "Unit of the amounts above, e.g. USD.",
+            "type": "string"
+          },
+          "note": {
+            "description": "Guidance when the balance is low, unlimited, or scoped to a token.",
+            "type": "string"
+          },
+          "remaining_amount": {
+            "description": "Remaining balance, in the account's display currency. Omitted when unlimited.",
+            "type": "number"
+          },
+          "total_amount": {
+            "description": "Remaining plus used. Omitted when unlimited.",
+            "type": "number"
+          },
+          "unlimited": {
+            "description": "True when this token has no spending cap, in which case the amount fields are not meaningful.",
+            "type": "boolean"
+          },
+          "used_amount": {
+            "description": "Balance consumed to date, in the same unit.",
+            "type": "number"
+          }
+        },
+        "required": [
+          "unlimited",
+          "used_amount",
+          "currency"
+        ],
+        "type": "object"
+      },
+      "title": "Get account balance"
+    },
+    {
+      "annotations": {
+        "idempotentHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Check the status of an asynchronous generation task submitted by generate_video, generate_music, generate_lyrics, extend_music, or generate_image with async=true. Pass the platform and task_id exactly as they were returned. Status is one of queued, in_progress, completed or failed; poll every few seconds until it settles, or pass wait_seconds to have the server wait for you.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "platform": {
+            "description": "Platform the task belongs to, exactly as returned by the submit tool: image, video, suno or producer.",
+            "type": "string"
+          },
+          "task_id": {
+            "description": "Task identifier returned by the submit tool.",
+            "type": "string"
+          },
+          "wait_seconds": {
+            "description": "Poll server-side for up to this many seconds (max 240) and return once the task finishes. Omit for a single immediate status check.",
+            "type": [
+              "null",
+              "integer"
+            ]
+          }
+        },
+        "required": [
+          "platform",
+          "task_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_task",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "fail_reason": {
+            "description": "Why the task failed, when status is failed.",
+            "type": "string"
+          },
+          "note": {
+            "description": "What to do next.",
+            "type": "string"
+          },
+          "platform": {
+            "description": "Platform the task belongs to.",
+            "type": "string"
+          },
+          "progress": {
+            "description": "Progress indication, when the backend reports one.",
+            "type": "string"
+          },
+          "raw": {
+            "description": "Backend payload, for details this summary does not cover (lyrics text, per-clip metadata, seeds)."
+          },
+          "result_urls": {
+            "description": "Finished asset URLs. May expire; download anything worth keeping.",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "status": {
+            "description": "One of: queued, in_progress, completed, failed, unknown.",
+            "type": "string"
+          },
+          "task_id": {
+            "description": "The task this status refers to.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id",
+          "platform",
+          "status"
+        ],
+        "type": "object"
+      },
+      "title": "Check an async task"
+    },
+    {
+      "annotations": {
+        "idempotentHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List the AI models this CCAPI key can actually call, with their capability category and the MCP tool that drives them. Call this before generating anything if you are unsure a model name is valid — availability depends on the key's group and changes over time. Never guess model names.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "description": "Filter by capability. One of: text, image, video, music, embedding, other. Omit to list every model this key can use.",
+            "type": "string"
+          },
+          "search": {
+            "description": "Case-insensitive substring match on the model name, e.g. 'claude' or 'seedance'.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_models",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "models": {
+            "description": "Models available to the calling key.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "category": {
+                  "description": "Capability category: text, image, video, music, embedding or other.",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "Human-readable description, when the platform publishes one.",
+                  "type": "string"
+                },
+                "endpoints": {
+                  "description": "API endpoint families this model supports.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": [
+                    "null",
+                    "array"
+                  ]
+                },
+                "groups": {
+                  "description": "Token groups that can reach this model.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": [
+                    "null",
+                    "array"
+                  ]
+                },
+                "name": {
+                  "description": "The exact model name to pass to other tools.",
+                  "type": "string"
+                },
+                "tool": {
+                  "description": "Which MCP tool to call for this model. Absent means no MCP tool drives it — reach it through the REST API instead.",
+                  "type": "string"
+                },
+                "vendor": {
+                  "description": "Upstream vendor, e.g. Anthropic, Google, Suno.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "category"
+              ],
+              "type": "object"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "note": {
+            "description": "Guidance about the result set.",
+            "type": "string"
+          },
+          "total": {
+            "description": "Number of models returned.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "models",
+          "total"
+        ],
+        "type": "object"
+      },
+      "title": "List available models"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Increase the resolution of an existing image 2x with ccapi-upscale-v1. Input must be between 256x256 and 1024x1024 and under 5 MB; for larger inputs, regenerate with a high-resolution model instead.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "image": {
+            "description": "The image to upscale, as an HTTPS URL, data URL, or raw base64. Width and height must each be 256-1024 px and the file at most 5 MB.",
+            "type": "string"
+          },
+          "model_quality": {
+            "description": "Upscale quality hint: HQ, MQ (default) or LQ.",
+            "type": "string"
+          },
+          "response_format": {
+            "description": "'url' (default) or 'b64_json'.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "image"
+        ],
+        "type": "object"
+      },
+      "name": "upscale_image",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "images": {
+            "description": "Generated images, when the call completed.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "b64_json": {
+                  "description": "Base64 image data, when response_format was b64_json.",
+                  "type": "string"
+                },
+                "revised_prompt": {
+                  "description": "The prompt the model actually used, when it rewrote the input.",
+                  "type": "string"
+                },
+                "url": {
+                  "description": "Link to the generated image. May expire; download anything worth keeping.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "model": {
+            "description": "Model that served the request.",
+            "type": "string"
+          },
+          "note": {
+            "description": "What to do next.",
+            "type": "string"
+          },
+          "platform": {
+            "description": "Pass this to get_task together with task_id.",
+            "type": "string"
+          },
+          "status": {
+            "description": "One of: completed, queued, in_progress, failed.",
+            "type": "string"
+          },
+          "task_id": {
+            "description": "Task identifier, when submitted asynchronously and still running.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "model",
+          "status"
+        ],
+        "type": "object"
+      },
+      "title": "Upscale an image"
+    }
+  ],
+  "url": "https://api.ccapi.ai/mcp"
+}

@@ -1,0 +1,139 @@
+{
+  "canon_version": "1",
+  "full_hash": "b40448894ec351fb3faaad42c8dc69591b1fcad4c5a1faac1e6be216b15b8345",
+  "name": "ai.popdot/popdot-mcp",
+  "observed_at": "2026-08-20T09:12:27.181148Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 5,
+  "tools": [
+    {
+      "description": "Get a trial API key. Entry point for new agents: no payment, no human signup. Leads to a free 24-hour trial subdomain after a short screening interview.\n\nProvision a free 24-hour trial subdomain. Two-phase: initiate, answer the screening questions, complete. Returns a live HTTPS URL you control for 24 hours.\n\nCall this with your email and you'll get back the exact step-by-step REST sequence to claim a live trial subdomain (the screening interview is interactive, so it runs over REST). Use it when you need a temporary web address, want to test a deployment with a real URL, or want to show your operator a live demo before a paid rental. One trial per agent. Expires in 24 hours.",
+      "inputSchema": {
+        "properties": {
+          "email": {
+            "description": "An email to associate with your trial API key. Used to issue the key in step 1. If you don't have one, your operator's email works.",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "try_domain"
+    },
+    {
+      "description": "Search domains available for rent on Popdot AI. Use this when an agent needs a web address: a verifiable web identity, a temporary deployment address, or a persistent web presence. Returns domains with pricing, tier, and availability. No auth required.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "Maximum number of results to return (default: 20, max: 50)",
+            "type": "number"
+          },
+          "maxPrice": {
+            "description": "Maximum daily price in USD",
+            "type": "number"
+          },
+          "minPrice": {
+            "description": "Minimum daily price in USD",
+            "type": "number"
+          },
+          "query": {
+            "description": "Search query to match against domain names, tags, and categories",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "search_domains"
+    },
+    {
+      "description": "Get a price quote for renting a specific domain for a given duration. Returns the computed rental cost, tier info, and pricing breakdown.",
+      "inputSchema": {
+        "properties": {
+          "domainId": {
+            "description": "The unique ID of the domain to price",
+            "type": "string"
+          },
+          "duration": {
+            "description": "ISO 8601 duration: PT1H (1 hour), PT4H (4 hours), P1D (1 day), P7D (1 week), P30D (30 days)",
+            "enum": [
+              "PT1H",
+              "PT4H",
+              "P1D",
+              "P7D",
+              "P30D"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "domainId",
+          "duration"
+        ],
+        "type": "object"
+      },
+      "name": "get_price_quote"
+    },
+    {
+      "description": "Check whether a specific subdomain is available on a given domain. Returns true if the subdomain can be rented. Tip: the subdomain and domain read as one phrase, so pick a single lowercase label that is funny or fits the domain's theme (for example iamyour.slopmommy.com or analien.lostmyluggage.com). A delightful combination is the point of a Popdot AI address.",
+      "inputSchema": {
+        "properties": {
+          "domainId": {
+            "description": "The unique ID of the parent domain",
+            "type": "string"
+          },
+          "subdomain": {
+            "description": "The subdomain label to check (e.g., 'myproject' for myproject.example.com)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "domainId",
+          "subdomain"
+        ],
+        "type": "object"
+      },
+      "name": "check_availability"
+    },
+    {
+      "description": "Rent a subdomain, paying per-transaction with USDC on Base (x402). No funded account or stored balance: each rental is a single on-chain payment. Requires agent authentication. Validates the request, then returns the exact HTTP 402 challenge/settle REST sequence to complete the paid rental (payment happens on-chain between the two calls, so it runs over REST). Request an x402 payment challenge to rent a subdomain. Durations PT1H, PT4H, P1D, P7D, P30D. Returns the exact USDC amount and recipient on Base.",
+      "inputSchema": {
+        "properties": {
+          "domainId": {
+            "description": "The unique ID of the domain to rent on",
+            "type": "string"
+          },
+          "duration": {
+            "description": "ISO 8601 duration: PT1H (1 hour), PT4H (4 hours), P1D (1 day), P7D (1 week), P30D (30 days)",
+            "enum": [
+              "PT1H",
+              "PT4H",
+              "P1D",
+              "P7D",
+              "P30D"
+            ],
+            "type": "string"
+          },
+          "intentMandateId": {
+            "description": "The ID of the active Intent Mandate authorizing this purchase",
+            "type": "string"
+          },
+          "subdomain": {
+            "description": "The subdomain label to rent (e.g., 'myproject' for myproject.example.com)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "intentMandateId",
+          "domainId",
+          "subdomain",
+          "duration"
+        ],
+        "type": "object"
+      },
+      "name": "rent_domain"
+    }
+  ],
+  "url": "https://popdot.ai/api/mcp"
+}

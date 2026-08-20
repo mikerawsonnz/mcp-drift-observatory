@@ -1,0 +1,522 @@
+{
+  "canon_version": "1",
+  "full_hash": "f2a1d2c0d3ce7a73f1bb1eb9787220e58ac27d113de97ed84039ac9421c37ade",
+  "name": "ai.mcpanalytics/analytics",
+  "observed_at": "2026-08-20T09:12:07.500089Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 17,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Direct link to the right account page for anything not doable in chat — billing, browser upload, report management. Hand the user the link and guide them.",
+      "inputSchema": {
+        "properties": {
+          "section": {
+            "description": "Where to send the user",
+            "enum": [
+              "home",
+              "billing",
+              "upgrade",
+              "create",
+              "upload",
+              "reports"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "account_link"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Platform documentation and info — how it works, tiers, usage.",
+      "inputSchema": {
+        "properties": {
+          "topic": {
+            "description": "Topic: platform, manual, connectors, or a docs section",
+            "type": "string"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "type": "object"
+      },
+      "name": "about"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "AI help desk — which analysis fits your question, interpreting results, fixing errors. Multi-turn.",
+      "inputSchema": {
+        "properties": {
+          "message": {
+            "description": "Your question or request",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object"
+      },
+      "name": "agent_advisor"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Get your data in. Pass `data` as an array of row objects to create the dataset immediately and get a dataset_ref ready for create_analysis; omit it to get an upload link for a file only the user can reach. Add replace_ref (uuid://ID:KEY) with data to REFRESH an existing dataset in place — schedules and tools holding that reference read the new data on their next run.",
+      "inputSchema": {
+        "properties": {
+          "data": {
+            "description": "Rows as an array of flat objects — creates the dataset in one call",
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "expires_in": {
+            "default": 300,
+            "description": "Token expiration in seconds",
+            "type": "integer"
+          },
+          "replace_ref": {
+            "description": "uuid://ID:KEY of an existing dataset to overwrite in place with `data` (the push/refresh mode)",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "datasets_upload"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List and search your uploaded datasets — fuzzy matching on name, description, and tags. Returns each dataset's uuid:// reference for use in create_analysis and run_analysis.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "default": 20,
+            "description": "Max results",
+            "type": "integer"
+          },
+          "search": {
+            "description": "Search by name, description, or tags",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "datasets_list"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Browse the analyses you can run — the ones you commissioned plus the platform Standard Library (prebuilt tools; each result tagged source:'own' or 'standard_library'). Plain-language match; no query lists everything, your own first. Nothing fits? Commission it with create_analysis.",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "description": "Plain-language search over your library + the Standard Library; omit to list everything",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "discover_tools"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Get an analysis's parameter schema — ALWAYS call before run_analysis.",
+      "inputSchema": {
+        "properties": {
+          "tool_name": {
+            "description": "Name of the analysis",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tool_name"
+        ],
+        "type": "object"
+      },
+      "name": "tools_schema"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Run an analysis on your data. Returns a shareable interactive report URL — validated statistics you can cite, re-run, and share.",
+      "inputSchema": {
+        "properties": {
+          "taskList": {
+            "description": "Execution inputs. Call tools_schema first for the analysis-specific fields.",
+            "properties": {
+              "inputs": {
+                "properties": {
+                  "column_mapping": {
+                    "description": "Analysis-specific column mapping — see tools_schema",
+                    "type": "object"
+                  },
+                  "dataset": {
+                    "description": "Dataset reference: uuid://UUID:KEY from datasets_upload/datasets_list",
+                    "type": "string"
+                  },
+                  "module_parameters": {
+                    "description": "Analysis-specific parameters — see tools_schema",
+                    "type": "object"
+                  },
+                  "userContext": {
+                    "description": "Business context: objective (what you want to learn, required) and company",
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "tool_name": {
+            "description": "Name of the analysis to run",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tool_name",
+          "taskList"
+        ],
+        "type": "object"
+      },
+      "name": "run_analysis"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Commission a NEW analysis built for your question. tier is REQUIRED — the user picks. Easiest: fuzzy_request (plain language) + dataset_ref + tier. Snapshot = instant automated report (~2-10 min). JSON = a fast computed answer, numbers + method, re-runnable tool you own (~5 min). Brief = the computed answer on a one-page report — chart, numbers, method (~7 min). Deck = commissioned deep analysis, a durable re-runnable module you own (30-45 min). Failed builds are never billed.",
+      "inputSchema": {
+        "properties": {
+          "column_mapping": {
+            "description": "Optional semantic-to-real column map (hint only)",
+            "type": "object"
+          },
+          "dataset_ref": {
+            "description": "Single-dataset URI: 'uuid://UUID:KEY'",
+            "type": "string"
+          },
+          "datasets_refs": {
+            "description": "Multi-dataset URIs keyed by role",
+            "type": "object"
+          },
+          "fuzzy_request": {
+            "description": "Plain-language description of the analysis you want",
+            "type": "string"
+          },
+          "notes": {
+            "description": "Optional context for the build — constraints, definitions, or preferences the analyst agents should honor",
+            "type": "string"
+          },
+          "specification": {
+            "description": "Full 11-field spec (legacy path — prefer fuzzy_request)",
+            "type": "object"
+          },
+          "tier": {
+            "description": "snapshot = instant report (~2-10 min); json = fast computed answer (~5 min, default); brief = one-page report of the answer (~7 min); deck = commissioned re-runnable module (30-45 min)",
+            "enum": [
+              "snapshot",
+              "json",
+              "brief",
+              "deck"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "create_analysis"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Modify an EXISTING analysis into a new version — reword the question, swap the method, or add a variable. Pass tool_name + changes (plain language). Rebuilds on the analysis's own dataset by default; the original stays put. Returns pipeline tracking — follow with build_status.",
+      "inputSchema": {
+        "properties": {
+          "changes": {
+            "description": "What to change, in plain language, e.g. 'also break it down by region' or 'use a random forest instead'",
+            "type": "string"
+          },
+          "dataset_ref": {
+            "description": "Optional — rebuild against a different dataset ('uuid://UUID:KEY')",
+            "type": "string"
+          },
+          "tier": {
+            "description": "Optional — change the depth of the new version",
+            "enum": [
+              "snapshot",
+              "json",
+              "brief",
+              "deck"
+            ],
+            "type": "string"
+          },
+          "tool_name": {
+            "description": "The analysis to modify (from discover_tools or your library)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tool_name",
+          "changes"
+        ],
+        "type": "object"
+      },
+      "name": "modify_analysis"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Check a commissioned build in-chat: stage progress, queue position, rejection reason if the data didn't match the objective, honest ETA, report link when delivered.",
+      "inputSchema": {
+        "properties": {
+          "pipeline_id": {
+            "description": "pipeline_id from create_analysis",
+            "type": "integer"
+          },
+          "track_token": {
+            "description": "Token from the tracking URL",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "build_status"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Ask a question across all your delivered analyses — synthesized answer with citations back to specific reports.",
+      "inputSchema": {
+        "properties": {
+          "question": {
+            "description": "Plain-language question to answer from your report library",
+            "type": "string"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "type": "object"
+      },
+      "name": "ask_library"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Your report library — every analysis delivered, with status and links. Pass semantic_query to search report content in plain language.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "default": 10,
+            "description": "Max results",
+            "type": "integer"
+          },
+          "semantic_query": {
+            "description": "Natural-language search over your reports' content",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "reports_list"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Query your org's data warehouse free: browse the catalog (tables with column roles + computed metrics), semantically find data, plain-language ask, or named templates. Requires warehouse enablement (business plans).",
+      "inputSchema": {
+        "properties": {
+          "action": {
+            "enum": [
+              "ask",
+              "query",
+              "queries",
+              "catalog",
+              "find"
+            ],
+            "type": "string"
+          },
+          "params": {
+            "type": "object"
+          },
+          "query": {
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "name": "warehouse"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Standing re-runs of analyses you own: action='create' (weekly/monthly against a re-runnable data reference — connector:// or an https:// link; report emailed after each run), 'list', or 'cancel'.",
+      "inputSchema": {
+        "properties": {
+          "action": {
+            "description": "What to do",
+            "enum": [
+              "create",
+              "list",
+              "cancel"
+            ],
+            "type": "string"
+          },
+          "cadence": {
+            "enum": [
+              "weekly",
+              "monthly"
+            ],
+            "type": "string"
+          },
+          "column_mapping": {
+            "type": "object"
+          },
+          "dataset_ref": {
+            "description": "create: re-runnable reference (connector:// or https://)",
+            "type": "string"
+          },
+          "schedule_id": {
+            "description": "cancel: from action='list'",
+            "type": "integer"
+          },
+          "tool_name": {
+            "description": "create: the analysis to schedule",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "name": "schedules"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Get a shareable browser link for a report — viewable without authentication.",
+      "inputSchema": {
+        "properties": {
+          "processing_id": {
+            "description": "Processing ID from run_analysis / reports_list",
+            "type": "string"
+          }
+        },
+        "required": [
+          "processing_id"
+        ],
+        "type": "object"
+      },
+      "name": "reports_view"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Browse a delivered report's individual cards (charts, tables, insights) inline in chat.",
+      "inputSchema": {
+        "properties": {
+          "processing_id": {
+            "description": "The report's processing id, returned by run_analysis or build_status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "processing_id"
+        ],
+        "type": "object"
+      },
+      "name": "report_cards"
+    }
+  ],
+  "url": "https://api.mcpanalytics.ai/mcp/api-key"
+}

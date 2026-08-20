@@ -1,0 +1,3703 @@
+{
+  "canon_version": "1",
+  "full_hash": "9cf78df04441b0c908594f7e20e202eac192909ba62df83174609adfe16b7be1",
+  "name": "ai.memestack/mcp",
+  "observed_at": "2026-08-20T09:12:08.468479Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 20,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "tier": "free",
+        "title": "Search Images"
+      },
+      "description": "Search the MemeStack image gallery. Runs semantic AI and keyword matching in parallel and merges results. Returns images with captions, tags, zap stats, and URLs.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "Results per page (1-50, default 10)",
+            "type": "number"
+          },
+          "offset": {
+            "description": "Pagination offset (default 0)",
+            "type": "number"
+          },
+          "q": {
+            "description": "Alias for `query`. Provided so REST-API muscle memory (?q=...) works on the MCP tool too. If both are set, `query` wins.",
+            "type": "string"
+          },
+          "query": {
+            "description": "Search query — combines semantic AI and keyword matching automatically. Alias: `q` (matches the REST API param name).",
+            "type": "string"
+          },
+          "sort": {
+            "description": "Sort order (default: relevance)",
+            "enum": [
+              "newest",
+              "popular",
+              "oldest"
+            ],
+            "type": "string"
+          },
+          "tag": {
+            "description": "Filter results by a single tag slug (backward compat)",
+            "type": "string"
+          },
+          "tags": {
+            "description": "Filter results by multiple tag slugs (comma-separated, AND logic — e.g. \"bitcoin,meme\")",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_images",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "citations_combined": {
+            "additionalProperties": false,
+            "description": "Combined attribution for all images in this response, in three formats.",
+            "properties": {
+              "html": {
+                "description": "Numbered attribution list as HTML.",
+                "type": "string"
+              },
+              "markdown": {
+                "description": "Numbered attribution list as Markdown.",
+                "type": "string"
+              },
+              "plain": {
+                "description": "Numbered attribution list as plain text.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "markdown",
+              "html",
+              "plain"
+            ],
+            "type": "object"
+          },
+          "images": {
+            "description": "Matching images, best-first.",
+            "items": {
+              "additionalProperties": true,
+              "description": "A gallery image (lean list fields) with attribution.",
+              "properties": {
+                "canonical_url": {
+                  "description": "Full-resolution image URL.",
+                  "type": "string"
+                },
+                "caption": {
+                  "description": "AI-generated caption.",
+                  "type": "string"
+                },
+                "citation": {
+                  "additionalProperties": true,
+                  "description": "Ready-to-paste attribution for this image in three formats, plus source metadata.",
+                  "properties": {
+                    "attribution_recommended": {
+                      "description": "Always true — attribution is recommended.",
+                      "type": "boolean"
+                    },
+                    "attribution_required": {
+                      "description": "True only when the license requires attribution (OWID).",
+                      "type": "boolean"
+                    },
+                    "canonical_url": {
+                      "description": "Full-resolution image URL.",
+                      "type": "string"
+                    },
+                    "html": {
+                      "description": "Attribution as HTML.",
+                      "type": "string"
+                    },
+                    "markdown": {
+                      "description": "Attribution as Markdown.",
+                      "type": "string"
+                    },
+                    "page_url": {
+                      "description": "Canonical MemeStack gallery page for the image.",
+                      "type": "string"
+                    },
+                    "plain": {
+                      "description": "Attribution as plain text.",
+                      "type": "string"
+                    },
+                    "site": {
+                      "description": "Always \"MemeStack\".",
+                      "type": "string"
+                    },
+                    "site_url": {
+                      "description": "The MemeStack site URL.",
+                      "type": "string"
+                    },
+                    "source_external_url": {
+                      "description": "External source URL (set only for OWID-sourced images).",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "source_origin": {
+                      "description": "Origin: 'owid' | 'imgflip' | '4chan' | 'telegram' | 'generated' | 'unknown' | null.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "thumbnail_url": {
+                      "description": "Thumbnail image URL.",
+                      "type": "string"
+                    },
+                    "uploader_display_name": {
+                      "description": "Uploader name, or null when absent/withheld.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "site",
+                    "page_url",
+                    "markdown",
+                    "html",
+                    "plain"
+                  ],
+                  "type": "object"
+                },
+                "created_at": {
+                  "description": "ISO 8601 creation timestamp.",
+                  "type": "string"
+                },
+                "free_tags": {
+                  "description": "Free-form tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "height": {
+                  "description": "Original height in pixels.",
+                  "type": "number"
+                },
+                "id": {
+                  "description": "Image UUID.",
+                  "type": "string"
+                },
+                "like_count": {
+                  "description": "Number of likes.",
+                  "type": "number"
+                },
+                "meme_template_name": {
+                  "description": "Recognised meme template, if any.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "page_url": {
+                  "description": "MemeStack gallery page URL.",
+                  "type": "string"
+                },
+                "save_count": {
+                  "description": "Number of saves.",
+                  "type": "number"
+                },
+                "tags": {
+                  "description": "Topic tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "thumbnail_url": {
+                  "description": "Thumbnail image URL.",
+                  "type": "string"
+                },
+                "uploader_display_name": {
+                  "description": "Uploader name, or null.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "width": {
+                  "description": "Original width in pixels.",
+                  "type": "number"
+                },
+                "zap_count": {
+                  "description": "Number of Lightning zaps.",
+                  "type": "number"
+                },
+                "zap_total_sats": {
+                  "description": "Total sats zapped.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "thumbnail_url",
+                "canonical_url",
+                "page_url",
+                "citation"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "total": {
+            "description": "Total number of matching images.",
+            "type": "number"
+          }
+        },
+        "required": [
+          "images",
+          "total"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "tier": "free",
+        "title": "Get Image Details"
+      },
+      "description": "Get full metadata for a specific image by ID, including caption, alt text, tags, OCR text, zap stats, and URLs.",
+      "inputSchema": {
+        "properties": {
+          "id": {
+            "description": "Image UUID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_image",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "A gallery image (full detail) with OCR text, dimensions, and attribution.",
+        "properties": {
+          "alt_text": {
+            "description": "Accessible alt text.",
+            "type": "string"
+          },
+          "canonical_url": {
+            "description": "Full-resolution image URL.",
+            "type": "string"
+          },
+          "caption": {
+            "description": "AI-generated caption.",
+            "type": "string"
+          },
+          "citation": {
+            "additionalProperties": true,
+            "description": "Ready-to-paste attribution for this image in three formats, plus source metadata.",
+            "properties": {
+              "attribution_recommended": {
+                "description": "Always true — attribution is recommended.",
+                "type": "boolean"
+              },
+              "attribution_required": {
+                "description": "True only when the license requires attribution (OWID).",
+                "type": "boolean"
+              },
+              "canonical_url": {
+                "description": "Full-resolution image URL.",
+                "type": "string"
+              },
+              "html": {
+                "description": "Attribution as HTML.",
+                "type": "string"
+              },
+              "markdown": {
+                "description": "Attribution as Markdown.",
+                "type": "string"
+              },
+              "page_url": {
+                "description": "Canonical MemeStack gallery page for the image.",
+                "type": "string"
+              },
+              "plain": {
+                "description": "Attribution as plain text.",
+                "type": "string"
+              },
+              "site": {
+                "description": "Always \"MemeStack\".",
+                "type": "string"
+              },
+              "site_url": {
+                "description": "The MemeStack site URL.",
+                "type": "string"
+              },
+              "source_external_url": {
+                "description": "External source URL (set only for OWID-sourced images).",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "source_origin": {
+                "description": "Origin: 'owid' | 'imgflip' | '4chan' | 'telegram' | 'generated' | 'unknown' | null.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "thumbnail_url": {
+                "description": "Thumbnail image URL.",
+                "type": "string"
+              },
+              "uploader_display_name": {
+                "description": "Uploader name, or null when absent/withheld.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "site",
+              "page_url",
+              "markdown",
+              "html",
+              "plain"
+            ],
+            "type": "object"
+          },
+          "created_at": {
+            "description": "ISO 8601 creation timestamp.",
+            "type": "string"
+          },
+          "free_tags": {
+            "description": "Free-form tag slugs.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "height": {
+            "description": "Original height in pixels.",
+            "type": "number"
+          },
+          "id": {
+            "description": "Image UUID.",
+            "type": "string"
+          },
+          "like_count": {
+            "description": "Number of likes.",
+            "type": "number"
+          },
+          "meme_template_name": {
+            "description": "Recognised meme template, if any.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "mime_type": {
+            "description": "Image MIME type.",
+            "type": "string"
+          },
+          "page_url": {
+            "description": "MemeStack gallery page URL.",
+            "type": "string"
+          },
+          "quality_score": {
+            "description": "AI quality score (1-10).",
+            "type": "number"
+          },
+          "save_count": {
+            "description": "Number of saves.",
+            "type": "number"
+          },
+          "size": {
+            "description": "File size in bytes.",
+            "type": "number"
+          },
+          "tags": {
+            "description": "Topic tag slugs.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "text_in_image": {
+            "description": "OCR transcription of any text in the image.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "thumb_height": {
+            "description": "Thumbnail height in pixels.",
+            "type": "number"
+          },
+          "thumb_width": {
+            "description": "Thumbnail width in pixels.",
+            "type": "number"
+          },
+          "thumbnail_url": {
+            "description": "Thumbnail image URL.",
+            "type": "string"
+          },
+          "updated_at": {
+            "description": "ISO 8601 last-updated timestamp.",
+            "type": "string"
+          },
+          "uploader_display_name": {
+            "description": "Uploader name, or null.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "width": {
+            "description": "Original width in pixels.",
+            "type": "number"
+          },
+          "zap_count": {
+            "description": "Number of Lightning zaps.",
+            "type": "number"
+          },
+          "zap_total_sats": {
+            "description": "Total sats zapped.",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "thumbnail_url",
+          "canonical_url",
+          "page_url",
+          "citation"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "tier": "free",
+        "title": "Find Similar Images"
+      },
+      "description": "Find visually similar images using perceptual hash matching. Returns images that look alike.",
+      "inputSchema": {
+        "properties": {
+          "id": {
+            "description": "Source image UUID",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max results (1-20, default 10)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "find_similar",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "citations_combined": {
+            "additionalProperties": false,
+            "description": "Combined attribution for all images in this response, in three formats.",
+            "properties": {
+              "html": {
+                "description": "Numbered attribution list as HTML.",
+                "type": "string"
+              },
+              "markdown": {
+                "description": "Numbered attribution list as Markdown.",
+                "type": "string"
+              },
+              "plain": {
+                "description": "Numbered attribution list as plain text.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "markdown",
+              "html",
+              "plain"
+            ],
+            "type": "object"
+          },
+          "count": {
+            "description": "Total number of matching images.",
+            "type": "number"
+          },
+          "images": {
+            "description": "Visually similar images.",
+            "items": {
+              "additionalProperties": true,
+              "description": "A gallery image (compact fields) with a ranking score and attribution.",
+              "properties": {
+                "canonical_url": {
+                  "description": "Full-resolution image URL.",
+                  "type": "string"
+                },
+                "caption": {
+                  "description": "AI-generated caption.",
+                  "type": "string"
+                },
+                "citation": {
+                  "additionalProperties": true,
+                  "description": "Ready-to-paste attribution for this image in three formats, plus source metadata.",
+                  "properties": {
+                    "attribution_recommended": {
+                      "description": "Always true — attribution is recommended.",
+                      "type": "boolean"
+                    },
+                    "attribution_required": {
+                      "description": "True only when the license requires attribution (OWID).",
+                      "type": "boolean"
+                    },
+                    "canonical_url": {
+                      "description": "Full-resolution image URL.",
+                      "type": "string"
+                    },
+                    "html": {
+                      "description": "Attribution as HTML.",
+                      "type": "string"
+                    },
+                    "markdown": {
+                      "description": "Attribution as Markdown.",
+                      "type": "string"
+                    },
+                    "page_url": {
+                      "description": "Canonical MemeStack gallery page for the image.",
+                      "type": "string"
+                    },
+                    "plain": {
+                      "description": "Attribution as plain text.",
+                      "type": "string"
+                    },
+                    "site": {
+                      "description": "Always \"MemeStack\".",
+                      "type": "string"
+                    },
+                    "site_url": {
+                      "description": "The MemeStack site URL.",
+                      "type": "string"
+                    },
+                    "source_external_url": {
+                      "description": "External source URL (set only for OWID-sourced images).",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "source_origin": {
+                      "description": "Origin: 'owid' | 'imgflip' | '4chan' | 'telegram' | 'generated' | 'unknown' | null.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "thumbnail_url": {
+                      "description": "Thumbnail image URL.",
+                      "type": "string"
+                    },
+                    "uploader_display_name": {
+                      "description": "Uploader name, or null when absent/withheld.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "site",
+                    "page_url",
+                    "markdown",
+                    "html",
+                    "plain"
+                  ],
+                  "type": "object"
+                },
+                "created_at": {
+                  "description": "ISO 8601 creation timestamp.",
+                  "type": "string"
+                },
+                "free_tags": {
+                  "description": "Free-form tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "height": {
+                  "description": "Original height in pixels.",
+                  "type": "number"
+                },
+                "id": {
+                  "description": "Image UUID.",
+                  "type": "string"
+                },
+                "like_count": {
+                  "description": "Number of likes.",
+                  "type": "number"
+                },
+                "meme_template_name": {
+                  "description": "Recognised meme template, if any.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "page_url": {
+                  "description": "MemeStack gallery page URL.",
+                  "type": "string"
+                },
+                "relevance_score": {
+                  "description": "Semantic-relevance score (find_related).",
+                  "type": "number"
+                },
+                "save_count": {
+                  "description": "Number of saves.",
+                  "type": "number"
+                },
+                "similarity": {
+                  "description": "Visual-similarity score (find_similar / reverse_image_search).",
+                  "type": "number"
+                },
+                "tags": {
+                  "description": "Topic tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "thumbnail_url": {
+                  "description": "Thumbnail image URL.",
+                  "type": "string"
+                },
+                "uploader_display_name": {
+                  "description": "Uploader name, or null.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "width": {
+                  "description": "Original width in pixels.",
+                  "type": "number"
+                },
+                "zap_count": {
+                  "description": "Number of Lightning zaps.",
+                  "type": "number"
+                },
+                "zap_total_sats": {
+                  "description": "Total sats zapped.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "thumbnail_url",
+                "canonical_url",
+                "page_url",
+                "citation"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "images",
+          "count"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "tier": "free",
+        "title": "Find Related Images"
+      },
+      "description": "Find semantically related images using AI embedding similarity. Returns images with similar meaning/topic.",
+      "inputSchema": {
+        "properties": {
+          "id": {
+            "description": "Source image UUID",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max results (1-20, default 10)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "find_related",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "citations_combined": {
+            "additionalProperties": false,
+            "description": "Combined attribution for all images in this response, in three formats.",
+            "properties": {
+              "html": {
+                "description": "Numbered attribution list as HTML.",
+                "type": "string"
+              },
+              "markdown": {
+                "description": "Numbered attribution list as Markdown.",
+                "type": "string"
+              },
+              "plain": {
+                "description": "Numbered attribution list as plain text.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "markdown",
+              "html",
+              "plain"
+            ],
+            "type": "object"
+          },
+          "count": {
+            "description": "Total number of matching images.",
+            "type": "number"
+          },
+          "images": {
+            "description": "Semantically related images.",
+            "items": {
+              "additionalProperties": true,
+              "description": "A gallery image (compact fields) with a ranking score and attribution.",
+              "properties": {
+                "canonical_url": {
+                  "description": "Full-resolution image URL.",
+                  "type": "string"
+                },
+                "caption": {
+                  "description": "AI-generated caption.",
+                  "type": "string"
+                },
+                "citation": {
+                  "additionalProperties": true,
+                  "description": "Ready-to-paste attribution for this image in three formats, plus source metadata.",
+                  "properties": {
+                    "attribution_recommended": {
+                      "description": "Always true — attribution is recommended.",
+                      "type": "boolean"
+                    },
+                    "attribution_required": {
+                      "description": "True only when the license requires attribution (OWID).",
+                      "type": "boolean"
+                    },
+                    "canonical_url": {
+                      "description": "Full-resolution image URL.",
+                      "type": "string"
+                    },
+                    "html": {
+                      "description": "Attribution as HTML.",
+                      "type": "string"
+                    },
+                    "markdown": {
+                      "description": "Attribution as Markdown.",
+                      "type": "string"
+                    },
+                    "page_url": {
+                      "description": "Canonical MemeStack gallery page for the image.",
+                      "type": "string"
+                    },
+                    "plain": {
+                      "description": "Attribution as plain text.",
+                      "type": "string"
+                    },
+                    "site": {
+                      "description": "Always \"MemeStack\".",
+                      "type": "string"
+                    },
+                    "site_url": {
+                      "description": "The MemeStack site URL.",
+                      "type": "string"
+                    },
+                    "source_external_url": {
+                      "description": "External source URL (set only for OWID-sourced images).",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "source_origin": {
+                      "description": "Origin: 'owid' | 'imgflip' | '4chan' | 'telegram' | 'generated' | 'unknown' | null.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "thumbnail_url": {
+                      "description": "Thumbnail image URL.",
+                      "type": "string"
+                    },
+                    "uploader_display_name": {
+                      "description": "Uploader name, or null when absent/withheld.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "site",
+                    "page_url",
+                    "markdown",
+                    "html",
+                    "plain"
+                  ],
+                  "type": "object"
+                },
+                "created_at": {
+                  "description": "ISO 8601 creation timestamp.",
+                  "type": "string"
+                },
+                "free_tags": {
+                  "description": "Free-form tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "height": {
+                  "description": "Original height in pixels.",
+                  "type": "number"
+                },
+                "id": {
+                  "description": "Image UUID.",
+                  "type": "string"
+                },
+                "like_count": {
+                  "description": "Number of likes.",
+                  "type": "number"
+                },
+                "meme_template_name": {
+                  "description": "Recognised meme template, if any.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "page_url": {
+                  "description": "MemeStack gallery page URL.",
+                  "type": "string"
+                },
+                "relevance_score": {
+                  "description": "Semantic-relevance score (find_related).",
+                  "type": "number"
+                },
+                "save_count": {
+                  "description": "Number of saves.",
+                  "type": "number"
+                },
+                "similarity": {
+                  "description": "Visual-similarity score (find_similar / reverse_image_search).",
+                  "type": "number"
+                },
+                "tags": {
+                  "description": "Topic tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "thumbnail_url": {
+                  "description": "Thumbnail image URL.",
+                  "type": "string"
+                },
+                "uploader_display_name": {
+                  "description": "Uploader name, or null.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "width": {
+                  "description": "Original width in pixels.",
+                  "type": "number"
+                },
+                "zap_count": {
+                  "description": "Number of Lightning zaps.",
+                  "type": "number"
+                },
+                "zap_total_sats": {
+                  "description": "Total sats zapped.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "thumbnail_url",
+                "canonical_url",
+                "page_url",
+                "citation"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "images",
+          "count"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "tier": "free",
+        "title": "Browse Images"
+      },
+      "description": "Browse and filter the image gallery without a search query. Useful for discovering content by tag, trending, or recent uploads.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "Results per page (1-50, default 10)",
+            "type": "number"
+          },
+          "offset": {
+            "description": "Pagination offset (default 0)",
+            "type": "number"
+          },
+          "sort": {
+            "description": "Sort order (default: newest)",
+            "enum": [
+              "newest",
+              "popular",
+              "oldest",
+              "trending"
+            ],
+            "type": "string"
+          },
+          "tag": {
+            "description": "Filter by tag slug (e.g. \"bitcoin\", \"meme\")",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "browse_images",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "citations_combined": {
+            "additionalProperties": false,
+            "description": "Combined attribution for all images in this response, in three formats.",
+            "properties": {
+              "html": {
+                "description": "Numbered attribution list as HTML.",
+                "type": "string"
+              },
+              "markdown": {
+                "description": "Numbered attribution list as Markdown.",
+                "type": "string"
+              },
+              "plain": {
+                "description": "Numbered attribution list as plain text.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "markdown",
+              "html",
+              "plain"
+            ],
+            "type": "object"
+          },
+          "images": {
+            "description": "Images in the requested view.",
+            "items": {
+              "additionalProperties": true,
+              "description": "A gallery image (lean list fields) with attribution.",
+              "properties": {
+                "canonical_url": {
+                  "description": "Full-resolution image URL.",
+                  "type": "string"
+                },
+                "caption": {
+                  "description": "AI-generated caption.",
+                  "type": "string"
+                },
+                "citation": {
+                  "additionalProperties": true,
+                  "description": "Ready-to-paste attribution for this image in three formats, plus source metadata.",
+                  "properties": {
+                    "attribution_recommended": {
+                      "description": "Always true — attribution is recommended.",
+                      "type": "boolean"
+                    },
+                    "attribution_required": {
+                      "description": "True only when the license requires attribution (OWID).",
+                      "type": "boolean"
+                    },
+                    "canonical_url": {
+                      "description": "Full-resolution image URL.",
+                      "type": "string"
+                    },
+                    "html": {
+                      "description": "Attribution as HTML.",
+                      "type": "string"
+                    },
+                    "markdown": {
+                      "description": "Attribution as Markdown.",
+                      "type": "string"
+                    },
+                    "page_url": {
+                      "description": "Canonical MemeStack gallery page for the image.",
+                      "type": "string"
+                    },
+                    "plain": {
+                      "description": "Attribution as plain text.",
+                      "type": "string"
+                    },
+                    "site": {
+                      "description": "Always \"MemeStack\".",
+                      "type": "string"
+                    },
+                    "site_url": {
+                      "description": "The MemeStack site URL.",
+                      "type": "string"
+                    },
+                    "source_external_url": {
+                      "description": "External source URL (set only for OWID-sourced images).",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "source_origin": {
+                      "description": "Origin: 'owid' | 'imgflip' | '4chan' | 'telegram' | 'generated' | 'unknown' | null.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "thumbnail_url": {
+                      "description": "Thumbnail image URL.",
+                      "type": "string"
+                    },
+                    "uploader_display_name": {
+                      "description": "Uploader name, or null when absent/withheld.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "site",
+                    "page_url",
+                    "markdown",
+                    "html",
+                    "plain"
+                  ],
+                  "type": "object"
+                },
+                "created_at": {
+                  "description": "ISO 8601 creation timestamp.",
+                  "type": "string"
+                },
+                "free_tags": {
+                  "description": "Free-form tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "height": {
+                  "description": "Original height in pixels.",
+                  "type": "number"
+                },
+                "id": {
+                  "description": "Image UUID.",
+                  "type": "string"
+                },
+                "like_count": {
+                  "description": "Number of likes.",
+                  "type": "number"
+                },
+                "meme_template_name": {
+                  "description": "Recognised meme template, if any.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "page_url": {
+                  "description": "MemeStack gallery page URL.",
+                  "type": "string"
+                },
+                "save_count": {
+                  "description": "Number of saves.",
+                  "type": "number"
+                },
+                "tags": {
+                  "description": "Topic tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "thumbnail_url": {
+                  "description": "Thumbnail image URL.",
+                  "type": "string"
+                },
+                "uploader_display_name": {
+                  "description": "Uploader name, or null.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "width": {
+                  "description": "Original width in pixels.",
+                  "type": "number"
+                },
+                "zap_count": {
+                  "description": "Number of Lightning zaps.",
+                  "type": "number"
+                },
+                "zap_total_sats": {
+                  "description": "Total sats zapped.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "thumbnail_url",
+                "canonical_url",
+                "page_url",
+                "citation"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "total": {
+            "description": "Total number of matching images.",
+            "type": "number"
+          }
+        },
+        "required": [
+          "images",
+          "total"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "tier": "free",
+        "title": "Get User Profile"
+      },
+      "description": "Get a user's public profile including display name, stats, and avatar info.",
+      "inputSchema": {
+        "properties": {
+          "identifier": {
+            "description": "User public key (hex) or UUID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier"
+        ],
+        "type": "object"
+      },
+      "name": "get_user_profile",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "A public user profile (pubkey and role omitted).",
+        "properties": {
+          "approved_image_count": {
+            "description": "Number of approved uploads.",
+            "type": "number"
+          },
+          "created_at": {
+            "description": "ISO 8601 account-creation timestamp.",
+            "type": "string"
+          },
+          "display_name": {
+            "description": "Display name.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "has_avatar": {
+            "description": "Whether the user has an avatar.",
+            "type": "boolean"
+          },
+          "id": {
+            "description": "User UUID.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "tier": "free",
+        "title": "Get Leaderboard"
+      },
+      "description": "Get top-ranked images by zaps received, or top zappers by amount zapped, over a time period.",
+      "inputSchema": {
+        "properties": {
+          "period": {
+            "description": "Time period (default: week)",
+            "enum": [
+              "day",
+              "week",
+              "month",
+              "all"
+            ],
+            "type": "string"
+          },
+          "type": {
+            "description": "Leaderboard type",
+            "enum": [
+              "images",
+              "zappers"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "type": "object"
+      },
+      "name": "get_leaderboard",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "Leaderboard results — `images` for the images board, `users` for the zappers board.",
+        "properties": {
+          "citations_combined": {
+            "additionalProperties": false,
+            "description": "Combined attribution for all images in this response, in three formats.",
+            "properties": {
+              "html": {
+                "description": "Numbered attribution list as HTML.",
+                "type": "string"
+              },
+              "markdown": {
+                "description": "Numbered attribution list as Markdown.",
+                "type": "string"
+              },
+              "plain": {
+                "description": "Numbered attribution list as plain text.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "markdown",
+              "html",
+              "plain"
+            ],
+            "type": "object"
+          },
+          "images": {
+            "description": "Top images (images leaderboard).",
+            "items": {
+              "additionalProperties": true,
+              "description": "A gallery image (lean list fields) with attribution.",
+              "properties": {
+                "canonical_url": {
+                  "description": "Full-resolution image URL.",
+                  "type": "string"
+                },
+                "caption": {
+                  "description": "AI-generated caption.",
+                  "type": "string"
+                },
+                "citation": {
+                  "additionalProperties": true,
+                  "description": "Ready-to-paste attribution for this image in three formats, plus source metadata.",
+                  "properties": {
+                    "attribution_recommended": {
+                      "description": "Always true — attribution is recommended.",
+                      "type": "boolean"
+                    },
+                    "attribution_required": {
+                      "description": "True only when the license requires attribution (OWID).",
+                      "type": "boolean"
+                    },
+                    "canonical_url": {
+                      "description": "Full-resolution image URL.",
+                      "type": "string"
+                    },
+                    "html": {
+                      "description": "Attribution as HTML.",
+                      "type": "string"
+                    },
+                    "markdown": {
+                      "description": "Attribution as Markdown.",
+                      "type": "string"
+                    },
+                    "page_url": {
+                      "description": "Canonical MemeStack gallery page for the image.",
+                      "type": "string"
+                    },
+                    "plain": {
+                      "description": "Attribution as plain text.",
+                      "type": "string"
+                    },
+                    "site": {
+                      "description": "Always \"MemeStack\".",
+                      "type": "string"
+                    },
+                    "site_url": {
+                      "description": "The MemeStack site URL.",
+                      "type": "string"
+                    },
+                    "source_external_url": {
+                      "description": "External source URL (set only for OWID-sourced images).",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "source_origin": {
+                      "description": "Origin: 'owid' | 'imgflip' | '4chan' | 'telegram' | 'generated' | 'unknown' | null.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "thumbnail_url": {
+                      "description": "Thumbnail image URL.",
+                      "type": "string"
+                    },
+                    "uploader_display_name": {
+                      "description": "Uploader name, or null when absent/withheld.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "site",
+                    "page_url",
+                    "markdown",
+                    "html",
+                    "plain"
+                  ],
+                  "type": "object"
+                },
+                "created_at": {
+                  "description": "ISO 8601 creation timestamp.",
+                  "type": "string"
+                },
+                "free_tags": {
+                  "description": "Free-form tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "height": {
+                  "description": "Original height in pixels.",
+                  "type": "number"
+                },
+                "id": {
+                  "description": "Image UUID.",
+                  "type": "string"
+                },
+                "like_count": {
+                  "description": "Number of likes.",
+                  "type": "number"
+                },
+                "meme_template_name": {
+                  "description": "Recognised meme template, if any.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "page_url": {
+                  "description": "MemeStack gallery page URL.",
+                  "type": "string"
+                },
+                "save_count": {
+                  "description": "Number of saves.",
+                  "type": "number"
+                },
+                "tags": {
+                  "description": "Topic tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "thumbnail_url": {
+                  "description": "Thumbnail image URL.",
+                  "type": "string"
+                },
+                "uploader_display_name": {
+                  "description": "Uploader name, or null.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "width": {
+                  "description": "Original width in pixels.",
+                  "type": "number"
+                },
+                "zap_count": {
+                  "description": "Number of Lightning zaps.",
+                  "type": "number"
+                },
+                "zap_total_sats": {
+                  "description": "Total sats zapped.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "thumbnail_url",
+                "canonical_url",
+                "page_url",
+                "citation"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "period": {
+            "description": "The leaderboard period.",
+            "type": "string"
+          },
+          "users": {
+            "description": "Top zappers (zappers leaderboard).",
+            "items": {
+              "additionalProperties": true,
+              "description": "A public user profile (pubkey and role omitted).",
+              "properties": {
+                "approved_image_count": {
+                  "description": "Number of approved uploads.",
+                  "type": "number"
+                },
+                "created_at": {
+                  "description": "ISO 8601 account-creation timestamp.",
+                  "type": "string"
+                },
+                "display_name": {
+                  "description": "Display name.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "has_avatar": {
+                  "description": "Whether the user has an avatar.",
+                  "type": "boolean"
+                },
+                "id": {
+                  "description": "User UUID.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "tier": "free",
+        "title": "Browse by Tag"
+      },
+      "description": "Browse images for a specific tag. Returns the tag profile (description, stats) and optionally a paginated list of images tagged with it.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "Images per page (1-50, default 10). When provided, images are included in the response.",
+            "type": "number"
+          },
+          "offset": {
+            "description": "Pagination offset (default 0)",
+            "type": "number"
+          },
+          "tag": {
+            "description": "Tag slug (e.g. \"bitcoin\", \"meme\", \"lightning\")",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tag"
+        ],
+        "type": "object"
+      },
+      "name": "browse_by_tag",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "A tag profile plus its images and combined citations.",
+        "properties": {
+          "citations_combined": {
+            "additionalProperties": false,
+            "description": "Combined attribution for all images in this response, in three formats.",
+            "properties": {
+              "html": {
+                "description": "Numbered attribution list as HTML.",
+                "type": "string"
+              },
+              "markdown": {
+                "description": "Numbered attribution list as Markdown.",
+                "type": "string"
+              },
+              "plain": {
+                "description": "Numbered attribution list as plain text.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "markdown",
+              "html",
+              "plain"
+            ],
+            "type": "object"
+          },
+          "description": {
+            "description": "Tag description.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "image_count": {
+            "description": "Number of images with this tag.",
+            "type": "number"
+          },
+          "images": {
+            "description": "Images with this tag.",
+            "items": {
+              "additionalProperties": true,
+              "description": "A gallery image (lean list fields) with attribution.",
+              "properties": {
+                "canonical_url": {
+                  "description": "Full-resolution image URL.",
+                  "type": "string"
+                },
+                "caption": {
+                  "description": "AI-generated caption.",
+                  "type": "string"
+                },
+                "citation": {
+                  "additionalProperties": true,
+                  "description": "Ready-to-paste attribution for this image in three formats, plus source metadata.",
+                  "properties": {
+                    "attribution_recommended": {
+                      "description": "Always true — attribution is recommended.",
+                      "type": "boolean"
+                    },
+                    "attribution_required": {
+                      "description": "True only when the license requires attribution (OWID).",
+                      "type": "boolean"
+                    },
+                    "canonical_url": {
+                      "description": "Full-resolution image URL.",
+                      "type": "string"
+                    },
+                    "html": {
+                      "description": "Attribution as HTML.",
+                      "type": "string"
+                    },
+                    "markdown": {
+                      "description": "Attribution as Markdown.",
+                      "type": "string"
+                    },
+                    "page_url": {
+                      "description": "Canonical MemeStack gallery page for the image.",
+                      "type": "string"
+                    },
+                    "plain": {
+                      "description": "Attribution as plain text.",
+                      "type": "string"
+                    },
+                    "site": {
+                      "description": "Always \"MemeStack\".",
+                      "type": "string"
+                    },
+                    "site_url": {
+                      "description": "The MemeStack site URL.",
+                      "type": "string"
+                    },
+                    "source_external_url": {
+                      "description": "External source URL (set only for OWID-sourced images).",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "source_origin": {
+                      "description": "Origin: 'owid' | 'imgflip' | '4chan' | 'telegram' | 'generated' | 'unknown' | null.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "thumbnail_url": {
+                      "description": "Thumbnail image URL.",
+                      "type": "string"
+                    },
+                    "uploader_display_name": {
+                      "description": "Uploader name, or null when absent/withheld.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "site",
+                    "page_url",
+                    "markdown",
+                    "html",
+                    "plain"
+                  ],
+                  "type": "object"
+                },
+                "created_at": {
+                  "description": "ISO 8601 creation timestamp.",
+                  "type": "string"
+                },
+                "free_tags": {
+                  "description": "Free-form tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "height": {
+                  "description": "Original height in pixels.",
+                  "type": "number"
+                },
+                "id": {
+                  "description": "Image UUID.",
+                  "type": "string"
+                },
+                "like_count": {
+                  "description": "Number of likes.",
+                  "type": "number"
+                },
+                "meme_template_name": {
+                  "description": "Recognised meme template, if any.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "page_url": {
+                  "description": "MemeStack gallery page URL.",
+                  "type": "string"
+                },
+                "save_count": {
+                  "description": "Number of saves.",
+                  "type": "number"
+                },
+                "tags": {
+                  "description": "Topic tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "thumbnail_url": {
+                  "description": "Thumbnail image URL.",
+                  "type": "string"
+                },
+                "uploader_display_name": {
+                  "description": "Uploader name, or null.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "width": {
+                  "description": "Original width in pixels.",
+                  "type": "number"
+                },
+                "zap_count": {
+                  "description": "Number of Lightning zaps.",
+                  "type": "number"
+                },
+                "zap_total_sats": {
+                  "description": "Total sats zapped.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "thumbnail_url",
+                "canonical_url",
+                "page_url",
+                "citation"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "name": {
+            "description": "Tag display name.",
+            "type": "string"
+          },
+          "related_tags": {
+            "description": "Related tag slugs.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "slug": {
+            "description": "Tag slug.",
+            "type": "string"
+          },
+          "total": {
+            "description": "Total matching images.",
+            "type": "number"
+          }
+        },
+        "required": [
+          "images"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "tier": "free",
+        "title": "Browse by Category"
+      },
+      "description": "Get a category and its featured images. Categories group related tags (e.g. \"charts\", \"memes\", \"lightning-network\").",
+      "inputSchema": {
+        "properties": {
+          "category": {
+            "description": "Category slug (e.g. \"charts\", \"memes\")",
+            "type": "string"
+          }
+        },
+        "required": [
+          "category"
+        ],
+        "type": "object"
+      },
+      "name": "browse_by_category",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "A category profile plus its featured images and combined citations.",
+        "properties": {
+          "citations_combined": {
+            "additionalProperties": false,
+            "description": "Combined attribution for all images in this response, in three formats.",
+            "properties": {
+              "html": {
+                "description": "Numbered attribution list as HTML.",
+                "type": "string"
+              },
+              "markdown": {
+                "description": "Numbered attribution list as Markdown.",
+                "type": "string"
+              },
+              "plain": {
+                "description": "Numbered attribution list as plain text.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "markdown",
+              "html",
+              "plain"
+            ],
+            "type": "object"
+          },
+          "description": {
+            "description": "Category description.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "featured_images": {
+            "description": "Featured images in the category.",
+            "items": {
+              "additionalProperties": true,
+              "description": "A gallery image (lean list fields) with attribution.",
+              "properties": {
+                "canonical_url": {
+                  "description": "Full-resolution image URL.",
+                  "type": "string"
+                },
+                "caption": {
+                  "description": "AI-generated caption.",
+                  "type": "string"
+                },
+                "citation": {
+                  "additionalProperties": true,
+                  "description": "Ready-to-paste attribution for this image in three formats, plus source metadata.",
+                  "properties": {
+                    "attribution_recommended": {
+                      "description": "Always true — attribution is recommended.",
+                      "type": "boolean"
+                    },
+                    "attribution_required": {
+                      "description": "True only when the license requires attribution (OWID).",
+                      "type": "boolean"
+                    },
+                    "canonical_url": {
+                      "description": "Full-resolution image URL.",
+                      "type": "string"
+                    },
+                    "html": {
+                      "description": "Attribution as HTML.",
+                      "type": "string"
+                    },
+                    "markdown": {
+                      "description": "Attribution as Markdown.",
+                      "type": "string"
+                    },
+                    "page_url": {
+                      "description": "Canonical MemeStack gallery page for the image.",
+                      "type": "string"
+                    },
+                    "plain": {
+                      "description": "Attribution as plain text.",
+                      "type": "string"
+                    },
+                    "site": {
+                      "description": "Always \"MemeStack\".",
+                      "type": "string"
+                    },
+                    "site_url": {
+                      "description": "The MemeStack site URL.",
+                      "type": "string"
+                    },
+                    "source_external_url": {
+                      "description": "External source URL (set only for OWID-sourced images).",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "source_origin": {
+                      "description": "Origin: 'owid' | 'imgflip' | '4chan' | 'telegram' | 'generated' | 'unknown' | null.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "thumbnail_url": {
+                      "description": "Thumbnail image URL.",
+                      "type": "string"
+                    },
+                    "uploader_display_name": {
+                      "description": "Uploader name, or null when absent/withheld.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "site",
+                    "page_url",
+                    "markdown",
+                    "html",
+                    "plain"
+                  ],
+                  "type": "object"
+                },
+                "created_at": {
+                  "description": "ISO 8601 creation timestamp.",
+                  "type": "string"
+                },
+                "free_tags": {
+                  "description": "Free-form tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "height": {
+                  "description": "Original height in pixels.",
+                  "type": "number"
+                },
+                "id": {
+                  "description": "Image UUID.",
+                  "type": "string"
+                },
+                "like_count": {
+                  "description": "Number of likes.",
+                  "type": "number"
+                },
+                "meme_template_name": {
+                  "description": "Recognised meme template, if any.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "page_url": {
+                  "description": "MemeStack gallery page URL.",
+                  "type": "string"
+                },
+                "save_count": {
+                  "description": "Number of saves.",
+                  "type": "number"
+                },
+                "tags": {
+                  "description": "Topic tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "thumbnail_url": {
+                  "description": "Thumbnail image URL.",
+                  "type": "string"
+                },
+                "uploader_display_name": {
+                  "description": "Uploader name, or null.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "width": {
+                  "description": "Original width in pixels.",
+                  "type": "number"
+                },
+                "zap_count": {
+                  "description": "Number of Lightning zaps.",
+                  "type": "number"
+                },
+                "zap_total_sats": {
+                  "description": "Total sats zapped.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "thumbnail_url",
+                "canonical_url",
+                "page_url",
+                "citation"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "name": {
+            "description": "Category display name.",
+            "type": "string"
+          },
+          "slug": {
+            "description": "Category slug.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "featured_images"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "tier": "free",
+        "title": "List Categories"
+      },
+      "description": "List all available image categories. Use this to discover what categories exist before calling browse_by_category.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_categories",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "All content categories.",
+        "properties": {
+          "categories": {
+            "description": "The full category list.",
+            "items": {
+              "additionalProperties": true,
+              "description": "A content category.",
+              "properties": {
+                "description": {
+                  "description": "Category description.",
+                  "type": "string"
+                },
+                "image_count": {
+                  "description": "Number of images in the category.",
+                  "type": "number"
+                },
+                "name": {
+                  "description": "Display name.",
+                  "type": "string"
+                },
+                "slug": {
+                  "description": "Category slug.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "tier": "free",
+        "title": "Get Tag Profile"
+      },
+      "description": "Get the profile for a tag (description, image count, total zaps, related tags) without fetching any images. Use browse_by_tag to also retrieve images.",
+      "inputSchema": {
+        "properties": {
+          "tag": {
+            "description": "Tag slug (e.g. \"bitcoin\", \"meme\")",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tag"
+        ],
+        "type": "object"
+      },
+      "name": "get_tag_profile",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "A tag profile (description, related tags, stats) without images.",
+        "properties": {
+          "description": {
+            "description": "Tag description.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "image_count": {
+            "description": "Number of images with this tag.",
+            "type": "number"
+          },
+          "name": {
+            "description": "Tag display name.",
+            "type": "string"
+          },
+          "related_tags": {
+            "description": "Related tag slugs.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "slug": {
+            "description": "Tag slug.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "tier": "free",
+        "title": "Get Mutation Group"
+      },
+      "description": "Get all variants of a meme template tracked on MemeStack. Returns the dominant image plus every variant in the same mutation group, with citation blocks for each. Use this to research how a meme has evolved or to find variants of a known image.",
+      "inputSchema": {
+        "properties": {
+          "image_id": {
+            "description": "Image UUID",
+            "type": "string"
+          }
+        },
+        "required": [
+          "image_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_mutation_group",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "A meme-evolution group: the dominant image plus its variants.",
+        "properties": {
+          "citations_combined": {
+            "additionalProperties": false,
+            "description": "Combined attribution for all images in this response, in three formats.",
+            "properties": {
+              "html": {
+                "description": "Numbered attribution list as HTML.",
+                "type": "string"
+              },
+              "markdown": {
+                "description": "Numbered attribution list as Markdown.",
+                "type": "string"
+              },
+              "plain": {
+                "description": "Numbered attribution list as plain text.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "markdown",
+              "html",
+              "plain"
+            ],
+            "type": "object"
+          },
+          "dominant": {
+            "additionalProperties": true,
+            "description": "A gallery image (full detail) with OCR text, dimensions, and attribution.",
+            "properties": {
+              "alt_text": {
+                "description": "Accessible alt text.",
+                "type": "string"
+              },
+              "canonical_url": {
+                "description": "Full-resolution image URL.",
+                "type": "string"
+              },
+              "caption": {
+                "description": "AI-generated caption.",
+                "type": "string"
+              },
+              "citation": {
+                "additionalProperties": true,
+                "description": "Ready-to-paste attribution for this image in three formats, plus source metadata.",
+                "properties": {
+                  "attribution_recommended": {
+                    "description": "Always true — attribution is recommended.",
+                    "type": "boolean"
+                  },
+                  "attribution_required": {
+                    "description": "True only when the license requires attribution (OWID).",
+                    "type": "boolean"
+                  },
+                  "canonical_url": {
+                    "description": "Full-resolution image URL.",
+                    "type": "string"
+                  },
+                  "html": {
+                    "description": "Attribution as HTML.",
+                    "type": "string"
+                  },
+                  "markdown": {
+                    "description": "Attribution as Markdown.",
+                    "type": "string"
+                  },
+                  "page_url": {
+                    "description": "Canonical MemeStack gallery page for the image.",
+                    "type": "string"
+                  },
+                  "plain": {
+                    "description": "Attribution as plain text.",
+                    "type": "string"
+                  },
+                  "site": {
+                    "description": "Always \"MemeStack\".",
+                    "type": "string"
+                  },
+                  "site_url": {
+                    "description": "The MemeStack site URL.",
+                    "type": "string"
+                  },
+                  "source_external_url": {
+                    "description": "External source URL (set only for OWID-sourced images).",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "source_origin": {
+                    "description": "Origin: 'owid' | 'imgflip' | '4chan' | 'telegram' | 'generated' | 'unknown' | null.",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "thumbnail_url": {
+                    "description": "Thumbnail image URL.",
+                    "type": "string"
+                  },
+                  "uploader_display_name": {
+                    "description": "Uploader name, or null when absent/withheld.",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "site",
+                  "page_url",
+                  "markdown",
+                  "html",
+                  "plain"
+                ],
+                "type": "object"
+              },
+              "created_at": {
+                "description": "ISO 8601 creation timestamp.",
+                "type": "string"
+              },
+              "free_tags": {
+                "description": "Free-form tag slugs.",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "height": {
+                "description": "Original height in pixels.",
+                "type": "number"
+              },
+              "id": {
+                "description": "Image UUID.",
+                "type": "string"
+              },
+              "like_count": {
+                "description": "Number of likes.",
+                "type": "number"
+              },
+              "meme_template_name": {
+                "description": "Recognised meme template, if any.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "mime_type": {
+                "description": "Image MIME type.",
+                "type": "string"
+              },
+              "page_url": {
+                "description": "MemeStack gallery page URL.",
+                "type": "string"
+              },
+              "quality_score": {
+                "description": "AI quality score (1-10).",
+                "type": "number"
+              },
+              "save_count": {
+                "description": "Number of saves.",
+                "type": "number"
+              },
+              "size": {
+                "description": "File size in bytes.",
+                "type": "number"
+              },
+              "tags": {
+                "description": "Topic tag slugs.",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "text_in_image": {
+                "description": "OCR transcription of any text in the image.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "thumb_height": {
+                "description": "Thumbnail height in pixels.",
+                "type": "number"
+              },
+              "thumb_width": {
+                "description": "Thumbnail width in pixels.",
+                "type": "number"
+              },
+              "thumbnail_url": {
+                "description": "Thumbnail image URL.",
+                "type": "string"
+              },
+              "updated_at": {
+                "description": "ISO 8601 last-updated timestamp.",
+                "type": "string"
+              },
+              "uploader_display_name": {
+                "description": "Uploader name, or null.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "width": {
+                "description": "Original width in pixels.",
+                "type": "number"
+              },
+              "zap_count": {
+                "description": "Number of Lightning zaps.",
+                "type": "number"
+              },
+              "zap_total_sats": {
+                "description": "Total sats zapped.",
+                "type": "number"
+              }
+            },
+            "required": [
+              "id",
+              "thumbnail_url",
+              "canonical_url",
+              "page_url",
+              "citation"
+            ],
+            "type": "object"
+          },
+          "total_variants": {
+            "description": "Number of variants.",
+            "type": "number"
+          },
+          "variants": {
+            "description": "Variant images in the group.",
+            "items": {
+              "additionalProperties": true,
+              "description": "A gallery image (lean list fields) with attribution.",
+              "properties": {
+                "canonical_url": {
+                  "description": "Full-resolution image URL.",
+                  "type": "string"
+                },
+                "caption": {
+                  "description": "AI-generated caption.",
+                  "type": "string"
+                },
+                "citation": {
+                  "additionalProperties": true,
+                  "description": "Ready-to-paste attribution for this image in three formats, plus source metadata.",
+                  "properties": {
+                    "attribution_recommended": {
+                      "description": "Always true — attribution is recommended.",
+                      "type": "boolean"
+                    },
+                    "attribution_required": {
+                      "description": "True only when the license requires attribution (OWID).",
+                      "type": "boolean"
+                    },
+                    "canonical_url": {
+                      "description": "Full-resolution image URL.",
+                      "type": "string"
+                    },
+                    "html": {
+                      "description": "Attribution as HTML.",
+                      "type": "string"
+                    },
+                    "markdown": {
+                      "description": "Attribution as Markdown.",
+                      "type": "string"
+                    },
+                    "page_url": {
+                      "description": "Canonical MemeStack gallery page for the image.",
+                      "type": "string"
+                    },
+                    "plain": {
+                      "description": "Attribution as plain text.",
+                      "type": "string"
+                    },
+                    "site": {
+                      "description": "Always \"MemeStack\".",
+                      "type": "string"
+                    },
+                    "site_url": {
+                      "description": "The MemeStack site URL.",
+                      "type": "string"
+                    },
+                    "source_external_url": {
+                      "description": "External source URL (set only for OWID-sourced images).",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "source_origin": {
+                      "description": "Origin: 'owid' | 'imgflip' | '4chan' | 'telegram' | 'generated' | 'unknown' | null.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "thumbnail_url": {
+                      "description": "Thumbnail image URL.",
+                      "type": "string"
+                    },
+                    "uploader_display_name": {
+                      "description": "Uploader name, or null when absent/withheld.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "site",
+                    "page_url",
+                    "markdown",
+                    "html",
+                    "plain"
+                  ],
+                  "type": "object"
+                },
+                "created_at": {
+                  "description": "ISO 8601 creation timestamp.",
+                  "type": "string"
+                },
+                "free_tags": {
+                  "description": "Free-form tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "height": {
+                  "description": "Original height in pixels.",
+                  "type": "number"
+                },
+                "id": {
+                  "description": "Image UUID.",
+                  "type": "string"
+                },
+                "like_count": {
+                  "description": "Number of likes.",
+                  "type": "number"
+                },
+                "meme_template_name": {
+                  "description": "Recognised meme template, if any.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "page_url": {
+                  "description": "MemeStack gallery page URL.",
+                  "type": "string"
+                },
+                "save_count": {
+                  "description": "Number of saves.",
+                  "type": "number"
+                },
+                "tags": {
+                  "description": "Topic tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "thumbnail_url": {
+                  "description": "Thumbnail image URL.",
+                  "type": "string"
+                },
+                "uploader_display_name": {
+                  "description": "Uploader name, or null.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "width": {
+                  "description": "Original width in pixels.",
+                  "type": "number"
+                },
+                "zap_count": {
+                  "description": "Number of Lightning zaps.",
+                  "type": "number"
+                },
+                "zap_total_sats": {
+                  "description": "Total sats zapped.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "thumbnail_url",
+                "canonical_url",
+                "page_url",
+                "citation"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "dominant",
+          "variants"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "tier": "free",
+        "title": "Search OCR Text"
+      },
+      "description": "Search for images by the text written or printed in them (OCR). Different from regular search — only matches the text_in_image field, not captions or tags. Use this to find screenshots of specific quotes, signs, watermarks, or memes with specific embedded text.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "Results per page (1-50, default 10)",
+            "type": "number"
+          },
+          "offset": {
+            "description": "Pagination offset",
+            "type": "number"
+          },
+          "query": {
+            "description": "Text to search for in image OCR",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_text_in_image",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "citations_combined": {
+            "additionalProperties": false,
+            "description": "Combined attribution for all images in this response, in three formats.",
+            "properties": {
+              "html": {
+                "description": "Numbered attribution list as HTML.",
+                "type": "string"
+              },
+              "markdown": {
+                "description": "Numbered attribution list as Markdown.",
+                "type": "string"
+              },
+              "plain": {
+                "description": "Numbered attribution list as plain text.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "markdown",
+              "html",
+              "plain"
+            ],
+            "type": "object"
+          },
+          "images": {
+            "description": "Images whose OCR text matched.",
+            "items": {
+              "additionalProperties": true,
+              "description": "A gallery image (lean list fields) with attribution.",
+              "properties": {
+                "canonical_url": {
+                  "description": "Full-resolution image URL.",
+                  "type": "string"
+                },
+                "caption": {
+                  "description": "AI-generated caption.",
+                  "type": "string"
+                },
+                "citation": {
+                  "additionalProperties": true,
+                  "description": "Ready-to-paste attribution for this image in three formats, plus source metadata.",
+                  "properties": {
+                    "attribution_recommended": {
+                      "description": "Always true — attribution is recommended.",
+                      "type": "boolean"
+                    },
+                    "attribution_required": {
+                      "description": "True only when the license requires attribution (OWID).",
+                      "type": "boolean"
+                    },
+                    "canonical_url": {
+                      "description": "Full-resolution image URL.",
+                      "type": "string"
+                    },
+                    "html": {
+                      "description": "Attribution as HTML.",
+                      "type": "string"
+                    },
+                    "markdown": {
+                      "description": "Attribution as Markdown.",
+                      "type": "string"
+                    },
+                    "page_url": {
+                      "description": "Canonical MemeStack gallery page for the image.",
+                      "type": "string"
+                    },
+                    "plain": {
+                      "description": "Attribution as plain text.",
+                      "type": "string"
+                    },
+                    "site": {
+                      "description": "Always \"MemeStack\".",
+                      "type": "string"
+                    },
+                    "site_url": {
+                      "description": "The MemeStack site URL.",
+                      "type": "string"
+                    },
+                    "source_external_url": {
+                      "description": "External source URL (set only for OWID-sourced images).",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "source_origin": {
+                      "description": "Origin: 'owid' | 'imgflip' | '4chan' | 'telegram' | 'generated' | 'unknown' | null.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "thumbnail_url": {
+                      "description": "Thumbnail image URL.",
+                      "type": "string"
+                    },
+                    "uploader_display_name": {
+                      "description": "Uploader name, or null when absent/withheld.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "site",
+                    "page_url",
+                    "markdown",
+                    "html",
+                    "plain"
+                  ],
+                  "type": "object"
+                },
+                "created_at": {
+                  "description": "ISO 8601 creation timestamp.",
+                  "type": "string"
+                },
+                "free_tags": {
+                  "description": "Free-form tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "height": {
+                  "description": "Original height in pixels.",
+                  "type": "number"
+                },
+                "id": {
+                  "description": "Image UUID.",
+                  "type": "string"
+                },
+                "like_count": {
+                  "description": "Number of likes.",
+                  "type": "number"
+                },
+                "meme_template_name": {
+                  "description": "Recognised meme template, if any.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "page_url": {
+                  "description": "MemeStack gallery page URL.",
+                  "type": "string"
+                },
+                "save_count": {
+                  "description": "Number of saves.",
+                  "type": "number"
+                },
+                "tags": {
+                  "description": "Topic tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "thumbnail_url": {
+                  "description": "Thumbnail image URL.",
+                  "type": "string"
+                },
+                "uploader_display_name": {
+                  "description": "Uploader name, or null.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "width": {
+                  "description": "Original width in pixels.",
+                  "type": "number"
+                },
+                "zap_count": {
+                  "description": "Number of Lightning zaps.",
+                  "type": "number"
+                },
+                "zap_total_sats": {
+                  "description": "Total sats zapped.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "thumbnail_url",
+                "canonical_url",
+                "page_url",
+                "citation"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "total": {
+            "description": "Total number of matching images.",
+            "type": "number"
+          }
+        },
+        "required": [
+          "images",
+          "total"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "tier": "free",
+        "title": "Find Meme For Text"
+      },
+      "description": "Find a meme that captures a vibe, idea, or concept. Returns ready-to-embed images with citation blocks. Use this when writing posts, articles, or social content and you need a meme to illustrate a point.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "How many memes to return (1-20, default 5)",
+            "type": "number"
+          },
+          "vibe": {
+            "description": "The vibe, topic, or idea you want a meme for",
+            "type": "string"
+          }
+        },
+        "required": [
+          "vibe"
+        ],
+        "type": "object"
+      },
+      "name": "find_meme_for_text",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "citations_combined": {
+            "additionalProperties": false,
+            "description": "Combined attribution for all images in this response, in three formats.",
+            "properties": {
+              "html": {
+                "description": "Numbered attribution list as HTML.",
+                "type": "string"
+              },
+              "markdown": {
+                "description": "Numbered attribution list as Markdown.",
+                "type": "string"
+              },
+              "plain": {
+                "description": "Numbered attribution list as plain text.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "markdown",
+              "html",
+              "plain"
+            ],
+            "type": "object"
+          },
+          "images": {
+            "description": "Memes that capture the requested vibe.",
+            "items": {
+              "additionalProperties": true,
+              "description": "A gallery image (lean list fields) with attribution.",
+              "properties": {
+                "canonical_url": {
+                  "description": "Full-resolution image URL.",
+                  "type": "string"
+                },
+                "caption": {
+                  "description": "AI-generated caption.",
+                  "type": "string"
+                },
+                "citation": {
+                  "additionalProperties": true,
+                  "description": "Ready-to-paste attribution for this image in three formats, plus source metadata.",
+                  "properties": {
+                    "attribution_recommended": {
+                      "description": "Always true — attribution is recommended.",
+                      "type": "boolean"
+                    },
+                    "attribution_required": {
+                      "description": "True only when the license requires attribution (OWID).",
+                      "type": "boolean"
+                    },
+                    "canonical_url": {
+                      "description": "Full-resolution image URL.",
+                      "type": "string"
+                    },
+                    "html": {
+                      "description": "Attribution as HTML.",
+                      "type": "string"
+                    },
+                    "markdown": {
+                      "description": "Attribution as Markdown.",
+                      "type": "string"
+                    },
+                    "page_url": {
+                      "description": "Canonical MemeStack gallery page for the image.",
+                      "type": "string"
+                    },
+                    "plain": {
+                      "description": "Attribution as plain text.",
+                      "type": "string"
+                    },
+                    "site": {
+                      "description": "Always \"MemeStack\".",
+                      "type": "string"
+                    },
+                    "site_url": {
+                      "description": "The MemeStack site URL.",
+                      "type": "string"
+                    },
+                    "source_external_url": {
+                      "description": "External source URL (set only for OWID-sourced images).",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "source_origin": {
+                      "description": "Origin: 'owid' | 'imgflip' | '4chan' | 'telegram' | 'generated' | 'unknown' | null.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "thumbnail_url": {
+                      "description": "Thumbnail image URL.",
+                      "type": "string"
+                    },
+                    "uploader_display_name": {
+                      "description": "Uploader name, or null when absent/withheld.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "site",
+                    "page_url",
+                    "markdown",
+                    "html",
+                    "plain"
+                  ],
+                  "type": "object"
+                },
+                "created_at": {
+                  "description": "ISO 8601 creation timestamp.",
+                  "type": "string"
+                },
+                "free_tags": {
+                  "description": "Free-form tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "height": {
+                  "description": "Original height in pixels.",
+                  "type": "number"
+                },
+                "id": {
+                  "description": "Image UUID.",
+                  "type": "string"
+                },
+                "like_count": {
+                  "description": "Number of likes.",
+                  "type": "number"
+                },
+                "meme_template_name": {
+                  "description": "Recognised meme template, if any.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "page_url": {
+                  "description": "MemeStack gallery page URL.",
+                  "type": "string"
+                },
+                "save_count": {
+                  "description": "Number of saves.",
+                  "type": "number"
+                },
+                "tags": {
+                  "description": "Topic tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "thumbnail_url": {
+                  "description": "Thumbnail image URL.",
+                  "type": "string"
+                },
+                "uploader_display_name": {
+                  "description": "Uploader name, or null.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "width": {
+                  "description": "Original width in pixels.",
+                  "type": "number"
+                },
+                "zap_count": {
+                  "description": "Number of Lightning zaps.",
+                  "type": "number"
+                },
+                "zap_total_sats": {
+                  "description": "Total sats zapped.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "thumbnail_url",
+                "canonical_url",
+                "page_url",
+                "citation"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "images"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "tier": "free",
+        "title": "Popular Tags"
+      },
+      "description": "List the most-used tags on MemeStack by all-time usage count. (Time-period filtering is not yet supported — tag usage is currently counted across the full lifetime of each tag.)",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "How many tags to return (1-100, default 20)",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "name": "popular_tags",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "The most-used tags by image count.",
+        "properties": {
+          "tags": {
+            "description": "Tags ordered by usage.",
+            "items": {
+              "additionalProperties": true,
+              "description": "A tag with usage stats.",
+              "properties": {
+                "name": {
+                  "description": "Display name.",
+                  "type": "string"
+                },
+                "tag": {
+                  "description": "Tag slug.",
+                  "type": "string"
+                },
+                "usage_count": {
+                  "description": "Number of images using this tag.",
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "tier": "free",
+        "title": "Tag Autocomplete"
+      },
+      "description": "Suggest tag slugs matching a prefix. Use this to verify a tag exists before filtering by it, or to discover related tags. Prefix must be ≥ 2 characters.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "Max suggestions (1-50, default 10)",
+            "type": "number"
+          },
+          "prefix": {
+            "description": "Tag prefix to autocomplete (≥ 2 characters), e.g. \"bit\" → \"bitcoin\".",
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "required": [
+          "prefix"
+        ],
+        "type": "object"
+      },
+      "name": "tag_autocomplete",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "Tag suggestions for a prefix.",
+        "properties": {
+          "tags": {
+            "description": "Suggested tags matching the prefix.",
+            "items": {
+              "additionalProperties": true,
+              "description": "A tag with usage stats.",
+              "properties": {
+                "name": {
+                  "description": "Display name.",
+                  "type": "string"
+                },
+                "tag": {
+                  "description": "Tag slug.",
+                  "type": "string"
+                },
+                "usage_count": {
+                  "description": "Number of images using this tag.",
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "tier": "free",
+        "title": "Cite Image"
+      },
+      "description": "Generate canonical attribution blocks for one or more MemeStack images. Returns markdown, HTML, and plain-text citation strings ready to paste into your output, plus a combined block for citing multiple images at once.",
+      "inputSchema": {
+        "properties": {
+          "image_ids": {
+            "description": "Up to 50 image UUIDs",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 50,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "image_ids"
+        ],
+        "type": "object"
+      },
+      "name": "cite_image",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "Per-image and combined citations for the requested image IDs.",
+        "properties": {
+          "citations": {
+            "description": "One citation per resolved image ID.",
+            "items": {
+              "additionalProperties": true,
+              "properties": {
+                "html": {
+                  "description": "Attribution as HTML.",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "Image UUID.",
+                  "type": "string"
+                },
+                "markdown": {
+                  "description": "Attribution as Markdown.",
+                  "type": "string"
+                },
+                "plain": {
+                  "description": "Attribution as plain text.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "markdown",
+                "html",
+                "plain"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "combined": {
+            "additionalProperties": false,
+            "description": "Combined attribution for all images in this response, in three formats.",
+            "properties": {
+              "html": {
+                "description": "Numbered attribution list as HTML.",
+                "type": "string"
+              },
+              "markdown": {
+                "description": "Numbered attribution list as Markdown.",
+                "type": "string"
+              },
+              "plain": {
+                "description": "Numbered attribution list as plain text.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "markdown",
+              "html",
+              "plain"
+            ],
+            "type": "object"
+          },
+          "missing_ids": {
+            "description": "Requested IDs that could not be resolved.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "citations",
+          "combined",
+          "missing_ids"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "tier": "free",
+        "title": "Reverse Image Search"
+      },
+      "description": "Find MemeStack images that look visually similar to a given image. Accepts an HTTPS image URL or a `data:image/...;base64,...` URL for bytes pasted into agent context. Returns visually-similar matches via perceptual-hash (dHash) hamming distance, with citation blocks. Heavily rate-limited (10/min/IP) since each call hashes the input.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "Max results (1-20, default 10)",
+            "type": "number"
+          },
+          "url": {
+            "description": "HTTPS image URL, or data:image/(jpeg|png|webp);base64,... URL",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "type": "object"
+      },
+      "name": "reverse_image_search",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "Visually similar gallery images for the input image, plus input metadata.",
+        "properties": {
+          "citations_combined": {
+            "additionalProperties": false,
+            "description": "Combined attribution for all images in this response, in three formats.",
+            "properties": {
+              "html": {
+                "description": "Numbered attribution list as HTML.",
+                "type": "string"
+              },
+              "markdown": {
+                "description": "Numbered attribution list as Markdown.",
+                "type": "string"
+              },
+              "plain": {
+                "description": "Numbered attribution list as plain text.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "markdown",
+              "html",
+              "plain"
+            ],
+            "type": "object"
+          },
+          "input_meta": {
+            "additionalProperties": true,
+            "description": "Computed metadata for the input image.",
+            "properties": {
+              "mime_type": {
+                "description": "Input MIME type.",
+                "type": "string"
+              },
+              "phash": {
+                "description": "Perceptual hash of the input.",
+                "type": "string"
+              },
+              "size_bytes": {
+                "description": "Input size in bytes.",
+                "type": "number"
+              }
+            },
+            "type": "object"
+          },
+          "similar": {
+            "description": "Visually similar images.",
+            "items": {
+              "additionalProperties": true,
+              "description": "A gallery image (compact fields) with a ranking score and attribution.",
+              "properties": {
+                "canonical_url": {
+                  "description": "Full-resolution image URL.",
+                  "type": "string"
+                },
+                "caption": {
+                  "description": "AI-generated caption.",
+                  "type": "string"
+                },
+                "citation": {
+                  "additionalProperties": true,
+                  "description": "Ready-to-paste attribution for this image in three formats, plus source metadata.",
+                  "properties": {
+                    "attribution_recommended": {
+                      "description": "Always true — attribution is recommended.",
+                      "type": "boolean"
+                    },
+                    "attribution_required": {
+                      "description": "True only when the license requires attribution (OWID).",
+                      "type": "boolean"
+                    },
+                    "canonical_url": {
+                      "description": "Full-resolution image URL.",
+                      "type": "string"
+                    },
+                    "html": {
+                      "description": "Attribution as HTML.",
+                      "type": "string"
+                    },
+                    "markdown": {
+                      "description": "Attribution as Markdown.",
+                      "type": "string"
+                    },
+                    "page_url": {
+                      "description": "Canonical MemeStack gallery page for the image.",
+                      "type": "string"
+                    },
+                    "plain": {
+                      "description": "Attribution as plain text.",
+                      "type": "string"
+                    },
+                    "site": {
+                      "description": "Always \"MemeStack\".",
+                      "type": "string"
+                    },
+                    "site_url": {
+                      "description": "The MemeStack site URL.",
+                      "type": "string"
+                    },
+                    "source_external_url": {
+                      "description": "External source URL (set only for OWID-sourced images).",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "source_origin": {
+                      "description": "Origin: 'owid' | 'imgflip' | '4chan' | 'telegram' | 'generated' | 'unknown' | null.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "thumbnail_url": {
+                      "description": "Thumbnail image URL.",
+                      "type": "string"
+                    },
+                    "uploader_display_name": {
+                      "description": "Uploader name, or null when absent/withheld.",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "site",
+                    "page_url",
+                    "markdown",
+                    "html",
+                    "plain"
+                  ],
+                  "type": "object"
+                },
+                "created_at": {
+                  "description": "ISO 8601 creation timestamp.",
+                  "type": "string"
+                },
+                "free_tags": {
+                  "description": "Free-form tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "height": {
+                  "description": "Original height in pixels.",
+                  "type": "number"
+                },
+                "id": {
+                  "description": "Image UUID.",
+                  "type": "string"
+                },
+                "like_count": {
+                  "description": "Number of likes.",
+                  "type": "number"
+                },
+                "meme_template_name": {
+                  "description": "Recognised meme template, if any.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "page_url": {
+                  "description": "MemeStack gallery page URL.",
+                  "type": "string"
+                },
+                "relevance_score": {
+                  "description": "Semantic-relevance score (find_related).",
+                  "type": "number"
+                },
+                "save_count": {
+                  "description": "Number of saves.",
+                  "type": "number"
+                },
+                "similarity": {
+                  "description": "Visual-similarity score (find_similar / reverse_image_search).",
+                  "type": "number"
+                },
+                "tags": {
+                  "description": "Topic tag slugs.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "thumbnail_url": {
+                  "description": "Thumbnail image URL.",
+                  "type": "string"
+                },
+                "uploader_display_name": {
+                  "description": "Uploader name, or null.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "width": {
+                  "description": "Original width in pixels.",
+                  "type": "number"
+                },
+                "zap_count": {
+                  "description": "Number of Lightning zaps.",
+                  "type": "number"
+                },
+                "zap_total_sats": {
+                  "description": "Total sats zapped.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "thumbnail_url",
+                "canonical_url",
+                "page_url",
+                "citation"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "similar"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "_meta": {
+        "agents-x402/paymentRequired": true
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "tier": "free",
+        "title": "Submit Image"
+      },
+      "description": "Submit an image to the MemeStack review queue. Paid tool — 100 sats (or USDC equivalent) per submission via the agent payment rails (x402/L402); no account or API key. IMPORTANT: there is NO refund if moderation rejects the submission (duplicate, nsfw/spam, low quality) — the fee is the anti-spam mechanism. Accepted images await human review before publication. Accepts an HTTPS image URL or a data:image/...;base64 URL (JPEG/PNG/WebP, max 8MB). Optional caption/tags/attribution are hints shown to the AI tagger and moderators — never published verbatim. If the call fails or times out, retry with the SAME payment proof to resume — one payment delivers at most one submission and is never charged twice (up to 10 delivery attempts per payment; a corrected image_url is allowed while no submission has been created yet). Note for x402 clients: 100 sats exceeds the agents-SDK default per-call cap of $0.10 whenever BTC trades above $100k — raise maxPaymentValue in withX402Client if payment is refused client-side.",
+      "inputSchema": {
+        "properties": {
+          "attribution": {
+            "description": "Optional credit line for the original creator/source (shown to moderators, not published).",
+            "maxLength": 200,
+            "type": "string"
+          },
+          "caption": {
+            "description": "Optional caption hint for the AI tagger (admin-visible, never published verbatim).",
+            "maxLength": 200,
+            "type": "string"
+          },
+          "image_url": {
+            "description": "HTTPS image URL, or data:image/(jpeg|png|webp);base64,... URL. Max 8MB.",
+            "type": "string"
+          },
+          "tags": {
+            "description": "Optional tag hints (max 10).",
+            "items": {
+              "maxLength": 40,
+              "type": "string"
+            },
+            "maxItems": 10,
+            "type": "array"
+          }
+        },
+        "required": [
+          "image_url"
+        ],
+        "type": "object"
+      },
+      "name": "submit_image",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "Outcome of a paid submit_image call: accepted into the human review queue.",
+        "properties": {
+          "image_id": {
+            "description": "UUID of the submitted image.",
+            "type": "string"
+          },
+          "page_url": {
+            "description": "Gallery URL where the image will be published if approved.",
+            "type": "string"
+          },
+          "status": {
+            "description": "Always 'pending_review' on success — accepted, awaiting human moderation.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "image_id",
+          "status"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "_meta": {
+        "agents-x402/paymentRequired": true
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "tier": "free",
+        "title": "Generate Meme"
+      },
+      "description": "Generate a new image from a text prompt using AI (Grok Imagine). Paid tool — billed per call via the agent payment rails (x402/L402); not covered by any free quota. Generation runs asynchronously on the server and this call polls until it completes, up to ~90 seconds. If you get a \"still running\" error, call the tool again with the SAME payment proof to resume polling — you will never be charged twice for one payment. Note for x402 clients: \"quality\" mode (~$0.15) exceeds the agents-SDK default per-call cap of $0.10 — raise maxPaymentValue in withX402Client to use it.",
+      "inputSchema": {
+        "properties": {
+          "aspect_ratio": {
+            "description": "Output image aspect ratio (default \"1:1\").",
+            "enum": [
+              "1:1",
+              "3:4",
+              "16:9"
+            ],
+            "type": "string"
+          },
+          "mode": {
+            "description": "Generation quality tier — \"standard\" (default, cheaper) or \"quality\" (higher fidelity, costs more).",
+            "enum": [
+              "standard",
+              "quality"
+            ],
+            "type": "string"
+          },
+          "prompt": {
+            "description": "Text description of the image to generate (max 2000 characters).",
+            "maxLength": 2000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "type": "object"
+      },
+      "name": "generate_meme",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "The AI-generated image produced by a paid generate_meme call.",
+        "properties": {
+          "caption": {
+            "description": "AI-generated caption for the image.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "image_id": {
+            "description": "UUID of the generated image.",
+            "type": "string"
+          },
+          "image_url": {
+            "description": "Direct serve URL for the full generated image bytes.",
+            "type": "string"
+          },
+          "tags": {
+            "description": "Scored tags assigned to the generated image.",
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "thumbnail_url": {
+            "description": "Thumbnail URL for the generated image.",
+            "type": "string"
+          },
+          "url": {
+            "description": "MemeStack gallery page URL for the generated image.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "image_id",
+          "url",
+          "image_url",
+          "thumbnail_url"
+        ],
+        "type": "object"
+      }
+    }
+  ],
+  "url": "https://mcp.memestack.ai/mcp"
+}

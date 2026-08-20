@@ -1,0 +1,96 @@
+{
+  "canon_version": "1",
+  "full_hash": "f67889d58e72cfe146e02c275f13c7269e00e493547644cc57412e35f7676388",
+  "name": "ai.eosl/eosl",
+  "observed_at": "2026-08-20T09:11:44.506259Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 5,
+  "tools": [
+    {
+      "description": "Look up one hardware part number or model name in the EOSL.ai database (read-only, no auth; for many parts use bulk_check). Returns support status, End-of-Sale and End-of-Service-Life dates, support runway score, and the primary vendor bulletin URL backing the dates. Matching is exact, then punctuation-insensitive, then Fortinet short-SKU aliases (FG-60E -> FortiGate-60E); a model/family name (e.g. \"7010TX-48\") that matches no SKU returns the family-level record, flagged matchedVia:family-name. Anything else returns found:false rather than a guessed date.",
+      "inputSchema": {
+        "properties": {
+          "part_number": {
+            "description": "Vendor part number / SKU, e.g. \"WS-C3850-48P-S\" or \"FG-100F\".",
+            "type": "string"
+          },
+          "vendor": {
+            "description": "Optional vendor hint, e.g. \"Cisco\". Restricts the match to that vendor.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "part_number"
+        ],
+        "type": "object"
+      },
+      "name": "lookup_part"
+    },
+    {
+      "description": "Check up to 200 part numbers in one call (read-only, no auth; for a single part use lookup_part). Returns a per-part row (status, EOSL date, source URL, page URL) plus summary counts: past, endingSoon, supported, active, notFound. Never partial and never destructive: unknown or malformed entries do not fail the call, each simply returns found:false in its row.",
+      "inputSchema": {
+        "properties": {
+          "part_numbers": {
+            "description": "Part numbers to check; max 200 after case-insensitive deduplication. Punctuation differences (dashes, dots, spaces) are tolerated by the matcher, so raw inventory strings are fine.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 200,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "part_numbers"
+        ],
+        "type": "object"
+      },
+      "name": "bulk_check"
+    },
+    {
+      "description": "Search tracked product families by vendor, product line, or series name (case-insensitive substring, e.g. \"nexus 9300\"). Read-only. Returns up to 10 families with status, EOSL window, and page URL. Use this for discovery when you have a name; for an exact part number use lookup_part, and use get_family with a returned slug for the full record.",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "description": "Search text, 1-120 characters.",
+            "maxLength": 120,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_models"
+    },
+    {
+      "description": "Fetch the full source-backed record for one product family by slug (from search_models or lookup_part pageUrl): lifecycle dates per SKU group, every part number, support runway score factors, and the vendor bulletin URLs. Read-only; an unknown slug returns found:false with a hint, never an error.",
+      "inputSchema": {
+        "properties": {
+          "slug": {
+            "description": "Family slug, e.g. \"cisco-catalyst-3850\".",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_family"
+    },
+    {
+      "description": "List all vendors tracked by EOSL.ai with family counts and vendor page URLs. Read-only, no parameters. Use this first to check whether a vendor is covered at all; for specific models use search_models, for a part number use lookup_part.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_vendors"
+    }
+  ],
+  "url": "https://eosl.ai/mcp"
+}

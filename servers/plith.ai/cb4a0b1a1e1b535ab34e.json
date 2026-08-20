@@ -1,0 +1,1669 @@
+{
+  "canon_version": "1",
+  "full_hash": "5500298510599741cc87c7d35baa3bbf45a3f6c4363bbe4bd968391fd178fed2",
+  "name": "ai.plith/plith",
+  "observed_at": "2026-08-20T09:12:27.052800Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 15,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Check for duplicate tasks"
+      },
+      "description": "Before executing any LLM task, check if an identical or semantically similar task has already been completed. Returns cached result on hit, saving one LLM call. On a miss, execute your task and call dedupq_complete to cache the result for future hits. Costs 1 credit.",
+      "discoverable": true,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "description": "The task content to check for duplicates. This is hashed and embedded for matching.",
+            "type": "string"
+          },
+          "hash_only": {
+            "description": "If true, skip vector similarity search and use exact hash matching only. Default: false.",
+            "type": "boolean"
+          },
+          "similarity_threshold": {
+            "description": "Cosine similarity threshold for semantic matching, 0.0 to 1.0. Default: 0.80.",
+            "type": "number"
+          },
+          "task_id": {
+            "description": "Optional caller task ID for tracing and cross-referencing with BurnRate.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "content"
+        ],
+        "type": "object"
+      },
+      "name": "dedupq_check",
+      "outputSchema": {
+        "properties": {
+          "cache_age_seconds": {
+            "type": "number"
+          },
+          "cache_hit": {
+            "type": "string"
+          },
+          "content_hash": {
+            "type": "string"
+          },
+          "credits_remaining": {
+            "type": "number"
+          },
+          "credits_used": {
+            "type": "number"
+          },
+          "fallback_behavior": {
+            "type": "string"
+          },
+          "match": {
+            "properties": {
+              "cached_at": {
+                "type": "string"
+              },
+              "match_type": {
+                "type": "string"
+              },
+              "similarity": {
+                "type": "number"
+              },
+              "task_id": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "status": {
+            "description": "hit | miss | in_progress",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "suite": "operations"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Store completed task result"
+      },
+      "description": "After executing a task, store the result so future identical or similar tasks return a cache hit via dedupq_check. Costs 2 credits.",
+      "discoverable": true,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "description": "Original task content. Used to compute hash and embedding for future matching.",
+            "type": "string"
+          },
+          "hash_only": {
+            "description": "If true, skip embedding generation. Default: false.",
+            "type": "boolean"
+          },
+          "result": {
+            "description": "The task result to cache. Can be any JSON value."
+          },
+          "task_id": {
+            "description": "Optional task ID. Used as the database row ID if provided.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "content",
+          "result"
+        ],
+        "type": "object"
+      },
+      "name": "dedupq_complete",
+      "outputSchema": {
+        "properties": {
+          "content_hash": {
+            "type": "string"
+          },
+          "credits_remaining": {
+            "type": "number"
+          },
+          "credits_used": {
+            "type": "number"
+          },
+          "fallback_behavior": {
+            "type": "string"
+          },
+          "has_embedding": {
+            "type": "boolean"
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "stored": {
+            "type": "boolean"
+          },
+          "task_id": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "suite": "operations"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Estimate LLM cost for a plan"
+      },
+      "description": "Before executing a multi-step agent plan, estimate the total LLM cost. Returns per-step breakdown and optimization suggestions. If the estimate exceeds your budget, pipe the same plan into burnrate_optimize. Costs 1 credit.",
+      "discoverable": true,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "plan": {
+            "description": "Array of plan steps with provider, model, and token estimates.",
+            "items": {
+              "properties": {
+                "cache_read_tokens": {
+                  "description": "Optional. Cached prompt tokens for providers with prompt caching.",
+                  "type": "number"
+                },
+                "estimated_input_tokens": {
+                  "description": "Estimated prompt token count.",
+                  "type": "number"
+                },
+                "estimated_output_tokens": {
+                  "description": "Estimated completion token count.",
+                  "type": "number"
+                },
+                "model": {
+                  "description": "Model name: claude-sonnet-4-6, gpt-4o, etc.",
+                  "type": "string"
+                },
+                "provider": {
+                  "description": "LLM provider: anthropic, openai, google, etc.",
+                  "type": "string"
+                },
+                "search_calls": {
+                  "description": "Optional. Number of grounding/search calls (e.g. Gemini Search).",
+                  "type": "number"
+                },
+                "step": {
+                  "description": "Step identifier — string label or number.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "step",
+                "provider",
+                "model",
+                "estimated_input_tokens",
+                "estimated_output_tokens"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "plan"
+        ],
+        "type": "object"
+      },
+      "name": "burnrate_estimate",
+      "outputSchema": {
+        "properties": {
+          "credits_remaining": {
+            "type": "number"
+          },
+          "credits_used": {
+            "type": "number"
+          },
+          "estimate": {
+            "properties": {
+              "estimate_complete": {
+                "type": "boolean"
+              },
+              "pricing_as_of": {
+                "type": "string"
+              },
+              "pricing_source": {
+                "type": "string"
+              },
+              "recognized_step_count": {
+                "type": "number"
+              },
+              "step_count": {
+                "type": "number"
+              },
+              "steps": {
+                "items": {
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "total_cost_usd": {
+                "type": "number"
+              },
+              "total_cost_usd_formatted": {
+                "type": "string"
+              },
+              "unrecognized_models": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "fallback_behavior": {
+            "type": "string"
+          },
+          "optimization_suggestions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "request_id": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "suite": "operations"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Record actual LLM spend"
+      },
+      "description": "Log the actual cost of an LLM call after execution. Call this after every LLM request to build calibration data that improves burnrate_estimate accuracy over time. Free — no credits charged. Returns the recorded cost entry with computed margin versus the prior estimate when one exists for this model and token range.",
+      "discoverable": true,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "cache_read_tokens": {
+            "description": "Optional. Cache-read tokens.",
+            "type": "number"
+          },
+          "input_tokens": {
+            "description": "Actual prompt tokens used. Must be >= 0.",
+            "type": "number"
+          },
+          "model": {
+            "description": "Model identifier as returned by the provider. Examples: claude-sonnet-4-6, gpt-4o, gemini-2.0-flash, mistral-large-latest. Unknown models are accepted but cost may show as $0.",
+            "type": "string"
+          },
+          "output_tokens": {
+            "description": "Actual completion tokens used. Must be >= 0.",
+            "type": "number"
+          },
+          "provider": {
+            "description": "LLM provider identifier. Supported: anthropic, openai, google, mistral, cohere, deepseek, together, fireworks, groq. Must match the provider of the model used.",
+            "type": "string"
+          },
+          "task_id": {
+            "description": "Optional task ID for cross-referencing spend with DedupQ deduplication results. Use the same task_id passed to dedupq_check to link cost tracking with deduplication.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "model",
+          "input_tokens",
+          "output_tokens"
+        ],
+        "type": "object"
+      },
+      "name": "burnrate_track",
+      "outputSchema": {
+        "properties": {
+          "actual_cost_usd": {
+            "type": "number"
+          },
+          "actual_cost_usd_formatted": {
+            "type": "string"
+          },
+          "credits_remaining": {
+            "type": "number"
+          },
+          "credits_used": {
+            "type": "number"
+          },
+          "fallback_behavior": {
+            "type": "string"
+          },
+          "input_tokens": {
+            "type": "number"
+          },
+          "model": {
+            "type": "string"
+          },
+          "output_tokens": {
+            "type": "number"
+          },
+          "pricing_found": {
+            "type": "boolean"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "record_id": {
+            "type": "string"
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "tracked": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "suite": "operations"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Optimize plan for lower cost"
+      },
+      "description": "Get a cheaper equivalent plan by substituting models with lower-cost alternatives. Call after burnrate_estimate if the estimated cost exceeds your budget. Returns the optimized plan with substituted models, new per-step costs, total savings, and whether the target_budget is met. Optionally set target_budget to constrain the optimization. Costs 1 credit.",
+      "discoverable": true,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "plan": {
+            "description": "Array of plan steps. Same schema as burnrate_estimate: each step needs step, provider, model, estimated_input_tokens, estimated_output_tokens.",
+            "items": {
+              "properties": {
+                "estimated_input_tokens": {
+                  "description": "Estimated input tokens.",
+                  "type": "number"
+                },
+                "estimated_output_tokens": {
+                  "description": "Estimated output tokens.",
+                  "type": "number"
+                },
+                "model": {
+                  "description": "Model name.",
+                  "type": "string"
+                },
+                "provider": {
+                  "description": "LLM provider.",
+                  "type": "string"
+                },
+                "step": {
+                  "description": "Step identifier — string label or number.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "step",
+                "provider",
+                "model",
+                "estimated_input_tokens",
+                "estimated_output_tokens"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "target_budget": {
+            "description": "Optional. Target total cost in USD.",
+            "type": "number"
+          }
+        },
+        "required": [
+          "plan"
+        ],
+        "type": "object"
+      },
+      "name": "burnrate_optimize",
+      "outputSchema": {
+        "properties": {
+          "credits_remaining": {
+            "type": "number"
+          },
+          "credits_used": {
+            "type": "number"
+          },
+          "fallback_behavior": {
+            "type": "string"
+          },
+          "optimized": {
+            "properties": {
+              "total_cost_usd": {
+                "type": "number"
+              },
+              "total_cost_usd_formatted": {
+                "type": "string"
+              },
+              "total_savings_pct": {
+                "type": "number"
+              },
+              "total_savings_usd": {
+                "type": "number"
+              }
+            },
+            "type": "object"
+          },
+          "original": {
+            "properties": {
+              "total_cost_usd": {
+                "type": "number"
+              },
+              "total_cost_usd_formatted": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "steps": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "suggestions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "suite": "operations"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get daily spend and budget"
+      },
+      "description": "Get today's tracked LLM spend, per-model breakdown, projection, and budget alerts. Free — no credits charged.",
+      "discoverable": true,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "daily_limit": {
+            "description": "Optional. Daily budget in USD (e.g., 10.0 for a $10/day cap). Enables budget alerts and remaining-balance calculation.",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "name": "burnrate_budget",
+      "outputSchema": {
+        "properties": {
+          "alerts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "credits_remaining": {
+            "type": "number"
+          },
+          "credits_used": {
+            "type": "number"
+          },
+          "date": {
+            "type": "string"
+          },
+          "fallback_behavior": {
+            "type": "string"
+          },
+          "projection": {
+            "properties": {
+              "hourly_rate_usd": {
+                "type": "number"
+              },
+              "hours_remaining": {
+                "type": "number"
+              },
+              "projected_day_total_usd": {
+                "type": "number"
+              }
+            },
+            "type": "object"
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "spend": {
+            "properties": {
+              "by_model": {
+                "items": {
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "total_calls": {
+                "type": "number"
+              },
+              "total_usd": {
+                "type": "number"
+              },
+              "total_usd_formatted": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "suite": "operations"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Validate agent output"
+      },
+      "description": "After your agent generates output, validate it against your rules before shipping. Runs deterministic checks (regex, JSON schema, syntax) plus optional LLM-powered tone and factual analysis. Returns a structured verdict (pass, warn, or fail) with a 0-100 score and per-check issue details. Use qualitygate_trends to spot recurring failure patterns over time. Variable cost: 1 credit per deterministic check, 8 credits per LLM check.",
+      "discoverable": true,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "check_types": {
+            "description": "Checks to run. Auto-inferred if omitted.",
+            "items": {
+              "enum": [
+                "directive_compliance",
+                "schema_validation",
+                "code_syntax",
+                "tone",
+                "factual_claims"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "directives": {
+            "description": "Directive objects. Types: must_include, must_not_include, must_match, must_not_match, must_contain, must_not_contain, min_length, max_length.",
+            "items": {
+              "properties": {
+                "name": {
+                  "description": "Optional directive name.",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "Directive type.",
+                  "type": "string"
+                },
+                "value": {
+                  "description": "Directive value — string pattern, regex, keyword array (as comma-separated string), or number (as string). Interpreted based on directive type.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type",
+                "value"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "language": {
+            "description": "Code language for syntax check: json, python, javascript, typescript.",
+            "type": "string"
+          },
+          "output": {
+            "description": "The agent output text to validate.",
+            "type": "string"
+          },
+          "override": {
+            "description": "Force pass. Requires override_reason.",
+            "type": "boolean"
+          },
+          "override_reason": {
+            "description": "Required when override is true.",
+            "type": "string"
+          },
+          "schema": {
+            "description": "JSON Schema to validate output against.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "output"
+        ],
+        "type": "object"
+      },
+      "name": "qualitygate_validate",
+      "outputSchema": {
+        "properties": {
+          "checks_run": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "credits_remaining": {
+            "type": "number"
+          },
+          "credits_used": {
+            "type": "number"
+          },
+          "fallback_behavior": {
+            "type": "string"
+          },
+          "issues": {
+            "items": {
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "summary": {
+            "properties": {
+              "errors": {
+                "type": "number"
+              },
+              "total": {
+                "type": "number"
+              },
+              "warnings": {
+                "type": "number"
+              }
+            },
+            "type": "object"
+          },
+          "verdict": {
+            "enum": [
+              "pass",
+              "warn",
+              "fail"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "suite": "governance"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Check action against policies"
+      },
+      "description": "Evaluate a proposed agent action against your governance policies. Returns allow or deny with the matched policy reason. Requires at least one active policy created via guardrail_create_policy. Deterministic rule evaluation — no LLM. Costs 1 credit.",
+      "discoverable": true,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_id": {
+            "description": "Agent identifier.",
+            "type": "string"
+          },
+          "proposed_action": {
+            "description": "Action to evaluate. Must contain a 'type' field. Example: {\"type\": \"http_request\", \"url\": \"https://external.example.com\"} or {\"type\": \"file_write\", \"path\": \"/etc/config\"}.",
+            "properties": {
+              "type": {
+                "description": "Action type: http_request, delete_file, send_email, etc.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "agent_id",
+          "proposed_action"
+        ],
+        "type": "object"
+      },
+      "name": "guardrail_check",
+      "outputSchema": {
+        "properties": {
+          "audit_id": {
+            "type": "string"
+          },
+          "credits_remaining": {
+            "type": "number"
+          },
+          "credits_used": {
+            "type": "number"
+          },
+          "decision": {
+            "enum": [
+              "allow",
+              "deny",
+              "stub"
+            ],
+            "type": "string"
+          },
+          "fallback_behavior": {
+            "type": "string"
+          },
+          "policy_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "request_id": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "suite": "governance"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Create governance policy"
+      },
+      "description": "Create a persistent governance policy that guardrail_check evaluates on every subsequent call. Define rules using and/or/not operators over action types, resource patterns, and budget thresholds. Call this before using guardrail_check — checks require at least one active policy. Policies persist until explicitly deleted. Duplicate policy names return an error. Returns the created policy with its ID and active status.",
+      "discoverable": true,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "action_types": {
+            "description": "Optional. Restrict this policy to only evaluate when proposed_action.type matches one of these values. Examples: ['file_write', 'api_call', 'db_delete']. Omit to apply the policy to all action types regardless of type field.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "description": {
+            "description": "Optional human-readable summary of what this policy enforces. Returned in guardrail_check responses and guardrail_list_policies output for auditability.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Unique policy name per org. Examples: 'no-delete-in-prod', 'budget-cap-50', 'pii-block'.",
+            "type": "string"
+          },
+          "priority": {
+            "description": "Optional. Evaluation order. Default: 0.",
+            "type": "number"
+          },
+          "rules": {
+            "description": "Array of rule objects evaluated against the proposed_action in guardrail_check. Leaf operators: eq, starts_with, contains, gt, lt (compare field to value). Compound operators: and, or, not (nest sub-rules in a rules array). Example: [{operator:'eq', field:'type', value:'file_write'}] blocks all file writes. Nested example: [{operator:'and', rules:[{operator:'eq',field:'type',value:'api_call'},{operator:'contains',field:'url',value:'prod'}]}] blocks prod API calls.",
+            "items": {
+              "properties": {
+                "field": {
+                  "description": "Field path on proposed_action (e.g. 'action_type', 'path', 'amount').",
+                  "type": "string"
+                },
+                "operator": {
+                  "description": "Rule operator: eq | starts_with | contains | gt | lt | and | or | not.",
+                  "type": "string"
+                },
+                "rules": {
+                  "description": "Nested rules for compound operators (and/or/not).",
+                  "type": "array"
+                },
+                "value": {
+                  "description": "Comparison value for leaf operators. String, number, or boolean as string.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "operator"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "rules"
+        ],
+        "type": "object"
+      },
+      "name": "guardrail_create_policy",
+      "outputSchema": {
+        "properties": {
+          "credits_remaining": {
+            "type": "number"
+          },
+          "credits_used": {
+            "type": "number"
+          },
+          "fallback_behavior": {
+            "type": "string"
+          },
+          "policy": {
+            "properties": {
+              "action_types": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "created_at": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "priority": {
+                "type": "number"
+              },
+              "rules": {
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "request_id": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "suite": "governance"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Query known failure patterns"
+      },
+      "description": "Check for known failure patterns before executing a task type. Returns pitfalls with severity, fix suggestions, and confidence scores. After your agent runs, submit failures via pitfalldb_report so others benefit. Costs 2 credits.",
+      "discoverable": true,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "filters": {
+            "description": "Optional filters.",
+            "properties": {
+              "framework": {
+                "description": "Framework.",
+                "type": "string"
+              },
+              "language": {
+                "description": "Programming language.",
+                "type": "string"
+              },
+              "provider": {
+                "description": "LLM provider.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "task_description": {
+            "description": "Optional. Natural-language task description for semantic search.",
+            "type": "string"
+          },
+          "task_type": {
+            "description": "Task category: code_generation, web_search, data_analysis, etc.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_type"
+        ],
+        "type": "object"
+      },
+      "name": "pitfalldb_query",
+      "outputSchema": {
+        "properties": {
+          "credits_remaining": {
+            "type": "number"
+          },
+          "credits_used": {
+            "type": "number"
+          },
+          "fallback_behavior": {
+            "type": "string"
+          },
+          "pitfalls": {
+            "items": {
+              "properties": {
+                "description": {
+                  "type": "string"
+                },
+                "fix": {
+                  "type": "string"
+                },
+                "fix_confidence": {
+                  "type": "number"
+                },
+                "frequency": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "reports": {
+                  "type": "number"
+                },
+                "severity": {
+                  "type": "string"
+                },
+                "tags": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "total_matching": {
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "suite": "operations"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Report an agent failure"
+      },
+      "description": "Report an agent failure. PII-scrubbed before storage. Linked to existing pitfalls if similar. Free — no credits charged.",
+      "discoverable": true,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "failure": {
+            "description": "Failure details.",
+            "properties": {
+              "error_message": {
+                "description": "Error message (PII-scrubbed).",
+                "type": "string"
+              },
+              "error_type": {
+                "description": "Error category: tool_call_ignored, syntax_error, etc.",
+                "type": "string"
+              },
+              "fix_applied": {
+                "description": "Fix applied (PII-scrubbed).",
+                "type": "string"
+              },
+              "fix_worked": {
+                "description": "Whether the fix worked.",
+                "type": "boolean"
+              },
+              "framework": {
+                "description": "Framework.",
+                "type": "string"
+              },
+              "language": {
+                "description": "Programming language.",
+                "type": "string"
+              },
+              "provider": {
+                "description": "LLM provider.",
+                "type": "string"
+              },
+              "root_cause": {
+                "description": "Root cause analysis (PII-scrubbed).",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "task_description": {
+            "description": "Description of the failed task.",
+            "type": "string"
+          },
+          "task_type": {
+            "description": "Task category.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_type",
+          "task_description",
+          "failure"
+        ],
+        "type": "object"
+      },
+      "name": "pitfalldb_report",
+      "outputSchema": {
+        "properties": {
+          "credits_remaining": {
+            "type": "number"
+          },
+          "credits_used": {
+            "type": "number"
+          },
+          "fallback_behavior": {
+            "type": "string"
+          },
+          "linked_pitfall_id": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "report_id": {
+            "type": "string"
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "verified": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "suite": "operations"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Plan a Rigor workflow"
+      },
+      "description": "Before executing a complex task, get a structured workflow plan with per-step cost estimates. Classifies your task, selects the optimal framework sequence, and returns the full plan without executing anything. Free — no credits charged.",
+      "discoverable": true,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "preferences": {
+            "description": "Optional workflow preferences.",
+            "properties": {
+              "add_frameworks": {
+                "description": "Inject additional frameworks into the plan.",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "approval_before_step": {
+                "description": "Zero-based step indices where approval gates are inserted.",
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "max_budget_usd": {
+                "description": "Budget ceiling in USD. Triggers warning if plan exceeds this.",
+                "type": "number"
+              },
+              "only_frameworks": {
+                "description": "Restrict plan to only these frameworks (mutex with skip_frameworks).",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "require_approval": {
+                "description": "Pause at pending_approval before the final step.",
+                "type": "boolean"
+              },
+              "rigor_level": {
+                "description": "Review depth. Default auto-detected from task complexity.",
+                "enum": [
+                  "quick",
+                  "standard",
+                  "thorough"
+                ],
+                "type": "string"
+              },
+              "skip_frameworks": {
+                "description": "Framework names to exclude from the plan.",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "task_description": {
+            "description": "Natural language description of the task. Be specific — include what you want produced, constraints, and context. Example: 'Design a caching layer for our API gateway with Redis integration.'",
+            "type": "string"
+          },
+          "task_type": {
+            "description": "Optional hint to bypass automatic classification. Values: solution_design, requirements_analysis, code_implementation, code_review, bug_fix, root_cause_analysis, incident_response, deployment_execution, competitive_scan, financial_analysis, research_task, documentation, governance_change, compliance_audit, data_security_assessment, performance_optimization, user_story_definition, implementation_prompt_generation.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_description"
+        ],
+        "type": "object"
+      },
+      "name": "rigor_plan",
+      "outputSchema": {
+        "properties": {
+          "generated_title": {
+            "type": "string"
+          },
+          "ok": {
+            "type": "boolean"
+          },
+          "plan": {
+            "properties": {
+              "alternatives": {
+                "type": "object"
+              },
+              "classification": {
+                "properties": {
+                  "task_type": {
+                    "type": "string"
+                  },
+                  "value_class": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "cost": {
+                "properties": {
+                  "credits": {
+                    "type": "number"
+                  },
+                  "range": {
+                    "type": "object"
+                  },
+                  "usd": {
+                    "type": "number"
+                  }
+                },
+                "type": "object"
+              },
+              "info": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "rigor_level": {
+                "type": "string"
+              },
+              "sequence": {
+                "items": {
+                  "properties": {
+                    "estimated_credits": {
+                      "type": "number"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "step": {
+                      "type": "number"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "warnings": {
+                "items": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "suggestion": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "workflow_id": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "suite": "rigor"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Execute a Rigor workflow"
+      },
+      "description": "Execute a structured workflow end-to-end. Call rigor_plan first (free) to preview the step sequence and cost estimate before committing credits. Classifies the task, selects the optimal tool sequence, and executes each step with the right LLM model. Returns a complete deliverable — solution designs, competitive analyses, governance documents, and more. Supports SSE streaming for real-time progress, webhook callback, or polling.",
+      "discoverable": true,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "context": {
+            "description": "Additional context for the workflow.",
+            "properties": {
+              "additional_context": {
+                "description": "Free-form context the workflow steps can reference.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "delivery": {
+            "description": "Delivery method. Default: polling (MCP clients typically can't handle SSE).",
+            "properties": {
+              "method": {
+                "description": "sse | webhook | polling. Default for MCP: polling.",
+                "type": "string"
+              },
+              "webhook_url": {
+                "description": "Required if method is webhook. Must be HTTPS.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "preferences": {
+            "description": "Optional workflow preferences.",
+            "properties": {
+              "max_budget_usd": {
+                "description": "Maximum budget in USD.",
+                "type": "number"
+              },
+              "rigor_level": {
+                "description": "quick | standard (default) | thorough. Controls analysis depth and cost.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "task_description": {
+            "description": "Natural language description of the task. Be specific — include what you want produced, constraints, and context. Example: 'Design a caching layer for our API gateway with Redis integration.'",
+            "type": "string"
+          },
+          "task_type": {
+            "description": "Optional hint to bypass automatic classification. Values: solution_design, requirements_analysis, code_implementation, code_review, bug_fix, root_cause_analysis, incident_response, deployment_execution, competitive_scan, financial_analysis, research_task, documentation, governance_change, compliance_audit, data_security_assessment, performance_optimization, user_story_definition, implementation_prompt_generation.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_description"
+        ],
+        "type": "object"
+      },
+      "name": "rigor_execute",
+      "outputSchema": {
+        "properties": {
+          "available_modes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "delivery_mode": {
+            "type": "string"
+          },
+          "estimated_credits": {
+            "type": "number"
+          },
+          "ok": {
+            "type": "boolean"
+          },
+          "poll_url": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "task_type": {
+            "type": "string"
+          },
+          "value_class": {
+            "type": "string"
+          },
+          "workflow_id": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "suite": "rigor"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Check workflow status"
+      },
+      "description": "Check the status of a running or completed Rigor workflow. Returns progress, step results, and the full deliverable when complete. Use after rigor_execute with polling delivery to retrieve results.",
+      "discoverable": true,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "workflow_id": {
+            "description": "The workflow ID returned by rigor_execute (format: wr_xxx).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workflow_id"
+        ],
+        "type": "object"
+      },
+      "name": "rigor_status",
+      "outputSchema": {
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "workflow": {
+            "properties": {
+              "actual_steps_executed": {
+                "type": "number"
+              },
+              "completed_at": {
+                "type": "string"
+              },
+              "completed_step_summaries": {
+                "items": {
+                  "properties": {
+                    "framework": {
+                      "type": "string"
+                    },
+                    "model": {
+                      "type": "string"
+                    },
+                    "step": {
+                      "type": "number"
+                    },
+                    "summary": {
+                      "type": "string"
+                    },
+                    "tool": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "created_at": {
+                "type": "string"
+              },
+              "credits_used": {
+                "type": "number"
+              },
+              "current_step": {
+                "type": "number"
+              },
+              "deliverable": {
+                "properties": {
+                  "sections": {
+                    "items": {
+                      "properties": {
+                        "content": {
+                          "type": "string"
+                        },
+                        "heading": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "title": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "error": {
+                "type": "string"
+              },
+              "generated_title": {
+                "type": "string"
+              },
+              "quality_review": {
+                "properties": {
+                  "path_to_100": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "score": {
+                    "type": "number"
+                  },
+                  "summary": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "status": {
+                "type": "string"
+              },
+              "task_type": {
+                "type": "string"
+              },
+              "total_steps": {
+                "type": "number"
+              },
+              "workflow_id": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "suite": "rigor"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List Rigor workflows"
+      },
+      "description": "List all Rigor workflows for your organization with filtering and pagination. Returns status, progress, capacity usage, and available actions per workflow. Use to monitor workflow state, understand concurrent limit usage, and identify stuck or completed workflows.",
+      "discoverable": true,
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "counts_toward_limit": {
+            "description": "Filter to workflows counting toward the concurrent limit",
+            "enum": [
+              "true",
+              "false"
+            ],
+            "type": "string"
+          },
+          "cursor": {
+            "description": "Pagination cursor (created_at timestamp from previous page)",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Page size (default 20, max 100)",
+            "type": "number"
+          },
+          "status": {
+            "description": "Filter by status (comma-separated). Valid values: executing, step_executing, completed, failed, halted, pending_approval, cancelled. E.g. \"halted,failed,pending_approval\"",
+            "type": "string"
+          },
+          "task_type": {
+            "description": "Filter by classified task type",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "rigor_workflows",
+      "outputSchema": {
+        "properties": {
+          "concurrent_summary": {
+            "properties": {
+              "active": {
+                "type": "number"
+              },
+              "limit": {
+                "type": "number"
+              },
+              "remaining": {
+                "type": "number"
+              }
+            },
+            "type": "object"
+          },
+          "credits_remaining": {
+            "type": "number"
+          },
+          "ok": {
+            "type": "boolean"
+          },
+          "pagination": {
+            "properties": {
+              "cursor": {
+                "type": "string"
+              },
+              "has_more": {
+                "type": "boolean"
+              },
+              "limit": {
+                "type": "number"
+              },
+              "total_count": {
+                "type": "number"
+              }
+            },
+            "type": "object"
+          },
+          "workflows": {
+            "items": {
+              "properties": {
+                "available_actions": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "completed_at": {
+                  "type": "string"
+                },
+                "counts_toward_limit": {
+                  "type": "boolean"
+                },
+                "created_at": {
+                  "type": "string"
+                },
+                "credits_charged": {
+                  "type": "number"
+                },
+                "current_step": {
+                  "type": "number"
+                },
+                "generated_title": {
+                  "type": "string"
+                },
+                "started_at": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "task_type": {
+                  "type": "string"
+                },
+                "total_steps": {
+                  "type": "number"
+                },
+                "workflow_id": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "suite": "rigor"
+    }
+  ],
+  "url": "https://plith.ai/api/mcp"
+}

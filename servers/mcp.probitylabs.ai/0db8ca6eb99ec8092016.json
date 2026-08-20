@@ -1,0 +1,805 @@
+{
+  "canon_version": "1",
+  "full_hash": "5e459ac862d72be1d0e69dadc4bf45a551856452f496c4d16334dfa12dcdb577",
+  "name": "ai.probitylabs/wallet-reputation",
+  "observed_at": "2026-08-20T09:12:29.335237Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 6,
+  "tools": [
+    {
+      "annotations": {
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Screen an Ethereum address or `.eth` ENS name for on-chain reputation risk. Costs 1 credit. Returns a signed reputation score (-100 to +100), a risk band, a confidence level, a sanctioned flag, the top evidence factors, a screeningId, and a link to the full report. The enhanced review is generated in the background. Fetch it with get_screening_narrative(screeningId). Use the score, band, and sanctioned flag to gate pre-trade or payout flows.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "address": {
+            "description": "Ethereum address (0x...) or `.eth` ENS name (e.g. vitalik.eth) to screen. ENS names resolve to their current mainnet address and must resolve or the call errors. Addresses are case-insensitive and need not be checksummed.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "address"
+        ],
+        "type": "object"
+      },
+      "name": "screen_address",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "address": {
+            "description": "The screened address",
+            "type": "string"
+          },
+          "band": {
+            "description": "Reputation band, e.g. Low Risk, Reputable",
+            "type": "string"
+          },
+          "bandCode": {
+            "description": "Band identifier, e.g. LOW_RISK, REPUTABLE",
+            "type": "string"
+          },
+          "confidence": {
+            "description": "Engine confidence in the result",
+            "enum": [
+              "High",
+              "Medium",
+              "Low"
+            ],
+            "type": "string"
+          },
+          "evidence": {
+            "description": "Up to 10 signals behind the verdict, most severe first",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "code": {
+                  "description": "Stable code for this signal, e.g. OUTBOUND_DUST_SPRAY",
+                  "type": "string"
+                },
+                "factor": {
+                  "description": "Category of the signal, e.g. Behaviour Patterns",
+                  "type": "string"
+                },
+                "message": {
+                  "description": "Short description of the signal",
+                  "type": "string"
+                },
+                "severity": {
+                  "enum": [
+                    "High",
+                    "Medium",
+                    "Low"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "code",
+                "factor",
+                "severity",
+                "message"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "reportUrl": {
+            "description": "Link to the full report on the Probity dashboard",
+            "type": "string"
+          },
+          "sanctioned": {
+            "description": "True if the address is a direct OFAC match",
+            "type": "boolean"
+          },
+          "score": {
+            "description": "Signed reputation score from -100 to +100. Lower is worse.",
+            "type": "number"
+          },
+          "screenedAt": {
+            "description": "When the screen ran (ISO-8601)",
+            "type": "string"
+          },
+          "screeningId": {
+            "description": "Immutable identifier for this screen (rsr_...)",
+            "type": "string"
+          },
+          "summary": {
+            "description": "One line verdict headline",
+            "type": "string"
+          },
+          "transactionCount": {
+            "description": "Number of transactions analysed",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "screeningId",
+          "address",
+          "score",
+          "bandCode",
+          "band",
+          "confidence",
+          "sanctioned",
+          "transactionCount",
+          "summary",
+          "evidence",
+          "screenedAt",
+          "reportUrl"
+        ],
+        "type": "object"
+      },
+      "title": "Screen address"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Retrieve the enhanced Probity review for a completed screen by its screeningId. Costs zero credits. Returns the narrative and the key concerns it raises. It is generated in the background after screen_address returns, so it may briefly be pending. Retry shortly if so.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "screeningId": {
+            "description": "The rsr_... id returned by screen_address. Must reference a completed screen; the narrative can be pending for a few seconds right after the screen returns.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "screeningId"
+        ],
+        "type": "object"
+      },
+      "name": "get_screening_narrative",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "address": {
+            "description": "The screened address",
+            "type": "string"
+          },
+          "concerns": {
+            "description": "Key concerns raised by the review",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "narrative": {
+            "description": "The enhanced review text",
+            "type": "string"
+          },
+          "reportUrl": {
+            "description": "Link to the full report on the Probity dashboard",
+            "type": "string"
+          },
+          "screeningId": {
+            "description": "The screen this review belongs to",
+            "type": "string"
+          }
+        },
+        "required": [
+          "screeningId",
+          "address",
+          "narrative",
+          "concerns",
+          "reportUrl"
+        ],
+        "type": "object"
+      },
+      "title": "Get screening narrative"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Retrieve the authenticated user's prior screening runs for a specific Ethereum address, each with the same detail as screen_address: reputation score, band, confidence, sanctioned flag, and the top evidence signals. Use it to recall context for an already-screened address. Costs zero credits, unlike screen_address which always runs a fresh screen. For runs across all your addresses, use get_screening_history.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "address": {
+            "description": "Ethereum address (0x...) or .eth ENS name to look up historic screenings for",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Number of past runs to return (1-50, default 5, newest first)",
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "address"
+        ],
+        "type": "object"
+      },
+      "name": "get_address_screening_history",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "description": "Recent screening runs, newest first, each with the same detail as screen_address",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "address": {
+                  "description": "The screened address",
+                  "type": "string"
+                },
+                "band": {
+                  "description": "Reputation band, e.g. Low Risk",
+                  "type": "string"
+                },
+                "bandCode": {
+                  "description": "Band identifier, e.g. LOW_RISK",
+                  "type": "string"
+                },
+                "confidence": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "High",
+                        "Medium",
+                        "Low"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Engine confidence for this run"
+                },
+                "ensName": {
+                  "description": "ENS name for the address, when known",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "evidence": {
+                  "description": "Up to 10 signals behind this run, most severe first",
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "code": {
+                        "type": "string"
+                      },
+                      "factor": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      },
+                      "severity": {
+                        "enum": [
+                          "High",
+                          "Medium",
+                          "Low"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "code",
+                      "factor",
+                      "severity",
+                      "message"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "reportUrl": {
+                  "description": "Link to the full report on the Probity dashboard",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "sanctioned": {
+                  "description": "True if the address is a direct OFAC match",
+                  "type": "boolean"
+                },
+                "score": {
+                  "description": "Signed reputation score from -100 to +100. Lower is worse.",
+                  "type": "number"
+                },
+                "screenedAt": {
+                  "description": "When the screen ran (ISO-8601)",
+                  "type": "string"
+                },
+                "screeningId": {
+                  "description": "Immutable run id (rsr_...)",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "transactionCount": {
+                  "description": "Number of transactions analysed",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "screeningId",
+                "address",
+                "ensName",
+                "score",
+                "bandCode",
+                "band",
+                "confidence",
+                "sanctioned",
+                "transactionCount",
+                "evidence",
+                "screenedAt",
+                "reportUrl"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "type": "object"
+      },
+      "title": "Get address screening history"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Compare two completed screens by their screeningId and see what changed. Costs zero credits. Two runs of the same address show why the reputation score moved. Two different addresses show a side by side. Returns each run score, band, and confidence, a reason level diff, and the score change broken into its drivers. Small differences between runs of one address can be normal variation rather than a data change.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "runIdA": {
+            "description": "First screeningId (rsr_...). Must be a completed screen you own.",
+            "type": "string"
+          },
+          "runIdB": {
+            "description": "Second screeningId (rsr_...). Must be a completed screen you own.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "runIdA",
+          "runIdB"
+        ],
+        "type": "object"
+      },
+      "name": "compare_screening_runs",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "compositionDiff": {
+            "description": "Which score drivers differ between the runs",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "change": {
+                  "enum": [
+                    "appeared",
+                    "strengthened",
+                    "weakened",
+                    "removed"
+                  ],
+                  "type": "string"
+                },
+                "group": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "side": {
+                  "enum": [
+                    "raising",
+                    "lowering"
+                  ],
+                  "type": "string"
+                },
+                "widthPctA": {
+                  "type": "number"
+                },
+                "widthPctB": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "group",
+                "label",
+                "side",
+                "change",
+                "widthPctA",
+                "widthPctB"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "mode": {
+            "description": "temporal_delta when both runs are the same address, else side_by_side",
+            "enum": [
+              "temporal_delta",
+              "side_by_side"
+            ],
+            "type": "string"
+          },
+          "reasonDiff": {
+            "additionalProperties": false,
+            "description": "What changed between the two runs at the reason level",
+            "properties": {
+              "added": {
+                "description": "Reasons present in runA but not runB",
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "factor": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "severity": {
+                      "$ref": "#/properties/runA/properties/confidence/anyOf/0"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "factor",
+                    "severity",
+                    "message"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "changed": {
+                "description": "Reasons in both runs whose severity changed from runB to runA",
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "factor": {
+                      "type": "string"
+                    },
+                    "from": {
+                      "$ref": "#/properties/runA/properties/confidence/anyOf/0"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "to": {
+                      "$ref": "#/properties/runA/properties/confidence/anyOf/0"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "factor",
+                    "from",
+                    "to",
+                    "message"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "removed": {
+                "description": "Reasons present in runB but not runA",
+                "items": {
+                  "$ref": "#/properties/reasonDiff/properties/added/items"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "added",
+              "removed",
+              "changed"
+            ],
+            "type": "object"
+          },
+          "runA": {
+            "additionalProperties": false,
+            "properties": {
+              "address": {
+                "description": "The screened address",
+                "type": "string"
+              },
+              "band": {
+                "description": "Reputation band, e.g. Low Risk",
+                "type": "string"
+              },
+              "bandCode": {
+                "description": "Band identifier, e.g. LOW_RISK",
+                "type": "string"
+              },
+              "confidence": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "High",
+                      "Medium",
+                      "Low"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Engine confidence for this run"
+              },
+              "ensName": {
+                "description": "ENS name for the address, when known",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "reportUrl": {
+                "description": "Link to the full report on the Probity dashboard",
+                "type": "string"
+              },
+              "score": {
+                "description": "Signed reputation score from -100 to +100. Lower is worse.",
+                "type": "number"
+              },
+              "screenedAt": {
+                "description": "When this screen ran (ISO-8601)",
+                "type": "string"
+              },
+              "screeningId": {
+                "description": "The rsr_... id of this run",
+                "type": "string"
+              },
+              "transactionCount": {
+                "description": "Number of transactions analysed",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "screeningId",
+              "address",
+              "ensName",
+              "score",
+              "bandCode",
+              "band",
+              "confidence",
+              "transactionCount",
+              "screenedAt",
+              "reportUrl"
+            ],
+            "type": "object"
+          },
+          "runB": {
+            "$ref": "#/properties/runA"
+          },
+          "scoreDelta": {
+            "description": "runA score minus runB score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "mode",
+          "scoreDelta",
+          "runA",
+          "runB",
+          "reasonDiff",
+          "compositionDiff"
+        ],
+        "type": "object"
+      },
+      "title": "Compare screening runs"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Returns the authenticated user's most recent screening runs across all addresses, newest first, each with the same detail as screen_address: score, band, confidence, sanctioned flag, and the top evidence signals. Returns up to `limit` runs (default 20) with no cursor paging, so raise `limit` to reach older runs. Costs zero credits. For the history of one specific address, use get_address_screening_history instead.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "description": "Number of results (1-100, default 20)",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_screening_history",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "description": "Recent screening runs, newest first, each with the same detail as screen_address",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "address": {
+                  "description": "The screened address",
+                  "type": "string"
+                },
+                "band": {
+                  "description": "Reputation band, e.g. Low Risk",
+                  "type": "string"
+                },
+                "bandCode": {
+                  "description": "Band identifier, e.g. LOW_RISK",
+                  "type": "string"
+                },
+                "confidence": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "High",
+                        "Medium",
+                        "Low"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Engine confidence for this run"
+                },
+                "ensName": {
+                  "description": "ENS name for the address, when known",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "evidence": {
+                  "description": "Up to 10 signals behind this run, most severe first",
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "code": {
+                        "type": "string"
+                      },
+                      "factor": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      },
+                      "severity": {
+                        "enum": [
+                          "High",
+                          "Medium",
+                          "Low"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "code",
+                      "factor",
+                      "severity",
+                      "message"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "reportUrl": {
+                  "description": "Link to the full report on the Probity dashboard",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "sanctioned": {
+                  "description": "True if the address is a direct OFAC match",
+                  "type": "boolean"
+                },
+                "score": {
+                  "description": "Signed reputation score from -100 to +100. Lower is worse.",
+                  "type": "number"
+                },
+                "screenedAt": {
+                  "description": "When the screen ran (ISO-8601)",
+                  "type": "string"
+                },
+                "screeningId": {
+                  "description": "Immutable run id (rsr_...)",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "transactionCount": {
+                  "description": "Number of transactions analysed",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "screeningId",
+                "address",
+                "ensName",
+                "score",
+                "bandCode",
+                "band",
+                "confidence",
+                "sanctioned",
+                "transactionCount",
+                "evidence",
+                "screenedAt",
+                "reportUrl"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "type": "object"
+      },
+      "title": "Get screening history"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Returns the authenticated user's current credit balance as a whole number of credits. One credit screens one address: screen_address costs 1 credit, while this call and the history, narrative, and compare tools cost zero. Check it before screen_address to confirm a screen can be afforded.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_credit_balance",
+      "title": "Get credit balance"
+    }
+  ],
+  "url": "https://mcp.probitylabs.ai/mcp"
+}

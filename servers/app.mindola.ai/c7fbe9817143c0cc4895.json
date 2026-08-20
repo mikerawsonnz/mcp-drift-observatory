@@ -1,0 +1,261 @@
+{
+  "canon_version": "1",
+  "full_hash": "810e08cd011b0d8114dbb2e9d075c2563722bf423eda880c791679b4e99bce29",
+  "name": "ai.mindola/lens",
+  "observed_at": "2026-08-20T09:12:09.351273Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 3,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Create a shareable Mindola lens (AI clone) from a profile the user has approved in this conversation. Call this only after summarizing the proposed lens for the user and receiving explicit confirmation. Use only information the user provided or confirmed in the conversation; do not claim access to hidden memory, private chats, or external accounts.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "accentColor": {
+            "description": "Optional hex color, for example #4f46e5.",
+            "pattern": "^#[0-9a-fA-F]{6}$",
+            "type": "string"
+          },
+          "audience": {
+            "description": "Who this lens is intended to help or answer questions for.",
+            "maxLength": 500,
+            "type": "string"
+          },
+          "bio": {
+            "description": "A concise first-person or third-person biography assembled from user-confirmed information.",
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "boundaries": {
+            "description": "Things the lens should not claim, discuss, or answer beyond. Ask the user to confirm these before calling.",
+            "items": {
+              "maxLength": 160,
+              "type": "string"
+            },
+            "maxItems": 12,
+            "type": "array"
+          },
+          "context": {
+            "description": "Extra grounding context for how the lens should answer. Use only information the user confirmed.",
+            "maxLength": 4000,
+            "type": "string"
+          },
+          "displayName": {
+            "description": "The user's preferred public name for the lens, after they confirm it.",
+            "maxLength": 80,
+            "type": "string"
+          },
+          "expertise": {
+            "description": "Specific domains, skills, or interests the user confirmed.",
+            "items": {
+              "maxLength": 160,
+              "type": "string"
+            },
+            "maxItems": 12,
+            "type": "array"
+          },
+          "facts": {
+            "description": "Concrete user-approved facts to seed the lens memory. Each item should stand alone.",
+            "items": {
+              "maxLength": 320,
+              "type": "string"
+            },
+            "maxItems": 30,
+            "type": "array"
+          },
+          "locale": {
+            "description": "Optional BCP-47 locale for user-facing lens copy.",
+            "maxLength": 32,
+            "type": "string"
+          },
+          "sourceSummary": {
+            "description": "Short note describing what ChatGPT used to assemble the profile, without exposing hidden chain-of-thought or unapproved private data.",
+            "maxLength": 1500,
+            "type": "string"
+          },
+          "suggestedPrompts": {
+            "description": "Starter questions visitors can ask the lens.",
+            "items": {
+              "maxLength": 120,
+              "type": "string"
+            },
+            "maxItems": 4,
+            "type": "array"
+          },
+          "tagline": {
+            "description": "A short one-line summary of what this lens represents.",
+            "maxLength": 160,
+            "type": "string"
+          },
+          "tone": {
+            "description": "The visitor-facing tone of the lens.",
+            "enum": [
+              "warm",
+              "neutral",
+              "professional",
+              "playful"
+            ],
+            "type": "string"
+          },
+          "topicName": {
+            "description": "The Mindola space name that will hold the seeded facts.",
+            "maxLength": 80,
+            "type": "string"
+          },
+          "vibeWords": {
+            "description": "Up to four short adjectives for the lens profile.",
+            "items": {
+              "maxLength": 24,
+              "type": "string"
+            },
+            "maxItems": 4,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "name": "create_digital_twin_lens",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "claimRequired": {
+            "type": "boolean"
+          },
+          "claimUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "factCount": {
+            "type": "number"
+          },
+          "manageUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "shareUrl": {
+            "type": "string"
+          },
+          "suggestedPrompts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "topicName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "displayName",
+          "topicName",
+          "shareUrl",
+          "claimUrl",
+          "manageUrl",
+          "claimRequired",
+          "expiresAt",
+          "factCount",
+          "suggestedPrompts"
+        ],
+        "type": "object"
+      },
+      "title": "Create a Mindola lens"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Add text notes or URLs to a Mindola lens created in this conversation (before it is claimed). Content runs through the standard ingest pipeline so the lens can answer from it, with citations.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "content": {
+                  "maxLength": 20000,
+                  "type": "string"
+                },
+                "title": {
+                  "maxLength": 80,
+                  "type": "string"
+                },
+                "type": {
+                  "enum": [
+                    "text",
+                    "url"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type",
+                "content"
+              ],
+              "type": "object"
+            },
+            "maxItems": 20,
+            "type": "array"
+          },
+          "lens_token": {
+            "description": "The token from the lens's share URL (the part after /me/).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "lens_token",
+          "items"
+        ],
+        "type": "object"
+      },
+      "name": "add_lens_knowledge",
+      "title": "Add knowledge to a lens"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Check a Mindola lens: its share URL, whether it has been claimed, and how much of its knowledge has finished ingesting (ready / pending / failed).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "lens_token": {
+            "description": "The token from the lens's share URL (the part after /me/).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "lens_token"
+        ],
+        "type": "object"
+      },
+      "name": "get_lens_status",
+      "title": "Check a lens's status"
+    }
+  ],
+  "url": "https://app.mindola.ai/mcp/lens"
+}

@@ -1,0 +1,179 @@
+{
+  "canon_version": "1",
+  "full_hash": "389a49bae13a2feefe13b463833bc34cfa30dff910c60abc39eaee2a1455e5c3",
+  "name": "ai.prdictionedge.aux/transaction-preflight",
+  "observed_at": "2026-08-20T18:46:09.197103Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 2,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "AUX Transaction Preflight"
+      },
+      "description": "Evaluate a purpose-built synthetic B2B payment scenario for duplicate invoices, changed payment destinations, vendor-history anomalies, and signed decision evidence. Returns PROCEED, REVIEW, or STOP with evidence and an ES256-signed receipt. Evaluation only: never send real, masked, personal, banking, invoice, or confidential data.",
+      "inputSchema": {
+        "properties": {
+          "proposal": {
+            "properties": {
+              "invoice": {
+                "properties": {
+                  "amount": {
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "number": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "number",
+                  "amount"
+                ],
+                "type": "object"
+              },
+              "payment": {
+                "properties": {
+                  "bank_fingerprint": {
+                    "description": "Synthetic opaque fingerprint only; never submit real bank details.",
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "bank_fingerprint"
+                ],
+                "type": "object"
+              },
+              "transaction_id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "vendor": {
+                "properties": {
+                  "address_match": {
+                    "type": "boolean"
+                  },
+                  "corporate_status": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "id": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "lookalike_domain": {
+                    "type": "boolean"
+                  },
+                  "name": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "sanctioned": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "corporate_status",
+                  "sanctioned",
+                  "address_match",
+                  "lookalike_domain"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "transaction_id",
+              "vendor",
+              "invoice",
+              "payment"
+            ],
+            "type": "object"
+          },
+          "transaction_history": {
+            "items": {
+              "properties": {
+                "amount": {
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "bank_fingerprint": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "invoice_number": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "vendor_id": {
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "vendor_id",
+                "invoice_number",
+                "amount",
+                "bank_fingerprint"
+              ],
+              "type": "object"
+            },
+            "maxItems": 1000,
+            "type": "array"
+          }
+        },
+        "required": [
+          "proposal",
+          "transaction_history"
+        ],
+        "type": "object"
+      },
+      "name": "aux_transaction_preflight",
+      "title": "AUX Transaction Preflight"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "AUX Mortgage Closing Funds Preflight"
+      },
+      "description": "Evaluate one published fictional mortgage closing scenario for destination changes and cash-to-close evidence sufficiency. Optionally add live public FDIC institution context. Returns MATCH, CHANGE_REVIEW, or INSUFFICIENT_EVIDENCE with a signed receipt; never authorizes a wire or accepts real customer or bank data.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "include_live_fdic_context": {
+            "default": false,
+            "type": "boolean"
+          },
+          "scenario_id": {
+            "enum": [
+              "closing-match",
+              "wire-change-email",
+              "stale-bank-snapshot",
+              "cash-to-close-shortfall",
+              "partial-source-evidence"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "scenario_id"
+        ],
+        "type": "object"
+      },
+      "name": "aux_mortgage_closing_preflight",
+      "title": "AUX Mortgage Closing Funds Preflight"
+    }
+  ],
+  "url": "https://aux.prdictionedge.ai/mcp/v1"
+}
