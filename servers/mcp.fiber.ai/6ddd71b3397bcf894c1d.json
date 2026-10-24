@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "ca105037e9e337730fcf44f7a1b14d44de3cec766bf889956a481516b7993dc0",
+  "full_hash": "01a49a3b42e38849d1b9474b554803d10b6019a9eb8d044ec697073aefa3558c",
   "name": "ai.fiber/mcp",
-  "observed_at": "2026-08-20T09:11:46.741700Z",
+  "observed_at": "2026-09-03T02:07:11.602511Z",
   "sources": [
     "official"
   ],
@@ -73,7 +73,7 @@
               }
             ],
             "default": null,
-            "description": "When true, returns an estimated total count of matching companies in the response. The count does not account for exclusion lists."
+            "description": "When true, returns an estimated total count of matching companies in the response and charges one additional count credit. The count does not account for exclusion lists."
           },
           "pageSize": {
             "anyOf": [
@@ -182,7 +182,7 @@
               }
             ],
             "default": null,
-            "description": "When true, returns an estimated total count of matching prospects in the response. The count does not account for exclusion lists."
+            "description": "When true, returns an estimated total count of matching prospects in the response and charges one additional count credit. The count does not account for exclusion lists."
           },
           "pageSize": {
             "anyOf": [
@@ -483,12 +483,54 @@
         }
       },
       "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Cards Attach"
+      },
+      "description": "OperationId: cardsAttach.\n\nAttach card to trial account.\n\nUSE THIS WHEN:\n- Attach card to trial account.\n- Attach a payment card to a cardless trial organization using a single-use Stripe shared payment token. The card is verified with a temporary $1 authorization that is refunded immediately (net cost $0), and the organization's free-credit ceiling is raised. The verified card is not saved for future charges — every future paid top-up requires a freshly-minted shared payment token.\n- Inspect or manage account-level billing and usage settings.\n\nEXAMPLE:\nInput: cardsAttach_tool(sharedPaymentGrantedToken=\"example_string\")\n\nINPUT SCHEMA:\nRequired parameters:\n  - sharedPaymentGrantedToken (string): Single-use Stripe shared payment token (`spt_...`) authorizing exactly one card handoff. Mint it on the buyer side (see https://docs.stripe.com/agentic-commerce/concepts/shared-payment-tokens); each request must submit a freshly-minted token.\nOptional parameters:\n\nRETURNS:\nResponse object with keys: output, chargeInfo, warnings, advice",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "apiKey": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Your Fiber API key. Optional if you provide it via mcp.json headers (x-api-key / x-apikey / Authorization: Bearer)."
+          },
+          "sharedPaymentGrantedToken": {
+            "description": "Single-use Stripe shared payment token (`spt_...`) authorizing exactly one card handoff. Mint it on the buyer side (see https://docs.stripe.com/agentic-commerce/concepts/shared-payment-tokens); each request must submit a freshly-minted token.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sharedPaymentGrantedToken"
+        ],
+        "type": "object"
+      },
+      "name": "cardsAttach_tool",
+      "title": "Cards Attach"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "annotations": {
         "idempotentHint": true,
         "openWorldHint": true,
         "readOnlyHint": true,
         "title": "Get All Api Keys"
       },
-      "description": "OperationId: getAllApiKeys.\n\nList API keys.\n\nUSE THIS WHEN:\n- List API keys.\n- List all API keys for your organization, including each key's name, prefix, expiration, and per-key credit usage. The secret value of a key is only shown once at creation and is never returned here.\n\nEXAMPLE:\nInput: getAllApiKeys_tool(includeRevoked=True)\n\nINPUT SCHEMA:\nRequired parameters:\nOptional parameters:\n  - includeRevoked (boolean): Include revoked keys in the results. Defaults to false, returning only active keys.\n\nRETURNS:\nResponse object with keys: output, chargeInfo, warnings, advice",
+      "description": "OperationId: getAllApiKeys.\n\nList API keys.\n\nUSE THIS WHEN:\n- List API keys.\n- List all API keys for your organization, including each key's name, prefix, expiration, and per-key credit usage. The secret value of a key is only shown once at creation and is never returned here. First-time users: create your initial API key at https://app.fiber.ai or via POST /v1/account/send-otp + verify-otp. This endpoint manages keys once you have one.\n\nEXAMPLE:\nInput: getAllApiKeys_tool(includeRevoked=True)\n\nINPUT SCHEMA:\nRequired parameters:\nOptional parameters:\n  - includeRevoked (boolean): Include revoked keys in the results. Defaults to false, returning only active keys.\n\nRETURNS:\nResponse object with keys: output, chargeInfo, warnings, advice",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -521,40 +563,6 @@
       },
       "name": "getAllApiKeys_tool",
       "title": "Get All Api Keys"
-    },
-    {
-      "_meta": {
-        "fastmcp": {
-          "tags": []
-        }
-      },
-      "annotations": {
-        "idempotentHint": true,
-        "openWorldHint": true,
-        "readOnlyHint": true,
-        "title": "List Webhook Endpoints"
-      },
-      "description": "OperationId: listWebhookEndpoints.\n\nList webhook endpoints.\n\nUSE THIS WHEN:\n- List webhook endpoints.\n- List every webhook endpoint configured for your organization, including each endpoint's delivery URL, subscribed event types, and paused state. Reading webhook endpoints is free.\n\nEXAMPLE:\nInput: listWebhookEndpoints_tool()\n\nINPUT SCHEMA:\nRequired parameters:\nOptional parameters:\n\nRETURNS:\nResponse object with keys: output, chargeInfo, warnings, advice",
-      "inputSchema": {
-        "additionalProperties": false,
-        "properties": {
-          "apiKey": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Your Fiber API key. Optional if you provide it via mcp.json headers (x-api-key / x-apikey / Authorization: Bearer)."
-          }
-        },
-        "type": "object"
-      },
-      "name": "listWebhookEndpoints_tool",
-      "title": "List Webhook Endpoints"
     }
   ],
   "url": "https://mcp.fiber.ai/mcp/v2"

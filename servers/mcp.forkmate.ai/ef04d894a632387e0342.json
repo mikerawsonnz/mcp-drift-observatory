@@ -1,34 +1,47 @@
 {
   "canon_version": "1",
-  "full_hash": "a9f10cf1e356755d2d329231cd54498436dc04bff094b90ef1fbf895a8498585",
+  "full_hash": "cdc28be7edd82da8be37e3109b46f366f4fec654c4398e74dd1cc32d8657d09a",
   "name": "ai.forkmate/forkmate",
-  "observed_at": "2026-08-20T09:11:50.551786Z",
+  "observed_at": "2026-10-04T02:06:48.390873Z",
   "sources": [
     "official"
   ],
-  "tool_count": 12,
+  "tool_count": 11,
   "tools": [
     {
       "annotations": {
+        "destructiveHint": false,
         "openWorldHint": false,
         "readOnlyHint": true,
         "title": "Who am I"
       },
-      "description": "Diagnostic: returns the authenticated user id and scopes.",
+      "description": "Diagnostic: confirms that this connection is signed in to a Forkmate account. Returns no account id, email or other identifier.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {},
         "type": "object"
       },
-      "name": "whoami"
+      "name": "whoami",
+      "outputSchema": {
+        "properties": {
+          "connected": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "connected"
+        ],
+        "type": "object"
+      }
     },
     {
       "annotations": {
+        "destructiveHint": false,
         "openWorldHint": false,
         "readOnlyHint": true,
         "title": "Get day's diary"
       },
-      "description": "Read the user's food diary for a day (entries + calorie/macro totals). SAFETY: all calorie and macro values here — including carbohydrates — are ESTIMATES (from USDA / Open Food Facts or the user's own entry), approximate and not lab-measured or per-batch. They are for general nutrition tracking ONLY. Do NOT use them for insulin dosing, carb-counting for a bolus, blood-glucose prediction, or any other medical decision, and do NOT compute a dose or glucose estimate from them. For anything medical, direct the user to the product's own label and their care team.",
+      "description": "Read the user's food diary for one day: its entries, each listed with its `id` and each food with its item_index, quantity and macros, and calorie/macro totals. All calorie and macro values, including carbohydrates, are estimates from USDA FoodData Central, Open Food Facts, the user's own entry or an AI assistant's estimate — approximate, not lab-measured or specific to a package or batch, and not suitable for insulin dosing (including carb counting for a meal bolus), blood-glucose prediction or any other medical decision.",
       "inputSchema": {
         "properties": {
           "local_date": {
@@ -38,15 +51,165 @@
         },
         "type": "object"
       },
-      "name": "get_day"
+      "name": "get_day",
+      "outputSchema": {
+        "properties": {
+          "entries": {
+            "items": {
+              "description": "One diary entry: a meal with its foods.",
+              "properties": {
+                "at": {
+                  "description": "ISO-8601 UTC instant the food was eaten.",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "Identifies the entry for a later edit or deletion.",
+                  "type": "string"
+                },
+                "items": {
+                  "items": {
+                    "properties": {
+                      "caffeine_mg": {
+                        "type": "number"
+                      },
+                      "fluid_ml": {
+                        "type": "number"
+                      },
+                      "macros": {
+                        "description": "Calories and macros. Estimates, not lab-measured; not for insulin dosing.",
+                        "properties": {
+                          "carb_g": {
+                            "type": "number"
+                          },
+                          "fat_g": {
+                            "type": "number"
+                          },
+                          "kcal": {
+                            "type": "number"
+                          },
+                          "protein_g": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [],
+                        "type": "object"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "quantity": {
+                        "type": "string"
+                      },
+                      "unknown_macros": {
+                        "description": "Macros missing from the source data: shown as 0 but unknown, not a real zero.",
+                        "items": {
+                          "enum": [
+                            "protein_g",
+                            "carb_g",
+                            "fat_g"
+                          ],
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "local_date": {
+                  "description": "A local date, YYYY-MM-DD.",
+                  "type": "string"
+                },
+                "meal": {
+                  "description": "breakfast, lunch, dinner or snack, when set.",
+                  "type": "string"
+                },
+                "note": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "at",
+                "local_date",
+                "items"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "local_date": {
+            "description": "A local date, YYYY-MM-DD.",
+            "type": "string"
+          },
+          "totals": {
+            "properties": {
+              "caffeine_mg": {
+                "type": "number"
+              },
+              "entry_count": {
+                "type": "integer"
+              },
+              "fluid_ml": {
+                "type": "number"
+              },
+              "local_date": {
+                "description": "A local date, YYYY-MM-DD.",
+                "type": "string"
+              },
+              "totals": {
+                "description": "Calories and macros. Estimates, not lab-measured; not for insulin dosing.",
+                "properties": {
+                  "carb_g": {
+                    "type": "number"
+                  },
+                  "fat_g": {
+                    "type": "number"
+                  },
+                  "kcal": {
+                    "type": "number"
+                  },
+                  "protein_g": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "kcal",
+                  "protein_g",
+                  "carb_g",
+                  "fat_g"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "local_date",
+              "entry_count",
+              "totals"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "local_date",
+          "entries",
+          "totals"
+        ],
+        "type": "object"
+      }
     },
     {
       "annotations": {
+        "destructiveHint": false,
         "openWorldHint": false,
         "readOnlyHint": true,
         "title": "Get diary range"
       },
-      "description": "Read the user's diary across a date range, with per-day calorie/macro totals. SAFETY: all calorie and macro values here — including carbohydrates — are ESTIMATES (from USDA / Open Food Facts or the user's own entry), approximate and not lab-measured or per-batch. They are for general nutrition tracking ONLY. Do NOT use them for insulin dosing, carb-counting for a bolus, blood-glucose prediction, or any other medical decision, and do NOT compute a dose or glucose estimate from them. For anything medical, direct the user to the product's own label and their care team.",
+      "description": "Read the user's food diary across a date range, with per-day calorie/macro totals and each entry listed with its `id`. All calorie and macro values, including carbohydrates, are estimates from USDA FoodData Central, Open Food Facts, the user's own entry or an AI assistant's estimate — approximate, not lab-measured or specific to a package or batch, and not suitable for insulin dosing (including carb counting for a meal bolus), blood-glucose prediction or any other medical decision.",
       "inputSchema": {
         "properties": {
           "end": {
@@ -64,52 +227,27 @@
         ],
         "type": "object"
       },
-      "name": "get_range"
-    },
-    {
-      "annotations": {
-        "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "Get dietary preferences"
-      },
-      "description": "Read the user's saved dietary preferences so you can tailor logging and suggestions WITHOUT re-asking every chat: their diet style, a structured list of allergies to avoid (the big-9 major allergens), foods they dislike, and a typical-portion note. IMPORTANT: the allergen list is self-reported and is NOT a safety guarantee — always tell the user to check ingredient labels themselves; cross-contamination and gaps in food data are not captured (see the returned allergy_disclaimer). The `allergies` field covers the major US allergens ONLY; a user may have an allergen outside it (e.g. mustard, celery, corn, mollusks, barley/rye) — ask about those directly. NEVER treat the `dislikes` list as an allergy: it is a taste preference to de-prioritize, never a safety exclusion.",
-      "inputSchema": {
-        "additionalProperties": false,
-        "properties": {},
-        "type": "object"
-      },
-      "name": "get_preferences"
-    },
-    {
-      "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": false,
-        "openWorldHint": false,
-        "readOnlyHint": false,
-        "title": "Log a meal"
-      },
-      "description": "Log what the user ate to their food diary. Parse the user's free text into items and, when you can, include estimated macros per item for accuracy. SAFETY: all calorie and macro values here — including carbohydrates — are ESTIMATES (from USDA / Open Food Facts or the user's own entry), approximate and not lab-measured or per-batch. They are for general nutrition tracking ONLY. Do NOT use them for insulin dosing, carb-counting for a bolus, blood-glucose prediction, or any other medical decision, and do NOT compute a dose or glucose estimate from them. For anything medical, direct the user to the product's own label and their care team.",
-      "inputSchema": {
+      "name": "get_range",
+      "outputSchema": {
         "properties": {
-          "at": {
-            "description": "ISO-8601 instant the meal was eaten; defaults to now.",
-            "type": "string"
-          },
-          "items": {
+          "days": {
             "items": {
               "properties": {
-                "barcode": {
-                  "type": "string"
-                },
                 "caffeine_mg": {
-                  "description": "Optional caffeine content of this item, in milligrams (e.g. ~95 for a mug of brewed coffee). Include it for caffeinated drinks/foods when known; omit if unknown.",
                   "type": "number"
+                },
+                "entry_count": {
+                  "type": "integer"
                 },
                 "fluid_ml": {
-                  "description": "Optional fluid/hydration volume of this item, in millilitres (e.g. 240 for an 8 oz cup). Include it for drinks when known; omit if unknown.",
                   "type": "number"
                 },
-                "macros": {
+                "local_date": {
+                  "description": "A local date, YYYY-MM-DD.",
+                  "type": "string"
+                },
+                "totals": {
+                  "description": "Calories and macros. Estimates, not lab-measured; not for insulin dosing.",
                   "properties": {
                     "carb_g": {
                       "type": "number"
@@ -124,13 +262,609 @@
                       "type": "number"
                     }
                   },
+                  "required": [
+                    "kcal",
+                    "protein_g",
+                    "carb_g",
+                    "fat_g"
+                  ],
                   "type": "object"
+                }
+              },
+              "required": [
+                "local_date",
+                "entry_count",
+                "totals"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "end": {
+            "description": "A local date, YYYY-MM-DD.",
+            "type": "string"
+          },
+          "entries": {
+            "items": {
+              "description": "One diary entry: a meal with its foods.",
+              "properties": {
+                "at": {
+                  "description": "ISO-8601 UTC instant the food was eaten.",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "Identifies the entry for a later edit or deletion.",
+                  "type": "string"
+                },
+                "items": {
+                  "items": {
+                    "properties": {
+                      "caffeine_mg": {
+                        "type": "number"
+                      },
+                      "fluid_ml": {
+                        "type": "number"
+                      },
+                      "macros": {
+                        "description": "Calories and macros. Estimates, not lab-measured; not for insulin dosing.",
+                        "properties": {
+                          "carb_g": {
+                            "type": "number"
+                          },
+                          "fat_g": {
+                            "type": "number"
+                          },
+                          "kcal": {
+                            "type": "number"
+                          },
+                          "protein_g": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [],
+                        "type": "object"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "quantity": {
+                        "type": "string"
+                      },
+                      "unknown_macros": {
+                        "description": "Macros missing from the source data: shown as 0 but unknown, not a real zero.",
+                        "items": {
+                          "enum": [
+                            "protein_g",
+                            "carb_g",
+                            "fat_g"
+                          ],
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "local_date": {
+                  "description": "A local date, YYYY-MM-DD.",
+                  "type": "string"
+                },
+                "meal": {
+                  "description": "breakfast, lunch, dinner or snack, when set.",
+                  "type": "string"
+                },
+                "note": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "at",
+                "local_date",
+                "items"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "start": {
+            "description": "A local date, YYYY-MM-DD.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "end",
+          "days",
+          "entries"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get food profile"
+      },
+      "description": "Read the user's food profile: diet style, allergies (a structured list of the major US allergens), foods they like, foods they dislike, and a typical-portion note. Allergies are self-reported and not a safety guarantee; the response includes an allergy_disclaimer. Likes and dislikes are taste preferences, not allergies or restrictions.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_preferences",
+      "outputSchema": {
+        "properties": {
+          "allergies": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "allergy_disclaimer": {
+            "type": "string"
+          },
+          "diet_style": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "dislikes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "likes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "portion_note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "diet_style",
+          "allergies",
+          "likes",
+          "dislikes",
+          "portion_note",
+          "allergy_disclaimer"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Update food profile"
+      },
+      "description": "Edit the user's food profile: add or remove foods they like or dislike, add or remove allergies from the major US allergen list, or set their diet style. Only the fields sent change. A removal matches a saved name in any casing; a name that matches nothing is reported in `not_found` and nothing else is affected. Adding a food to likes takes it off dislikes, and the reverse. Lists hold up to 50 foods of up to 80 characters each. The reply is the whole updated profile. It saves what the user states about their own tastes and allergies, not inferences from the diary. Every call carries `user_approved: true`, meaning the user saw this exact change and said yes to it; a call without it changes nothing and returns the change for the user to approve. A user stating a preference (e.g. 'I dislike olives') has not approved saving it: approval is a later message agreeing to the change as proposed. The server cannot verify that a person gave the approval. Removals work without health-data consent and then return only what was removed. The user can see and edit the same profile in Forkmate's Settings.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "add_allergies": {
+            "description": "Allergens to add, from the major US allergen list.",
+            "items": {
+              "enum": [
+                "milk",
+                "eggs",
+                "fish",
+                "shellfish",
+                "tree_nuts",
+                "peanuts",
+                "wheat",
+                "soy",
+                "sesame"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "add_dislikes": {
+            "description": "Foods the user dislikes, e.g. 'mushrooms'. A taste preference, not an allergy or a restriction.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "add_likes": {
+            "description": "Foods the user enjoys, e.g. 'salmon'.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "diet_style": {
+            "description": "The user's diet style; 'none' clears it.",
+            "enum": [
+              "omnivore",
+              "vegetarian",
+              "vegan",
+              "pescatarian",
+              "keto",
+              "none"
+            ],
+            "type": "string"
+          },
+          "remove_allergies": {
+            "description": "Allergens to remove.",
+            "items": {
+              "enum": [
+                "milk",
+                "eggs",
+                "fish",
+                "shellfish",
+                "tree_nuts",
+                "peanuts",
+                "wheat",
+                "soy",
+                "sesame"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "remove_dislikes": {
+            "description": "Foods to take off the dislikes list.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "remove_likes": {
+            "description": "Foods to take off the likes list.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "user_approved": {
+            "description": "True only when the previous assistant message proposed this exact change and the user's latest message agreed to it. The user stating the preference itself is not approval.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "user_approved"
+        ],
+        "type": "object"
+      },
+      "name": "update_preferences",
+      "outputSchema": {
+        "properties": {
+          "allergies": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "allergy_disclaimer": {
+            "type": "string"
+          },
+          "diet_style": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "dislikes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "likes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "not_found": {
+            "properties": {
+              "allergies": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "dislikes": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "likes": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "likes",
+              "dislikes",
+              "allergies"
+            ],
+            "type": "object"
+          },
+          "portion_note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "removed": {
+            "properties": {
+              "allergies": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "dislikes": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "likes": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "likes",
+              "dislikes",
+              "allergies"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "removed",
+          "not_found"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get usual foods"
+      },
+      "description": "Read what the user usually and recently eats. `usual` lists their most-logged foods, most frequent first, each with how many times it was logged, the date last eaten, the meal it is usually logged under, and the portion and macros from the last time. `recent` lists each distinct food from the last seven days with the date last eaten, its meal and how many times. An optional `meal` narrows both lists to one meal. All calorie and macro values, including carbohydrates, are estimates from USDA FoodData Central, Open Food Facts, the user's own entry or an AI assistant's estimate — approximate, not lab-measured or specific to a package or batch, and not suitable for insulin dosing (including carb counting for a meal bolus), blood-glucose prediction or any other medical decision.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "meal": {
+            "description": "Only foods logged under this meal.",
+            "enum": [
+              "breakfast",
+              "lunch",
+              "dinner",
+              "snack",
+              "other"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_usual_foods",
+      "outputSchema": {
+        "properties": {
+          "meal": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "recent": {
+            "items": {
+              "properties": {
+                "last_eaten": {
+                  "description": "A local date, YYYY-MM-DD.",
+                  "type": "string"
+                },
+                "meal": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "name": {
                   "type": "string"
                 },
+                "times": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "name",
+                "last_eaten",
+                "meal",
+                "times"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "recent_window": {
+            "properties": {
+              "end": {
+                "description": "A local date, YYYY-MM-DD.",
+                "type": "string"
+              },
+              "start": {
+                "description": "A local date, YYYY-MM-DD.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "start",
+              "end"
+            ],
+            "type": "object"
+          },
+          "usual": {
+            "items": {
+              "properties": {
+                "last_eaten": {
+                  "description": "A local date, YYYY-MM-DD.",
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "times_logged": {
+                  "type": "integer"
+                },
+                "typical_serving": {
+                  "properties": {
+                    "macros": {
+                      "description": "Calories and macros. Estimates, not lab-measured; not for insulin dosing.",
+                      "properties": {
+                        "carb_g": {
+                          "type": "number"
+                        },
+                        "fat_g": {
+                          "type": "number"
+                        },
+                        "kcal": {
+                          "type": "number"
+                        },
+                        "protein_g": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "kcal",
+                        "protein_g",
+                        "carb_g",
+                        "fat_g"
+                      ],
+                      "type": "object"
+                    },
+                    "quantity": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "quantity",
+                    "macros"
+                  ],
+                  "type": "object"
+                },
+                "usual_meal": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "name",
+                "times_logged",
+                "last_eaten",
+                "usual_meal",
+                "typical_serving"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "meal",
+          "usual",
+          "recent",
+          "recent_window"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Log a meal"
+      },
+      "description": "Add a meal to the user's food diary: one or more food items, each with an optional quantity and macros, plus an optional meal label, date, note and provenance `source`. The reply names the new entry's `id` and `local_date`, which identify it for a later edit or deletion. All calorie and macro values, including carbohydrates, are estimates from USDA FoodData Central, Open Food Facts, the user's own entry or an AI assistant's estimate — approximate, not lab-measured or specific to a package or batch, and not suitable for insulin dosing (including carb counting for a meal bolus), blood-glucose prediction or any other medical decision.",
+      "inputSchema": {
+        "properties": {
+          "at": {
+            "description": "ISO-8601 instant the meal was eaten; defaults to now.",
+            "type": "string"
+          },
+          "items": {
+            "description": "The foods in this meal, one entry per food.",
+            "items": {
+              "properties": {
+                "barcode": {
+                  "description": "The package's UPC/EAN barcode, when the food came from a barcode lookup.",
+                  "type": "string"
+                },
+                "caffeine_mg": {
+                  "description": "Optional caffeine content of this item, in milligrams (e.g. ~95 for a mug of brewed coffee).",
+                  "type": "number"
+                },
+                "fluid_ml": {
+                  "description": "Optional fluid/hydration volume of this item, in millilitres (e.g. 240 for an 8 oz cup).",
+                  "type": "number"
+                },
+                "macros": {
+                  "description": "Estimated nutrition for the portion eaten. Omitted fields are looked up from the food databases.",
+                  "properties": {
+                    "carb_g": {
+                      "description": "Total carbohydrate for the whole portion eaten, in grams.",
+                      "type": "number"
+                    },
+                    "fat_g": {
+                      "description": "Total fat for the whole portion eaten, in grams.",
+                      "type": "number"
+                    },
+                    "kcal": {
+                      "description": "Energy for the whole portion eaten, in kilocalories (not per 100 g).",
+                      "type": "number"
+                    },
+                    "protein_g": {
+                      "description": "Protein for the whole portion eaten, in grams.",
+                      "type": "number"
+                    }
+                  },
+                  "type": "object"
+                },
+                "name": {
+                  "description": "What the food is, e.g. 'scrambled eggs' or 'Greek yogurt, plain'.",
+                  "type": "string"
+                },
                 "quantity": {
-                  "description": "Portion as the user stated it, e.g. '3' or '1 cup'. When logging a search_foods/lookup_barcode candidate you scaled by its serving, write it as 'N × <serving_label> (<total_g> g)' to match the web app's diary — e.g. a candidate with serving_grams 48 and serving_label '1 frank', eaten ×2, becomes macros = the per-100 g figures × 0.96 (96 g total), quantity '2 × 1 frank (96 g)', and `source` set to that candidate's source. This field is a DISPLAY LABEL ONLY — you must still send the already-scaled macros; the server never re-scales them.",
+                  "description": "Portion as a display label, e.g. '3', '1 cup' or '2 × 1 frank (96 g)'. Display only: the server stores macros exactly as sent and does not re-scale them.",
                   "type": "string"
                 }
               },
@@ -143,10 +877,11 @@
             "type": "array"
           },
           "local_date": {
-            "description": "YYYY-MM-DD diary date; defaults to the user's local date (from their timezone). Pass this to log a meal on a different day.",
+            "description": "YYYY-MM-DD diary date; defaults to the user's local date (from their timezone).",
             "type": "string"
           },
           "meal": {
+            "description": "Which meal of the day this was.",
             "enum": [
               "breakfast",
               "lunch",
@@ -157,18 +892,16 @@
             "type": "string"
           },
           "note": {
+            "description": "Optional free-text note stored with the meal, e.g. 'post-run'.",
             "type": "string"
           },
           "source": {
-            "description": "Optional provenance for these items. After search_foods/lookup_barcode, pass the candidate's source class (e.g. 'usda' or 'off') so the diary shows it's grounded. Defaults to 'client' (your own estimate). Unrecognized values are recorded as 'client'.",
+            "description": "Optional provenance for these items: the `source` label of the food-database candidate they came from ('USDA', 'Open Food Facts' or 'Forkmate'), or 'estimate'. Defaults to 'estimate'; unrecognized values are recorded as an estimate.",
             "enum": [
-              "client",
-              "usda",
-              "off",
-              "usda-index",
-              "mfp-import",
-              "manual",
-              "chain-menu"
+              "USDA",
+              "Open Food Facts",
+              "Forkmate",
+              "estimate"
             ],
             "type": "string"
           }
@@ -178,17 +911,158 @@
         ],
         "type": "object"
       },
-      "name": "log_meal"
+      "name": "log_meal",
+      "outputSchema": {
+        "properties": {
+          "day_totals": {
+            "properties": {
+              "caffeine_mg": {
+                "type": "number"
+              },
+              "entry_count": {
+                "type": "integer"
+              },
+              "fluid_ml": {
+                "type": "number"
+              },
+              "local_date": {
+                "description": "A local date, YYYY-MM-DD.",
+                "type": "string"
+              },
+              "totals": {
+                "description": "Calories and macros. Estimates, not lab-measured; not for insulin dosing.",
+                "properties": {
+                  "carb_g": {
+                    "type": "number"
+                  },
+                  "fat_g": {
+                    "type": "number"
+                  },
+                  "kcal": {
+                    "type": "number"
+                  },
+                  "protein_g": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "kcal",
+                  "protein_g",
+                  "carb_g",
+                  "fat_g"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "local_date",
+              "entry_count",
+              "totals"
+            ],
+            "type": "object"
+          },
+          "entry": {
+            "description": "One diary entry: a meal with its foods.",
+            "properties": {
+              "at": {
+                "description": "ISO-8601 UTC instant the food was eaten.",
+                "type": "string"
+              },
+              "id": {
+                "description": "Identifies the entry for a later edit or deletion.",
+                "type": "string"
+              },
+              "items": {
+                "items": {
+                  "properties": {
+                    "caffeine_mg": {
+                      "type": "number"
+                    },
+                    "fluid_ml": {
+                      "type": "number"
+                    },
+                    "macros": {
+                      "description": "Calories and macros. Estimates, not lab-measured; not for insulin dosing.",
+                      "properties": {
+                        "carb_g": {
+                          "type": "number"
+                        },
+                        "fat_g": {
+                          "type": "number"
+                        },
+                        "kcal": {
+                          "type": "number"
+                        },
+                        "protein_g": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [],
+                      "type": "object"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "quantity": {
+                      "type": "string"
+                    },
+                    "unknown_macros": {
+                      "description": "Macros missing from the source data: shown as 0 but unknown, not a real zero.",
+                      "items": {
+                        "enum": [
+                          "protein_g",
+                          "carb_g",
+                          "fat_g"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "local_date": {
+                "description": "A local date, YYYY-MM-DD.",
+                "type": "string"
+              },
+              "meal": {
+                "description": "breakfast, lunch, dinner or snack, when set.",
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "at",
+              "local_date",
+              "items"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "entry",
+          "day_totals"
+        ],
+        "type": "object"
+      }
     },
     {
       "annotations": {
-        "destructiveHint": false,
+        "destructiveHint": true,
         "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": false,
         "title": "Edit a logged food"
       },
-      "description": "Correct a food already logged to the user's diary — fix a wrong calorie/macro value, quantity, or name, or move an entry to a different meal. Identify the entry by its `id` and `local_date` (both from get_day) and the food by its `item_index` within that entry's items[]. Only the fields you send change; the macros you send are MERGED onto the existing ones (so sending just `kcal` leaves protein/carb/fat as they were). This overwrites the value IN PLACE — there is no history of the previous value. Editing never moves an entry to another day (to do that, delete and re-log). SAFETY: all calorie and macro values here — including carbohydrates — are ESTIMATES (from USDA / Open Food Facts or the user's own entry), approximate and not lab-measured or per-batch. They are for general nutrition tracking ONLY. Do NOT use them for insulin dosing, carb-counting for a bolus, blood-glucose prediction, or any other medical decision, and do NOT compute a dose or glucose estimate from them. For anything medical, direct the user to the product's own label and their care team.",
+      "description": "Correct a food already in the user's diary — its name, quantity, macros, caffeine or fluid — or change an entry's meal label or note. The entry is identified by `id` and `local_date`, and a food by its `item_index`. Only the fields sent change; macros are merged onto the existing values and overwritten in place, with no history kept. A new `quantity` sent without `macros` rescales the food's macros, caffeine and fluid by the new amount ÷ the old one when both are the same kind of amount (a weight, a volume or a count), so '150 g' to '300 g' doubles them; otherwise the macros stay as they were and the reply says so. An entry cannot be moved to another day. All calorie and macro values, including carbohydrates, are estimates from USDA FoodData Central, Open Food Facts, the user's own entry or an AI assistant's estimate — approximate, not lab-measured or specific to a package or batch, and not suitable for insulin dosing (including carb counting for a meal bolus), blood-glucose prediction or any other medical decision.",
       "inputSchema": {
         "properties": {
           "caffeine_mg": {
@@ -200,7 +1074,7 @@
             "type": "number"
           },
           "id": {
-            "description": "The entry id to edit (from get_day).",
+            "description": "The entry id, shown with each entry in the reply text when a meal is logged or a day or range is read.",
             "type": "string"
           },
           "item_index": {
@@ -208,22 +1082,26 @@
             "type": "number"
           },
           "local_date": {
-            "description": "YYYY-MM-DD diary date of the entry (from get_day).",
+            "description": "YYYY-MM-DD diary date of the entry.",
             "type": "string"
           },
           "macros": {
-            "description": "Corrected macros — only the components you send are changed.",
+            "description": "Corrected macros. Only the components included are changed.",
             "properties": {
               "carb_g": {
+                "description": "Corrected total carbohydrate for the whole portion, in grams.",
                 "type": "number"
               },
               "fat_g": {
+                "description": "Corrected total fat for the whole portion, in grams.",
                 "type": "number"
               },
               "kcal": {
+                "description": "Corrected energy for the whole portion, in kilocalories.",
                 "type": "number"
               },
               "protein_g": {
+                "description": "Corrected protein for the whole portion, in grams.",
                 "type": "number"
               }
             },
@@ -241,9 +1119,11 @@
             "type": "string"
           },
           "name": {
+            "description": "Corrected name of the food.",
             "type": "string"
           },
           "note": {
+            "description": "Replacement note for the entry.",
             "type": "string"
           },
           "quantity": {
@@ -257,7 +1137,148 @@
         ],
         "type": "object"
       },
-      "name": "update_meal"
+      "name": "update_meal",
+      "outputSchema": {
+        "properties": {
+          "day_totals": {
+            "properties": {
+              "caffeine_mg": {
+                "type": "number"
+              },
+              "entry_count": {
+                "type": "integer"
+              },
+              "fluid_ml": {
+                "type": "number"
+              },
+              "local_date": {
+                "description": "A local date, YYYY-MM-DD.",
+                "type": "string"
+              },
+              "totals": {
+                "description": "Calories and macros. Estimates, not lab-measured; not for insulin dosing.",
+                "properties": {
+                  "carb_g": {
+                    "type": "number"
+                  },
+                  "fat_g": {
+                    "type": "number"
+                  },
+                  "kcal": {
+                    "type": "number"
+                  },
+                  "protein_g": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "kcal",
+                  "protein_g",
+                  "carb_g",
+                  "fat_g"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "local_date",
+              "entry_count",
+              "totals"
+            ],
+            "type": "object"
+          },
+          "entry": {
+            "description": "One diary entry: a meal with its foods.",
+            "properties": {
+              "at": {
+                "description": "ISO-8601 UTC instant the food was eaten.",
+                "type": "string"
+              },
+              "id": {
+                "description": "Identifies the entry for a later edit or deletion.",
+                "type": "string"
+              },
+              "items": {
+                "items": {
+                  "properties": {
+                    "caffeine_mg": {
+                      "type": "number"
+                    },
+                    "fluid_ml": {
+                      "type": "number"
+                    },
+                    "macros": {
+                      "description": "Calories and macros. Estimates, not lab-measured; not for insulin dosing.",
+                      "properties": {
+                        "carb_g": {
+                          "type": "number"
+                        },
+                        "fat_g": {
+                          "type": "number"
+                        },
+                        "kcal": {
+                          "type": "number"
+                        },
+                        "protein_g": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [],
+                      "type": "object"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "quantity": {
+                      "type": "string"
+                    },
+                    "unknown_macros": {
+                      "description": "Macros missing from the source data: shown as 0 but unknown, not a real zero.",
+                      "items": {
+                        "enum": [
+                          "protein_g",
+                          "carb_g",
+                          "fat_g"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "local_date": {
+                "description": "A local date, YYYY-MM-DD.",
+                "type": "string"
+              },
+              "meal": {
+                "description": "breakfast, lunch, dinner or snack, when set.",
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "at",
+              "local_date",
+              "items"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "entry",
+          "day_totals"
+        ],
+        "type": "object"
+      }
     },
     {
       "annotations": {
@@ -267,11 +1288,11 @@
         "readOnlyHint": false,
         "title": "Delete a logged food"
       },
-      "description": "Delete a food from the user's diary — remove one food from an entry (by `item_index`), or the whole entry (omit `item_index`). Identify the entry by its `id` and `local_date` (both from get_day). This is a TRUE removal: the data is gone, with NO server-side tombstone and no undo. Deleting the last food in an entry removes the entry. Safe to retry — deleting something already gone is a no-op success. SAFETY: all calorie and macro values here — including carbohydrates — are ESTIMATES (from USDA / Open Food Facts or the user's own entry), approximate and not lab-measured or per-batch. They are for general nutrition tracking ONLY. Do NOT use them for insulin dosing, carb-counting for a bolus, blood-glucose prediction, or any other medical decision, and do NOT compute a dose or glucose estimate from them. For anything medical, direct the user to the product's own label and their care team.",
+      "description": "Delete one food from a diary entry (by `item_index`), or the whole entry (without it). The entry is identified by `id` and `local_date`. Deletion is permanent, with no undo; deleting the last food removes the entry, and an `id` that matches no entry on that date returns a not-found error and deletes nothing. All calorie and macro values, including carbohydrates, are estimates from USDA FoodData Central, Open Food Facts, the user's own entry or an AI assistant's estimate — approximate, not lab-measured or specific to a package or batch, and not suitable for insulin dosing (including carb counting for a meal bolus), blood-glucose prediction or any other medical decision.",
       "inputSchema": {
         "properties": {
           "id": {
-            "description": "The entry id to delete from (from get_day).",
+            "description": "The entry id, shown with each entry in the reply text when a meal is logged or a day or range is read.",
             "type": "string"
           },
           "item_index": {
@@ -279,7 +1300,7 @@
             "type": "number"
           },
           "local_date": {
-            "description": "YYYY-MM-DD diary date of the entry (from get_day).",
+            "description": "YYYY-MM-DD diary date of the entry.",
             "type": "string"
           }
         },
@@ -289,125 +1310,178 @@
         ],
         "type": "object"
       },
-      "name": "delete_meal"
-    },
-    {
-      "annotations": {
-        "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "Get pantry"
-      },
-      "description": "Read the user's PANTRY — the foods they keep ON HAND (their staples), so you can suggest meals from what they actually have and pre-fill macros when they log one. Returns each item's name and, when the user saved them, macros (for the item's serving), a serving label, a `source`, and a short note. The pantry is the user's CURATED list of what they stock — separate from what they've logged (their diary) and from their frequents (what they log often). IMPORTANT: a `source` (e.g. 'usda') is the user's own CLAIM about where the macros came from, NOT a server-verified guarantee — treat it as a hint, never as certified.",
-      "inputSchema": {
-        "additionalProperties": false,
-        "properties": {},
+      "name": "delete_meal",
+      "outputSchema": {
+        "properties": {
+          "day_totals": {
+            "properties": {
+              "caffeine_mg": {
+                "type": "number"
+              },
+              "entry_count": {
+                "type": "integer"
+              },
+              "fluid_ml": {
+                "type": "number"
+              },
+              "local_date": {
+                "description": "A local date, YYYY-MM-DD.",
+                "type": "string"
+              },
+              "totals": {
+                "description": "Calories and macros. Estimates, not lab-measured; not for insulin dosing.",
+                "properties": {
+                  "carb_g": {
+                    "type": "number"
+                  },
+                  "fat_g": {
+                    "type": "number"
+                  },
+                  "kcal": {
+                    "type": "number"
+                  },
+                  "protein_g": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "kcal",
+                  "protein_g",
+                  "carb_g",
+                  "fat_g"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "local_date",
+              "entry_count",
+              "totals"
+            ],
+            "type": "object"
+          },
+          "entry": {
+            "anyOf": [
+              {
+                "description": "One diary entry: a meal with its foods.",
+                "properties": {
+                  "at": {
+                    "description": "ISO-8601 UTC instant the food was eaten.",
+                    "type": "string"
+                  },
+                  "id": {
+                    "description": "Identifies the entry for a later edit or deletion.",
+                    "type": "string"
+                  },
+                  "items": {
+                    "items": {
+                      "properties": {
+                        "caffeine_mg": {
+                          "type": "number"
+                        },
+                        "fluid_ml": {
+                          "type": "number"
+                        },
+                        "macros": {
+                          "description": "Calories and macros. Estimates, not lab-measured; not for insulin dosing.",
+                          "properties": {
+                            "carb_g": {
+                              "type": "number"
+                            },
+                            "fat_g": {
+                              "type": "number"
+                            },
+                            "kcal": {
+                              "type": "number"
+                            },
+                            "protein_g": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [],
+                          "type": "object"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "quantity": {
+                          "type": "string"
+                        },
+                        "unknown_macros": {
+                          "description": "Macros missing from the source data: shown as 0 but unknown, not a real zero.",
+                          "items": {
+                            "enum": [
+                              "protein_g",
+                              "carb_g",
+                              "fat_g"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "local_date": {
+                    "description": "A local date, YYYY-MM-DD.",
+                    "type": "string"
+                  },
+                  "meal": {
+                    "description": "breakfast, lunch, dinner or snack, when set.",
+                    "type": "string"
+                  },
+                  "note": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "at",
+                  "local_date",
+                  "items"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What remains of the entry, or null."
+          },
+          "removed": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "removed",
+          "entry",
+          "day_totals"
+        ],
         "type": "object"
-      },
-      "name": "get_pantry"
+      }
     },
     {
       "annotations": {
         "destructiveHint": false,
-        "idempotentHint": true,
-        "openWorldHint": false,
-        "readOnlyHint": false,
-        "title": "Add or update a pantry item"
-      },
-      "description": "Add a food to the user's pantry, or UPDATE it if it's already there (matched by name, any casing) — e.g. 'add rolled oats to my pantry'. Only `name` is required; include `macros` (for one serving), a `serving` label, a `source`, and a short `note` when you know them, so a later log can reuse them. Re-adding the same food REPLACES its details (an upsert — it never creates a duplicate). Only pass a `source` you actually got from search_foods/lookup_barcode; an unrecognized value is recorded as the user's own estimate ('client'). This does NOT log a meal — it only curates the user's staples.",
-      "inputSchema": {
-        "additionalProperties": false,
-        "properties": {
-          "macros": {
-            "description": "Macros for ONE serving of this food, when known.",
-            "properties": {
-              "carb_g": {
-                "type": "number"
-              },
-              "fat_g": {
-                "type": "number"
-              },
-              "kcal": {
-                "type": "number"
-              },
-              "protein_g": {
-                "type": "number"
-              }
-            },
-            "type": "object"
-          },
-          "name": {
-            "description": "The food to keep on hand, e.g. 'rolled oats'.",
-            "type": "string"
-          },
-          "note": {
-            "description": "Optional short note, e.g. 'the Costco tub'.",
-            "type": "string"
-          },
-          "serving": {
-            "description": "Serving label the macros are for, e.g. '1 cup' or 'per 100 g'.",
-            "type": "string"
-          },
-          "source": {
-            "description": "Where the macros came from, if grounded via search_foods/lookup_barcode (e.g. 'usda'). Defaults to your own estimate ('client'); unrecognized values are recorded as 'client'.",
-            "enum": [
-              "client",
-              "usda",
-              "off",
-              "usda-index",
-              "mfp-import",
-              "manual",
-              "chain-menu"
-            ],
-            "type": "string"
-          }
-        },
-        "required": [
-          "name"
-        ],
-        "type": "object"
-      },
-      "name": "add_pantry_item"
-    },
-    {
-      "annotations": {
-        "destructiveHint": true,
-        "idempotentHint": true,
-        "openWorldHint": false,
-        "readOnlyHint": false,
-        "title": "Remove a pantry item"
-      },
-      "description": "Remove a food from the user's pantry by name — e.g. 'take eggs off my pantry list'. This removes it from their on-hand STAPLES only; it does NOT delete anything from their food diary. Safe to retry — removing something that isn't in the pantry is a no-op success.",
-      "inputSchema": {
-        "additionalProperties": false,
-        "properties": {
-          "name": {
-            "description": "The food to remove from the pantry (any casing).",
-            "type": "string"
-          }
-        },
-        "required": [
-          "name"
-        ],
-        "type": "object"
-      },
-      "name": "remove_pantry_item"
-    },
-    {
-      "annotations": {
         "openWorldHint": true,
         "readOnlyHint": true,
         "title": "Search foods"
       },
-      "description": "Search USDA FoodData Central and Open Food Facts for foods matching a query, returning candidates with macros and a `source` you can show the user. IMPORTANT: the macros are PER 100 g (see each candidate's `serving`) — scale them to the portion the user actually ate before logging with log_meal. A candidate MAY also carry `serving_grams`/`serving_label` for ONE household serving (e.g. 48 g / \"1 frank\") — when present, offer the user 'N servings' instead of asking for grams, but still scale the per-100 g macros to the resolved grams before logging. When you log a chosen candidate, pass its `source` to log_meal so the diary records real provenance (USDA/Open Food Facts) instead of an estimate. SAFETY: all calorie and macro values here — including carbohydrates — are ESTIMATES (from USDA / Open Food Facts or the user's own entry), approximate and not lab-measured or per-batch. They are for general nutrition tracking ONLY. Do NOT use them for insulin dosing, carb-counting for a bolus, blood-glucose prediction, or any other medical decision, and do NOT compute a dose or glucose estimate from them. For anything medical, direct the user to the product's own label and their care team.",
+      "description": "Search USDA FoodData Central, Open Food Facts and Forkmate's curated restaurant menus for a named food. Returns up to 5 candidates, each with macros per 100 g, a `source` label ('USDA', 'Open Food Facts' or 'Forkmate'), and, when known, `serving_grams`/`serving_label` for one household serving. Curated chain-menu candidates include a `provenance` object that may carry a portion caveat. A query names a food (at least 2 letters, no wildcards); there is no paging. All calorie and macro values, including carbohydrates, are estimates from USDA FoodData Central, Open Food Facts, the user's own entry or an AI assistant's estimate — approximate, not lab-measured or specific to a package or batch, and not suitable for insulin dosing (including carb counting for a meal bolus), blood-glucose prediction or any other medical decision.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
           "limit": {
-            "description": "Max candidates to return (default 5, clamped to 1–10).",
+            "description": "Max candidates to return (default and maximum 5).",
             "type": "number"
           },
           "query": {
-            "description": "Food to search, e.g. 'greek yogurt' or 'Chipotle chicken'.",
+            "description": "Food to search, e.g. 'greek yogurt' or 'Chipotle chicken'. At least 2 letters; wildcards are not supported.",
             "type": "string"
           }
         },
@@ -416,15 +1490,129 @@
         ],
         "type": "object"
       },
-      "name": "search_foods"
+      "name": "search_foods",
+      "outputSchema": {
+        "properties": {
+          "candidates": {
+            "items": {
+              "description": "A food match. Macros are PER 100 g — scale to the portion before logging.",
+              "properties": {
+                "macros": {
+                  "description": "Calories and macros. Estimates, not lab-measured; not for insulin dosing.",
+                  "properties": {
+                    "carb_g": {
+                      "type": "number"
+                    },
+                    "fat_g": {
+                      "type": "number"
+                    },
+                    "kcal": {
+                      "type": "number"
+                    },
+                    "protein_g": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "kcal",
+                    "protein_g",
+                    "carb_g",
+                    "fat_g"
+                  ],
+                  "type": "object"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "provenance": {
+                  "description": "Chain-menu citation: the chain, its data date, its published page, the assumed build and a caveat.",
+                  "properties": {
+                    "as_of": {
+                      "description": "A local date, YYYY-MM-DD.",
+                      "type": "string"
+                    },
+                    "assumed_build": {
+                      "type": "string"
+                    },
+                    "caveat": {
+                      "type": "string"
+                    },
+                    "chain": {
+                      "type": "string"
+                    },
+                    "source_url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "chain",
+                    "as_of"
+                  ],
+                  "type": "object"
+                },
+                "serving": {
+                  "description": "The basis the macros are for, e.g. '100 g'.",
+                  "type": "string"
+                },
+                "serving_approx": {
+                  "description": "serving_grams is estimated from a drink's volume.",
+                  "type": "boolean"
+                },
+                "serving_grams": {
+                  "type": "number"
+                },
+                "serving_label": {
+                  "type": "string"
+                },
+                "source": {
+                  "description": "Where the figures came from, as a label.",
+                  "enum": [
+                    "USDA",
+                    "Open Food Facts",
+                    "Forkmate",
+                    "your entry",
+                    "estimate"
+                  ],
+                  "type": "string"
+                },
+                "unknown_macros": {
+                  "description": "Macros missing from the source data: shown as 0 but unknown, not a real zero.",
+                  "items": {
+                    "enum": [
+                      "protein_g",
+                      "carb_g",
+                      "fat_g"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "name",
+                "serving",
+                "macros",
+                "source"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "candidates"
+        ],
+        "type": "object"
+      }
     },
     {
       "annotations": {
+        "destructiveHint": false,
         "openWorldHint": true,
         "readOnlyHint": true,
         "title": "Look up barcode"
       },
-      "description": "Look up a packaged food by its UPC/EAN barcode via Open Food Facts. IMPORTANT: the macros are PER 100 g (see `serving`) — scale to the portion eaten before logging with log_meal. It MAY also carry `serving_grams`/`serving_label` for one household serving — offer 'N servings' when present, still scaling the per-100 g macros before logging. Pass the returned `source` to log_meal to preserve provenance. SAFETY: all calorie and macro values here — including carbohydrates — are ESTIMATES (from USDA / Open Food Facts or the user's own entry), approximate and not lab-measured or per-batch. They are for general nutrition tracking ONLY. Do NOT use them for insulin dosing, carb-counting for a bolus, blood-glucose prediction, or any other medical decision, and do NOT compute a dose or glucose estimate from them. For anything medical, direct the user to the product's own label and their care team.",
+      "description": "Look up a packaged food by its UPC/EAN barcode in Open Food Facts. Returns macros per 100 g, a `source` label ('Open Food Facts'), and, when known, `serving_grams`/`serving_label` for one household serving. All calorie and macro values, including carbohydrates, are estimates from USDA FoodData Central, Open Food Facts, the user's own entry or an AI assistant's estimate — approximate, not lab-measured or specific to a package or batch, and not suitable for insulin dosing (including carb counting for a meal bolus), blood-glucose prediction or any other medical decision.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -438,7 +1626,120 @@
         ],
         "type": "object"
       },
-      "name": "lookup_barcode"
+      "name": "lookup_barcode",
+      "outputSchema": {
+        "properties": {
+          "candidates": {
+            "items": {
+              "description": "A food match. Macros are PER 100 g — scale to the portion before logging.",
+              "properties": {
+                "macros": {
+                  "description": "Calories and macros. Estimates, not lab-measured; not for insulin dosing.",
+                  "properties": {
+                    "carb_g": {
+                      "type": "number"
+                    },
+                    "fat_g": {
+                      "type": "number"
+                    },
+                    "kcal": {
+                      "type": "number"
+                    },
+                    "protein_g": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "kcal",
+                    "protein_g",
+                    "carb_g",
+                    "fat_g"
+                  ],
+                  "type": "object"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "provenance": {
+                  "description": "Chain-menu citation: the chain, its data date, its published page, the assumed build and a caveat.",
+                  "properties": {
+                    "as_of": {
+                      "description": "A local date, YYYY-MM-DD.",
+                      "type": "string"
+                    },
+                    "assumed_build": {
+                      "type": "string"
+                    },
+                    "caveat": {
+                      "type": "string"
+                    },
+                    "chain": {
+                      "type": "string"
+                    },
+                    "source_url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "chain",
+                    "as_of"
+                  ],
+                  "type": "object"
+                },
+                "serving": {
+                  "description": "The basis the macros are for, e.g. '100 g'.",
+                  "type": "string"
+                },
+                "serving_approx": {
+                  "description": "serving_grams is estimated from a drink's volume.",
+                  "type": "boolean"
+                },
+                "serving_grams": {
+                  "type": "number"
+                },
+                "serving_label": {
+                  "type": "string"
+                },
+                "source": {
+                  "description": "Where the figures came from, as a label.",
+                  "enum": [
+                    "USDA",
+                    "Open Food Facts",
+                    "Forkmate",
+                    "your entry",
+                    "estimate"
+                  ],
+                  "type": "string"
+                },
+                "unknown_macros": {
+                  "description": "Macros missing from the source data: shown as 0 but unknown, not a real zero.",
+                  "items": {
+                    "enum": [
+                      "protein_g",
+                      "carb_g",
+                      "fat_g"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "name",
+                "serving",
+                "macros",
+                "source"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "candidates"
+        ],
+        "type": "object"
+      }
     }
   ],
   "url": "https://mcp.forkmate.ai"

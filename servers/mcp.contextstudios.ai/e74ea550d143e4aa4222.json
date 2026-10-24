@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "ff727388a6ee284c427379f1484ce35e509dd69bedb91b50459b3651bb751694",
+  "full_hash": "1087bc2034dbb07d856efe2fe024645b01520215c80b55fbe2271f130f741f43",
   "name": "ai.contextstudios/mcp",
-  "observed_at": "2026-08-20T09:11:37.718779Z",
+  "observed_at": "2026-10-02T02:05:29.053056Z",
   "sources": [
     "official"
   ],
-  "tool_count": 28,
+  "tool_count": 46,
   "tools": [
     {
       "_meta": {
@@ -19,6 +19,24 @@
         "readOnlyHint": true
       },
       "description": "Interactive AI project estimation tool.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "projectDescription": {
@@ -91,6 +109,24 @@
         "readOnlyHint": true
       },
       "description": "Interactive blog browsing interface.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/blog-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/blog-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "language": {
@@ -165,11 +201,29 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
-      "description": "Fetch the full content of a document by ID returned from the search tool.",
+      "description": "Fetch the full content of a document by ID returned from the search tool (e.g. 'blog:de:mein-artikel'), OR by a full https://www.contextstudios.ai/... URL or site-relative path — any public page's Markdown twin (<url>.md) is fetched, cached, and returned in the same shape.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/search-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/search-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "id": {
-            "description": "Document ID from search results, e.g. 'blog:de:mein-artikel'",
+            "description": "Document ID from search results (e.g. 'blog:de:mein-artikel'), or a full contextstudios.ai URL / site-relative path.",
             "type": "string"
           }
         },
@@ -217,7 +271,149 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
+      "description": "Recommend local-AI setups for a given hardware: platform + device count, optional goal (quality | balance | speed). Returns the editorial picks for that setup first (with the reason and the recipe's numbers), then all matching recipes by rank (category → value) or by AA intelligence. Every number has category, condition and source_url.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-dark.svg",
+          "theme": "dark"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of devices/GPUs (e.g. 1, 2, 4)",
+            "type": "number"
+          },
+          "goal": {
+            "description": "Optional: only picks for this goal",
+            "enum": [
+              "quality",
+              "balance",
+              "speed"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "default": 10,
+            "description": "Max recipes after the picks (default 20, max 100)",
+            "examples": [
+              5,
+              10,
+              20
+            ],
+            "maximum": 50,
+            "minimum": 1,
+            "type": "number"
+          },
+          "locale": {
+            "default": "en",
+            "description": "Page locale for returned URLs (default en)",
+            "enum": [
+              "en",
+              "de",
+              "fr",
+              "it"
+            ],
+            "examples": [
+              "en",
+              "de"
+            ],
+            "type": "string"
+          },
+          "platform": {
+            "description": "Hardware platform",
+            "enum": [
+              "dgx-spark",
+              "mac",
+              "strix-halo",
+              "rtx-3090",
+              "rtx-5090",
+              "rtx-pro-6000"
+            ],
+            "type": "string"
+          },
+          "sort": {
+            "default": "rank",
+            "enum": [
+              "rank",
+              "intelligence"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "platform",
+          "count"
+        ],
+        "type": "object"
+      },
+      "name": "find_local_ai_recipes",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of returned records for list and search tools.",
+            "type": "number"
+          },
+          "data": {
+            "description": "Structured result payload. Present for responseFormat='v2' tools."
+          },
+          "error": {
+            "description": "Human-readable error message when success is false.",
+            "type": "string"
+          },
+          "meta": {
+            "description": "Result metadata such as count, locale fallback, cache scope, or response format."
+          },
+          "success": {
+            "description": "Whether the tool call completed successfully.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Find Local AI Recipes for Hardware"
+    },
+    {
+      "_meta": {
+        "contextstudios/defaultResponseFormat": "legacy",
+        "contextstudios/recommendedResponseFormat": "v2",
+        "contextstudios/visibility": "public"
+      },
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
       "description": "Search and retrieve published blog posts.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/blog-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/blog-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "language": {
@@ -305,10 +501,28 @@
         "readOnlyHint": true
       },
       "description": "Retrieve comprehensive information about Context Studios including company overview, tech stack, differentiators, legal info, and contact details.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "sections": {
-            "description": "Which sections to return. Defaults to ['overview']",
+            "description": "Which sections to return. Defaults to ['overview']. 'pricing' returns the three fixed-price workshops and the one pricing statement — no project prices.",
             "examples": [
               [
                 "overview",
@@ -319,7 +533,8 @@
                 "contact",
                 "tech_stack",
                 "differentiators",
-                "legal"
+                "legal",
+                "pricing"
               ]
             ],
             "items": {
@@ -328,7 +543,8 @@
                 "contact",
                 "tech_stack",
                 "differentiators",
-                "legal"
+                "legal",
+                "pricing"
               ],
               "type": "string"
             },
@@ -373,7 +589,124 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
+      "description": "Get a specific company-size segment's full profile: name, TL;DR, entity definition, description, characteristics/needs, FAQ, and canonical + Markdown-twin URLs.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/audiences-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/audiences-dark.svg",
+          "theme": "dark"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "locale": {
+            "default": "en",
+            "description": "Preferred content locale.",
+            "enum": [
+              "de",
+              "en",
+              "fr",
+              "it"
+            ],
+            "examples": [
+              "en",
+              "de"
+            ],
+            "type": "string"
+          },
+          "responseFormat": {
+            "default": "legacy",
+            "description": "Response shape. Use v2 for agent-friendly {success,data,meta,error}; legacy remains available for older clients.",
+            "enum": [
+              "legacy",
+              "v2"
+            ],
+            "examples": [
+              "v2"
+            ],
+            "type": "string"
+          },
+          "slug": {
+            "description": "Exact slug or id, as returned by the matching list tool.",
+            "examples": [
+              "smb",
+              "startups"
+            ],
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_company_type",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of returned records for list and search tools.",
+            "type": "number"
+          },
+          "data": {
+            "description": "Structured result payload. Present for responseFormat='v2' tools."
+          },
+          "error": {
+            "description": "Human-readable error message when success is false.",
+            "type": "string"
+          },
+          "meta": {
+            "description": "Result metadata such as count, locale fallback, cache scope, or response format."
+          },
+          "success": {
+            "description": "Whether the tool call completed successfully.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Get Company Type"
+    },
+    {
+      "_meta": {
+        "contextstudios/defaultResponseFormat": "legacy",
+        "contextstudios/recommendedResponseFormat": "v2",
+        "contextstudios/visibility": "public"
+      },
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
       "description": "Retrieve a detailed comparison between two AI tools.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/comparisons-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/comparisons-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "language": {
@@ -406,7 +739,7 @@
           "slug": {
             "description": "Exact public slug for a blog post, guide, location page, comparison, glossary term, CMS page, or landing page.",
             "examples": [
-              "claude-vs-chatgpt",
+              "claude-opus-5-vs-claude-opus-4-6",
               "convex-vs-supabase"
             ],
             "minLength": 2,
@@ -454,7 +787,135 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
+      "description": "Get frequently asked questions. `scope=site` (default) returns the general Context Studios FAQ. `scope=service` or `scope=industry` requires `slug` and returns the FAQ for that specific service (e.g. mcp-server-development) or industry (e.g. handwerk-bau).",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-dark.svg",
+          "theme": "dark"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "locale": {
+            "default": "en",
+            "description": "Preferred content locale.",
+            "enum": [
+              "de",
+              "en",
+              "fr",
+              "it"
+            ],
+            "examples": [
+              "en",
+              "de"
+            ],
+            "type": "string"
+          },
+          "responseFormat": {
+            "default": "legacy",
+            "description": "Response shape. Use v2 for agent-friendly {success,data,meta,error}; legacy remains available for older clients.",
+            "enum": [
+              "legacy",
+              "v2"
+            ],
+            "examples": [
+              "v2"
+            ],
+            "type": "string"
+          },
+          "scope": {
+            "default": "site",
+            "description": "Location-page scope: locations, bundeslaender, or all.",
+            "enum": [
+              "site",
+              "service",
+              "industry"
+            ],
+            "examples": [
+              "locations",
+              "all"
+            ],
+            "type": "string"
+          },
+          "slug": {
+            "description": "Required for scope=service or scope=industry: the service or industry slug.",
+            "examples": [
+              "my-favorite-mcp-servers-in-january-2026-the-best-tools-for-ai-powered-development",
+              "mvp-sprint"
+            ],
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_faq",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of returned records for list and search tools.",
+            "type": "number"
+          },
+          "data": {
+            "description": "Structured result payload. Present for responseFormat='v2' tools."
+          },
+          "error": {
+            "description": "Human-readable error message when success is false.",
+            "type": "string"
+          },
+          "meta": {
+            "description": "Result metadata such as count, locale fallback, cache scope, or response format."
+          },
+          "success": {
+            "description": "Whether the tool call completed successfully.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Get FAQ"
+    },
+    {
+      "_meta": {
+        "contextstudios/defaultResponseFormat": "legacy",
+        "contextstudios/recommendedResponseFormat": "v2",
+        "contextstudios/visibility": "public"
+      },
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
       "description": "Get a curated list of featured AI terms.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/glossary-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/glossary-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "language": {
@@ -536,6 +997,24 @@
         "readOnlyHint": true
       },
       "description": "Filter glossary terms by technology provider or stack.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/glossary-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/glossary-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "language": {
@@ -630,6 +1109,24 @@
         "readOnlyHint": true
       },
       "description": "Get a detailed explanation of an AI term.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/glossary-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/glossary-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "language": {
@@ -711,6 +1208,24 @@
         "readOnlyHint": true
       },
       "description": "Get a specific guide.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/guides-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/guides-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "locale": {
@@ -790,7 +1305,429 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
+      "description": "Get a specific industry's full profile: name, TL;DR, entity definition, description, typical pain points, FAQ, and canonical + Markdown-twin URLs.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/audiences-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/audiences-dark.svg",
+          "theme": "dark"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "locale": {
+            "default": "en",
+            "description": "Preferred content locale.",
+            "enum": [
+              "de",
+              "en",
+              "fr",
+              "it"
+            ],
+            "examples": [
+              "en",
+              "de"
+            ],
+            "type": "string"
+          },
+          "responseFormat": {
+            "default": "legacy",
+            "description": "Response shape. Use v2 for agent-friendly {success,data,meta,error}; legacy remains available for older clients.",
+            "enum": [
+              "legacy",
+              "v2"
+            ],
+            "examples": [
+              "v2"
+            ],
+            "type": "string"
+          },
+          "slug": {
+            "description": "Exact slug or id, as returned by the matching list tool.",
+            "examples": [
+              "healthcare-care",
+              "crafts-construction"
+            ],
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_industry",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of returned records for list and search tools.",
+            "type": "number"
+          },
+          "data": {
+            "description": "Structured result payload. Present for responseFormat='v2' tools."
+          },
+          "error": {
+            "description": "Human-readable error message when success is false.",
+            "type": "string"
+          },
+          "meta": {
+            "description": "Result metadata such as count, locale fallback, cache scope, or response format."
+          },
+          "success": {
+            "description": "Whether the tool call completed successfully.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Get Industry"
+    },
+    {
+      "_meta": {
+        "contextstudios/defaultResponseFormat": "legacy",
+        "contextstudios/recommendedResponseFormat": "v2",
+        "contextstudios/visibility": "public"
+      },
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Get one creator with all of their published local-AI recipes (numbers with category, condition, source_url).",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-dark.svg",
+          "theme": "dark"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "locale": {
+            "default": "en",
+            "description": "Page locale for returned URLs (default en)",
+            "enum": [
+              "en",
+              "de",
+              "fr",
+              "it"
+            ],
+            "examples": [
+              "en",
+              "de"
+            ],
+            "type": "string"
+          },
+          "slug": {
+            "description": "Creator slug",
+            "examples": [
+              "my-favorite-mcp-servers-in-january-2026-the-best-tools-for-ai-powered-development",
+              "mvp-sprint"
+            ],
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_local_ai_creator",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of returned records for list and search tools.",
+            "type": "number"
+          },
+          "data": {
+            "description": "Structured result payload. Present for responseFormat='v2' tools."
+          },
+          "error": {
+            "description": "Human-readable error message when success is false.",
+            "type": "string"
+          },
+          "meta": {
+            "description": "Result metadata such as count, locale fallback, cache scope, or response format."
+          },
+          "success": {
+            "description": "Whether the tool call completed successfully.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Get Local AI Creator"
+    },
+    {
+      "_meta": {
+        "contextstudios/defaultResponseFormat": "legacy",
+        "contextstudios/recommendedResponseFormat": "v2",
+        "contextstudios/visibility": "public"
+      },
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "How the local-AI hub measures and ranks: categories (typ = everyday, mixed, peak), rank formula, E12 rule (values of some third-party sites only as links), Terminal-Bench-Mini attribution, Artificial Analysis index version and retrieval date, price policy.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-dark.svg",
+          "theme": "dark"
+        }
+      ],
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_local_ai_methodology",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of returned records for list and search tools.",
+            "type": "number"
+          },
+          "data": {
+            "description": "Structured result payload. Present for responseFormat='v2' tools."
+          },
+          "error": {
+            "description": "Human-readable error message when success is false.",
+            "type": "string"
+          },
+          "meta": {
+            "description": "Result metadata such as count, locale fallback, cache scope, or response format."
+          },
+          "success": {
+            "description": "Whether the tool call completed successfully.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Get Local AI Methodology"
+    },
+    {
+      "_meta": {
+        "contextstudios/defaultResponseFormat": "legacy",
+        "contextstudios/recommendedResponseFormat": "v2",
+        "contextstudios/visibility": "public"
+      },
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Agentic quality results for local models from Terminal-Bench-Mini (core19) by kyuz0, Apache-2.0: pass rate within attempts and pass@1 per model/quant/hardware, each with the run URL. Returned with the required attribution.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-dark.svg",
+          "theme": "dark"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "platform": {
+            "description": "Hardware platform",
+            "enum": [
+              "dgx-spark",
+              "mac",
+              "strix-halo",
+              "rtx-3090",
+              "rtx-5090",
+              "rtx-pro-6000"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_local_ai_quality",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of returned records for list and search tools.",
+            "type": "number"
+          },
+          "data": {
+            "description": "Structured result payload. Present for responseFormat='v2' tools."
+          },
+          "error": {
+            "description": "Human-readable error message when success is false.",
+            "type": "string"
+          },
+          "meta": {
+            "description": "Result metadata such as count, locale fallback, cache scope, or response format."
+          },
+          "success": {
+            "description": "Whether the tool call completed successfully.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Get Local AI Quality (Terminal-Bench-Mini)"
+    },
+    {
+      "_meta": {
+        "contextstudios/defaultResponseFormat": "legacy",
+        "contextstudios/recommendedResponseFormat": "v2",
+        "contextstudios/visibility": "public"
+      },
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Get one published local-AI recipe by slug: all measured numbers (each with category, condition, source_url), weights with licenses, sources, AA intelligence of the original model (with attribution) and the page URL. Returns not-found for drafts.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-dark.svg",
+          "theme": "dark"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "locale": {
+            "default": "en",
+            "description": "Page locale for returned URLs (default en)",
+            "enum": [
+              "en",
+              "de",
+              "fr",
+              "it"
+            ],
+            "examples": [
+              "en",
+              "de"
+            ],
+            "type": "string"
+          },
+          "slug": {
+            "description": "Recipe slug",
+            "examples": [
+              "my-favorite-mcp-servers-in-january-2026-the-best-tools-for-ai-powered-development",
+              "mvp-sprint"
+            ],
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_local_ai_recipe",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of returned records for list and search tools.",
+            "type": "number"
+          },
+          "data": {
+            "description": "Structured result payload. Present for responseFormat='v2' tools."
+          },
+          "error": {
+            "description": "Human-readable error message when success is false.",
+            "type": "string"
+          },
+          "meta": {
+            "description": "Result metadata such as count, locale fallback, cache scope, or response format."
+          },
+          "success": {
+            "description": "Whether the tool call completed successfully.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Get Local AI Recipe"
+    },
+    {
+      "_meta": {
+        "contextstudios/defaultResponseFormat": "legacy",
+        "contextstudios/recommendedResponseFormat": "v2",
+        "contextstudios/visibility": "public"
+      },
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
       "description": "Get specific location page.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/locations-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/locations-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "includeSections": {
@@ -832,8 +1769,7 @@
           "slug": {
             "description": "Exact public slug for a blog post, guide, location page, comparison, glossary term, CMS page, or landing page.",
             "examples": [
-              "locations/berlin",
-              "bundeslaender/bayern"
+              "locations/berlin/ki-agentur/ki-entwicklung"
             ],
             "minLength": 2,
             "type": "string"
@@ -881,6 +1817,24 @@
         "readOnlyHint": true
       },
       "description": "Get a specific CMS page by slug and locale.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/pages-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/pages-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "includeSections": {
@@ -922,9 +1876,8 @@
           "slug": {
             "description": "Exact public slug for a blog post, guide, location page, comparison, glossary term, CMS page, or landing page.",
             "examples": [
-              "services",
-              "pricing",
-              "ai-agents"
+              "ai-development-services",
+              "ai-agency-berlin"
             ],
             "minLength": 2,
             "type": "string"
@@ -971,30 +1924,46 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
-      "description": "Get services that match a specific budget range.",
+      "description": "Explain how Context Studios prices projects: the entry point is a fixed-price workshop (Light Discovery, Strategy Day, or Prototyping Sprint — see the returned `workshops` list), project prices follow scoping with a 48-hour proposal turnaround. Returns the three workshop prices, the phases from discovery to sprint, and what drives the project price. No project price ranges or amounts beyond the workshops — call get_services for what each package includes, and request_consultation or book a call for a project-specific quote.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
-          "budget": {
-            "default": "all",
-            "description": "Budget band to filter pricing. Use all or omit it for the full pricing overview.",
+          "locale": {
+            "default": "en",
+            "description": "Preferred content locale. Supported values are de, en, fr, and it. Some source catalogs may fall back to de or en.",
             "enum": [
-              "all",
-              "under_5k",
-              "5k_20k",
-              "20k_50k",
-              "50k_plus"
+              "de",
+              "en",
+              "fr",
+              "it"
             ],
             "examples": [
-              "all",
-              "5k_20k",
-              "20k_50k"
+              "en",
+              "de"
             ],
             "type": "string"
           }
         },
         "type": "object"
       },
-      "name": "get_pricing",
+      "name": "get_pricing_model",
       "outputSchema": {
         "properties": {
           "count": {
@@ -1018,7 +1987,7 @@
         },
         "type": "object"
       },
-      "title": "Get Pricing"
+      "title": "Get Pricing Model"
     },
     {
       "_meta": {
@@ -1031,6 +2000,24 @@
         "readOnlyHint": true
       },
       "description": "Get terms that are related to a specific glossary term.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/glossary-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/glossary-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "language": {
@@ -1075,8 +2062,7 @@
           "slug": {
             "description": "Exact public slug for a blog post, guide, location page, comparison, glossary term, CMS page, or landing page.",
             "examples": [
-              "my-favorite-mcp-servers-in-january-2026-the-best-tools-for-ai-powered-development",
-              "mvp-sprint"
+              "model-context-protocol"
             ],
             "minLength": 2,
             "type": "string"
@@ -1123,21 +2109,145 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
-      "description": "List all 11 services offered by Context Studios.",
+      "description": "Get a specific role's full profile: name, TL;DR, entity definition, description, responsibilities, FAQ, and canonical + Markdown-twin URLs.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/audiences-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/audiences-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
-          "category": {
-            "description": "Optional category filter. For services use starter, fasttrack, enterprise, or all. For glossary/comparisons use a published content category.",
+          "locale": {
+            "default": "en",
+            "description": "Preferred content locale.",
             "enum": [
-              "starter",
-              "fasttrack",
-              "enterprise",
-              "all"
+              "de",
+              "en",
+              "fr",
+              "it"
             ],
             "examples": [
-              "all",
-              "fasttrack",
-              "agentic"
+              "en",
+              "de"
+            ],
+            "type": "string"
+          },
+          "responseFormat": {
+            "default": "legacy",
+            "description": "Response shape. Use v2 for agent-friendly {success,data,meta,error}; legacy remains available for older clients.",
+            "enum": [
+              "legacy",
+              "v2"
+            ],
+            "examples": [
+              "v2"
+            ],
+            "type": "string"
+          },
+          "slug": {
+            "description": "Exact slug or id, as returned by the matching list tool.",
+            "examples": [
+              "founder",
+              "marketing-manager"
+            ],
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_role",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of returned records for list and search tools.",
+            "type": "number"
+          },
+          "data": {
+            "description": "Structured result payload. Present for responseFormat='v2' tools."
+          },
+          "error": {
+            "description": "Human-readable error message when success is false.",
+            "type": "string"
+          },
+          "meta": {
+            "description": "Result metadata such as count, locale fallback, cache scope, or response format."
+          },
+          "success": {
+            "description": "Whether the tool call completed successfully.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Get Role"
+    },
+    {
+      "_meta": {
+        "contextstudios/defaultResponseFormat": "legacy",
+        "contextstudios/recommendedResponseFormat": "v2",
+        "contextstudios/visibility": "public"
+      },
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List the services offered by Context Studios. Every service sits under one of six goals (cluster) and is delivered in one or more of four formats (workshop, setup, sprint, build); only the workshop format has public prices, everything else is quoted after scoping.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-dark.svg",
+          "theme": "dark"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "cluster": {
+            "enum": [
+              "visibility",
+              "automation",
+              "product",
+              "agents",
+              "systems",
+              "orientation",
+              "all"
+            ],
+            "type": "string"
+          },
+          "format": {
+            "enum": [
+              "workshop",
+              "setup",
+              "sprint",
+              "build",
+              "all"
             ],
             "type": "string"
           },
@@ -1188,7 +2298,298 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
+      "description": "Get a specific use case's full profile: name, TL;DR, entity definition, description, key features/benefits, FAQ, and canonical + Markdown-twin URLs.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/audiences-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/audiences-dark.svg",
+          "theme": "dark"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "locale": {
+            "default": "en",
+            "description": "Preferred content locale.",
+            "enum": [
+              "de",
+              "en",
+              "fr",
+              "it"
+            ],
+            "examples": [
+              "en",
+              "de"
+            ],
+            "type": "string"
+          },
+          "responseFormat": {
+            "default": "legacy",
+            "description": "Response shape. Use v2 for agent-friendly {success,data,meta,error}; legacy remains available for older clients.",
+            "enum": [
+              "legacy",
+              "v2"
+            ],
+            "examples": [
+              "v2"
+            ],
+            "type": "string"
+          },
+          "slug": {
+            "description": "Exact slug or id, as returned by the matching list tool.",
+            "examples": [
+              "crm",
+              "marketing-automation"
+            ],
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_use_case",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of returned records for list and search tools.",
+            "type": "number"
+          },
+          "data": {
+            "description": "Structured result payload. Present for responseFormat='v2' tools."
+          },
+          "error": {
+            "description": "Human-readable error message when success is false.",
+            "type": "string"
+          },
+          "meta": {
+            "description": "Result metadata such as count, locale fallback, cache scope, or response format."
+          },
+          "success": {
+            "description": "Whether the tool call completed successfully.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Get Use Case"
+    },
+    {
+      "_meta": {
+        "contextstudios/defaultResponseFormat": "legacy",
+        "contextstudios/recommendedResponseFormat": "v2",
+        "contextstudios/visibility": "public"
+      },
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Get the three fixed-price entry workshops (Light Discovery, Strategy Day, Prototyping Sprint) with price, duration, and delivery mode, plus the booking link and the localized pricing statement. Project prices are scoped, not published — see get_pricing_model for the full pricing approach.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-dark.svg",
+          "theme": "dark"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "locale": {
+            "default": "en",
+            "description": "Preferred content locale for the pricing statement.",
+            "enum": [
+              "de",
+              "en",
+              "fr",
+              "it"
+            ],
+            "examples": [
+              "en",
+              "de"
+            ],
+            "type": "string"
+          },
+          "responseFormat": {
+            "default": "legacy",
+            "description": "Response shape. Use v2 for agent-friendly {success,data,meta,error}; legacy remains available for older clients.",
+            "enum": [
+              "legacy",
+              "v2"
+            ],
+            "examples": [
+              "v2"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_workshops",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of returned records for list and search tools.",
+            "type": "number"
+          },
+          "data": {
+            "description": "Structured result payload. Present for responseFormat='v2' tools."
+          },
+          "error": {
+            "description": "Human-readable error message when success is false.",
+            "type": "string"
+          },
+          "meta": {
+            "description": "Result metadata such as count, locale fallback, cache scope, or response format."
+          },
+          "success": {
+            "description": "Whether the tool call completed successfully.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Get Workshops"
+    },
+    {
+      "_meta": {
+        "contextstudios/defaultResponseFormat": "legacy",
+        "contextstudios/recommendedResponseFormat": "v2",
+        "contextstudios/visibility": "public"
+      },
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List the company-size segments Context Studios serves (e.g. startups, SMB, enterprise), with name, one-line summary, and canonical + Markdown-twin URLs.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/audiences-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/audiences-dark.svg",
+          "theme": "dark"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "locale": {
+            "default": "en",
+            "description": "Preferred content locale.",
+            "enum": [
+              "de",
+              "en",
+              "fr",
+              "it"
+            ],
+            "examples": [
+              "en",
+              "de"
+            ],
+            "type": "string"
+          },
+          "responseFormat": {
+            "default": "legacy",
+            "description": "Response shape. Use v2 for agent-friendly {success,data,meta,error}; legacy remains available for older clients.",
+            "enum": [
+              "legacy",
+              "v2"
+            ],
+            "examples": [
+              "v2"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_company_types",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of returned records for list and search tools.",
+            "type": "number"
+          },
+          "data": {
+            "description": "Structured result payload. Present for responseFormat='v2' tools."
+          },
+          "error": {
+            "description": "Human-readable error message when success is false.",
+            "type": "string"
+          },
+          "meta": {
+            "description": "Result metadata such as count, locale fallback, cache scope, or response format."
+          },
+          "success": {
+            "description": "Whether the tool call completed successfully.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "title": "List Company Types"
+    },
+    {
+      "_meta": {
+        "contextstudios/defaultResponseFormat": "legacy",
+        "contextstudios/recommendedResponseFormat": "v2",
+        "contextstudios/visibility": "public"
+      },
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
       "description": "List all available comparisons.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/comparisons-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/comparisons-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "category": {
@@ -1279,6 +2680,24 @@
         "readOnlyHint": true
       },
       "description": "List all 10 glossary categories.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/glossary-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/glossary-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "responseFormat": {
@@ -1333,6 +2752,24 @@
         "readOnlyHint": true
       },
       "description": "List public guides.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/guides-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/guides-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "limit": {
@@ -1423,7 +2860,358 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
+      "description": "List the industries Context Studios serves, with name, one-line summary, and canonical + Markdown-twin URLs.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/audiences-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/audiences-dark.svg",
+          "theme": "dark"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "locale": {
+            "default": "en",
+            "description": "Preferred content locale.",
+            "enum": [
+              "de",
+              "en",
+              "fr",
+              "it"
+            ],
+            "examples": [
+              "en",
+              "de"
+            ],
+            "type": "string"
+          },
+          "responseFormat": {
+            "default": "legacy",
+            "description": "Response shape. Use v2 for agent-friendly {success,data,meta,error}; legacy remains available for older clients.",
+            "enum": [
+              "legacy",
+              "v2"
+            ],
+            "examples": [
+              "v2"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_industries",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of returned records for list and search tools.",
+            "type": "number"
+          },
+          "data": {
+            "description": "Structured result payload. Present for responseFormat='v2' tools."
+          },
+          "error": {
+            "description": "Human-readable error message when success is false.",
+            "type": "string"
+          },
+          "meta": {
+            "description": "Result metadata such as count, locale fallback, cache scope, or response format."
+          },
+          "success": {
+            "description": "Whether the tool call completed successfully.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "title": "List Industries"
+    },
+    {
+      "_meta": {
+        "contextstudios/defaultResponseFormat": "legacy",
+        "contextstudios/recommendedResponseFormat": "v2",
+        "contextstudios/visibility": "public"
+      },
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List the creators (people/projects) behind the published local-AI recipes, with recipe counts per platform.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-dark.svg",
+          "theme": "dark"
+        }
+      ],
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_local_ai_creators",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of returned records for list and search tools.",
+            "type": "number"
+          },
+          "data": {
+            "description": "Structured result payload. Present for responseFormat='v2' tools."
+          },
+          "error": {
+            "description": "Human-readable error message when success is false.",
+            "type": "string"
+          },
+          "meta": {
+            "description": "Result metadata such as count, locale fallback, cache scope, or response format."
+          },
+          "success": {
+            "description": "Whether the tool call completed successfully.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "title": "List Local AI Creators"
+    },
+    {
+      "_meta": {
+        "contextstudios/defaultResponseFormat": "legacy",
+        "contextstudios/recommendedResponseFormat": "v2",
+        "contextstudios/visibility": "public"
+      },
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Hardware platforms of the local-AI hub with datasheet (memory, bandwidth, TDP — each with vendor source) and current German prices (EUR incl. VAT, retailer, URL, retrieval date per entry). Hardware prices only; no service prices.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-dark.svg",
+          "theme": "dark"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "platform": {
+            "description": "Hardware platform",
+            "enum": [
+              "dgx-spark",
+              "mac",
+              "strix-halo",
+              "rtx-3090",
+              "rtx-5090",
+              "rtx-pro-6000"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_local_ai_hardware",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of returned records for list and search tools.",
+            "type": "number"
+          },
+          "data": {
+            "description": "Structured result payload. Present for responseFormat='v2' tools."
+          },
+          "error": {
+            "description": "Human-readable error message when success is false.",
+            "type": "string"
+          },
+          "meta": {
+            "description": "Result metadata such as count, locale fallback, cache scope, or response format."
+          },
+          "success": {
+            "description": "Whether the tool call completed successfully.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "title": "List Local AI Hardware"
+    },
+    {
+      "_meta": {
+        "contextstudios/defaultResponseFormat": "legacy",
+        "contextstudios/recommendedResponseFormat": "v2",
+        "contextstudios/visibility": "public"
+      },
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List published local-AI recipes (model + quantization + engine on specific hardware: DGX Spark, Mac, Strix Halo, RTX 3090/5090/PRO 6000) from contextstudios.ai/local-ai. Every number comes with category (typ = everyday, mixed, peak), condition and source_url; aaIntelligence is the Artificial Analysis index of the original model. Sorted by rank (category first, then value) or by intelligence.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-dark.svg",
+          "theme": "dark"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of devices/GPUs (e.g. 1, 2, 4)",
+            "type": "number"
+          },
+          "creator": {
+            "description": "Creator slug",
+            "type": "string"
+          },
+          "limit": {
+            "default": 10,
+            "description": "Max results (default 50, max 300)",
+            "examples": [
+              5,
+              10,
+              20
+            ],
+            "maximum": 50,
+            "minimum": 1,
+            "type": "number"
+          },
+          "locale": {
+            "default": "en",
+            "description": "Page locale for returned URLs (default en)",
+            "enum": [
+              "en",
+              "de",
+              "fr",
+              "it"
+            ],
+            "examples": [
+              "en",
+              "de"
+            ],
+            "type": "string"
+          },
+          "platform": {
+            "description": "Hardware platform",
+            "enum": [
+              "dgx-spark",
+              "mac",
+              "strix-halo",
+              "rtx-3090",
+              "rtx-5090",
+              "rtx-pro-6000"
+            ],
+            "type": "string"
+          },
+          "sort": {
+            "default": "rank",
+            "enum": [
+              "rank",
+              "intelligence"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_local_ai_recipes",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of returned records for list and search tools.",
+            "type": "number"
+          },
+          "data": {
+            "description": "Structured result payload. Present for responseFormat='v2' tools."
+          },
+          "error": {
+            "description": "Human-readable error message when success is false.",
+            "type": "string"
+          },
+          "meta": {
+            "description": "Result metadata such as count, locale fallback, cache scope, or response format."
+          },
+          "success": {
+            "description": "Whether the tool call completed successfully.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "title": "List Local AI Recipes"
+    },
+    {
+      "_meta": {
+        "contextstudios/defaultResponseFormat": "legacy",
+        "contextstudios/recommendedResponseFormat": "v2",
+        "contextstudios/visibility": "public"
+      },
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
       "description": "List public location and bundesland pages.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/locations-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/locations-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "city": {
@@ -1541,12 +3329,204 @@
         "contextstudios/visibility": "public"
       },
       "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List the buyer/user roles Context Studios addresses (e.g. founder, CTO, marketing manager), with name, one-line summary, and canonical + Markdown-twin URLs.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/audiences-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/audiences-dark.svg",
+          "theme": "dark"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "locale": {
+            "default": "en",
+            "description": "Preferred content locale.",
+            "enum": [
+              "de",
+              "en",
+              "fr",
+              "it"
+            ],
+            "examples": [
+              "en",
+              "de"
+            ],
+            "type": "string"
+          },
+          "responseFormat": {
+            "default": "legacy",
+            "description": "Response shape. Use v2 for agent-friendly {success,data,meta,error}; legacy remains available for older clients.",
+            "enum": [
+              "legacy",
+              "v2"
+            ],
+            "examples": [
+              "v2"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_roles",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of returned records for list and search tools.",
+            "type": "number"
+          },
+          "data": {
+            "description": "Structured result payload. Present for responseFormat='v2' tools."
+          },
+          "error": {
+            "description": "Human-readable error message when success is false.",
+            "type": "string"
+          },
+          "meta": {
+            "description": "Result metadata such as count, locale fallback, cache scope, or response format."
+          },
+          "success": {
+            "description": "Whether the tool call completed successfully.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "title": "List Roles"
+    },
+    {
+      "_meta": {
+        "contextstudios/defaultResponseFormat": "legacy",
+        "contextstudios/recommendedResponseFormat": "v2",
+        "contextstudios/visibility": "public"
+      },
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List the software use cases Context Studios builds (e.g. CRM, invoicing, booking systems), with name, one-line summary, and canonical + Markdown-twin URLs.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/audiences-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/audiences-dark.svg",
+          "theme": "dark"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "locale": {
+            "default": "en",
+            "description": "Preferred content locale.",
+            "enum": [
+              "de",
+              "en",
+              "fr",
+              "it"
+            ],
+            "examples": [
+              "en",
+              "de"
+            ],
+            "type": "string"
+          },
+          "responseFormat": {
+            "default": "legacy",
+            "description": "Response shape. Use v2 for agent-friendly {success,data,meta,error}; legacy remains available for older clients.",
+            "enum": [
+              "legacy",
+              "v2"
+            ],
+            "examples": [
+              "v2"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_use_cases",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of returned records for list and search tools.",
+            "type": "number"
+          },
+          "data": {
+            "description": "Structured result payload. Present for responseFormat='v2' tools."
+          },
+          "error": {
+            "description": "Human-readable error message when success is false.",
+            "type": "string"
+          },
+          "meta": {
+            "description": "Result metadata such as count, locale fallback, cache scope, or response format."
+          },
+          "success": {
+            "description": "Whether the tool call completed successfully.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "title": "List Use Cases"
+    },
+    {
+      "_meta": {
+        "contextstudios/defaultResponseFormat": "legacy",
+        "contextstudios/recommendedResponseFormat": "v2",
+        "contextstudios/visibility": "public"
+      },
+      "annotations": {
         "destructiveHint": false,
         "idempotentHint": false,
         "openWorldHint": false,
         "readOnlyHint": false
       },
       "description": "Request a free consultation with Context Studios. Use this when a user wants to get in touch, start a project, or receive an offer. Captures name, email, and a short project description; the team replies within 24 hours.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/company-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "company": {
@@ -1628,6 +3608,24 @@
         "readOnlyHint": true
       },
       "description": "Search all public Context Studios content (blog, guides, glossary, AI comparisons). Returns result IDs for use with the fetch tool.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/search-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/search-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "query": {
@@ -1692,6 +3690,24 @@
         "readOnlyHint": true
       },
       "description": "Deep full-text search through the entire blog knowledge base. Provide either `query` (full-text search) or `slug` (fetch a specific post).",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/blog-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/blog-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "language": {
@@ -1780,6 +3796,24 @@
         "readOnlyHint": true
       },
       "description": "Search comparisons by keyword.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/comparisons-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/comparisons-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "language": {
@@ -1874,6 +3908,24 @@
         "readOnlyHint": true
       },
       "description": "Universal search across all public content.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/search-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/search-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "locale": {
@@ -1967,6 +4019,24 @@
         "readOnlyHint": true
       },
       "description": "Search the AI glossary by keyword or category. Provide either `query` or `category`.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/glossary-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/glossary-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "category": {
@@ -2067,6 +4137,24 @@
         "readOnlyHint": true
       },
       "description": "Search public guides.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/guides-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/guides-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "limit": {
@@ -2161,6 +4249,24 @@
         "readOnlyHint": true
       },
       "description": "Search public location and bundesland pages.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/locations-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/locations-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "limit": {
@@ -2269,6 +4375,24 @@
         "readOnlyHint": true
       },
       "description": "Full-text search across all published CMS pages.",
+      "icons": [
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/pages-light.svg",
+          "theme": "light"
+        },
+        {
+          "mimeType": "image/svg+xml",
+          "sizes": [
+            "any"
+          ],
+          "src": "https://mcp.contextstudios.ai/icons/pages-dark.svg",
+          "theme": "dark"
+        }
+      ],
       "inputSchema": {
         "properties": {
           "limit": {

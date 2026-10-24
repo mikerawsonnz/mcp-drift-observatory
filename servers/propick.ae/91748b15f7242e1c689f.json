@@ -1,0 +1,167 @@
+{
+  "canon_version": "1",
+  "full_hash": "87efc210c90f0e3f6a9f5fca40b11a911f682f10b51fc7367701643e4022d296",
+  "name": "ae.propick/propick",
+  "observed_at": "2026-08-26T02:06:18.873328Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 8,
+  "tools": [
+    {
+      "description": "Health check for the integration key. Returns the channel clientId. Call once after connecting to verify the key works.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "ping"
+    },
+    {
+      "description": "Submit a batch of property listings (up to 500) for import. The engine diffs the batch against the channel current stock and plans creations, updates, archivals and deletions; quotas and safety thresholds are enforced server-side. ALWAYS start with mode=DRY_RUN: it queues a plan without changing anything. Read the plan via get_run and list_events, show the summary to the human manager, and only after their explicit confirmation repeat the same call with mode=APPLY. Each element of properties mirrors the REST property draft body; use get_reference for every closed vocabulary and limit, search_projects to resolve projectId, list_responsibles to resolve responsibleUsername. Returns the importId of the queued run.",
+      "inputSchema": {
+        "properties": {
+          "confirmRemovals": {
+            "description": "A run that would archive or delete more than the safety share of the current stock stops with an error; pass true to confirm the removals are intended.",
+            "type": "boolean"
+          },
+          "mode": {
+            "description": "DRY_RUN plans without applying; APPLY executes. Never APPLY without human confirmation of the DRY_RUN plan.",
+            "enum": [
+              "DRY_RUN",
+              "APPLY"
+            ],
+            "type": "string"
+          },
+          "properties": {
+            "items": {
+              "description": "One listing. externalPropertyId is the stable id in YOUR system; the rest mirrors the REST property draft body (title, description, category, listingType, price, squareArea, projectId, responsibleUsername, permitNumber, images, ...). get_reference lists every closed vocabulary and limit.",
+              "required": [
+                "externalPropertyId"
+              ],
+              "type": "object"
+            },
+            "maxItems": 500,
+            "type": "array"
+          }
+        },
+        "required": [
+          "mode",
+          "properties"
+        ],
+        "type": "object"
+      },
+      "name": "sync_properties"
+    },
+    {
+      "description": "Fetch one import run by importId: status, counters of planned and applied decisions, stop reason if the run did not finish.",
+      "inputSchema": {
+        "properties": {
+          "importId": {
+            "description": "The id returned by sync_properties.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "importId"
+        ],
+        "type": "object"
+      },
+      "name": "get_run"
+    },
+    {
+      "description": "List this channel import runs, newest first. Paginated.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "maximum": 30,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "page": {
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_runs"
+    },
+    {
+      "description": "Per-property outcomes of import runs: what happened to each externalPropertyId, with error codes and details. Filter by importId and/or externalPropertyId. Paginated.",
+      "inputSchema": {
+        "properties": {
+          "externalPropertyId": {
+            "type": "string"
+          },
+          "importId": {
+            "type": "string"
+          },
+          "limit": {
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "page": {
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_events"
+    },
+    {
+      "description": "Resolve a development project to the numeric projectId required by every listing in sync_properties. Search by name fragment (min 2 characters) or by exact DLD project number (digits-only query). Only projects the import would actually accept are returned.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "page": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "maxLength": 120,
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_projects"
+    },
+    {
+      "description": "List agency members that can be set as responsibleUsername on a listing. Agency channels only: a personal channel gets a refusal, not an empty list.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "page": {
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_responsibles"
+    },
+    {
+      "description": "Every closed vocabulary and limit of the import payload in one call: categories, listing types, building statuses, rental periods, occupancy statuses, currency codes, area units, property features, bedroom counts, payload limits.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_reference"
+    }
+  ],
+  "url": "https://propick.ae/mcp"
+}

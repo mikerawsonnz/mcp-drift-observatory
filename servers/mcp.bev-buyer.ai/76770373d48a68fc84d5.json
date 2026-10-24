@@ -1,0 +1,308 @@
+{
+  "canon_version": "1",
+  "full_hash": "70c465df6d89fb476c4fa747cdb9687c3673b106a3db94b8168a43276675873c",
+  "name": "ai.agent-bev/bev-door",
+  "observed_at": "2026-10-01T02:05:14.003175Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 9,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Search drinks"
+      },
+      "description": "Find beers, wines, spirits, ciders and ready-to-drink drinks by name, style, origin or category across every open country node. Returns record ids with each record's CUVEE.",
+      "inputSchema": {
+        "properties": {
+          "category": {
+            "description": "optional category to keep: beer, wine, spirits, cider_perry or rtd (ready-to-drink)",
+            "enum": [
+              "beer",
+              "wine",
+              "spirits",
+              "cider_perry",
+              "rtd"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "description": "optional number of results, 1 to 100",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "node": {
+            "description": "optional node id, e.g. es-bev",
+            "type": "string"
+          },
+          "query": {
+            "description": "name, style, origin or category",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_drinks",
+      "title": "Search drinks"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get record"
+      },
+      "description": "Read one product in full by record_id: every field with its source page, reader and state; its CUVEE; its claim status; the signed record (JWS).",
+      "inputSchema": {
+        "properties": {
+          "record_id": {
+            "description": "the record id, <node>:<6 digits>, e.g. es-bev:000123",
+            "type": "string"
+          }
+        },
+        "required": [
+          "record_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_record",
+      "title": "Get record"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Find producer"
+      },
+      "description": "Find a maker and its products across every open node, with the maker's name as each source wrote it.",
+      "inputSchema": {
+        "properties": {
+          "node": {
+            "description": "optional node id, e.g. es-bev",
+            "type": "string"
+          },
+          "producer": {
+            "description": "the maker's name, or part of it",
+            "type": "string"
+          }
+        },
+        "required": [
+          "producer"
+        ],
+        "type": "object"
+      },
+      "name": "find_producer",
+      "title": "Find producer"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List nodes"
+      },
+      "description": "List the countries on the record: each node's door, languages, state and, for an open node, its counts.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_nodes",
+      "title": "List nodes"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Compare drinks"
+      },
+      "description": "Compare two to ten products side by side, field by field, each value with its source page.",
+      "inputSchema": {
+        "properties": {
+          "record_ids": {
+            "description": "two to ten record ids, e.g. [\"es-bev:000123\", \"fr-bev:000456\"]",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "minItems": 2,
+            "type": "array"
+          }
+        },
+        "required": [
+          "record_ids"
+        ],
+        "type": "object"
+      },
+      "name": "compare_drinks",
+      "title": "Compare drinks"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get order route"
+      },
+      "description": "Get the maker's or distributor's trade channel to order a product, as the record states it. Never a consumer channel.",
+      "inputSchema": {
+        "properties": {
+          "record_id": {
+            "description": "the record id, <node>:<6 digits>, e.g. es-bev:000123",
+            "type": "string"
+          }
+        },
+        "required": [
+          "record_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_order_route",
+      "title": "Get order route"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Create order intent"
+      },
+      "description": "Place an order intent for one to ten records (quantity, delivery market, optional date and note, the buyer's organisation and email). The Bourse routes it to each maker; verified makers answer with offers, and a maker's own Brand Agent address comes back with the routing. The email stays private: it is the buyer's key to read offers and accept one.",
+      "inputSchema": {
+        "properties": {
+          "buyer": {
+            "description": "the buying organisation and its email (kept private; the key to read offers and accept one)",
+            "properties": {
+              "email": {
+                "description": "the buyer's email",
+                "type": "string"
+              },
+              "organisation": {
+                "description": "the buying organisation's name",
+                "type": "string"
+              }
+            },
+            "required": [
+              "organisation",
+              "email"
+            ],
+            "type": "object"
+          },
+          "market": {
+            "description": "delivery market (country)",
+            "type": "string"
+          },
+          "needed_by": {
+            "description": "YYYY-MM-DD",
+            "type": "string"
+          },
+          "note": {
+            "description": "optional note to the makers",
+            "type": "string"
+          },
+          "quantity": {
+            "description": "quantity with its unit, e.g. 600 bottles (75 cl)",
+            "type": "string"
+          },
+          "record_ids": {
+            "description": "one to ten record ids to order, e.g. [\"es-bev:000123\"]",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "record_ids",
+          "quantity",
+          "market",
+          "buyer"
+        ],
+        "type": "object"
+      },
+      "name": "create_order_intent",
+      "title": "Create order intent"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get offers"
+      },
+      "description": "Read the makers' offers on an order intent, and the order once placed. By the buyer's email given on create_order_intent.",
+      "inputSchema": {
+        "properties": {
+          "email": {
+            "description": "the buyer's email given on create_order_intent",
+            "type": "string"
+          },
+          "intent_id": {
+            "description": "the order intent id from create_order_intent, oi-<16 hex>",
+            "type": "string"
+          }
+        },
+        "required": [
+          "intent_id",
+          "email"
+        ],
+        "type": "object"
+      },
+      "name": "get_offers",
+      "title": "Get offers"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Accept offer"
+      },
+      "description": "Accept one offer and place the order through the Bourse. Accepting is one x402 paid call (HTTP 402 with the payment offer until paid): it settles and signs the order. The goods are paid between the two companies on the offer's own terms.",
+      "inputSchema": {
+        "properties": {
+          "email": {
+            "description": "the buyer's email given on create_order_intent",
+            "type": "string"
+          },
+          "intent_id": {
+            "description": "the order intent id, oi-<16 hex>",
+            "type": "string"
+          },
+          "offer_id": {
+            "description": "the offer to accept, as get_offers lists it",
+            "type": "string"
+          }
+        },
+        "required": [
+          "intent_id",
+          "offer_id",
+          "email"
+        ],
+        "type": "object"
+      },
+      "name": "accept_offer",
+      "title": "Accept offer"
+    }
+  ],
+  "url": "https://mcp.bev-buyer.ai/mcp"
+}

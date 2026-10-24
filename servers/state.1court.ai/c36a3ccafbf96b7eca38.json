@@ -1,0 +1,174 @@
+{
+  "canon_version": "1",
+  "full_hash": "dc8fe6fd4c1a039efc3b880cd1a75bd80faf3454fe86c6eb76bfff0b1efab928",
+  "name": "ai.1court.state/court-directory",
+  "observed_at": "2026-10-24T02:04:31.567093Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 6,
+  "tools": [
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List court deadline types"
+      },
+      "description": "List the court deadline types 1Court can calculate for a jurisdiction. Available ids: TX, CA (civil), CA-FAM (California family), CA-APP (California appeals and writs), US (federal civil and appellate), US-BK (bankruptcy), with the governing rule citation for each. Use before calculate_deadline to get valid deadline_type ids.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "state": {
+            "description": "Rule-set id: TX, CA, CA-FAM, CA-APP, US, or US-BK",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state"
+        ],
+        "type": "object"
+      },
+      "name": "list_deadline_rules"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Calculate a court deadline"
+      },
+      "description": "Calculate a court deadline deterministically from cited rules (weekends, legal holidays, short-period and mail-service rules applied). Returns the date, each computation step, and the rule text and source. Always show the user the citation and caveats; this is not legal advice.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "deadline_type": {
+            "description": "Deadline id from list_deadline_rules, e.g. \"answer_district_county\"",
+            "type": "string"
+          },
+          "service_method": {
+            "description": "How the triggering paper or summons was served, e.g. \"mail\" (TX), \"mail_in_state\", \"electronic\", \"substituted\" (CA). Omit for personal service.",
+            "type": "string"
+          },
+          "state": {
+            "description": "Rule-set id: TX, CA, CA-FAM, CA-APP, US, or US-BK",
+            "type": "string"
+          },
+          "trigger_date": {
+            "description": "Trigger date as YYYY-MM-DD (e.g. date of service or date judgment signed)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "deadline_type",
+          "trigger_date"
+        ],
+        "type": "object"
+      },
+      "name": "calculate_deadline"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List covered states"
+      },
+      "description": "List all U.S. states currently covered by the 1Court Directory, with how many counties are available in each. Use this to discover coverage before looking up a specific county.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_states"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List counties in a state"
+      },
+      "description": "List the counties covered in a given U.S. state (accepts a full state name, 2-letter code, or slug). Returns each county name and its 1Court page URL.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "state": {
+            "description": "State name, 2-letter code, or slug, e.g. \"California\", \"CA\", or \"california\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state"
+        ],
+        "type": "object"
+      },
+      "name": "list_counties"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get county court & filing info"
+      },
+      "description": "Get verified court information for a specific U.S. county: clerk of court contacts, e-filing provider and whether e-filing is mandatory, filing fees (civil, small claims, divorce), case lookup, self-help, jury service, and payment links. Data is sourced from official court/clerk records. Always cite the returned 1Court source URL.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "county": {
+            "description": "County name, e.g. \"Harris\" or \"Harris County\"",
+            "type": "string"
+          },
+          "state": {
+            "description": "State name, 2-letter code, or slug, e.g. \"Texas\", \"TX\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "county"
+        ],
+        "type": "object"
+      },
+      "name": "get_court_info"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Search courts by name"
+      },
+      "description": "Search the 1Court Directory by county or state name and get matching counties with their 1Court page URLs. Use when you are unsure of the exact county or state format.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "query": {
+            "description": "A county or state name, e.g. \"Maricopa\", \"Cook County\", or \"Nevada\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_courts"
+    }
+  ],
+  "url": "https://state.1court.ai/api/mcp"
+}

@@ -1,15 +1,22 @@
 {
   "canon_version": "1",
-  "full_hash": "b470d42c64a7081d280b757d834dd9fdb34efb9c5a885a7f40896a4657379d72",
+  "full_hash": "6336e8a916969e241e8b4a81fb1f8c438f88f78ade3610fefb46106785169d4a",
   "name": "ai.kaiv/dependency-trust",
-  "observed_at": "2026-08-20T09:11:58.975529Z",
+  "observed_at": "2026-08-22T02:05:43.503835Z",
   "sources": [
     "official"
   ],
   "tool_count": 5,
   "tools": [
     {
-      "description": "Get a security advisory (vulnerability) by its key.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get Advisory"
+      },
+      "description": "Get a security advisory (vulnerability) by its key.\n\nReturns a security advisory by key — e.g. a GHSA id taken from a version's advisoryKeys — including the title, CVE aliases, CVSS v3 score and vector, and a link to the full record on osv.dev. Use this only when you already have an advisory ID from get_package_version's advisoryKeys — there is no search here. To find out whether a version has vulnerabilities at all, call get_package_version first; this tool explains one advisory in depth.",
       "inputSchema": {
         "properties": {
           "advisoryKey": {
@@ -23,10 +30,18 @@
         ],
         "type": "object"
       },
-      "name": "get_advisory"
+      "name": "get_advisory",
+      "title": "Get Advisory"
     },
     {
-      "description": "Get the resolved dependency graph for one package version.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get Dependencies"
+      },
+      "description": "Get the resolved dependency graph for one package version.\n\nReturns the full resolved dependency graph (direct and indirect) for a version — each node has the dependency's exact version and its relation (SELF / DIRECT / INDIRECT). Use it to reason about transitive dependencies and supply chain.",
       "inputSchema": {
         "properties": {
           "package": {
@@ -36,6 +51,15 @@
           },
           "system": {
             "description": "Package ecosystem.",
+            "enum": [
+              "npm",
+              "pypi",
+              "go",
+              "maven",
+              "cargo",
+              "nuget",
+              "rubygems"
+            ],
             "type": "string",
             "x-in": "path"
           },
@@ -52,10 +76,18 @@
         ],
         "type": "object"
       },
-      "name": "get_dependencies"
+      "name": "get_dependencies",
+      "title": "Get Dependencies"
     },
     {
-      "description": "List every version of a package and whether each is deprecated.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get Package"
+      },
+      "description": "List every version of a package and whether each is deprecated.\n\nReturns all published versions of a package with publish date, the default-version flag, and deprecation status. Use it to find the latest version or check if a package is deprecated. Coding agents should call this before recommending a package or version.",
       "inputSchema": {
         "properties": {
           "package": {
@@ -65,6 +97,15 @@
           },
           "system": {
             "description": "Package ecosystem.",
+            "enum": [
+              "npm",
+              "pypi",
+              "go",
+              "maven",
+              "cargo",
+              "nuget",
+              "rubygems"
+            ],
             "type": "string",
             "x-in": "path"
           }
@@ -75,10 +116,18 @@
         ],
         "type": "object"
       },
-      "name": "get_package"
+      "name": "get_package",
+      "title": "Get Package"
     },
     {
-      "description": "Get license, security advisories, and source links for one package version.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get Package Version"
+      },
+      "description": "Get license, security advisories, and source links for one package version.\n\nReturns detailed metadata for a single version: SPDX licenses, security advisoryKeys (known vulnerabilities), homepage/issue-tracker/source-repo links, registries, publish date, and deprecation status. Pass any advisoryKey returned here to get_advisory for the vulnerability details.",
       "inputSchema": {
         "properties": {
           "package": {
@@ -88,6 +137,15 @@
           },
           "system": {
             "description": "Package ecosystem.",
+            "enum": [
+              "npm",
+              "pypi",
+              "go",
+              "maven",
+              "cargo",
+              "nuget",
+              "rubygems"
+            ],
             "type": "string",
             "x-in": "path"
           },
@@ -104,10 +162,18 @@
         ],
         "type": "object"
       },
-      "name": "get_package_version"
+      "name": "get_package_version",
+      "title": "Get Package Version"
     },
     {
-      "description": "Get a project's OpenSSF Scorecard security posture and maintenance signals.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get Project Health"
+      },
+      "description": "Get a project's OpenSSF Scorecard security posture and maintenance signals.\n\nTHE trust check. Returns supply-chain trust signals for a package's source repository: the OpenSSF Scorecard overall score (0-10) and per-check results (Maintained, Code-Review, Signed-Releases, Branch-Protection, Pinned-Dependencies, Dangerous-Workflow, Token-Permissions, Security-Policy, Vulnerabilities, ...), plus stars, forks, open-issue count, and license. Use it to judge whether a dependency is actively maintained and securely operated — not just whether it has a known CVE. Get the projectKey from a version's SOURCE_REPO link (call get_package_version first), e.g. 'github.com/facebook/react'.",
       "inputSchema": {
         "properties": {
           "projectKey": {
@@ -121,7 +187,8 @@
         ],
         "type": "object"
       },
-      "name": "get_project_health"
+      "name": "get_project_health",
+      "title": "Get Project Health"
     }
   ],
   "url": "https://api.kaiv.ai/api/bridge/mcp/dependency-trust-f1aaf06d"

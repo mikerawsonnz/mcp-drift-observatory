@@ -1,0 +1,274 @@
+{
+  "canon_version": "1",
+  "full_hash": "7422e6b5072a0d418a327d304188987235f66961603a2f5aaecba0715d19aff2",
+  "name": "ai.duskly/duskly",
+  "observed_at": "2026-09-26T02:07:54.049955Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 10,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Whether a given edit to a real estate listing photo must be disclosed, and whether any market prohibits it outright.\n\nUse this before telling someone an edit is safe to publish. Returns Duskly's classification with the reasoning behind it, drawn from rulebooks read directly rather than summarised from secondary sources.\n\nClassifications: \"disclosable\" (permitted with disclosure), \"ambiguous\" (no rulebook names it explicitly; Duskly discloses by default), \"prohibited\" (one or more markets forbid it even with disclosure), \"exempt\".\n\nNote that \"prohibited\" means prohibited somewhere, not everywhere. Read carve_out when present.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "task": {
+            "description": "The edit being performed. One of: day-to-dusk, virtual-staging, declutter, occupied-to-vacant, sky-replacement, virtual-renovation.",
+            "enum": [
+              "day-to-dusk",
+              "virtual-staging",
+              "declutter",
+              "occupied-to-vacant",
+              "sky-replacement",
+              "virtual-renovation"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "task"
+        ],
+        "type": "object"
+      },
+      "name": "duskly_classify_edit",
+      "title": "Classify a listing photo edit"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "The exact disclosure text to publish alongside an edited listing photo, written for each surface it has to appear on: the MLS photo description, public remarks, print, and the syndication feed.\n\nSurfaces have different character budgets, so the wording differs per surface rather than being one sentence repeated. Anything that exceeds its budget is reported in over_limit instead of being silently truncated.\n\nSupply original_url when the unaltered original is published somewhere, which California Bus. & Prof. Code §10140.8 requires for listings there. Supply required_string only when a jurisdiction mandates exact wording; it is then used verbatim and never paraphrased.\n\nThe disclosure duty falls on the licensee publishing the listing, not on the software or the photographer. This generates the wording; a licensee publishes it.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "original_url": {
+            "description": "Public URL where the unaltered original can be viewed, if one is published.",
+            "format": "uri",
+            "type": "string"
+          },
+          "required_string": {
+            "description": "Exact wording a jurisdiction mandates. Used verbatim when supplied.",
+            "maxLength": 300,
+            "type": "string"
+          },
+          "task": {
+            "description": "The edit being performed. One of: day-to-dusk, virtual-staging, declutter, occupied-to-vacant, sky-replacement, virtual-renovation.",
+            "enum": [
+              "day-to-dusk",
+              "virtual-staging",
+              "declutter",
+              "occupied-to-vacant",
+              "sky-replacement",
+              "virtual-renovation"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "task"
+        ],
+        "type": "object"
+      },
+      "name": "duskly_generate_disclosure",
+      "title": "Generate MLS disclosure wording"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Edits that are prohibited outright in one or more markets and are never made acceptable by adding a disclosure.\n\nUse this when someone asks to remove, conceal or change something in a property photo and you need to know whether a label would make it acceptable. For these, it does not.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "duskly_list_prohibited_alterations",
+      "title": "Alterations no disclosure can cure"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Every edit Duskly performs, with what it does and how it is classified for disclosure.\n\nUse this to pick the right edit for what someone is asking for, and to see in one call which ones carry compliance consequences.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "duskly_list_edits",
+      "title": "List available edits and their compliance status"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Inspect an image for provenance signals: an invisible Duskly watermark, IPTC digital source type metadata, and whether a C2PA container appears present.\n\nWorks on images Duskly did not produce.\n\nRead the result carefully before repeating it. This is a limited inspection report, not a certificate of authenticity or compliance. **The absence of a mark is not evidence that an image is a camera capture** — most AI editors write nothing at all, and Duskly's own paid downloads are deliberately unmarked. The C2PA field reports only that a container appears present: manifests are not parsed, signatures are not validated, and Duskly does not sign them.\n\nPrefer repeating the summary lines over paraphrasing individual fields.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "image_base64": {
+            "description": "Base64-encoded JPEG or PNG, up to 8MB decoded. A data: URL prefix is accepted and stripped.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "image_base64"
+        ],
+        "type": "object"
+      },
+      "name": "duskly_verify_image",
+      "title": "Check an image for provenance marks"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Duskly's price and what a paid listing returns. Use this when someone asks what it costs or what they get.\n\nEditing is not available over MCP: renders spend model credit and require a browser session. Send the person to the URL in the response to do the work.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "duskly_get_pricing",
+      "title": "What Duskly costs and what a purchase includes"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Returns the URL a person should open to upload listing photos and run an edit themselves.\n\nUse this when someone wants an edit performed. Editing is deliberately not callable over MCP: a render spends model credit and is gated behind a browser check that an automated client cannot pass. Hand the person the link rather than attempting the edit.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "task": {
+            "description": "Preselects the edit on the page, when known.",
+            "enum": [
+              "day-to-dusk",
+              "virtual-staging",
+              "declutter",
+              "occupied-to-vacant",
+              "sky-replacement",
+              "virtual-renovation"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "duskly_start_listing",
+      "title": "Get a link for a person to upload photos"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "The state of a Duskly listing: how many photos it holds, which have been edited, whether it has been paid for, and how much of its render budget remains.\n\nTakes the listing id from the listing URL. Possession of that id is what authorises this, exactly as it does on the website.\n\nUse this before duskly_get_listing_pack to check whether a listing has been paid for.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "listing_id": {
+            "description": "The listing id, the part of a Duskly listing URL after /listing/.",
+            "pattern": "^listing_[a-f0-9]+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "listing_id"
+        ],
+        "type": "object"
+      },
+      "name": "duskly_get_listing",
+      "title": "Look up a listing"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Everything a paid listing returns: the download link for the archive, the disclosure wording for every edited photo, and the public page showing the unaltered originals.\n\nRequires the listing to have been paid for. An unpaid listing returns the checkout URL instead, for a person to open.\n\nThe disclosure wording is generated per photo and per publishing surface. The duty to publish it falls on the licensee publishing the listing, not on the software.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "listing_id": {
+            "description": "The listing id, the part of a Duskly listing URL after /listing/.",
+            "pattern": "^listing_[a-f0-9]+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "listing_id"
+        ],
+        "type": "object"
+      },
+      "name": "duskly_get_listing_pack",
+      "title": "Get the deliverables for a paid listing"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "A Stripe Checkout URL for an unpaid listing, for a **person** to open and pay.\n\nDuskly does not take payment through MCP and no agent completes a purchase. Give this URL to the person you are working for; once they have paid, the listing is unlocked and duskly_get_listing_pack returns the deliverables.\n\nReturns an error for a listing that is already paid.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "listing_id": {
+            "description": "The listing id, the part of a Duskly listing URL after /listing/.",
+            "pattern": "^listing_[a-f0-9]+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "listing_id"
+        ],
+        "type": "object"
+      },
+      "name": "duskly_get_checkout_url",
+      "title": "Get a payment link for a listing"
+    }
+  ],
+  "url": "https://duskly.ai/mcp"
+}

@@ -1,0 +1,62 @@
+{
+  "canon_version": "1",
+  "full_hash": "abf25e7155f267ff80201b276bc298a190088bd52ac5b0145321296dfaafb6d3",
+  "name": "ai.aient/mcp",
+  "observed_at": "2026-09-18T02:05:10.255636Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 2,
+  "tools": [
+    {
+      "description": "Create an Aient account from an email address, or get a sign-in code for an existing one, with no browser and no token.\n\n**When to use**: you have no Aient access token and the user wants a workspace, or an earlier `verify_email` answered `workspace_unavailable` or its token expired. Ask the user which email address to use.\n\n**What happens**: Aient emails a 6-10 digit one-time code to that address. Read the code from that inbox (or ask the user for it), then call `verify_email` with the same email and the code. An address that already has an Aient account receives a sign-in code from this tool instead of a new account; verify_email then returns a token for that account's workspace, preparing the workspace first if an earlier signup never finished. The emailed code is a Supabase Auth credential: it grants this MCP token, and the same email carries a browser sign-in link, so treat both as secrets.\n\n**Limits**: a few attempts per minute per address.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "email": {
+            "format": "email",
+            "maxLength": 320,
+            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "type": "object"
+      },
+      "name": "signup"
+    },
+    {
+      "description": "Confirm the code Aient emailed after `signup` and receive the access token for this MCP server.\n\n**Returns**: `access_token` (a Bearer token for this server, valid for `expires_in` seconds), `organisation_id`, and `user_id`. For an address that already had an account, the token belongs to that account's existing workspace; a workspace that was never prepared is prepared now. Reconnect to this MCP server sending \"Authorization: Bearer <access_token>\" on every request. Then call `verify_connection` and `get_activation_status` and follow its `nextActions` to finish onboarding. The token is not refreshable: when it expires, call `signup` and `verify_email` again.\n\n**Errors**: `confirmation_expired` means the code is too old (call `signup` again); `confirmation_failed` means it did not match; `workspace_unavailable` means the code was accepted but the workspace could not be prepared (call `signup` again for a new code, never `verify_email` with the used one).",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "code": {
+            "pattern": "^[0-9]{6,10}$",
+            "type": "string"
+          },
+          "email": {
+            "format": "email",
+            "maxLength": 320,
+            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "code"
+        ],
+        "type": "object"
+      },
+      "name": "verify_email"
+    }
+  ],
+  "url": "https://aient.ai/mcp"
+}

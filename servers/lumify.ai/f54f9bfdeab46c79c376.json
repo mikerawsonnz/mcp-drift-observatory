@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "e97ad2358ecc9194beebb6dc341b84cc65de4e22a094929131a7d0f87ca25efd",
+  "full_hash": "ba2b80e3998c4349cbb1e209835617686d4abc87ee2e9460462a4884c9f0843f",
   "name": "ai.lumify/sports-intelligence",
-  "observed_at": "2026-08-20T09:12:04.615155Z",
+  "observed_at": "2026-09-03T02:07:18.670131Z",
   "sources": [
     "official"
   ],
-  "tool_count": 18,
+  "tool_count": 24,
   "tools": [
     {
       "annotations": {
@@ -111,7 +111,7 @@
             "type": "boolean"
           },
           "league": {
-            "description": "League slug, e.g. nfl, atp, fifa_world_cup.",
+            "description": "League slug, e.g. nfl, atp, mls.",
             "type": "string"
           },
           "limit": {
@@ -176,6 +176,13 @@
               },
               "id": {
                 "type": "integer"
+              },
+              "inprogress_since": {
+                "description": "ISO-8601 UTC when status first became inprogress (first live tick). Null until then; stays set after final.",
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "league": {
                 "type": "string"
@@ -243,11 +250,11 @@
         "openWorldHint": true,
         "readOnlyHint": true
       },
-      "description": "Get a single event with participants and venue. Optionally inline current odds and/or bet intelligence (+1 credit each, only charged when that data is actually available). Raises a not-found error if event_id doesn't exist. Use list_events / query_events to discover ids first, or batch_get_events to fetch several ids in one call.",
+      "description": "Get a single event with participants and venue. Optionally inline current odds and/or bet intelligence (same 1 credit as the event call). Raises a not-found error if event_id doesn't exist. Use list_events / query_events to discover ids first, or batch_get_events to fetch several ids in one call.",
       "inputSchema": {
         "properties": {
           "bookmaker": {
-            "description": "Bookmaker for inlined odds and intelligence market prices. Defaults to pinnacle. Valid: pinnacle, fanduel, draftkings, betmgm, caesars, bet365, circa, hardrock, betonline, all.",
+            "description": "Bookmaker for inlined odds and intelligence market prices. Defaults to pinnacle. Valid: pinnacle, fanduel, draftkings, betmgm, caesars, bet365, circa, westgate, wynn, south_point, stations, hardrock, betonline, betr, betrivers, lowvig, all.",
             "type": "string"
           },
           "event_id": {
@@ -256,12 +263,12 @@
           },
           "include_intelligence": {
             "default": false,
-            "description": "Inline bet intelligence (+1 credit when available).",
+            "description": "Inline bet intelligence. Does not add credits.",
             "type": "boolean"
           },
           "include_odds": {
             "default": false,
-            "description": "Inline current odds scoped by bookmaker (default: pinnacle). +1 credit for a single book when available; +2 for bookmaker=all or a comma-separated list.",
+            "description": "Inline current odds scoped by bookmaker (default: pinnacle). Does not add credits — the event call stays 1 credit.",
             "type": "boolean"
           }
         },
@@ -275,6 +282,13 @@
         "properties": {
           "id": {
             "type": "integer"
+          },
+          "inprogress_since": {
+            "description": "ISO-8601 UTC when status first became inprogress (first live tick). Null until then; stays set after final.",
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "league": {
             "type": "string"
@@ -356,7 +370,7 @@
       "inputSchema": {
         "properties": {
           "bookmaker": {
-            "description": "Bookmaker for inlined odds and intelligence market prices. Defaults to pinnacle. Valid: pinnacle, fanduel, draftkings, betmgm, caesars, bet365, circa, hardrock, betonline, all.",
+            "description": "Bookmaker for inlined odds and intelligence market prices. Defaults to pinnacle. Valid: pinnacle, fanduel, draftkings, betmgm, caesars, bet365, circa, westgate, wynn, south_point, stations, hardrock, betonline, betr, betrivers, lowvig, all.",
             "type": "string"
           },
           "event_ids": {
@@ -369,12 +383,12 @@
           },
           "include_intelligence": {
             "default": false,
-            "description": "Inline bet intelligence on each event (+1 credit per event when available).",
+            "description": "Inline bet intelligence on each event. Does not add credits.",
             "type": "boolean"
           },
           "include_odds": {
             "default": false,
-            "description": "Inline current odds scoped by bookmaker (default: pinnacle). +1 credit per event for a single book when available; +2 for bookmaker=all or a comma-separated list.",
+            "description": "Inline current odds scoped by bookmaker (default: pinnacle). Does not add credits — each found event stays 1 credit.",
             "type": "boolean"
           }
         },
@@ -571,11 +585,11 @@
         "openWorldHint": true,
         "readOnlyHint": true
       },
-      "description": "Get current betting odds for an event: per-bookmaker lines and last-updated time. bookmaker defaults to pinnacle (1 credit). Use 'all' or a comma-separated list for multiple books (2 credits). Default is main lines (is_main=true); set include_alts for alternate spread/total rungs. Final events include result (won/lost/push/void) graded from the stored score. MLB, tennis, and migrated soccer mains also include fair_price and consensus mirrored from published assessments. Returns available:false with no charge if odds aren't posted for this event yet. Use get_odds_history for line movement over time.",
+      "description": "Get current betting odds for an event: per-bookmaker lines and last-updated time. Includes in-play quotes while the event is underway; books that have not quoted since kickoff are omitted. bookmaker defaults to pinnacle. Use 'all' or a comma-separated list for multiple books — still 1 credit. Default is main lines (is_main=true); set include_alts for alternate spread/total rungs. Final events include result (won/lost/push/void) graded from the pre-kickoff close. MLB, tennis, and soccer (MLS + big-five) mains also include fair_price and consensus mirrored from published assessments. Returns available:false with no charge if odds aren't posted for this event yet. If bookmaker is omitted and Pinnacle hasn't posted a line yet (common for the first/last games of a preseason slate), falls back to the best-covered other book and adds requested_bookmaker='pinnacle' plus fallback_bookmaker to the response instead of reporting no odds; an explicit bookmaker='pinnacle' never falls back. Use get_odds_history for line movement over time.",
       "inputSchema": {
         "properties": {
           "bookmaker": {
-            "description": "Bookmaker slug. Defaults to pinnacle. Valid: pinnacle, fanduel, draftkings, betmgm, caesars, bet365, circa, hardrock, betonline, all, or a comma-separated list.",
+            "description": "Bookmaker slug. Defaults to pinnacle. Valid: pinnacle, fanduel, draftkings, betmgm, caesars, bet365, circa, westgate, wynn, south_point, stations, hardrock, betonline, betr, betrivers, lowvig, all, or a comma-separated list.",
             "type": "string"
           },
           "event_id": {
@@ -599,7 +613,7 @@
             "type": "boolean"
           },
           "bookmakers": {
-            "description": "Per-book markets. Outcomes include is_main; final events add result (won/lost/push/void) and close on graded points.",
+            "description": "Per-book markets. Outcomes include is_main. In-play omits books that have not quoted since kickoff. Final events add result (won/lost/push/void) and close on the pre-kickoff point.",
             "items": {
               "type": "object"
             },
@@ -608,11 +622,19 @@
           "event_id": {
             "type": "integer"
           },
+          "fallback_bookmaker": {
+            "description": "The book actually returned when requested_bookmaker is present.",
+            "type": "string"
+          },
           "last_updated": {
             "type": [
               "string",
               "null"
             ]
+          },
+          "requested_bookmaker": {
+            "description": "Present only when the default (no bookmaker arg) request fell back to a different book because Pinnacle has no line yet — always 'pinnacle' when present.",
+            "type": "string"
           }
         },
         "type": "object"
@@ -629,7 +651,7 @@
       "inputSchema": {
         "properties": {
           "bookmaker": {
-            "description": "Bookmaker slug. Defaults to pinnacle. Valid: pinnacle, fanduel, draftkings, betmgm, caesars, bet365, circa, hardrock, betonline, all, or a comma-separated list.",
+            "description": "Bookmaker slug. Defaults to pinnacle. Valid: pinnacle, fanduel, draftkings, betmgm, caesars, bet365, circa, westgate, wynn, south_point, stations, hardrock, betonline, betr, betrivers, lowvig, all, or a comma-separated list.",
             "type": "string"
           },
           "event_id": {
@@ -674,7 +696,7 @@
         "openWorldHint": true,
         "readOnlyHint": true
       },
-      "description": "Get raw, deterministic team/player and match statistics for a soccer, MLB, tennis, NFL, NCAAF, NBA, NCAAB, or NHL event — no market/odds data (use get_odds for that) and no scoring, weighting, confidence, or narrative attached; use get_intelligence for Lumify's judgment layer. The payload shape is sport-specific — soccer/MLB/NFL/NCAAF/NBA/NCAAB/NHL use teams.home/away; tennis uses players.player_1/player_2 + match.scoreboard; never share field names across sports. Soccer: team strength (league-table PPG or FIFA rank), recent form, head-to-head history, rest days, home/away splits, and boxscore rates (shots/SoT for & against, possession, corners, cards, saves/save rate, plus Phase 1C offsides/tackles/interceptions/blocked_shots/assists — team assists is summed from ESPN's per-player goalAssists, since ESPN has no team-level assists stat) over explicit windows rates_l5/rates_season. Shot location is not on ESPN's team box — not exposed. MLB: season-to-date W/L record + run differential, recent form (runs scored/allowed), H2H, rest days, team batting/pitching rates (rates_l5/rates_season — AVG/OBP/SLG/OPS/ERA/WHIP/K9/BB9 plus RBI/TB/triples), starting pitcher's own season ERA/WHIP/K9/BB9 once the post-final box lineup lands (pregame probable SP stays on get_intelligence), lineup from completed-game box scores, and this event's player_box (per-player batting/pitching counting stats — no per-player AVG/ERA; settleables stay on player-props). Tennis (main-draw singles only): Stage-1 FlashLive history (match context, rankings, set scoreboard, rest days, recent/surface form, tour lookback record, H2H) plus Stage-2 career_rates / career_surface from persisted Tennis API aggregates (serve/return, break points, match-surface W/L) — request path is DB-only. NFL Stage-1: season W/L + point differential, recent form (points scored/allowed), H2H, rest days, and team offense/defense rates (total/passing/rushing yards, attempts, turnovers, third_down_pct) from persisted ESPN team boxes — no per-player block on this endpoint (player game stats are persisted for a future player-props surface). NCAAF Stage-1: same football-native shape as NFL (season W/L + point differential, form, H2H, rest, offense/defense rates from ESPN college-football team boxes) — scoped to sport=ncaaf so rates never mix with NFL. NBA Stage-1: season W/L + point differential, recent form (points scored/allowed), H2H, rest days, and team box rates (rebounds/assists/steals/blocks/turnovers/fouls per game plus fg_pct/three_point_pct/free_throw_pct as ratio-of-sums over persisted made/attempt pairs) — no per-player block, same player-props deferral as NFL. NCAAB Stage-1: same basketball-native shape as NBA from ESPN mens-college-basketball team boxes — scoped to sport=ncaab. NHL Stage-1: season W/L + goal differential (OT/shootout losses count as losses), recent form (goals scored/allowed), H2H, rest days, and team box rates (shots_on_goal/hits/penalty_minutes/power_play_goals/giveaways/takeaways/blocked_shots per game) from the NHL Web API boxscore endpoint — no per-skater/goalie block, same player-props deferral as NFL/NBA. NFL/NCAAF/NBA/NCAAB preseason games are excluded from form/rates/record/H2H via lumify_events.season_type; NHL never ingests preseason games at all, so no filter is needed there. Form/record/rest/H2H count status final/complete only (walkovers excluded as unplayed; retirements count). Returns available:false with no charge if participants haven't resolved, or tennis draw_type is not exactly 'singles' (doubles and qualifying are out of scope, same as the tennis predictive stack).",
+      "description": "Get raw, deterministic team/match statistics for a soccer, MLB, tennis, NFL, NCAAF, NBA, NCAAB, or NHL event — no odds (use get_odds) and no scoring (use get_intelligence). Payload is sport-specific: teams.home/away except tennis (players.player_1/player_2). Tennis doubles/qualifying return available:false. Form/record/H2H exclude walkovers and NFL/NCAAF/NBA/NCAAB preseason. Other sports return HTTP 400. Field catalog: https://lumify.ai/docs/reference#event-stats",
       "inputSchema": {
         "properties": {
           "event_id": {
@@ -752,7 +774,7 @@
             "type": "string"
           },
           "teams": {
-            "description": "Soccer/MLB/NFL/NCAAF/NBA/NCAAB/NHL only (home/away). Soccer: recent_form, team_strength, venue, rest_days, sos, lineup, rates_l5, rates_season. MLB: record, recent_form, rest_days, rates_l5/rates_season (incl. OBP/SLG/OPS/RBI/TB), starting_pitcher (post-box only), lineup, player_box (this event's per-player batting/pitching counting stats). NFL/NCAAF Stage-1: record (points_for/against), recent_form (points_scored/allowed), rest_days, rates_l5/rates_season (total/passing/rushing yards, attempts, turnovers, third_down_pct) — no per-player block. NBA/NCAAB Stage-1: record (points_for/against), recent_form (points_scored/allowed), rest_days, rates_l5/rates_season (rebounds/assists/steals/blocks/turnovers/fouls, fg_pct/three_point_pct/free_throw_pct as ratio-of-sums) — no per-player block. NHL Stage-1: record (goals_for/against), recent_form (goals_scored/allowed), rest_days, rates_l5/rates_season (shots_on_goal/hits/penalty_minutes/power_play_goals/giveaways/takeaways/blocked_shots) — no per-skater/goalie block. Absent on tennis responses — use players instead.",
+            "description": "Soccer/MLB/NFL/NCAAF/NBA/NCAAB/NHL only (home/away). Each side includes image_url (Lumify media URL, null until ingest; never a vendor CDN). Soccer: recent_form, team_strength, venue, rest_days, sos, lineup, rates_l5, rates_season. MLB: record, recent_form, rest_days, rates_l5/rates_season (incl. OBP/SLG/OPS/RBI/TB), starting_pitcher (post-box only), lineup, player_box (this event's per-player batting/pitching counting stats). NFL/NCAAF: record (points_for/against), recent_form (points_scored/allowed), rest_days, rates_l5/rates_season (total/passing/rushing yards, attempts, turnovers, third_down_pct), player_box (one players[] line per athlete with passing/rushing/receiving/defense/kicking counts; final only). NBA/NCAAB: record (points_for/against), recent_form (points_scored/allowed), rest_days, rates_l5/rates_season (rebounds/assists/steals/blocks/turnovers/fouls, fg_pct/three_point_pct/free_throw_pct as ratio-of-sums), player_box (points/rebounds/assists/…; final only). NHL: record (goals_for/against), recent_form (goals_scored/allowed), rest_days, rates_l5/rates_season (shots_on_goal/hits/penalty_minutes/power_play_goals/giveaways/takeaways/blocked_shots), player_box (skaters[] + goalies[]; assists/hits remapped from assists_nhl/hits_nhl; final only). Settleables stay on get_player_props. Absent on tennis responses — use players instead.",
             "type": [
               "object",
               "null"
@@ -776,7 +798,266 @@
         "openWorldHint": true,
         "readOnlyHint": true
       },
-      "description": "Get public betting splits (bets% and handle%) for an event: a consensus split plus a per-bookmaker breakdown (bookmakers[].bookmaker uses the same odds slugs as get_odds, e.g. draftkings — not upstream short keys like dk), with a captured_at timestamp. Available for MLB, NBA, NHL, and NFL. Not available for tennis, soccer, or NCAAF (upstream does not expose splits). Returns available:false with no charge if splits haven't been captured for this event yet or the sport is unsupported.",
+      "description": "Get player-prop lines and live progress for an NFL, NCAAF, NBA, NCAAB, NHL, or MLB event. Joins persisted player-prop mains to this-event player box counts and grades over/under/push (1:1 slugs, combo sums, weighted total bases, anytime TD, double-double/triple-double, hockey points). Sport × market catalog: https://lumify.ai/docs/player-props. GET /odds / get_odds stay on moneyline/spread/total. Returns available:false with no charge if no prop mains have been ingested. Other sports return HTTP 400.",
+      "inputSchema": {
+        "properties": {
+          "event_id": {
+            "description": "Event id, from list_events, query_events, or search results.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "event_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_player_props",
+      "outputSchema": {
+        "properties": {
+          "available": {
+            "description": "False when no player-prop mains have been ingested; player_props is empty and the call isn't billed.",
+            "type": "boolean"
+          },
+          "clock": {
+            "description": "Game clock from the live score snapshot.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "event_id": {
+            "description": "Lumify event ID.",
+            "type": "integer"
+          },
+          "period": {
+            "description": "Current period from the live score snapshot.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "player_props": {
+            "description": "One row per (player, market, line). Fields: player, player_id (null if unmatched), market (prop category), line, current (this-event box count), pct_of_line, settleable, result (in_progress / over / under / push, or null), books ({book_slug: {over, under}} American prices).",
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "sport": {
+            "description": "Sport slug: nfl, ncaaf, nba, ncaab, nhl, or mlb.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "description": "Event status (scheduled, inprogress, delayed, final, …).",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Get team-total lines and live progress for an NFL, NCAAF, MLB, or soccer event. Joins persisted Pinnacle team-total mains (each team's full-game points/runs/goals Over/Under) to this-event participant scores and grades over/under/push. GET /odds / get_odds stay on moneyline/spread/total. Returns available:false with no charge if no team-total mains have been ingested. Other sports return HTTP 400.",
+      "inputSchema": {
+        "properties": {
+          "event_id": {
+            "description": "Event id, from list_events, query_events, or search results.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "event_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_team_props",
+      "outputSchema": {
+        "properties": {
+          "available": {
+            "description": "False when no team-total mains have been ingested; team_props is empty and the call isn't billed.",
+            "type": "boolean"
+          },
+          "clock": {
+            "description": "Game clock from the live score snapshot.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "event_id": {
+            "description": "Lumify event ID.",
+            "type": "integer"
+          },
+          "period": {
+            "description": "Current period from the live score snapshot.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sport": {
+            "description": "Sport slug: nfl, ncaaf, mlb, or soccer.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "description": "Event status (scheduled, inprogress, delayed, final, …).",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "team_props": {
+            "description": "One row per (team, line). Fields: team, team_id, side (home/away), market (team_total), line, current (this-event team score), pct_of_line, settleable, result (in_progress / over / under / push, or null), books ({book_slug: {over, under}} American prices).",
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Get prediction-market game-line probabilities for an NFL, NCAAF, NBA, NHL, MLB, soccer, or tennis event. Persist-then-read from Fanatics Markets, Kalshi, and Polymarket. Prices are implied probabilities in (0, 1] — never American odds and never the same surface as get_odds / GET /odds. Game-line contracts only (h2h / spreads / totals; soccer 1X2 as three outcomes). Returns available:false with no charge if no rows have been ingested. Other sports return HTTP 400. This is a price-input read, not a prediction-market trading product and not Edge.",
+      "inputSchema": {
+        "properties": {
+          "event_id": {
+            "description": "Event id, from list_events, query_events, or search results.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "event_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_prediction_markets",
+      "outputSchema": {
+        "properties": {
+          "available": {
+            "description": "False when no prediction-market rows have been ingested; venues is empty and the call isn't billed.",
+            "type": "boolean"
+          },
+          "event_id": {
+            "description": "Lumify event ID.",
+            "type": "integer"
+          },
+          "sport": {
+            "description": "Sport slug: nfl, ncaaf, nba, nhl, mlb, soccer, or tennis.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "venues": {
+            "description": "One block per venue (fanaticsmarkets, kalshi, polymarket). Each has venue, display_name, and markets[] of {key, point?, outcomes:[{label, probability, contract_id}]}. probability is in (0, 1].",
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Get first-half / first-five / first-set lines and live progress for an NFL, NCAAF, NBA, NCAAB, MLB, soccer, or tennis event. Joins persisted first_half_spreads / first_half_totals mains to this-event period scores (1H = Q1+Q2, NCAAB or soccer native 1H; MLB F5 = innings 1–5; tennis S1 = first-set games) and grades the period, not the full game. GET /odds / get_odds stay on moneyline/spread/total. Returns available:false with no charge if no period mains have been ingested. Other sports return HTTP 400.",
+      "inputSchema": {
+        "properties": {
+          "event_id": {
+            "description": "Event id, from list_events, query_events, or search results.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "event_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_period_odds",
+      "outputSchema": {
+        "properties": {
+          "available": {
+            "description": "False when no first-half / first-five / first-set mains have been ingested; period_odds is empty and the call isn't billed.",
+            "type": "boolean"
+          },
+          "clock": {
+            "description": "Game clock from the live score snapshot.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "event_id": {
+            "description": "Lumify event ID.",
+            "type": "integer"
+          },
+          "period": {
+            "description": "Current period from the live score snapshot.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "period_odds": {
+            "description": "One row per (scope, market, line). Fields: scope (1H, F5, or S1), market (first_half_spreads / first_half_totals), line (home-perspective for spreads), home_score, away_score, current (totals only), current_margin (spreads only), pct_of_line, settleable, scope_complete, result (totals), home_result / away_result (spreads), books ({book_slug: {home, away} or {over, under}}).",
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "sport": {
+            "description": "Sport slug: nfl, ncaaf, nba, ncaab, mlb, soccer, or tennis.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "description": "Event status (scheduled, inprogress, delayed, final, …).",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Get public betting splits (bets% and handle%) for an event: a consensus split plus a per-bookmaker breakdown (bookmakers[].bookmaker uses the same odds slugs as get_odds, e.g. draftkings — not upstream short keys like dk), with a captured_at timestamp. Available for MLB, NBA, NHL, NFL, NCAAF, and NCAAB. Not available for tennis or soccer (upstream 400). Returns available:false with no charge if splits haven't been captured for this event yet or the sport is unsupported.",
       "inputSchema": {
         "properties": {
           "event_id": {
@@ -829,11 +1110,11 @@
         "openWorldHint": true,
         "readOnlyHint": true
       },
-      "description": "Get AI bet intelligence for an event. Branch on sport/league and on the presence of probability (probability model) vs. confidence_score (points model). Probability customer surface (MLB, soccer/MLS, tennis): probability, interval, fair_price, market, edge, tier, plus Price fair/edges_by_book/best — framework plumbing (p_model, p_market, blend_w, sufficiency, phase, model_version, drivers, alignment) is omitted. edge/tier null and has_recommend false today — fair-price + line-shopping, not picks; price gap ≠ EV. Predictive MLB may also return a Search-backed match_overview + top-level rationale[] (context overlay, not a pick) generated on first request and reused after — distinct from bets[].rationale on points sports. Points model (NFL, NCAAF, unmigrated soccer): confidence scores, signals, bets[].rationale, narratives. Match-level tokens (OVER, UNDER, ML_DRAW) have null player_role/player_id/team_id/player_name. bookmaker defaults to pinnacle and is a no-op for probability-model sports. Returns available:false with no charge if intelligence hasn't been computed yet.",
+      "description": "Get predictive bet intelligence for an event: vig-stripped probability, fair_price, Price overlay, main-line ev (Beta), and forecasts[] — forecasted wagers from the model (same objects as list_forecasts): player props plus tennis moneyline/spreads/totals. bets[] is live for MLB, tennis, soccer (MLS + big-five), NFL, and NCAAF. forecasts[] covers MLB, NFL, NCAAF, NBA, NCAAB, NHL, and tennis and can populate when available is false. Fair-price + line-shopping on bets[] today (edge/tier null; has_recommend false). bookmaker is ignored. Match-level tokens (OVER, UNDER, ML_DRAW) have null player/team attribution. Free only when available is false and forecasts is empty. Field catalog: https://lumify.ai/docs/reference#event-intelligence",
       "inputSchema": {
         "properties": {
           "bookmaker": {
-            "description": "Bookmaker slug for market prices on recommended bets. Defaults to pinnacle. Valid: pinnacle, fanduel, draftkings, betmgm, caesars, bet365, circa, hardrock, betonline. No effect for probability-model sports (MLS soccer and MLB), which report the book their assessment was priced against.",
+            "description": "Ignored. Intelligence always reports the book the assessment was priced against. Valid: pinnacle, fanduel, draftkings, betmgm, caesars, bet365, circa, westgate, wynn, south_point, stations, hardrock, betonline, betr, betrivers, lowvig.",
             "type": "string"
           },
           "event_id": {
@@ -850,7 +1131,7 @@
       "outputSchema": {
         "properties": {
           "available": {
-            "description": "False when no intelligence has been computed for this event yet — every other field is then null/empty and the request is not charged.",
+            "description": "False when no predictive bets[] have been computed for this event yet. forecasts[] can still populate on MLB/NFL/NCAAF/NBA/NCAAB/NHL. Free only when available is false and forecasts is empty.",
             "type": "boolean"
           },
           "bets": {
@@ -864,14 +1145,14 @@
                   ]
                 },
                 "attribution": {
-                  "description": "Attribution keys backing rationale, same order. Points-model sports only.",
+                  "description": "Not published.",
                   "items": {
                     "type": "string"
                   },
                   "type": "array"
                 },
                 "best": {
-                  "description": "Highest price-gap pick across edges_by_book: {book, price, edge, quote_age_seconds}. Price gap ≠ EV; Tier C informational line-shopping.",
+                  "description": "Highest price-gap book across edges_by_book: {book, price, edge, quote_age_seconds}. Tier C informational line-shopping.",
                   "type": [
                     "object",
                     "null"
@@ -896,14 +1177,14 @@
                   ]
                 },
                 "confidence_score": {
-                  "description": "Points-engine score, 0-1, not a calibrated probability. Points-model sports only.",
+                  "description": "Not published. Use probability.",
                   "type": [
                     "number",
                     "null"
                   ]
                 },
                 "coverage": {
-                  "description": "Signal-coverage fraction, 0-1. Points-model sports only.",
+                  "description": "Not published.",
                   "type": [
                     "number",
                     "null"
@@ -924,14 +1205,21 @@
                   ]
                 },
                 "edges_by_book": {
-                  "description": "Price gap versus fair.probability per soft book (fair.probability × decimal_odds − 1). Line-shopping only, NOT EV / NOT a recommend.",
+                  "description": "Price gap versus fair.probability per soft book (fair.probability × decimal_odds − 1). Line-shopping metric: rank soft books by gap.",
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "ev": {
+                  "description": "Beta. Customer-facing EV estimate: {beta: true, book, price, ev_pct, kelly_fraction, quote_age_seconds, n_books}. Re-packages the same fair price gap for direct display. Moneyline only. n=1 Pinnacle is a valid fair (soccer/tennis). Null when the gap is ≤0, above 25% (stale-line), or only suppressed books remain (MLB ML × DK/FD proven null; BetMGM/Bet365/BetOnline unscreened).",
                   "type": [
                     "object",
                     "null"
                   ]
                 },
                 "fair": {
-                  "description": "Sharp-consensus fair: {probability, books, n_books, is_consensus}. MLB: Pinnacle+Circa; MLS/tennis: Pinnacle. Price-gap reference for edges_by_book/best — not EV.",
+                  "description": "Sharp-consensus fair: {probability, books, n_books, is_consensus}. MLB/NFL: Pinnacle+Circa; MLS/tennis: Pinnacle. Price-gap reference for edges_by_book/best.",
                   "type": [
                     "object",
                     "null"
@@ -969,7 +1257,7 @@
                   ]
                 },
                 "narrative": {
-                  "description": "Per-bet narrative sentence. Points-model sports only.",
+                  "description": "Not published.",
                   "type": [
                     "string",
                     "null"
@@ -1018,21 +1306,21 @@
                   ]
                 },
                 "probability": {
-                  "description": "Published probability for this outcome, 0-1. Outcomes of one market sum to 1. Customer surface for MLB, soccer, tennis.",
+                  "description": "Published probability for this outcome, 0-1. Outcomes of one market sum to 1. Customer surface for MLB, soccer, tennis, NFL.",
                   "type": [
                     "number",
                     "null"
                   ]
                 },
                 "rationale": {
-                  "description": "Per-bet signal-strength bullets. Points-model sports only. Distinct from top-level rationale (event-level context chips).",
+                  "description": "Not published. Top-level rationale is the event-level context overlay.",
                   "items": {
                     "type": "string"
                   },
                   "type": "array"
                 },
                 "signals": {
-                  "description": "Per-signal point breakdown. Points-model sports only.",
+                  "description": "Not published.",
                   "type": [
                     "object",
                     "null"
@@ -1060,7 +1348,7 @@
                   ]
                 },
                 "validator": {
-                  "description": "Qualitative-validator verdict: {stance, confidence, delta, validated_at}. Points-model sports only.",
+                  "description": "Not published.",
                   "type": [
                     "object",
                     "null"
@@ -1074,6 +1362,173 @@
           "event_id": {
             "description": "Lumify event ID this intelligence describes.",
             "type": "integer"
+          },
+          "forecasts": {
+            "description": "Forecasted wagers for this event (same object as list_forecasts) — a model prediction, not a beat-the-market claim. Player-prop rows on team sports; tennis main-line via bet_type ML_P1/ML_P2 (moneyline), SPREAD_P1/SPREAD_P2 (game handicap), OVER/UNDER (total games). selected marks the top-conviction rows on the daily slate; the rest of the event catalog is included with selected:false. Read p_hit as P(the picked outcome hits). How + field catalog: https://lumify.ai/docs/forecasts",
+            "items": {
+              "properties": {
+                "away_team": {
+                  "description": "Away team display name. Slate only.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "bet_type": {
+                  "description": "Main-line token when this row is a main-line forecast — ML_P1/ML_P2/ML_HOME/ML_AWAY/ML_DRAW, SPREAD_P1/SPREAD_P2/SPREAD_HOME/SPREAD_AWAY, or OVER/UNDER (same vocabulary as get_intelligence bets[].bet_type and list_ev). Null on player-prop rows — that's the discriminator between the two row shapes. Tennis sets ML_P1/ML_P2 (moneyline), SPREAD_P1/SPREAD_P2 (game handicap), and OVER/UNDER (total games).",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "books": {
+                  "description": "American price for the picked outcome, keyed by bookmaker slug (e.g. {draftkings: -453}). Posted market price for the side/bet_type the model picked.",
+                  "type": "object"
+                },
+                "commence_time": {
+                  "description": "ISO-8601 UTC scheduled start. Slate only.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "conviction": {
+                  "description": "Board rank key on 0–1: |p_hit−0.5|×2×sufficiency×research. A high p_hit on a thin sample ranks below a moderate p_hit on a long one. Highest conviction first on the daily slate.",
+                  "type": "number"
+                },
+                "drivers": {
+                  "description": "Signed contributions that moved p_hit. Read input as the measured rate/rating behind the pick and effect as how far it lifts the chosen outcome versus a baseline.",
+                  "items": {
+                    "properties": {
+                      "direction": {
+                        "description": "up / down / neutral from the sign of effect.",
+                        "type": "string"
+                      },
+                      "effect": {
+                        "description": "Signed shift in p_hit versus a baseline case on the same line. 0.0 on yardage markets.",
+                        "type": "number"
+                      },
+                      "id": {
+                        "description": "Prop rows: typically player.l10_rate — the recent-form rate that fed Poisson. Main-line rows would use a different namespace once a main-line forecast model ships.",
+                        "type": "string"
+                      },
+                      "input": {
+                        "description": "Measured rate/rating behind this driver, in native units.",
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "event_id": {
+                  "description": "Lumify event ID. Present on list_forecasts; omitted on get_intelligence.forecasts (the event is the argument).",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "home_team": {
+                  "description": "Home team display name. Slate only.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "interval": {
+                  "description": "[lo, hi] stated band around p_hit. Wider when sufficiency is low. A stated evidence band, not a statistical confidence interval.",
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                "league": {
+                  "description": "League slug, if any. Slate only.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line": {
+                  "description": "Posted line the model was scored against. Prop and totals main-line rows: Over/Under number. Spreads main-line rows: the spread number. Null on h2h/moneyline rows.",
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "market": {
+                  "description": "Player-prop rows: prop category (1:1 counting stats). MLB: strikeouts_pitcher, hits, rbis, runs, strikeouts_batter, hits_allowed, earned_runs, outs_recorded. NFL/NCAAF: passing/rushing/receiving_yards, receptions. NBA/NCAAB: points, rebounds, assists, steals, blocks, threes_made. NHL: goals, hockey_assists, shots_on_goal. Main-line rows (bet_type set): the main-line family — h2h, spreads, or totals.",
+                  "type": "string"
+                },
+                "model_version": {
+                  "description": "Scorer version, e.g. forecast-v0.",
+                  "type": "string"
+                },
+                "p_hit": {
+                  "description": "Model probability (0–1) that the picked outcome (side on prop rows, bet_type on main-line rows) hits. Prop rows: built from the player's shrunken counting-stat rate (Poisson vs the posted Over/Under). Optional research may nudge a prop's p_hit by at most ±0.03; the chosen side stays the same.",
+                  "type": "number"
+                },
+                "player": {
+                  "description": "Player display name from the priced line. Null on main-line rows with no player attribution (bet_type is a match-level token like OVER/UNDER/ML_DRAW).",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "player_id": {
+                  "description": "Lumify player ID. Bound by exact / Jr-stripped name match. Null on main-line rows with no player attribution.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "player_role": {
+                  "description": "'home'/'away' for team sports or 'p1'/'p2' for head-to-head sports, set only alongside a non-null bet_type. Null for player-prop rows and for match-level main-line tokens (OVER, UNDER, ML_DRAW).",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "reliability": {
+                  "description": "Badge on this sport×market cell: emerging, moderate, high, or informational. v0 ships emerging for every wager.",
+                  "type": "string"
+                },
+                "research": {
+                  "description": "Optional Deep Research overlay on high-probability wagers (p_hit ≥ 0.80): {stance, conviction, note}. stance is validate / neutral / invalidate. note is the wager-level why. Validate / invalidate rows always carry a note. Validate nudges p_hit up by at most 0.03 and lifts conviction; invalidate does the reverse. The chosen side stays. Null means read p_hit from the rate model alone.",
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "selected": {
+                  "description": "True when this wager is on the daily board (top conviction). On get_intelligence the array includes selected and the rest of the event catalog.",
+                  "type": "boolean"
+                },
+                "side": {
+                  "description": "Prop rows: 'over' or 'under' — the more likely side given the player's shrunken rate versus line. Null on main-line rows — read the picked outcome from bet_type instead.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "sport": {
+                  "description": "Sport slug. Slate only.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "sufficiency": {
+                  "description": "Evidence weight on 0–1: n/(n+12), where n is the recent-form game count (typically L10). A player with 10 games has sufficiency ≈ 0.45. The wager still ships; this field tells you how much of p_hit is earned from this player's own boxes.",
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
           },
           "has_recommend": {
             "description": "True when at least one bet meets the recommendation threshold; null when intelligence has not been computed. False while Edge is not published (current MLB/soccer/tennis Stage 1) — a recommendation requires a non-null tier derived from edge.",
@@ -1097,14 +1552,14 @@
             ]
           },
           "match_overview": {
-            "description": "Natural-language matchup preview — form, context, what to watch. On predictive MLB may be a Search-backed context overlay (not a recommendation). Null when no narrative has been generated.",
+            "description": "Natural-language pre-game matchup preview — form, context, what to watch. Written before kickoff by a Search-backed overlay on every event sport (MLB, NFL, NCAAF, NBA, NCAAB, NHL, soccer, tennis); sport-shaped queries. The request path only reads the stored row. Null when the pre-kickoff job has not run or the fixture was not eligible.",
             "type": [
               "string",
               "null"
             ]
           },
           "matchup": {
-            "description": "Legacy points-engine probable-starter context. Not returned on the MLB predictive customer surface — use get_stats for pitcher/lineup Data.",
+            "description": "Not returned. Use get_stats for pitcher/lineup Data.",
             "type": [
               "object",
               "null"
@@ -1122,7 +1577,7 @@
             "type": "object"
           },
           "rationale": {
-            "description": "Event-level factual matchup chips (starting pitchers, injuries, form). Context overlay only — not a pick. Distinct from bets[].rationale on points-model sports. Predictive MLB may populate on first get_intelligence; later calls reuse the stored row.",
+            "description": "Event-level factual pre-game matchup chips (injuries, recent form, lineup/availability news — sport-shaped). Written before kickoff; the request path only reads the stored row.",
             "items": {
               "type": "string"
             },
@@ -1149,7 +1604,335 @@
         "openWorldHint": true,
         "readOnlyHint": true
       },
-      "description": "List teams, paginated by id (after_id). Filter by sport, league, conference, division, country, active status, or name (q, partial match). Returns each team's id, slug, name, city, conference/division, and venue. Use get_team for full detail on one id once resolved here.",
+      "description": "Beta. List pregame main-line +EV opportunities for a predictive-framework sport (soccer, mlb, tennis, nfl, ncaaf), sorted by ev_pct descending. market=h2h (default, moneyline), spreads, or totals. Tennis totals are not offered (Stage 1 is moneyline + spreads). Same gates as bets[].ev on get_intelligence: sharp-fair price gap, positive and ≤25%, suppressed MLB moneyline null books skipped in favor of the next eligible book. 1 credit. Field catalog: https://lumify.ai/docs/reference#intelligence-ev",
+      "inputSchema": {
+        "properties": {
+          "book": {
+            "description": "Restrict opportunities to one sportsbook slug (e.g. fanduel).",
+            "type": "string"
+          },
+          "league": {
+            "description": "Optional league slug (mls, epl, atp, …). Soccer without a league scans every published soccer league (MLS + big-five).",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max opportunities to return (1–200). Default 50.",
+            "type": "integer"
+          },
+          "market": {
+            "description": "Main-line family: h2h (default, moneyline), spreads, or totals. Tennis + totals returns 400.",
+            "enum": [
+              "h2h",
+              "spreads",
+              "totals"
+            ],
+            "type": "string"
+          },
+          "min_ev": {
+            "description": "Minimum EV% to include. Default 0. Clamped to 0–25.",
+            "type": "number"
+          },
+          "sport": {
+            "description": "Sport slug: soccer, mlb, tennis, nfl, or ncaaf.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sport"
+        ],
+        "type": "object"
+      },
+      "name": "list_ev",
+      "outputSchema": {
+        "properties": {
+          "beta": {
+            "description": "Always true.",
+            "type": "boolean"
+          },
+          "book": {
+            "description": "Book filter, or null.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "league": {
+            "description": "League filter, or null for the whole sport.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "market": {
+            "description": "h2h, spreads, or totals — the family scanned.",
+            "type": "string"
+          },
+          "max_ev": {
+            "description": "Stale-line cap (25).",
+            "type": "number"
+          },
+          "min_ev": {
+            "description": "Minimum EV% applied.",
+            "type": "number"
+          },
+          "opportunities": {
+            "description": "Positive-EV main-line rows: {event_id, sport, league, commence_time, home_team, away_team, side, team, bet_type, line, fair_probability, ev}.",
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "sport": {
+            "description": "Sport slug this scan was run for.",
+            "type": "string"
+          },
+          "total": {
+            "description": "Count of opportunities on this page.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Daily board of forecasted wagers from Lumify's model — a prediction, not a beat-the-market claim (no OOS/independence gate; see list_ev for the gated main-line +EV claim). Player props (rate model) on MLB, NCAAF, NFL, NBA, NCAAB, NHL. Tennis main-line: moneyline (ranking Bradley-Terry) as bet_type ML_P1/ML_P2, game handicap as SPREAD_P1/SPREAD_P2, and total games as OVER/UNDER (a Normal-approx games model; soft-book game-unit lines only, never Pinnacle's set-unit total). Each wager has p_hit, conviction (|p_hit−0.5|×2×sufficiency×research), and posted books prices. Use list_ev to scan main lines by sharp-fair price gap; use this tool to scan high-probability forecasts. reliability is emerging on v0. 1 credit; empty slate is still 200. How + field catalog: https://lumify.ai/docs/forecasts Worked wager: https://lumify.ai/docs/understanding-odds#forecasts",
+      "inputSchema": {
+        "properties": {
+          "date": {
+            "description": "UTC slate date YYYY-MM-DD. Defaults to today UTC.",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max wagers (1–100). Default 25.",
+            "type": "integer"
+          },
+          "market": {
+            "description": "Main-line family filter (h2h, spreads, or totals). Tennis publishes all three (moneyline, game-handicap, total-games). Ignored on prop-only sports.",
+            "enum": [
+              "h2h",
+              "spreads",
+              "totals"
+            ],
+            "type": "string"
+          },
+          "sport": {
+            "description": "Sport slug: mlb, ncaaf, nfl, nba, ncaab, nhl, or tennis.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sport"
+        ],
+        "type": "object"
+      },
+      "name": "list_forecasts",
+      "outputSchema": {
+        "properties": {
+          "date": {
+            "description": "UTC slate date (YYYY-MM-DD).",
+            "type": "string"
+          },
+          "model_version": {
+            "description": "Scorer version (forecast-v0).",
+            "type": "string"
+          },
+          "reliability": {
+            "description": "Default badge on this slate. v0 ships emerging; each wager repeats the same field.",
+            "type": "string"
+          },
+          "sport": {
+            "description": "Sport slug this slate was scored for.",
+            "type": "string"
+          },
+          "total": {
+            "description": "Count of wagers on this page.",
+            "type": "integer"
+          },
+          "wagers": {
+            "description": "Selected forecasted wagers, highest conviction first. Read p_hit as P(the picked outcome — side on prop rows, bet_type on main-line rows — hits); conviction is the board rank. How + field catalog: https://lumify.ai/docs/forecasts",
+            "items": {
+              "properties": {
+                "away_team": {
+                  "description": "Away team display name. Slate only.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "bet_type": {
+                  "description": "Main-line token when this row is a main-line forecast — ML_P1/ML_P2/ML_HOME/ML_AWAY/ML_DRAW, SPREAD_P1/SPREAD_P2/SPREAD_HOME/SPREAD_AWAY, or OVER/UNDER (same vocabulary as get_intelligence bets[].bet_type and list_ev). Null on player-prop rows — that's the discriminator between the two row shapes. Tennis sets ML_P1/ML_P2 (moneyline), SPREAD_P1/SPREAD_P2 (game handicap), and OVER/UNDER (total games).",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "books": {
+                  "description": "American price for the picked outcome, keyed by bookmaker slug (e.g. {draftkings: -453}). Posted market price for the side/bet_type the model picked.",
+                  "type": "object"
+                },
+                "commence_time": {
+                  "description": "ISO-8601 UTC scheduled start. Slate only.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "conviction": {
+                  "description": "Board rank key on 0–1: |p_hit−0.5|×2×sufficiency×research. A high p_hit on a thin sample ranks below a moderate p_hit on a long one. Highest conviction first on the daily slate.",
+                  "type": "number"
+                },
+                "drivers": {
+                  "description": "Signed contributions that moved p_hit. Read input as the measured rate/rating behind the pick and effect as how far it lifts the chosen outcome versus a baseline.",
+                  "items": {
+                    "properties": {
+                      "direction": {
+                        "description": "up / down / neutral from the sign of effect.",
+                        "type": "string"
+                      },
+                      "effect": {
+                        "description": "Signed shift in p_hit versus a baseline case on the same line. 0.0 on yardage markets.",
+                        "type": "number"
+                      },
+                      "id": {
+                        "description": "Prop rows: typically player.l10_rate — the recent-form rate that fed Poisson. Main-line rows would use a different namespace once a main-line forecast model ships.",
+                        "type": "string"
+                      },
+                      "input": {
+                        "description": "Measured rate/rating behind this driver, in native units.",
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "event_id": {
+                  "description": "Lumify event ID. Present on list_forecasts; omitted on get_intelligence.forecasts (the event is the argument).",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "home_team": {
+                  "description": "Home team display name. Slate only.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "interval": {
+                  "description": "[lo, hi] stated band around p_hit. Wider when sufficiency is low. A stated evidence band, not a statistical confidence interval.",
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                "league": {
+                  "description": "League slug, if any. Slate only.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "line": {
+                  "description": "Posted line the model was scored against. Prop and totals main-line rows: Over/Under number. Spreads main-line rows: the spread number. Null on h2h/moneyline rows.",
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "market": {
+                  "description": "Player-prop rows: prop category (1:1 counting stats). MLB: strikeouts_pitcher, hits, rbis, runs, strikeouts_batter, hits_allowed, earned_runs, outs_recorded. NFL/NCAAF: passing/rushing/receiving_yards, receptions. NBA/NCAAB: points, rebounds, assists, steals, blocks, threes_made. NHL: goals, hockey_assists, shots_on_goal. Main-line rows (bet_type set): the main-line family — h2h, spreads, or totals.",
+                  "type": "string"
+                },
+                "model_version": {
+                  "description": "Scorer version, e.g. forecast-v0.",
+                  "type": "string"
+                },
+                "p_hit": {
+                  "description": "Model probability (0–1) that the picked outcome (side on prop rows, bet_type on main-line rows) hits. Prop rows: built from the player's shrunken counting-stat rate (Poisson vs the posted Over/Under). Optional research may nudge a prop's p_hit by at most ±0.03; the chosen side stays the same.",
+                  "type": "number"
+                },
+                "player": {
+                  "description": "Player display name from the priced line. Null on main-line rows with no player attribution (bet_type is a match-level token like OVER/UNDER/ML_DRAW).",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "player_id": {
+                  "description": "Lumify player ID. Bound by exact / Jr-stripped name match. Null on main-line rows with no player attribution.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "player_role": {
+                  "description": "'home'/'away' for team sports or 'p1'/'p2' for head-to-head sports, set only alongside a non-null bet_type. Null for player-prop rows and for match-level main-line tokens (OVER, UNDER, ML_DRAW).",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "reliability": {
+                  "description": "Badge on this sport×market cell: emerging, moderate, high, or informational. v0 ships emerging for every wager.",
+                  "type": "string"
+                },
+                "research": {
+                  "description": "Optional Deep Research overlay on high-probability wagers (p_hit ≥ 0.80): {stance, conviction, note}. stance is validate / neutral / invalidate. note is the wager-level why. Validate / invalidate rows always carry a note. Validate nudges p_hit up by at most 0.03 and lifts conviction; invalidate does the reverse. The chosen side stays. Null means read p_hit from the rate model alone.",
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "selected": {
+                  "description": "True when this wager is on the daily board (top conviction). On get_intelligence the array includes selected and the rest of the event catalog.",
+                  "type": "boolean"
+                },
+                "side": {
+                  "description": "Prop rows: 'over' or 'under' — the more likely side given the player's shrunken rate versus line. Null on main-line rows — read the picked outcome from bet_type instead.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "sport": {
+                  "description": "Sport slug. Slate only.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "sufficiency": {
+                  "description": "Evidence weight on 0–1: n/(n+12), where n is the recent-form game count (typically L10). A player with 10 games has sufficiency ≈ 0.45. The wager still ships; this field tells you how much of p_hit is earned from this player's own boxes.",
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "List teams, paginated by id (after_id). Filter by sport, league, conference, division, country, active status, or name (q, partial match). Returns each team's id, slug, name, city, conference/division, venue, and image_url (Lumify media URL, null until ingest). Use get_team for full detail on one id once resolved here.",
       "inputSchema": {
         "properties": {
           "active": {
@@ -1232,6 +2015,13 @@
               "id": {
                 "type": "integer"
               },
+              "image_url": {
+                "description": "Lumify media URL for the team logo (https://lumify.ai/media/teams/{sport}/{id}.png). Null until ingest. Never a vendor CDN.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "is_active": {
                 "type": "boolean"
               },
@@ -1300,7 +2090,7 @@
         "openWorldHint": true,
         "readOnlyHint": true
       },
-      "description": "Search players by name, sport, country, ranking, or active status, paginated by id (after_id). Returns each player's id, name, position, current team, and tennis ranking if applicable. Use get_player for full detail on one id, or get_player_events for a player's schedule/results.",
+      "description": "Search players by name, sport, country, ranking, or active status, paginated by id (after_id). Returns the same identity object on every sport (null means unknown, not wrong sport). Tennis standings nest under rankings.{singles, points}; rankings is null on every other sport. Use get_player for full detail on one id, or get_player_events for a player's schedule/results.",
       "inputSchema": {
         "properties": {
           "active": {
@@ -1327,7 +2117,7 @@
             "type": "string"
           },
           "ranked": {
-            "description": "If true, only players with a tennis ranking.",
+            "description": "If true, only tennis players with an ATP/WTA singles ranking (rankings.singles).",
             "type": "boolean"
           },
           "sport": {
@@ -1343,54 +2133,127 @@
           "Player": {
             "properties": {
               "birthdate": {
-                "description": "YYYY-MM-DD.",
+                "description": "YYYY-MM-DD date of birth.",
                 "type": [
                   "string",
                   "null"
                 ]
               },
               "country_code": {
+                "description": "ISO 3166-1 alpha-3 country code.",
                 "type": [
                   "string",
                   "null"
                 ]
               },
               "current_team_id": {
+                "description": "Lumify team ID when the player is on a club roster. Null for tennis.",
                 "type": [
                   "integer",
                   "null"
                 ]
               },
               "current_team_name": {
+                "description": "Current team display name. Null for tennis.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "first_name": {
                 "type": [
                   "string",
                   "null"
                 ]
               },
               "full_name": {
+                "description": "Display name.",
                 "type": "string"
               },
+              "handedness": {
+                "description": "left | right | switch. Meaning is sport-specific (bats for MLB, shoots for NHL, playing hand for tennis). Null when unknown.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "height_cm": {
+                "description": "Height in centimetres. Null when not ingested.",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
               "id": {
+                "description": "Lumify player ID.",
                 "type": "integer"
               },
+              "image_url": {
+                "description": "Lumify media URL for the player headshot (https://lumify.ai/media/players/{sport}/{id}.{ext}). Null until the sport's headshot/enrichment job. Never a vendor CDN.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "is_active": {
+                "description": "False when deactivated or retired.",
                 "type": "boolean"
               },
+              "last_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "position": {
+                "description": "Roster position abbreviation when the sport has one (e.g. C, P, SS for MLB; QB, WR for NFL). Null for tennis and when not yet ingested.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "rankings": {
+                "description": "Sport ranking block. Tennis: {singles, points} from ATP/WTA standings. Null for every other sport. Tennis /stats also exposes ranking / ranking_points on the tennis player block.",
+                "properties": {
+                  "points": {
+                    "description": "ATP/WTA ranking points. Tennis only.",
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  "singles": {
+                    "description": "ATP/WTA singles ranking. Tennis only.",
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  }
+                },
+                "type": [
+                  "object",
+                  "null"
+                ]
+              },
+              "retired_at": {
+                "description": "YYYY-MM-DD retirement date when known.",
                 "type": [
                   "string",
                   "null"
                 ]
               },
               "slug": {
+                "description": "URL-safe unique slug.",
                 "type": "string"
               },
               "sport": {
+                "description": "Sport slug, e.g. mlb, tennis, nfl.",
                 "type": "string"
               },
-              "tennis_ranking": {
+              "weight_kg": {
+                "description": "Weight in kilograms. Null when not ingested.",
                 "type": [
-                  "integer",
+                  "number",
                   "null"
                 ]
               }
@@ -1469,6 +2332,13 @@
           "id": {
             "type": "integer"
           },
+          "image_url": {
+            "description": "Lumify media URL for the team logo (https://lumify.ai/media/teams/{sport}/{id}.png). Null until ingest. Never a vendor CDN.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "is_active": {
             "type": "boolean"
           },
@@ -1504,7 +2374,7 @@
         "openWorldHint": true,
         "readOnlyHint": true
       },
-      "description": "Get a single player profile: name, sport, country, position/handedness, physical stats, current team, and tennis ranking if applicable. Raises a not-found error if player_id doesn't exist. Resolve ids via search_players.",
+      "description": "Get a single player identity profile: name, sport, country, position/handedness, physical stats, current team, rankings (tennis {singles, points}; null on every other sport), and image_url (Lumify media URL, null until the sport's headshot/enrichment job). Raises a not-found error if player_id doesn't exist. Resolve ids via search_players.",
       "inputSchema": {
         "properties": {
           "player_id": {
@@ -1521,69 +2391,125 @@
       "outputSchema": {
         "properties": {
           "birthdate": {
+            "description": "YYYY-MM-DD date of birth.",
             "type": [
               "string",
               "null"
             ]
           },
           "country_code": {
+            "description": "ISO 3166-1 alpha-3 country code.",
             "type": [
               "string",
               "null"
             ]
           },
           "current_team_id": {
+            "description": "Lumify team ID when the player is on a club roster. Null for tennis.",
             "type": [
               "integer",
               "null"
             ]
           },
           "current_team_name": {
+            "description": "Current team display name. Null for tennis.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "first_name": {
             "type": [
               "string",
               "null"
             ]
           },
           "full_name": {
+            "description": "Display name.",
             "type": "string"
           },
           "handedness": {
+            "description": "left | right | switch. Meaning is sport-specific (bats for MLB, shoots for NHL, playing hand for tennis). Null when unknown.",
             "type": [
               "string",
               "null"
             ]
           },
           "height_cm": {
+            "description": "Height in centimetres. Null when not ingested.",
             "type": [
               "integer",
               "null"
             ]
           },
           "id": {
+            "description": "Lumify player ID.",
             "type": "integer"
           },
+          "image_url": {
+            "description": "Lumify media URL for the player headshot (https://lumify.ai/media/players/{sport}/{id}.{ext}). Null until the sport's headshot/enrichment job. Never a vendor CDN.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "is_active": {
+            "description": "False when deactivated or retired.",
             "type": "boolean"
           },
+          "last_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "position": {
+            "description": "Roster position abbreviation when the sport has one (e.g. C, P, SS for MLB; QB, WR for NFL). Null for tennis and when not yet ingested.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "rankings": {
+            "description": "Sport ranking block. Tennis: {singles, points} from ATP/WTA standings. Null for every other sport. Tennis /stats also exposes ranking / ranking_points on the tennis player block.",
+            "properties": {
+              "points": {
+                "description": "ATP/WTA ranking points. Tennis only.",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "singles": {
+                "description": "ATP/WTA singles ranking. Tennis only.",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              }
+            },
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "retired_at": {
+            "description": "YYYY-MM-DD retirement date when known.",
             "type": [
               "string",
               "null"
             ]
           },
           "slug": {
+            "description": "URL-safe unique slug.",
             "type": "string"
           },
           "sport": {
+            "description": "Sport slug, e.g. mlb, tennis, nfl.",
             "type": "string"
           },
-          "tennis_ranking": {
-            "type": [
-              "integer",
-              "null"
-            ]
-          },
           "weight_kg": {
+            "description": "Weight in kilograms. Null when not ingested.",
             "type": [
               "number",
               "null"

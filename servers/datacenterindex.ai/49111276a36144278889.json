@@ -1,0 +1,158 @@
+{
+  "canon_version": "1",
+  "full_hash": "473a630e0094276f2179840d51cfe54fe19160a49515a8e23c146f4ff0081c0e",
+  "name": "ai.datacenterindex/datacenterindex",
+  "observed_at": "2026-09-23T02:06:14.473641Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 8,
+  "tools": [
+    {
+      "description": "Search tracked data center projects. Filter by free-text query (name, developer, tenant, city), US state code, status, developer, or minimum MW. Returns up to 50 rows sorted by capacity.",
+      "inputSchema": {
+        "properties": {
+          "developer": {
+            "description": "Developer / operator name, partial match",
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "min_mw": {
+            "description": "Minimum capacity in MW",
+            "type": "number"
+          },
+          "query": {
+            "description": "Free text matched against name, developer, tenant and city",
+            "type": "string"
+          },
+          "state": {
+            "description": "Two-letter US state code, e.g. TX",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "operational",
+              "under_construction",
+              "announced",
+              "permitted",
+              "paused",
+              "cancelled"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "search_projects"
+    },
+    {
+      "description": "One tracked project by slug (the last path segment of a datacenterindex.ai/projects/... URL), with its linked public companies.",
+      "inputSchema": {
+        "properties": {
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_project"
+    },
+    {
+      "description": "Every US state market with tracked projects: counts by status, pipeline MW, grid operator, page URL.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_markets"
+    },
+    {
+      "description": "One US state market: summary description, counts, the tracked projects, and the public companies exposed to it.",
+      "inputSchema": {
+        "properties": {
+          "state": {
+            "description": "State name or two-letter code, e.g. \"Ohio\" or \"OH\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state"
+        ],
+        "type": "object"
+      },
+      "name": "get_market"
+    },
+    {
+      "description": "Public companies in the tracked supply-chain universe with sector, data-center revenue exposure and project count.",
+      "inputSchema": {
+        "properties": {
+          "sector": {
+            "description": "Sector slug filter, e.g. power, cooling, networking, hyperscaler",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_companies"
+    },
+    {
+      "description": "One public company by ticker: description, data-center exposure, market cap, and the tracked projects it is linked to.",
+      "inputSchema": {
+        "properties": {
+          "ticker": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ticker"
+        ],
+        "type": "object"
+      },
+      "name": "get_company"
+    },
+    {
+      "description": "Biggest day and week stock moves across the tracked universe (latest close).",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "default": 10,
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_movers"
+    },
+    {
+      "description": "What changed in the tracker recently: new projects, status changes, capacity revisions. The single source for \"what is new\".",
+      "inputSchema": {
+        "properties": {
+          "days": {
+            "default": 7,
+            "maximum": 90,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "limit": {
+            "default": 25,
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "recent_changes"
+    }
+  ],
+  "url": "https://datacenterindex.ai/mcp"
+}

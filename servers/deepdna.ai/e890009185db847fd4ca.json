@@ -1,0 +1,171 @@
+{
+  "canon_version": "1",
+  "full_hash": "ecdd8fb26c01fd7d8744843fb7e417872f5679a6f4d1dbf0c65571d187213cf0",
+  "name": "ai.deepdna/knowledge",
+  "observed_at": "2026-10-12T02:06:04.730504Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 6,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List the genes in the DeepDNA knowledge base, with a one-line summary and category for each.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_genes",
+      "title": "List genes"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Everything curated about one gene: function, key variants with rsIDs, metabolizer or function phenotypes, drug interactions, what a consumer genotyping array can and cannot tell you, and sources.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "symbol": {
+            "description": "HGNC gene symbol, e.g. CYP2C19. Case-insensitive.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol"
+        ],
+        "type": "object"
+      },
+      "name": "lookup_gene",
+      "title": "Look up a gene"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "One variant by dbSNP rsID: gene, star-allele or common name, alleles, functional effect, population frequency and sources. Optionally pass the genotype read at that position (e.g. from a raw DNA file) to get how many copies of the variant allele it holds. That count is not a phenotype, metabolizer or risk call.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "genotype": {
+            "description": "Optional. The genotype at this position, e.g. AG, A/G, or one letter on X, Y or MT. Not stored.",
+            "type": "string"
+          },
+          "rsid": {
+            "description": "dbSNP identifier, e.g. rs4244285.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rsid"
+        ],
+        "type": "object"
+      },
+      "name": "lookup_variant",
+      "title": "Look up a variant"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Pharmacogenomic guidance for a gene, optionally for one drug: guideline (CPIC or DPWG, \"drug label\", or null when the record rests on the primary literature), summary of the recommendation, phenotypes and sources. Omit drug to list every drug curated for that gene.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "drug": {
+            "description": "Generic drug name, e.g. clopidogrel. Optional.",
+            "type": "string"
+          },
+          "gene": {
+            "description": "Pharmacogene symbol, e.g. CYP2C19.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "gene"
+        ],
+        "type": "object"
+      },
+      "name": "lookup_drug_gene",
+      "title": "Look up drug–gene guidance"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Given a list of generic drug names, say which ones have a curated drug–gene record, with which genes and what each record rests on (a CPIC or DPWG guideline, a drug label, or the primary literature), and which are not covered. Needs no genotype. Use it before discussing whether genetics could matter for someone's medicines.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "medications": {
+            "description": "Generic names, e.g. [\"clopidogrel\", \"simvastatin\"].",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 30,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "medications"
+        ],
+        "type": "object"
+      },
+      "name": "check_medications",
+      "title": "Screen a medication list"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Register the user's interest in DeepDNA's private beta (DNA file parsing, annotation, bloodwork; not deployed yet). Only call this after the user has explicitly agreed to share their email with DeepDNA for this purpose, and set user_consent to true. Stores the email and the optional use case; see https://deepdna.ai/privacy/.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "description": "The user's email address.",
+            "type": "string"
+          },
+          "use_case": {
+            "description": "Optional. What the user is building, in a sentence or two. Max 500 characters.",
+            "type": "string"
+          },
+          "user_consent": {
+            "description": "Must be true: the user agreed to share their email with DeepDNA for the private beta.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "email",
+          "user_consent"
+        ],
+        "type": "object"
+      },
+      "name": "request_beta_access",
+      "title": "Request private beta access"
+    }
+  ],
+  "url": "https://deepdna.ai/mcp"
+}

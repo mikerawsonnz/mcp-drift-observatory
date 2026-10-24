@@ -1,0 +1,251 @@
+{
+  "canon_version": "1",
+  "full_hash": "1d710c8ed45130d3f4c1e7872f2416794c8236a775915ead71cbc9500cfe671e",
+  "name": "ai.benchgecko/benchgecko",
+  "observed_at": "2026-10-06T02:05:10.160594Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 9,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Search AI models"
+      },
+      "description": "Find AI models in the BenchGecko catalog by name, slug or lab. Returns slugs to use with get_model, cheapest_provider and compare_models, with BenchGecko score and list price.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "default": 10,
+            "maximum": 25,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "description": "Model name, slug or lab, e.g. \"claude opus\", \"gpt-5\", \"deepseek\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_models",
+      "title": "Search AI models"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get model facts"
+      },
+      "description": "Core facts for one AI model: BenchGecko score and rank, list price, price at every provider, benchmark scores with their original sources, Gecko Tests grades and as-of dates.",
+      "inputSchema": {
+        "properties": {
+          "model": {
+            "description": "Model slug (from search_models) or name, e.g. \"claude-opus-5-5\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "model"
+        ],
+        "type": "object"
+      },
+      "name": "get_model",
+      "title": "Get model facts"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Cheapest provider for a model"
+      },
+      "description": "Every provider serving a model, sorted by input price per 1M tokens (refreshed daily from provider endpoints), with output price, quantization and 1 day uptime.",
+      "inputSchema": {
+        "properties": {
+          "model": {
+            "description": "Model slug or name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "model"
+        ],
+        "type": "object"
+      },
+      "name": "cheapest_provider",
+      "title": "Cheapest provider for a model"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Compare two models"
+      },
+      "description": "Side by side: BenchGecko score, list price, cheapest provider, context window, shared benchmark scores and Gecko Tests grades for two models.",
+      "inputSchema": {
+        "properties": {
+          "a": {
+            "description": "First model slug or name",
+            "type": "string"
+          },
+          "b": {
+            "description": "Second model slug or name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "a",
+          "b"
+        ],
+        "type": "object"
+      },
+      "name": "compare_models",
+      "title": "Compare two models"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Gecko Test results"
+      },
+      "description": "Results of one of BenchGecko's own tests (own measurements, CC BY 4.0): who-are-you (Does the model know which lab made it?) world-map (How well does the model draw the world map from memory?) censorship-index (How often does the model refuse legitimate questions?) knowledge-horizon (Where does the model's knowledge of world events actually stop?) tokenizer-tax (How many more tokens does the same text cost outside English?) same-model-different-host (Do providers serving the same open model give the same quality?) model-drift-index (Do models quietly change behind the same name?)",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "default": 20,
+            "description": "Rows in the text summary (structured result has all rows)",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "test": {
+            "enum": [
+              "who-are-you",
+              "world-map",
+              "censorship-index",
+              "knowledge-horizon",
+              "tokenizer-tax",
+              "same-model-different-host",
+              "model-drift-index"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "test"
+        ],
+        "type": "object"
+      },
+      "name": "get_gecko_test",
+      "title": "Gecko Test results"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Gecko Scorecard"
+      },
+      "description": "BenchGecko Gecko Scorecard: every model across BenchGecko's own profile tests with a letter grade per test and an overall Gecko Score (behavior, not intelligence).",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "default": 15,
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_scorecard",
+      "title": "Gecko Scorecard"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Latest findings"
+      },
+      "description": "Latest notable results detected in the Gecko Tests and price data (fixed rules, numbers and quotes from stored results).",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "default": 5,
+            "maximum": 20,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "latest_findings",
+      "title": "Latest findings"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Search BenchGecko"
+      },
+      "description": "Search BenchGecko models and Gecko Tests. Returns ids for fetch.",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search",
+      "title": "Search BenchGecko"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Fetch a BenchGecko record"
+      },
+      "description": "Fetch the full record for an id returned by search (model:<slug>, gecko-test:<slug> or scorecard).",
+      "inputSchema": {
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "fetch",
+      "title": "Fetch a BenchGecko record"
+    }
+  ],
+  "url": "https://benchgecko.ai/api/mcp"
+}

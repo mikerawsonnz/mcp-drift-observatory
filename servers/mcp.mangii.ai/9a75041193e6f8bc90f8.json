@@ -1,0 +1,833 @@
+{
+  "canon_version": "1",
+  "full_hash": "4a631ea66584927e6ab9d96362097f31ea1fe571d6ec6fa2ef4c12b35d9ccc62",
+  "name": "ai.mangii/manga",
+  "observed_at": "2026-08-24T02:05:02.223702Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 9,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "List the 24 canonical Mangii art styles with live style ids. Call this before manga.create_story. Experimental and alias ids are excluded. Filter with group or limit when you only need one look.",
+      "inputSchema": {
+        "properties": {
+          "group": {
+            "description": "Optional style group. Example: shonen_action or painterly_artistic. Omit to return every selectable style.",
+            "enum": [
+              "shonen_action",
+              "modern_anime",
+              "romance_cute",
+              "dark_mature",
+              "webtoon_cultivation",
+              "painterly_artistic"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "description": "Optional max number of styles to return after filtering. Example: 6.",
+            "maximum": 24,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "manga.list_styles",
+      "outputSchema": {
+        "properties": {
+          "error": {
+            "description": "Machine error code such as invalid_request, insufficient_credits, or quality_forbidden.",
+            "type": "string"
+          },
+          "message": {
+            "description": "Human-readable error. Never includes stack traces or internal paths.",
+            "type": "string"
+          },
+          "styles": {
+            "description": "Selectable styles.",
+            "items": {
+              "properties": {
+                "group": {
+                  "description": "Picker group id. Example: shonen_action.",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "Pass this as style_id on manga.create_story. Example: classic_shonen.",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Human display name. Example: Classic Action.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "group"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "styles"
+        ],
+        "type": "object"
+      },
+      "title": "List manga styles"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Return the API wallet. Spendable is apiPackCredits plus purchase-backed packCredits. weeklyCredits is display-only and does not pay MCP or HTTP generate. Use this before a paid tool to see if you need manga.buy_credits.",
+      "inputSchema": {
+        "properties": {
+          "include_notes": {
+            "description": "When true (default), include a notes string explaining that weeklyCredits does not spend on API or MCP.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "name": "manga.get_credits",
+      "outputSchema": {
+        "properties": {
+          "apiPackCredits": {
+            "description": "Spendable API credits for generate tools.",
+            "type": "integer"
+          },
+          "error": {
+            "description": "Machine error code such as invalid_request, insufficient_credits, or quality_forbidden.",
+            "type": "string"
+          },
+          "message": {
+            "description": "Human-readable error. Never includes stack traces or internal paths.",
+            "type": "string"
+          },
+          "notes": {
+            "description": "Wallet rules for agents.",
+            "type": "string"
+          },
+          "packCredits": {
+            "description": "In-app pack credits. Only the purchase-backed portion is included in spendableCredits.",
+            "type": "integer"
+          },
+          "spendableCredits": {
+            "description": "apiPackCredits plus purchase-backed packCredits. Same number useApiCredit will spend.",
+            "type": "integer"
+          },
+          "weeklyCredits": {
+            "description": "In-app weekly credits. Display-only for API/MCP.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Get API credits"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "List panels you own for a story. Use this to get panel_id values before changing Image 1 or Image 2 on manga.continue_story or manga.regenerate_panel. Each row has ref_role: identity on the first panel, scene on the last distinct panel, otherwise null.",
+      "inputSchema": {
+        "properties": {
+          "story_id": {
+            "description": "Story id from manga.create_story. Example: a Firestore story document id returned as story_id.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "story_id"
+        ],
+        "type": "object"
+      },
+      "name": "manga.list_panels",
+      "outputSchema": {
+        "properties": {
+          "error": {
+            "description": "Machine error code such as invalid_request, insufficient_credits, or quality_forbidden.",
+            "type": "string"
+          },
+          "hint": {
+            "description": "How to override Image 1 and Image 2 on continue or regenerate.",
+            "type": "string"
+          },
+          "message": {
+            "description": "Human-readable error. Never includes stack traces or internal paths.",
+            "type": "string"
+          },
+          "panels": {
+            "description": "Panels in reading order, with ids for identity_panel_id and continuity_panel_id.",
+            "items": {
+              "properties": {
+                "id": {
+                  "description": "Panel id. Pass as identity_panel_id or continuity_panel_id.",
+                  "type": "string"
+                },
+                "image_url": {
+                  "description": "HTTPS URL of this panel image.",
+                  "type": "string"
+                },
+                "order_index": {
+                  "description": "Zero-based reading order. First panel is 0.",
+                  "type": "integer"
+                },
+                "prompt": {
+                  "description": "Stored user prompt for this panel.",
+                  "type": "string"
+                },
+                "ref_role": {
+                  "description": "Default continue slot: identity, scene, or null if unused.",
+                  "type": "string"
+                },
+                "story_id": {
+                  "description": "Parent story id.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "story_id": {
+            "description": "Story id from manga.create_story. Example: a Firestore story document id returned as story_id.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "panels"
+        ],
+        "type": "object"
+      },
+      "title": "List story panels"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "List stories you own, newest first. Call this when you lost story_id after context compaction so you can resume with manga.continue_story. Optional limit is an integer from 1 to 50 (default 20).",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "Max stories to return. Integer from 1 to 50. Default 20. Omit to use the default.",
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "manga.list_stories",
+      "outputSchema": {
+        "properties": {
+          "error": {
+            "description": "Machine error code such as invalid_request, insufficient_credits, or quality_forbidden.",
+            "type": "string"
+          },
+          "message": {
+            "description": "Human-readable error. Never includes stack traces or internal paths.",
+            "type": "string"
+          },
+          "next_step": {
+            "description": "What to call next. Follow this instead of guessing.",
+            "type": "string"
+          },
+          "stories": {
+            "description": "Owned active stories, newest updated_at first.",
+            "items": {
+              "properties": {
+                "cover_url": {
+                  "description": "Cover image HTTPS URL when the story has one.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "created_at": {
+                  "description": "ISO created timestamp, or null if missing.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "description": "Story id. Pass as story_id on manga.continue_story.",
+                  "type": "string"
+                },
+                "language": {
+                  "description": "Story language code when stored.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "panelCount": {
+                  "description": "How many panels this story currently has.",
+                  "type": "integer"
+                },
+                "style_id": {
+                  "description": "Locked art style id from create. Do not send it on continue.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "title": {
+                  "description": "Story title. Null when the story was never named.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "updated_at": {
+                  "description": "ISO updated timestamp, or null if missing.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "visibility": {
+                  "description": "private or public. Defaults to private.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "stories",
+          "next_step"
+        ],
+        "type": "object"
+      },
+      "title": "List own stories"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Start a new private manga (panel 1). Required: prompt + style_id from manga.list_styles. Optional identity_image or reference_image is Image 1. Style locks. Default async=false returns image_url, story_id, panel_id. Then manga.continue_story. Costs 1/2/5 credits by quality.",
+      "inputSchema": {
+        "properties": {
+          "async": {
+            "description": "On this MCP server the default is false: wait and return image_url in one call. Set true only if you will poll manga.get_job. HTTP API default remains async.",
+            "type": "boolean"
+          },
+          "idempotency_key": {
+            "description": "Optional. Reuse the same key on retry so a timeout does not charge twice. 8-200 chars. Omit to mint a one-shot key (unsafe on retry).",
+            "maxLength": 200,
+            "minLength": 8,
+            "type": "string"
+          },
+          "identity_image": {
+            "description": "Replacement photo: https URL or data:image/...;base64,... URI. Public hosts only. Same slot cannot also send a panel id.",
+            "type": "string"
+          },
+          "prompt": {
+            "description": "Scene in everyday language: characters, place, action, mood, camera, weather, color or black-and-white. Example: \"A duel under cherry blossoms, low angle, rain, full color.\" Max 2000 characters.",
+            "type": "string"
+          },
+          "quality": {
+            "description": "Generation quality. standard costs 1 credit, hd 2, ultra 5. Default standard. HD/Ultra need an unlocked API wallet.",
+            "enum": [
+              "standard",
+              "hd",
+              "ultra"
+            ],
+            "type": "string"
+          },
+          "reference_image": {
+            "description": "Optional first-panel identity photo. https URL or data URI. Alias of identity_image.",
+            "type": "string"
+          },
+          "style_id": {
+            "description": "Canonical style id from manga.list_styles. Example: classic_shonen or cinematic_anime. Locked after panel 0.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Optional story title shown in the library. Example: \"Rain Duel\". Omit to let Mangii name it.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt",
+          "style_id"
+        ],
+        "type": "object"
+      },
+      "name": "manga.create_story",
+      "outputSchema": {
+        "description": "Completed panel, accepted job, or tool error.",
+        "properties": {
+          "credits_charged": {
+            "description": "API credits billed for a successful generation.",
+            "type": "integer"
+          },
+          "credits_remaining": {
+            "description": "Remaining spendableCredits after the call (apiPack plus purchase-backed packs).",
+            "type": "integer"
+          },
+          "error": {
+            "description": "Machine error code such as invalid_request, insufficient_credits, or quality_forbidden.",
+            "type": "string"
+          },
+          "image_url": {
+            "description": "HTTPS URL of the finished panel when async is false and generation succeeded.",
+            "type": "string"
+          },
+          "job_id": {
+            "description": "Async job id when async is true or the work is still running.",
+            "type": "string"
+          },
+          "message": {
+            "description": "Human-readable error. Never includes stack traces or internal paths.",
+            "type": "string"
+          },
+          "next_step": {
+            "description": "What the agent should call next. Follow this instead of guessing.",
+            "type": "string"
+          },
+          "panel_id": {
+            "description": "Generated or regenerated panel id.",
+            "type": "string"
+          },
+          "quality": {
+            "description": "Quality used for this generation.",
+            "enum": [
+              "standard",
+              "hd",
+              "ultra"
+            ],
+            "type": "string"
+          },
+          "request_id": {
+            "description": "Request correlation id.",
+            "type": "string"
+          },
+          "story_id": {
+            "description": "Created or existing story id.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Create manga story"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Add the next panel. Do not send style_id. Defaults: Image 1 = first panel (identity), Image 2 = last distinct panel (scene). Override via manga.list_panels then identity_panel_id or identity_image and/or continuity_panel_id or continuity_image. Same credit costs as create.",
+      "inputSchema": {
+        "properties": {
+          "async": {
+            "description": "On this MCP server the default is false: wait and return image_url in one call. Set true only if you will poll manga.get_job. HTTP API default remains async.",
+            "type": "boolean"
+          },
+          "context_panel_ids": {
+            "description": "Legacy list override [identity_panel_id, scene_panel_id]. Ignored when identity_* or continuity_* fields are set. Prefer those named slots.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "continuity_image": {
+            "description": "Replacement Image 2 (scene) photo: https URL or data URI. Do not also send continuity_panel_id.",
+            "type": "string"
+          },
+          "continuity_panel_id": {
+            "description": "Override Image 2 (scene) with this panel id from manga.list_panels. Do not also send continuity_image.",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "description": "Optional. Reuse the same key on retry so a timeout does not charge twice. 8-200 chars. Omit to mint a one-shot key (unsafe on retry).",
+            "maxLength": 200,
+            "minLength": 8,
+            "type": "string"
+          },
+          "identity_image": {
+            "description": "Replacement photo: https URL or data:image/...;base64,... URI. Public hosts only. Same slot cannot also send a panel id.",
+            "type": "string"
+          },
+          "identity_panel_id": {
+            "description": "Override Image 1 (identity) with this panel id from manga.list_panels. Do not also send identity_image.",
+            "type": "string"
+          },
+          "prompt": {
+            "description": "Scene in everyday language: characters, place, action, mood, camera, weather, color or black-and-white. Example: \"A duel under cherry blossoms, low angle, rain, full color.\" Max 2000 characters.",
+            "type": "string"
+          },
+          "quality": {
+            "description": "Generation quality. standard costs 1 credit, hd 2, ultra 5. Default standard. HD/Ultra need an unlocked API wallet.",
+            "enum": [
+              "standard",
+              "hd",
+              "ultra"
+            ],
+            "type": "string"
+          },
+          "reference_image": {
+            "description": "Alias for identity_image. Replaces Image 1 with an uploaded photo or URL.",
+            "type": "string"
+          },
+          "story_id": {
+            "description": "Story id from manga.create_story. Example: a Firestore story document id returned as story_id.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "story_id",
+          "prompt"
+        ],
+        "type": "object"
+      },
+      "name": "manga.continue_story",
+      "outputSchema": {
+        "description": "Completed panel, accepted job, or tool error.",
+        "properties": {
+          "credits_charged": {
+            "description": "API credits billed for a successful generation.",
+            "type": "integer"
+          },
+          "credits_remaining": {
+            "description": "Remaining spendableCredits after the call (apiPack plus purchase-backed packs).",
+            "type": "integer"
+          },
+          "error": {
+            "description": "Machine error code such as invalid_request, insufficient_credits, or quality_forbidden.",
+            "type": "string"
+          },
+          "image_url": {
+            "description": "HTTPS URL of the finished panel when async is false and generation succeeded.",
+            "type": "string"
+          },
+          "job_id": {
+            "description": "Async job id when async is true or the work is still running.",
+            "type": "string"
+          },
+          "message": {
+            "description": "Human-readable error. Never includes stack traces or internal paths.",
+            "type": "string"
+          },
+          "next_step": {
+            "description": "What the agent should call next. Follow this instead of guessing.",
+            "type": "string"
+          },
+          "panel_id": {
+            "description": "Generated or regenerated panel id.",
+            "type": "string"
+          },
+          "quality": {
+            "description": "Quality used for this generation.",
+            "enum": [
+              "standard",
+              "hd",
+              "ultra"
+            ],
+            "type": "string"
+          },
+          "request_id": {
+            "description": "Request correlation id.",
+            "type": "string"
+          },
+          "story_id": {
+            "description": "Created or existing story id.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Continue manga story"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Redraw or edit one panel. Style stays locked. Same Image 1 / Image 2 ref overrides as manga.continue_story. Get ids from manga.list_panels. Costs the same credits as a new panel.",
+      "inputSchema": {
+        "properties": {
+          "async": {
+            "description": "On this MCP server the default is false: wait and return image_url in one call. Set true only if you will poll manga.get_job. HTTP API default remains async.",
+            "type": "boolean"
+          },
+          "context_panel_ids": {
+            "description": "Legacy list override [identity_panel_id, scene_panel_id]. Ignored when identity_* or continuity_* fields are set. Prefer those named slots.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "continuity_image": {
+            "description": "Replacement Image 2 (scene) photo: https URL or data URI. Do not also send continuity_panel_id.",
+            "type": "string"
+          },
+          "continuity_panel_id": {
+            "description": "Override Image 2 (scene) with this panel id from manga.list_panels. Do not also send continuity_image.",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "description": "Optional. Reuse the same key on retry so a timeout does not charge twice. 8-200 chars. Omit to mint a one-shot key (unsafe on retry).",
+            "maxLength": 200,
+            "minLength": 8,
+            "type": "string"
+          },
+          "identity_image": {
+            "description": "Replacement photo: https URL or data:image/...;base64,... URI. Public hosts only. Same slot cannot also send a panel id.",
+            "type": "string"
+          },
+          "identity_panel_id": {
+            "description": "Override Image 1 (identity) with this panel id from manga.list_panels. Do not also send identity_image.",
+            "type": "string"
+          },
+          "panel_id": {
+            "description": "Panel id from a previous generate result or manga.list_panels. Example: the panel_id returned by manga.create_story.",
+            "type": "string"
+          },
+          "prompt": {
+            "description": "Optional rewrite of the scene. Same prompt rules as create. Omit to retry the stored prompt.",
+            "type": "string"
+          },
+          "quality": {
+            "description": "Generation quality. standard costs 1 credit, hd 2, ultra 5. Default standard. HD/Ultra need an unlocked API wallet.",
+            "enum": [
+              "standard",
+              "hd",
+              "ultra"
+            ],
+            "type": "string"
+          },
+          "reference_image": {
+            "description": "Alias for identity_image. Replaces Image 1 with an uploaded photo or URL.",
+            "type": "string"
+          },
+          "story_id": {
+            "description": "Story id from manga.create_story. Example: a Firestore story document id returned as story_id.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "story_id",
+          "panel_id"
+        ],
+        "type": "object"
+      },
+      "name": "manga.regenerate_panel",
+      "outputSchema": {
+        "description": "Completed panel, accepted job, or tool error.",
+        "properties": {
+          "credits_charged": {
+            "description": "API credits billed for a successful generation.",
+            "type": "integer"
+          },
+          "credits_remaining": {
+            "description": "Remaining spendableCredits after the call (apiPack plus purchase-backed packs).",
+            "type": "integer"
+          },
+          "error": {
+            "description": "Machine error code such as invalid_request, insufficient_credits, or quality_forbidden.",
+            "type": "string"
+          },
+          "image_url": {
+            "description": "HTTPS URL of the finished panel when async is false and generation succeeded.",
+            "type": "string"
+          },
+          "job_id": {
+            "description": "Async job id when async is true or the work is still running.",
+            "type": "string"
+          },
+          "message": {
+            "description": "Human-readable error. Never includes stack traces or internal paths.",
+            "type": "string"
+          },
+          "next_step": {
+            "description": "What the agent should call next. Follow this instead of guessing.",
+            "type": "string"
+          },
+          "panel_id": {
+            "description": "Generated or regenerated panel id.",
+            "type": "string"
+          },
+          "quality": {
+            "description": "Quality used for this generation.",
+            "enum": [
+              "standard",
+              "hd",
+              "ultra"
+            ],
+            "type": "string"
+          },
+          "request_id": {
+            "description": "Request correlation id.",
+            "type": "string"
+          },
+          "story_id": {
+            "description": "Created or existing story id.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Regenerate manga panel"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Return the Console billing URL so a human can fund apiPackCredits. Generate-scoped keys cannot create Checkout sessions. Call this after 402 insufficient_credits.",
+      "inputSchema": {
+        "properties": {
+          "quality": {
+            "description": "Optional quality you plan to generate next. Included in the response as next_generation_credits so the human knows how many credits to buy.",
+            "enum": [
+              "standard",
+              "hd",
+              "ultra"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "manga.buy_credits",
+      "outputSchema": {
+        "properties": {
+          "buy_url": {
+            "description": "Absolute Console billing URL. Always https://mangii.ai/console/billing.",
+            "type": "string"
+          },
+          "credit_costs": {
+            "description": "Credits charged per successful panel.",
+            "properties": {
+              "hd": {
+                "type": "integer"
+              },
+              "standard": {
+                "type": "integer"
+              },
+              "ultra": {
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "error": {
+            "description": "Machine error code such as invalid_request, insufficient_credits, or quality_forbidden.",
+            "type": "string"
+          },
+          "message": {
+            "description": "Human-readable error. Never includes stack traces or internal paths.",
+            "type": "string"
+          },
+          "next_generation_credits": {
+            "description": "Credits needed for the requested quality, or null if quality was omitted.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "buy_url",
+          "credit_costs"
+        ],
+        "type": "object"
+      },
+      "title": "Buy API credits"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Poll a generation job from manga.create_story, manga.continue_story, or manga.regenerate_panel when async=true. Repeat until status is succeeded or failed. Prefer async=false so you do not need this tool.",
+      "inputSchema": {
+        "properties": {
+          "job_id": {
+            "description": "Job id from a previous generate result. Example: job_ab12cd34.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id"
+        ],
+        "type": "object"
+      },
+      "name": "manga.get_job",
+      "outputSchema": {
+        "properties": {
+          "error": {
+            "description": "Machine error code such as invalid_request, insufficient_credits, or quality_forbidden.",
+            "type": "string"
+          },
+          "id": {
+            "description": "Job id.",
+            "type": "string"
+          },
+          "message": {
+            "description": "Human-readable error. Never includes stack traces or internal paths.",
+            "type": "string"
+          },
+          "next_step": {
+            "description": "What to call next.",
+            "type": "string"
+          },
+          "result": {
+            "description": "Finished panel fields when status is succeeded.",
+            "type": "object"
+          },
+          "status": {
+            "description": "Job status.",
+            "enum": [
+              "queued",
+              "running",
+              "succeeded",
+              "failed"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Get generation job"
+    }
+  ],
+  "url": "https://mcp.mangii.ai/mcp"
+}

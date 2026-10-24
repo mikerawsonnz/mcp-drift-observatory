@@ -1,0 +1,161 @@
+{
+  "canon_version": "1",
+  "full_hash": "2fa0980ebc78795388a9896be33daff496e92542cd273b0d5fe3f33d7977ebf0",
+  "name": "ai.calaf/seeds",
+  "observed_at": "2026-09-27T02:05:41.461649Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 2,
+  "tools": [
+    {
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "description": "Returns the complete specification (markdown) for calaf_seed: 1 JSON documents — the format to follow when a user asks for a Calaf seed. Read it before authoring; then check your draft with validate_seed.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_seed_format",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": {},
+        "properties": {
+          "markdown": {
+            "type": "string"
+          },
+          "uri": {
+            "description": "Where the same document lives as a resource.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "uri",
+          "markdown"
+        ],
+        "type": "object"
+      },
+      "title": "Get the Calaf seed file format"
+    },
+    {
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "description": "Runs a draft seed document through the exact parser the Calaf app imports with. Pass the entire JSON document as a string. Returns per-section counts and the precise issue list (path, severity, message): severity \"error\" means nothing imports; \"dropped\" means that row or field is discarded and the rest lands. Fix the issues and validate again until clean before delivering the file to the user.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "seed": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": {},
+                "propertyNames": {
+                  "type": "string"
+                },
+                "type": "object"
+              }
+            ],
+            "description": "The complete seed JSON document — as text, or as the JSON object itself."
+          }
+        },
+        "required": [
+          "seed"
+        ],
+        "type": "object"
+      },
+      "name": "validate_seed",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "counts": {
+            "additionalProperties": false,
+            "properties": {
+              "contacts": {
+                "type": "number"
+              },
+              "keyDates": {
+                "type": "number"
+              },
+              "ladderRungs": {
+                "type": "number"
+              },
+              "orgKinds": {
+                "type": "number"
+              },
+              "orgs": {
+                "type": "number"
+              },
+              "prep": {
+                "type": "number"
+              },
+              "templates": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "orgs",
+              "contacts",
+              "templates",
+              "prep",
+              "keyDates",
+              "orgKinds",
+              "ladderRungs"
+            ],
+            "type": "object"
+          },
+          "hasPlanner": {
+            "type": "boolean"
+          },
+          "hasVocab": {
+            "type": "boolean"
+          },
+          "issues": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "string"
+                },
+                "severity": {
+                  "enum": [
+                    "error",
+                    "dropped"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "message",
+                "severity"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "valid": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "valid",
+          "counts",
+          "hasVocab",
+          "hasPlanner",
+          "issues"
+        ],
+        "type": "object"
+      },
+      "title": "Validate a Calaf seed file"
+    }
+  ],
+  "url": "https://calaf.ai/api/mcp"
+}

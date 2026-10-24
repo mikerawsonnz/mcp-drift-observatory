@@ -1,0 +1,147 @@
+{
+  "canon_version": "1",
+  "full_hash": "56dca697f3611c476e5d56291e4890221b0f225fd8af6ee37755624f8edce27f",
+  "name": "ai.edge-agents/intelligence",
+  "observed_at": "2026-09-14T02:07:06.633486Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 7,
+  "tools": [
+    {
+      "annotations": {
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Find intelligence services by keyword. Returns id, name, description, family and price for each match. Start here when you know what evidence you need but not which service provides it.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "Maximum results to return (default 25).",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "description": "Free-text search, for example 'bitcoin leverage' or 'eurozone inflation'.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "edge_search_services",
+      "title": "Search the intelligence catalogue"
+    },
+    {
+      "annotations": {
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "List the families the catalogue is organised into, with a service count for each. Use this to browse when a keyword search is too narrow, or to check coverage of a subject area before committing to a purchase.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "edge_list_families",
+      "title": "List service families"
+    },
+    {
+      "annotations": {
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Look up one service by its id and return its full public record: what it produces, its price, its freshness target, its output schema version and its purchase endpoint. Call this before purchasing so the price and freshness are known rather than assumed. The top result is the exact id match.",
+      "inputSchema": {
+        "properties": {
+          "serviceId": {
+            "description": "The service id, as returned by edge_search_services or a product bundle's sample.serviceId.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "serviceId"
+        ],
+        "type": "object"
+      },
+      "name": "edge_get_service",
+      "title": "Get a service's full record"
+    },
+    {
+      "annotations": {
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Fetch a free, illustrative sample of a service's output so the response shape and evidence style can be inspected before paying. The sample is illustrative: treat it as a schema and quality guide, not as current market evidence.",
+      "inputSchema": {
+        "properties": {
+          "serviceId": {
+            "description": "The service id to sample.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "serviceId"
+        ],
+        "type": "object"
+      },
+      "name": "edge_get_free_sample",
+      "title": "Get a free illustrative sample"
+    },
+    {
+      "annotations": {
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "List the packaged products, each of which composes several specialist services into one buyer outcome, with its free sample and its representative purchase path. Prefer these over assembling specialist services yourself when a product already matches the question.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "edge_list_products",
+      "title": "List the buyer-facing product bundles"
+    },
+    {
+      "annotations": {
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Report per-service availability and data freshness. Call this when a purchase matters and staleness would change the decision: a service can be operational but working from evidence older than its freshness target, which is reported rather than hidden. Omit serviceId for the platform summary; pass one for a single service's probe record.",
+      "inputSchema": {
+        "properties": {
+          "serviceId": {
+            "description": "Optional. A single service's id, for its own probe record instead of the platform summary.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "edge_service_health",
+      "title": "Check service availability and freshness"
+    },
+    {
+      "annotations": {
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Read the live x402 payment terms for a service's report: the price, and one offer per settlement rail, exactly as the paid endpoint issues them. Use this to check a report's cost against your own spend policy before committing. Settlement happens over the plain HTTP endpoint named in the response, not through this tool -- signing a payment needs your own wallet, which no MCP client holds.",
+      "inputSchema": {
+        "properties": {
+          "serviceId": {
+            "description": "The service id whose payment terms you want.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "serviceId"
+        ],
+        "type": "object"
+      },
+      "name": "edge_get_report_terms",
+      "title": "Get a report's live payment terms (x402)"
+    }
+  ],
+  "url": "https://pay.edge-agents.ai/mcp"
+}

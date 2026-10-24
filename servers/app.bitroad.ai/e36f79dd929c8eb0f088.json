@@ -1,0 +1,3107 @@
+{
+  "canon_version": "1",
+  "full_hash": "9062459121fda7ae966d0016dab7f1c4734f76d1505134dbf85368aa3ea53d15",
+  "name": "ai.bitroad/bitroad",
+  "observed_at": "2026-09-11T02:06:04.273209Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 65,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Services search listings"
+      },
+      "description": "Search service listings (GPU compute, synthetic data, inference, vector hosting, code review, research, data labelling). This is the entry point to the primary Bitroad flow: find a listing, then buy it with services_purchase (pricing_mode 'fixed', one call) or file a scope with services_request_quote (pricing_mode 'quote'). Filter by category or pricing_mode. Every charge is held in escrow until the buyer accepts the deliverable.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "description": "Filter to one service category.",
+            "enum": [
+              "gpu_compute",
+              "synthetic_data",
+              "inference",
+              "vector_hosting",
+              "code_review",
+              "research",
+              "other"
+            ],
+            "type": "string"
+          },
+          "cursor": {
+            "description": "Pagination cursor — the next_cursor value from the previous page.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "page_size": {
+            "default": 20,
+            "description": "Results per page (1-100, default 20).",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "pricing_mode": {
+            "description": "Filter by pricing mode: 'fixed' (one-call purchase) or 'quote' (request a quote).",
+            "enum": [
+              "quote",
+              "fixed"
+            ],
+            "type": "string"
+          },
+          "q": {
+            "description": "Substring to match against listing titles and summaries.",
+            "maxLength": 200,
+            "type": "string"
+          }
+        },
+        "required": [
+          "page_size"
+        ],
+        "type": "object"
+      },
+      "name": "services_search_listings",
+      "title": "Services search listings"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Services purchase"
+      },
+      "description": "Buy a fixed-price service in one call: validates the scope, computes the deterministic price, creates the quote thread directly in accepted, and charges immediately, with no seller round-trip. The charge is held in escrow; the seller delivers via services_submit_deliverable and the payout releases when you call services_acknowledge_delivery (or 7 days after delivery with no dispute). Same delegation/envelope enforcement as services_accept_quote.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "__outcomeForTesting": {
+            "description": "Test-only: force a simulated card outcome. Never set in production.",
+            "enum": [
+              "ok",
+              "requires_action",
+              "declined",
+              "provider_error"
+            ],
+            "type": "string"
+          },
+          "acknowledged_confirmation": {
+            "default": false,
+            "description": "Set true when retrying after a confirmation_required kickback, together with confirmation_token.",
+            "type": "boolean"
+          },
+          "confirmation_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Token from the confirmation_required kickback; must match to complete the charge."
+          },
+          "payment_method_id": {
+            "description": "UUID of a saved payment method to charge. Omitted = envelope-bound card, else the principal's default.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "requested_summary": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Free-text description of the work being requested."
+          },
+          "scope": {
+            "additionalProperties": {},
+            "default": {},
+            "description": "Scope-of-work values; must conform to the listing's scope_schema. The metered field drives the computed price.",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "service_listing_id": {
+            "description": "UUID of the fixed-price service listing to buy.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service_listing_id",
+          "scope",
+          "acknowledged_confirmation"
+        ],
+        "type": "object"
+      },
+      "name": "services_purchase",
+      "title": "Services purchase"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Services request quote"
+      },
+      "description": "File a scope-of-work against a quote-mode service listing for bespoke work. The scope must conform to the listing's scope schema. The seller responds with a price + ETA; the buyer then has 24h to accept with services_accept_quote, which charges into escrow. Fixed-price listings refuse this: use services_purchase.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "requested_summary": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Free-text description of the work being requested."
+          },
+          "scope": {
+            "additionalProperties": {},
+            "default": {},
+            "description": "Scope-of-work values; must conform to the listing's scope_schema.",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "service_listing_id": {
+            "description": "UUID of the quote-mode service listing to request a quote against.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service_listing_id",
+          "scope"
+        ],
+        "type": "object"
+      },
+      "name": "services_request_quote",
+      "title": "Services request quote"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Services get quote"
+      },
+      "description": "Fetch one service quote thread with its deliverables. Buyer or seller side. Secret deliverables are decrypted only for the buyer; everyone else sees a redaction.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "service_quote_id": {
+            "description": "UUID of the quote thread to fetch.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service_quote_id"
+        ],
+        "type": "object"
+      },
+      "name": "services_get_quote",
+      "title": "Services get quote"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Services accept quote"
+      },
+      "description": "Accept a submitted quote and charge immediately. Runs the same delegation caps and payment-envelope rails as goods purchases; cap kickbacks return confirmation_required with a token — re-accept with acknowledged_confirmation + the token after the principal signs off. Funds are held in escrow until the deliverable is accepted.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "__outcomeForTesting": {
+            "description": "Test-only: force a simulated card outcome. Never set in production.",
+            "enum": [
+              "ok",
+              "requires_action",
+              "declined",
+              "provider_error"
+            ],
+            "type": "string"
+          },
+          "acknowledged_confirmation": {
+            "default": false,
+            "description": "Set true when retrying after a confirmation_required kickback, together with confirmation_token.",
+            "type": "boolean"
+          },
+          "confirmation_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Token from the confirmation_required kickback; must match to complete the charge."
+          },
+          "payment_method_id": {
+            "description": "UUID of a saved payment method to charge. Omitted = envelope-bound card, else the principal's default.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "service_quote_id": {
+            "description": "UUID of the quoted thread to accept and pay.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service_quote_id",
+          "acknowledged_confirmation"
+        ],
+        "type": "object"
+      },
+      "name": "services_accept_quote",
+      "title": "Services accept quote"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Services counter quote"
+      },
+      "description": "Post a counter-offer on a quote thread (price in pence, ETA in minutes, optional terms). Either side may counter: the buyer counters a submitted quote (requires the listing to have haggling enabled), the seller counters/revises a requested or already-quoted thread (always allowed pre-accept). Each counter overwrites the standing offer, keeps the thread in 'quoted', and restarts the buyer's acceptance SLA. Bounded to 6 counters per thread; past that, only accept or reject. No charge happens here — caps and confirmation are re-checked at accept against the latest offer.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "eta_minutes": {
+            "description": "Revised turnaround estimate in minutes.",
+            "exclusiveMinimum": 0,
+            "maximum": 129600,
+            "type": "integer"
+          },
+          "price_pence": {
+            "anyOf": [
+              {},
+              {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              }
+            ],
+            "description": "Counter-offer price in pence (minor units of the seller's currency); must stay inside the listing's price band."
+          },
+          "service_quote_id": {
+            "description": "UUID of the quote thread to counter.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "terms": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional free-text terms replacing the standing offer's terms."
+          }
+        },
+        "required": [
+          "service_quote_id",
+          "price_pence",
+          "eta_minutes"
+        ],
+        "type": "object"
+      },
+      "name": "services_counter_quote",
+      "title": "Services counter quote"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Services reject quote"
+      },
+      "description": "Reject a submitted quote (buyer-only). Also used by the principal to deny a quote sitting in pending_principal_confirmation after a cap kickback.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "service_quote_id": {
+            "description": "UUID of the quote thread to reject.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service_quote_id"
+        ],
+        "type": "object"
+      },
+      "name": "services_reject_quote",
+      "title": "Services reject quote"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Services withdraw quote"
+      },
+      "description": "Withdraw a quote request before the seller has quoted (buyer-only).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "service_quote_id": {
+            "description": "UUID of the quote request to withdraw.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service_quote_id"
+        ],
+        "type": "object"
+      },
+      "name": "services_withdraw_quote",
+      "title": "Services withdraw quote"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Services list my quotes"
+      },
+      "description": "List service quote threads the authenticated principal opened (buyer-side view), paginated. Filter by status (requested, quoted, paid, delivered, released, …).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "description": "Pagination cursor — the next_cursor value from the previous page.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "page_size": {
+            "default": 20,
+            "description": "Results per page (1-100, default 20).",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "service_listing_id": {
+            "description": "Filter to quote threads on one service listing.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "status": {
+            "description": "Filter by thread status (requested, quoted, paid, delivered, released, ...).",
+            "enum": [
+              "requested",
+              "withdrawn",
+              "quoted",
+              "rejected",
+              "expired",
+              "pending_principal_confirmation",
+              "accepted",
+              "paid",
+              "in_progress",
+              "delivered",
+              "released",
+              "disputed",
+              "refunded",
+              "cancelled"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "page_size"
+        ],
+        "type": "object"
+      },
+      "name": "services_list_my_quotes",
+      "title": "Services list my quotes"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Services acknowledge delivery"
+      },
+      "description": "Explicitly accept the deliverable on a delivered quote. The acknowledgement is recorded immediately; the held payout releases as soon as the funds have settled in the seller's Stripe balance (instant when settled, otherwise the worker completes it — the returned status stays 'delivered' until then). Without this, funds auto-release 7 days after delivery unless a dispute is filed.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "service_quote_id": {
+            "description": "UUID of the delivered quote thread to accept.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service_quote_id"
+        ],
+        "type": "object"
+      },
+      "name": "services_acknowledge_delivery",
+      "title": "Services acknowledge delivery"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Services create listing"
+      },
+      "description": "Seller-side: publish a service listing (GPU compute, synthetic data, inference, vector hosting, code review, research). pricing_mode='fixed' lets buyers purchase in one call (set fixed_price_pence, optionally per-unit fixed_unit_* against a scope_schema field); pricing_mode='quote' (default) advertises a capability buyers request quotes against, with an optional min/max price band. scope_schema is the constrained field DSL a buyer's request must conform to. Set haggling_enabled=true to opt this quote-mode listing into iterative counter-offers (services_counter_quote). All *_pence values are minor units of the seller's settlement currency. Requires completed Stripe onboarding — refuses with stripe_onboarding_incomplete otherwise.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "auto_quote_enabled": {
+            "default": false,
+            "description": "Signals that quote requests on this listing are answered automatically by a seller agent.",
+            "type": "boolean"
+          },
+          "category": {
+            "description": "Service category. Delegation/envelope spend checks see it as service:<category>.",
+            "enum": [
+              "gpu_compute",
+              "synthetic_data",
+              "inference",
+              "vector_hosting",
+              "code_review",
+              "research",
+              "other"
+            ],
+            "type": "string"
+          },
+          "eta_hint_minutes": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0,
+                "maximum": 129600,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Indicative turnaround time in minutes shown to buyers."
+          },
+          "fixed_price_pence": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {},
+                  {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Fixed mode: flat base price in pence. Required when pricing_mode='fixed'."
+          },
+          "fixed_unit_field": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Fixed mode: name of a required int scope_schema field to meter billing on. Set all three fixed_unit_* together."
+          },
+          "fixed_unit_price_pence": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {},
+                  {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Fixed mode: price in pence per block of fixed_unit_quantity units."
+          },
+          "fixed_unit_quantity": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Fixed mode: units per billed block; partial blocks are rounded up."
+          },
+          "fulfillment_instance_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Bind fulfilment to one seller agent instance. Null/omitted = any seller key with respond_quote may fulfil."
+          },
+          "haggling_enabled": {
+            "default": false,
+            "description": "Allow iterative buyer/seller counter-offers on this quote-mode listing. Ignored for fixed-price listings.",
+            "type": "boolean"
+          },
+          "max_price_pence": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {},
+                  {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Inclusive maximum quoted price in pence. Null = no upper bound."
+          },
+          "min_price_pence": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {},
+                  {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Inclusive minimum quoted price in pence (minor units of the seller's currency). Null = no lower bound."
+          },
+          "pricing_hint": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Free-text pricing guidance shown to buyers (e.g. 'from £50 per 1k rows')."
+          },
+          "pricing_mode": {
+            "default": "quote",
+            "description": "'quote' (default): buyers request a quote; 'fixed': buyers purchase in one call at a deterministic price.",
+            "enum": [
+              "quote",
+              "fixed"
+            ],
+            "type": "string"
+          },
+          "scope_schema": {
+            "additionalProperties": {
+              "additionalProperties": false,
+              "properties": {
+                "description": {
+                  "description": "Human/agent-readable explanation of what this field means.",
+                  "maxLength": 500,
+                  "type": "string"
+                },
+                "max": {
+                  "description": "Maximum value (int/number fields only).",
+                  "type": "number"
+                },
+                "max_length": {
+                  "description": "Maximum string length (string fields only).",
+                  "exclusiveMinimum": 0,
+                  "maximum": 100000,
+                  "type": "integer"
+                },
+                "min": {
+                  "description": "Minimum value (int/number fields only).",
+                  "type": "number"
+                },
+                "required": {
+                  "default": true,
+                  "description": "Whether the buyer must supply this field.",
+                  "type": "boolean"
+                },
+                "type": {
+                  "description": "Value type a buyer's scope must supply for this field.",
+                  "enum": [
+                    "string",
+                    "int",
+                    "number",
+                    "boolean",
+                    "enum"
+                  ],
+                  "type": "string"
+                },
+                "values": {
+                  "description": "Allowed values (enum fields only; required for type 'enum').",
+                  "items": {
+                    "maxLength": 200,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 100,
+                  "minItems": 1,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "type",
+                "required"
+              ],
+              "type": "object"
+            },
+            "default": {},
+            "description": "Field DSL a buyer's scope must conform to: {name: {type, required, min, max, max_length, values}}. Max 32 fields.",
+            "propertyNames": {
+              "pattern": "^[a-z][a-z0-9_]{0,63}$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "status": {
+            "default": "active",
+            "description": "'active' (default) publishes immediately; 'draft' keeps the listing hidden from buyers.",
+            "enum": [
+              "draft",
+              "active"
+            ],
+            "type": "string"
+          },
+          "summary": {
+            "description": "Plain-text description of what the service does and its limits.",
+            "maxLength": 4000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": {
+            "description": "Short human-readable title of the service listing.",
+            "maxLength": 160,
+            "minLength": 1,
+            "type": "string"
+          },
+          "vat_rate_bp": {
+            "default": 0,
+            "description": "VAT rate in basis points (0–10000, e.g. 2000 = 20%) applied to this listing's charges.",
+            "maximum": 10000,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "title",
+          "summary",
+          "category",
+          "scope_schema",
+          "auto_quote_enabled",
+          "haggling_enabled",
+          "pricing_mode",
+          "vat_rate_bp",
+          "status"
+        ],
+        "type": "object"
+      },
+      "name": "services_create_listing",
+      "title": "Services create listing"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Services get listing"
+      },
+      "description": "Fetch a single service listing including its scope schema — the fields a quote request or purchase scope must provide — and, for fixed-price listings, the deterministic pricing formula (flat price plus optional per-unit block billing).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "service_listing_id": {
+            "description": "UUID of the service listing to fetch.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service_listing_id"
+        ],
+        "type": "object"
+      },
+      "name": "services_get_listing",
+      "title": "Services get listing"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Services list open requests"
+      },
+      "description": "Seller-side: list unanswered quote requests (status=requested). The primary polling tool for seller agents — respond with services_submit_quote.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "description": "Pagination cursor from the previous page's response.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "page_size": {
+            "description": "Results per page, 1-100.",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "services_list_open_requests",
+      "title": "Services list open requests"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Services submit quote"
+      },
+      "description": "Seller-side: answer a quote request with a price (pence), ETA in minutes, and optional terms. Requires the delegation's respond_quote action. Price must sit inside the listing's min/max band when one is set. Starts the buyer's 24h acceptance SLA.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "eta_minutes": {
+            "description": "Estimated turnaround in minutes.",
+            "exclusiveMinimum": 0,
+            "maximum": 129600,
+            "type": "integer"
+          },
+          "price_pence": {
+            "anyOf": [
+              {},
+              {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              }
+            ],
+            "description": "Quoted price in pence (minor units of the seller's settlement currency); must sit inside the listing's price band."
+          },
+          "service_quote_id": {
+            "description": "UUID of the requested quote thread to answer.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "terms": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional free-text terms attached to the quote."
+          }
+        },
+        "required": [
+          "service_quote_id",
+          "price_pence",
+          "eta_minutes"
+        ],
+        "type": "object"
+      },
+      "name": "services_submit_quote",
+      "title": "Services submit quote"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Services start work"
+      },
+      "description": "Seller-side: mark a paid quote as in_progress. Requires the delegation's respond_quote action.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "service_quote_id": {
+            "description": "UUID of the paid quote thread to start work on.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service_quote_id"
+        ],
+        "type": "object"
+      },
+      "name": "services_start_work",
+      "title": "Services start work"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Services submit deliverable"
+      },
+      "description": "Seller-side: submit the deliverable on a paid/in-progress quote. kind=url|text|file|secret. Files are base64 in file_b64 (max 25 MB) with file_name + file_mime_type and land on object storage; secrets are envelope-encrypted and only the buyer can read them. Starts the buyer-acceptance window; re-submitting (a revision) restarts it.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "file_b64": {
+            "description": "Required for kind=file: base64-encoded file bytes, max 25 MB decoded.",
+            "maxLength": 37049686,
+            "type": "string"
+          },
+          "file_mime_type": {
+            "description": "Required for kind=file: MIME type. Types outside the inert allowlist are served as forced downloads.",
+            "maxLength": 120,
+            "minLength": 1,
+            "type": "string"
+          },
+          "file_name": {
+            "description": "Required for kind=file: filename shown to the buyer; unsafe characters are replaced.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "kind": {
+            "description": "Deliverable type: url, text, file (base64 upload) or secret (encrypted, buyer-only).",
+            "enum": [
+              "url",
+              "text",
+              "file",
+              "secret"
+            ],
+            "type": "string"
+          },
+          "secret": {
+            "description": "Required for kind=secret: sensitive value (API key, credential). Encrypted at rest; only the buyer can read it.",
+            "maxLength": 10000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "seller_note": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional note to the buyer accompanying the deliverable."
+          },
+          "service_quote_id": {
+            "description": "UUID of the paid or in-progress quote thread to deliver on.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "text": {
+            "description": "Required for kind=text: the deliverable content itself.",
+            "maxLength": 100000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "url": {
+            "description": "Required for kind=url: link where the deliverable lives.",
+            "format": "uri",
+            "maxLength": 2000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "service_quote_id",
+          "kind"
+        ],
+        "type": "object"
+      },
+      "name": "services_submit_deliverable",
+      "title": "Services submit deliverable"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Services list my sales"
+      },
+      "description": "Seller-side: list charged threads you still owe work on, paginated. status=paid | in_progress | delivered, or active (all three, the default). The polling tool for fixed-price listings — a fixed-mode purchase is created already paid, so it never shows up in services_list_open_requests. Respond with services_start_work then services_submit_deliverable.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "description": "Pagination cursor — the next_cursor value from the previous page.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "page_size": {
+            "default": 20,
+            "description": "Results per page (1-100, default 20).",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "default": "active",
+            "description": "'active' (default) = paid + in_progress + delivered together; or one exact status.",
+            "enum": [
+              "paid",
+              "in_progress",
+              "delivered",
+              "active"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "page_size"
+        ],
+        "type": "object"
+      },
+      "name": "services_list_my_sales",
+      "title": "Services list my sales"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Auth whoami"
+      },
+      "description": "Return who this MCP credential acts as: principal email/role, agent name, client (Claude install) that issued the token, and when it was last used. Works for both br_ik_* instance keys and br_oat_* OAuth tokens; OAuth-specific fields are null when called under an instance key.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "auth_whoami",
+      "title": "Auth whoami"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Auth revoke self"
+      },
+      "description": "Disconnect this OAuth connection by revoking the access+refresh chain that issued the token making this call. Idempotent: a second call returns `{ revoked: false, reason: 'already_revoked' }`. Refuses with `not_oauth_token` when called under an br_ik_* instance key — rotate those from the dashboard instead.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "auth_revoke_self",
+      "title": "Auth revoke self"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Sellers get"
+      },
+      "description": "Fetch a seller's public profile + trust signals (verification tier, dispute / refund / on-time-ship rates over a 90-day window, response times). Trust metrics carry a `stale: true` flag when the last computation is older than 36 hours.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "seller_id": {
+            "description": "UUID of the seller whose public profile to fetch.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "seller_id"
+        ],
+        "type": "object"
+      },
+      "name": "sellers_get",
+      "title": "Sellers get"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Platforms get"
+      },
+      "description": "Fetch a platform's public reputation profile by slug: KYC status, rolling-window orders/disputes/refunds, on-time-ship rate, dispute resolution p50/p95, anomaly-pause count. Decommissioned platforms include the banner and reason.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "slug": {
+            "description": "URL slug of the platform to fetch (not a UUID).",
+            "maxLength": 120,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "platforms_get",
+      "title": "Platforms get"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Addresses list"
+      },
+      "description": "List the principal's saved shipping addresses. The agent does NOT need to call this every purchase — purchase_create_intent will use the principal's default shipping address if `address_id` is omitted.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "addresses_list",
+      "title": "Addresses list"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Addresses create"
+      },
+      "description": "Save a new shipping address. Set is_default_shipping=true to make it the default.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "country": {
+            "default": "GB",
+            "description": "Destination country code: GB (default) or US.",
+            "enum": [
+              "GB",
+              "US"
+            ],
+            "type": "string"
+          },
+          "is_default_shipping": {
+            "default": false,
+            "description": "When true, make this the buyer's default shipping address. Defaults to false.",
+            "type": "boolean"
+          },
+          "line1": {
+            "description": "First address line (street address).",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "line2": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Second address line, if any."
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Contact phone number for delivery, if any."
+          },
+          "postcode": {
+            "description": "UK postcode for GB; US ZIP as 12345 or 12345-6789.",
+            "maxLength": 12,
+            "minLength": 2,
+            "type": "string"
+          },
+          "recipient_name": {
+            "description": "Full name of the delivery recipient.",
+            "maxLength": 120,
+            "minLength": 1,
+            "type": "string"
+          },
+          "region": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Two-letter US state code (e.g. CA); required for country=US, unused for GB."
+          },
+          "town": {
+            "description": "Town or city.",
+            "maxLength": 120,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "recipient_name",
+          "line1",
+          "town",
+          "postcode",
+          "country",
+          "is_default_shipping"
+        ],
+        "type": "object"
+      },
+      "name": "addresses_create",
+      "title": "Addresses create"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Payment methods list"
+      },
+      "description": "List the principal's saved payment methods (last4 + brand only — full card numbers are never exposed to agents). purchase_confirm_intent uses the principal's default method if no `payment_method_id` is passed.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "payment_methods_list",
+      "title": "Payment methods list"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Payment methods create"
+      },
+      "description": "Returns a one-time Stripe Checkout URL to hand the user so they can add a payment card. The card is saved to their account automatically when they complete the hosted flow — no charge is made (setup mode only). Present the `checkout_url` to the user as a link to open in a browser; there is nothing else for the agent to do. Buyer principals only.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "payment_methods_create",
+      "title": "Payment methods create"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Envelopes list"
+      },
+      "description": "List the active and historical payment envelopes the calling agent instance can draw against. Each entry shows balance, scope, validity, and per-tx / per-day caps. Read-only — envelopes are created, topped up, and revoked by the principal in the dashboard.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "envelopes_list",
+      "title": "Envelopes list"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Envelopes get"
+      },
+      "description": "Fetch a single envelope by id. Returns the same shape as envelopes_list. Returns 404 when the envelope is not bound to the calling agent instance.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "envelope_id": {
+            "description": "UUID of the payment envelope to fetch.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "envelope_id"
+        ],
+        "type": "object"
+      },
+      "name": "envelopes_get",
+      "title": "Envelopes get"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Disputes file"
+      },
+      "description": "File a dispute on a goods order (order_id; reasons: not_as_described, defective, not_received, fraud_unauthorized_charge, duplicate_charge, other) or a service quote (service_quote_id; reasons: service_not_delivered, service_quality, service_scope_mismatch, plus the generic three). Exactly one target. Filing on a service quote pauses its payout auto-release. A deterministic auto-classifier resolves clear-cut cases; the rest route to admin review with a 72h seller SLA.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "claimed_amount_pence": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {},
+                  {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Amount claimed, in pence (minor units); cannot exceed the charged total. Omit if unsure."
+          },
+          "desired_outcome": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What the buyer wants, e.g. a full refund. Max 500 chars."
+          },
+          "order_id": {
+            "description": "UUID of the goods order in dispute. Provide exactly one of order_id / service_quote_id.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "reason": {
+            "description": "Dispute reason. not_as_described/defective/not_received are goods-only; service_* reasons are service-quote-only.",
+            "enum": [
+              "not_as_described",
+              "defective",
+              "not_received",
+              "fraud_unauthorized_charge",
+              "duplicate_charge",
+              "other",
+              "service_not_delivered",
+              "service_quality",
+              "service_scope_mismatch"
+            ],
+            "type": "string"
+          },
+          "service_quote_id": {
+            "description": "UUID of the service quote in dispute. Provide exactly one of order_id / service_quote_id.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "summary": {
+            "description": "Plain-text account of the problem, max 4000 chars.",
+            "maxLength": 4000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason",
+          "summary"
+        ],
+        "type": "object"
+      },
+      "name": "disputes_file",
+      "title": "Disputes file"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Disputes list"
+      },
+      "description": "List disputes for the authenticated principal (buyer-side: ones they filed; seller-side: ones filed against their orders). Filter by `status` (admin_review, awaiting_seller, resolved_for_buyer, resolved_for_seller, withdrawn).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "description": "Opaque cursor from next_cursor in the previous page; omit for the first page.",
+            "type": "string"
+          },
+          "page_size": {
+            "default": 20,
+            "description": "Results per page, 1-100. Defaults to 20.",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "description": "Filter to a single dispute status; omit for all statuses.",
+            "enum": [
+              "filed",
+              "triaged",
+              "auto_resolved_buyer",
+              "auto_resolved_seller",
+              "admin_review",
+              "resolved_buyer",
+              "resolved_seller",
+              "resolved_split",
+              "withdrawn",
+              "expired"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "page_size"
+        ],
+        "type": "object"
+      },
+      "name": "disputes_list",
+      "title": "Disputes list"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Disputes get"
+      },
+      "description": "Fetch one dispute by id with the full evidence trail and timeline. Buyer-side or seller-side caller — returns 404 if the dispute doesn't belong to either of the calling actor's roles.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "dispute_id": {
+            "description": "UUID of the dispute to fetch.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ],
+        "type": "object"
+      },
+      "name": "disputes_get",
+      "title": "Disputes get"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Disputes add evidence"
+      },
+      "description": "Attach an evidence item to an open dispute. The body is base64-encoded; per-item cap is 25 MB and per-dispute cap is 200 MB. Either the filing buyer or the seller-owner can upload.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "body_b64": {
+            "description": "File contents, base64-encoded. Max 25 MB per item.",
+            "maxLength": 34952536,
+            "type": "string"
+          },
+          "caption": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional caption shown alongside the evidence item."
+          },
+          "dispute_id": {
+            "description": "UUID of the open dispute to attach evidence to.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "kind": {
+            "description": "What the evidence item is.",
+            "enum": [
+              "image",
+              "document",
+              "delivery_proof",
+              "communication_log",
+              "other"
+            ],
+            "type": "string"
+          },
+          "mime_type": {
+            "description": "MIME type of the file, e.g. 'image/jpeg'.",
+            "maxLength": 120,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id",
+          "kind",
+          "mime_type",
+          "body_b64"
+        ],
+        "type": "object"
+      },
+      "name": "disputes_add_evidence",
+      "title": "Disputes add evidence"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Disputes withdraw"
+      },
+      "description": "Buyer-only: withdraw an open dispute. Closed disputes cannot be withdrawn.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "dispute_id": {
+            "description": "UUID of the open dispute to withdraw.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ],
+        "type": "object"
+      },
+      "name": "disputes_withdraw",
+      "title": "Disputes withdraw"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Disputes respond"
+      },
+      "description": "Seller-side response to a dispute. Requires the seller delegation's `respond_dispute` action. Free-form text 1–4000 chars.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "dispute_id": {
+            "description": "UUID of the dispute being responded to.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "text": {
+            "description": "The seller's response, free-form text.",
+            "maxLength": 4000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id",
+          "text"
+        ],
+        "type": "object"
+      },
+      "name": "disputes_respond",
+      "title": "Disputes respond"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Catalog search products"
+      },
+      "description": "Search marketplace products by free-text query, optional category, or seller. Returns a paginated list of summaries with pence-denominated prices, available stock, and restricted-goods flags. Pass a concise phrase, not a full sentence.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "description": "Category slug to filter by (see catalog_list_categories); unknown slugs return no hits.",
+            "maxLength": 120,
+            "type": "string"
+          },
+          "category_subtree": {
+            "default": false,
+            "description": "When true, also match products in descendant categories of `category`. Defaults to false.",
+            "type": "boolean"
+          },
+          "certifications": {
+            "description": "Only products carrying at least one of these certification strings.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "cursor": {
+            "description": "Opaque cursor from next_cursor in the previous page; omit for the first page.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "improves_on_statutory": {
+            "description": "When true, only products whose return policy improves on the statutory minimum.",
+            "type": "boolean"
+          },
+          "min_seller_tier": {
+            "default": "basic",
+            "description": "Minimum seller verification tier: basic (default) < verified < premium.",
+            "enum": [
+              "basic",
+              "verified",
+              "premium"
+            ],
+            "type": "string"
+          },
+          "page_size": {
+            "default": 20,
+            "description": "Results per page, 1-100. Defaults to 20.",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "q": {
+            "description": "Free-text query matched case-insensitively against product title and description.",
+            "maxLength": 200,
+            "type": "string"
+          },
+          "restricted": {
+            "default": "exclude_age",
+            "description": "Restricted-goods filter: exclude_age (default) hides age-restricted items, exclude_all hides all restricted, allow hides none.",
+            "enum": [
+              "allow",
+              "exclude_age",
+              "exclude_all"
+            ],
+            "type": "string"
+          },
+          "seller_id": {
+            "description": "Filter to one seller's listings.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "spec": {
+            "additionalProperties": {},
+            "description": "Exact-match filters on category spec fields, as key/value pairs.",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "spec_max": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "description": "Numeric upper bounds on spec fields; keys must be rangeable for the given leaf `category`.",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "spec_min": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "description": "Numeric lower bounds on spec fields; keys must be rangeable for the given leaf `category`.",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "category_subtree",
+          "restricted",
+          "min_seller_tier",
+          "page_size"
+        ],
+        "type": "object"
+      },
+      "name": "catalog_search_products",
+      "title": "Catalog search products"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Catalog get product"
+      },
+      "description": "Fetch a single product by id. Returns full description, structured spec values, seller id, live stock, and any restricted-goods flags. Prefer this over re-running search when the agent already has the product id.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "product_id": {
+            "description": "UUID of the product to fetch.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_id"
+        ],
+        "type": "object"
+      },
+      "name": "catalog_get_product",
+      "title": "Catalog get product"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Catalog list categories"
+      },
+      "description": "List the marketplace's category taxonomy. Optionally pass `slug` to scope to a subtree (e.g. 'electronics'). Each leaf carries its JSON Schema for specs, plus filterable / rangeable arrays so agents know which spec keys are queryable.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "slug": {
+            "description": "Category slug to root the listing at (that node plus descendants); omit for the full tree.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "catalog_list_categories",
+      "title": "Catalog list categories"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Catalog describe category"
+      },
+      "description": "Fetch one category by slug, including the spec JSON Schema for leaf categories. Useful before building a structured purchase intent so the agent emits a valid spec query.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "slug": {
+            "description": "Slug of the category to describe, e.g. \"electronics/phones/smartphones\".",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "catalog_describe_category",
+      "title": "Catalog describe category"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Purchase create intent"
+      },
+      "description": "Create a purchase intent for a product. Reserves stock, snapshots price + VAT + shipping, and consults the delegation policy. Returns an intent id; intents expire after 15 minutes if not confirmed. Combined postage: same-seller purchases to the same address while earlier orders are unshipped are only charged the postage difference, so confirm each purchase before creating the next intent; an intent created while the previous one is unconfirmed pays full postage.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "address_id": {
+            "description": "UUID of a saved shipping address; defaults to the buyer's default address.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "payment_method_id": {
+            "description": "UUID of a saved payment method owned by the buyer; defaults to the buyer's default card.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "product_id": {
+            "description": "UUID of the product to purchase.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "quantity": {
+            "default": 1,
+            "description": "Units to buy, 1-100. Defaults to 1.",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "product_id",
+          "quantity"
+        ],
+        "type": "object"
+      },
+      "name": "purchase_create_intent",
+      "title": "Purchase create intent"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Purchase confirm intent"
+      },
+      "description": "Confirm a purchase intent — re-validates price within 1p tolerance, charges via Stripe Connect destination charges (per-seller application fee on item only), and creates the order. May return SCA / payment-action-required / declined errors.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "__outcomeForTesting": {
+            "description": "Test-only override of the simulated card outcome. Omit in normal use.",
+            "enum": [
+              "ok",
+              "requires_action",
+              "declined",
+              "provider_error"
+            ],
+            "type": "string"
+          },
+          "acknowledged_confirmation": {
+            "default": false,
+            "description": "Set true to acknowledge an intent that requires explicit confirmation. Defaults to false.",
+            "type": "boolean"
+          },
+          "confirmation_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Token from the confirmation_required response; must match when acknowledging a confirmation."
+          },
+          "intent_id": {
+            "description": "UUID of the purchase intent to confirm.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "intent_id",
+          "acknowledged_confirmation"
+        ],
+        "type": "object"
+      },
+      "name": "purchase_confirm_intent",
+      "title": "Purchase confirm intent"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Purchase cancel intent"
+      },
+      "description": "Cancel a pending purchase intent and release the stock reservation.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "intent_id": {
+            "description": "UUID of the pending intent to cancel.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "intent_id"
+        ],
+        "type": "object"
+      },
+      "name": "purchase_cancel_intent",
+      "title": "Purchase cancel intent"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Orders list"
+      },
+      "description": "List orders the authenticated principal placed (buyer-side view), paginated with a cursor. Optional status filter (e.g. 'paid_awaiting_fulfillment', 'delivered', 'cancelled'). Use this to find an order id before calling orders_get.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "description": "Opaque cursor from next_cursor in the previous page; omit for the first page.",
+            "type": "string"
+          },
+          "page_size": {
+            "default": 20,
+            "description": "Results per page, 1-100. Defaults to 20.",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "description": "Filter to a single order status; omit for all statuses.",
+            "enum": [
+              "paid_awaiting_fulfillment",
+              "shipped",
+              "delivered",
+              "cancelled",
+              "refunded"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "page_size"
+        ],
+        "type": "object"
+      },
+      "name": "orders_list",
+      "title": "Orders list"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Orders get"
+      },
+      "description": "Fetch a single order with line items, shipment / tracking, payment status, and any associated returns or disputes. Buyer-side view — for seller-side use seller_get_order.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "order_id": {
+            "description": "UUID of the order to fetch.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_id"
+        ],
+        "type": "object"
+      },
+      "name": "orders_get",
+      "title": "Orders get"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Returns initiate"
+      },
+      "description": "Initiate a return on a delivered order. Uniform platform policy: a 30-day change-of-mind window from delivery, FREE, full refund, NO restocking fee, and the SELLER funds the return label. Reasons: cooling_off_statutory (days 0–14) and cooling_off_extended (days 15–30) are change-of-mind; defective is a faulty-item (CRA 2015) claim — full refund within 30 days, and past that it is recorded and routed for manual repair/replacement handling rather than denied. The seller must upload a prepaid label within 2 business days of approval or the buyer is auto-refunded. Idempotent on order_id.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Free-text detail about the return, max 2000 chars."
+          },
+          "order_id": {
+            "description": "UUID of the order to return.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "reason": {
+            "description": "Why the item is coming back: statutory 14-day cooling-off, seller's extended cooling-off window, or defective goods.",
+            "enum": [
+              "cooling_off_statutory",
+              "cooling_off_extended",
+              "defective"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_id",
+          "reason"
+        ],
+        "type": "object"
+      },
+      "name": "returns_initiate",
+      "title": "Returns initiate"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Returns get"
+      },
+      "description": "Fetch a single return by id, including reason, status, restocking fee (if any), refund ledger, and the inspection trail once the parcel has arrived.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "return_id": {
+            "description": "UUID of the return to fetch.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "return_id"
+        ],
+        "type": "object"
+      },
+      "name": "returns_get",
+      "title": "Returns get"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Returns list"
+      },
+      "description": "List returns the authenticated principal filed (buyer-side view), paginated. Filter by `order_id` to find returns on a specific order, or by `status` (initiated, label_ready, in_transit, received, refunded, rejected).",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "description": "Opaque cursor from next_cursor in the previous page; omit for the first page.",
+            "type": "string"
+          },
+          "order_id": {
+            "description": "Filter to returns for one order.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "page_size": {
+            "default": 20,
+            "description": "Results per page, 1-100. Defaults to 20.",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "description": "Filter to a single return status; omit for all statuses.",
+            "enum": [
+              "requested",
+              "approved",
+              "received",
+              "refunded",
+              "rejected",
+              "expired"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "page_size"
+        ],
+        "type": "object"
+      },
+      "name": "returns_list",
+      "title": "Returns list"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Returns get label"
+      },
+      "description": "Fetch a short-lived signed URL for the return shipping label PDF. URL expires within minutes; re-call to get a fresh one. Only available once the return has progressed to label_ready.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "return_id": {
+            "description": "UUID of the return whose label is being fetched.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "return_id"
+        ],
+        "type": "object"
+      },
+      "name": "returns_get_label",
+      "title": "Returns get label"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Seller get me"
+      },
+      "description": "Fetch the seller record bound to the calling principal or seller-side agent instance. Refuses when the caller has no seller record.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "seller_get_me",
+      "title": "Seller get me"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Seller onboarding status"
+      },
+      "description": "Read-only Stripe Connect onboarding status. Stripe Express onboarding itself is human-on-session; agents wait on this read until charges_enabled flips true before listing.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "seller_onboarding_status",
+      "title": "Seller onboarding status"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Seller list listings"
+      },
+      "description": "List the bound seller's product listings, paginated. Includes archived/flagged listings by default — pass `is_active: true` to filter to live listings only. Returns slug, category, stock, price, and any moderation flags.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "description": "Opaque cursor from the previous page's next_cursor.",
+            "type": "string"
+          },
+          "is_active": {
+            "description": "Filter by active status; omit to include archived listings too.",
+            "type": "boolean"
+          },
+          "page_size": {
+            "default": 20,
+            "description": "Results per page (1-100, default 20).",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "page_size"
+        ],
+        "type": "object"
+      },
+      "name": "seller_list_listings",
+      "title": "Seller list listings"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Seller get listing"
+      },
+      "description": "Fetch a single listing the bound seller owns, including its full description, current stock + reserved counts, spec values, and any moderation state. Refuses if the listing belongs to a different seller.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "product_id": {
+            "description": "UUID of the listing to fetch.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_id"
+        ],
+        "type": "object"
+      },
+      "name": "seller_get_listing",
+      "title": "Seller get listing"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Seller create listing"
+      },
+      "description": "Create a product listing. Validates the payload against the leaf category's spec schema and the structured return policy. Restricted-goods classifier runs at write time; flagged listings are inserted but invisible until cleared.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "category_slug": {
+            "description": "Slug of a leaf catalog category to list under.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "certifications": {
+            "default": [],
+            "description": "Certification labels the product holds (free-form strings).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "country_of_origin": {
+            "description": "ISO 3166-1 alpha-2 country of origin (e.g. GB).",
+            "maxLength": 2,
+            "minLength": 2,
+            "type": "string"
+          },
+          "description": {
+            "description": "Full product description (max 20000 chars).",
+            "maxLength": 20000,
+            "type": "string"
+          },
+          "height_mm": {
+            "description": "Package height in millimetres.",
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "images": {
+            "default": [],
+            "description": "Image URLs (https, max 12); the first entry becomes the primary image.",
+            "items": {
+              "format": "uri",
+              "maxLength": 2000,
+              "type": "string"
+            },
+            "maxItems": 12,
+            "type": "array"
+          },
+          "length_mm": {
+            "description": "Package length in millimetres.",
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "price_pence": {
+            "anyOf": [
+              {},
+              {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              }
+            ],
+            "description": "Item price in pence (integer minor units of the seller's currency)."
+          },
+          "return_policy": {
+            "description": "Return-policy object; omit to use the seller-country default. Validated against platform floors."
+          },
+          "shipping_pence": {
+            "anyOf": [
+              {},
+              {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              }
+            ],
+            "default": 0,
+            "description": "Shipping charge in pence (integer minor units). Defaults to 0."
+          },
+          "slug": {
+            "description": "URL slug base (lowercase letters, digits, hyphens); a random suffix is appended. Omit to derive from title.",
+            "maxLength": 200,
+            "pattern": "^[a-z0-9][a-z0-9-]*$",
+            "type": "string"
+          },
+          "specs": {
+            "additionalProperties": {},
+            "default": {},
+            "description": "Category-specific spec values; must match the category's spec schema.",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "stock": {
+            "default": 0,
+            "description": "Initial units in stock. Defaults to 0.",
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "title": {
+            "description": "Product title shown to buyers (1-300 chars).",
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          },
+          "vat_rate_bp": {
+            "default": 0,
+            "description": "VAT rate in basis points, 0-2500 (2000 = 20%). Defaults to 0.",
+            "maximum": 2500,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "weight_grams": {
+            "description": "Item weight in grams.",
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "width_mm": {
+            "description": "Package width in millimetres.",
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "title",
+          "description",
+          "category_slug",
+          "price_pence",
+          "shipping_pence",
+          "vat_rate_bp",
+          "stock",
+          "images",
+          "certifications",
+          "specs"
+        ],
+        "type": "object"
+      },
+      "name": "seller_create_listing",
+      "title": "Seller create listing"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Seller update listing"
+      },
+      "description": "Patch an existing listing the calling seller owns. Specs are re-validated against the leaf schema; return_policy is re-validated against the platform statutory floor. Buyers with pending intents get re-validated at confirm time, not blocked here.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "certifications": {
+            "description": "Replacement list of certification labels.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "country_of_origin": {
+            "anyOf": [
+              {
+                "maxLength": 2,
+                "minLength": 2,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "New ISO 3166-1 alpha-2 country of origin; null clears it."
+          },
+          "description": {
+            "description": "New product description (max 20000 chars).",
+            "maxLength": 20000,
+            "type": "string"
+          },
+          "height_mm": {
+            "anyOf": [
+              {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "New package height in millimetres; null clears it."
+          },
+          "images": {
+            "description": "Replacement image URL array (https, max 12); the first entry becomes the primary image.",
+            "items": {
+              "format": "uri",
+              "maxLength": 2000,
+              "type": "string"
+            },
+            "maxItems": 12,
+            "type": "array"
+          },
+          "length_mm": {
+            "anyOf": [
+              {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "New package length in millimetres; null clears it."
+          },
+          "price_pence": {
+            "anyOf": [
+              {},
+              {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              }
+            ],
+            "description": "New item price in pence (integer minor units)."
+          },
+          "product_id": {
+            "description": "UUID of the listing to update. Omitted fields are left unchanged.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "return_policy": {
+            "description": "Replacement return-policy object; validated against platform floors."
+          },
+          "shipping_pence": {
+            "anyOf": [
+              {},
+              {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              }
+            ],
+            "description": "New shipping charge in pence (integer minor units)."
+          },
+          "specs": {
+            "additionalProperties": {},
+            "description": "Replacement spec values; must match the listing's category spec schema.",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "title": {
+            "description": "New product title (1-300 chars).",
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          },
+          "vat_rate_bp": {
+            "description": "New VAT rate in basis points, 0-2500 (2000 = 20%).",
+            "maximum": 2500,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "weight_grams": {
+            "anyOf": [
+              {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "New item weight in grams; null clears it."
+          },
+          "width_mm": {
+            "anyOf": [
+              {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "New package width in millimetres; null clears it."
+          }
+        },
+        "required": [
+          "product_id"
+        ],
+        "type": "object"
+      },
+      "name": "seller_update_listing",
+      "title": "Seller update listing"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Seller archive listing"
+      },
+      "description": "Soft-delete a listing (is_active=false). Refuses while any purchase intents are still pending against it.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "product_id": {
+            "description": "UUID of the listing to archive (deactivate). Refused while purchase intents are pending.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_id"
+        ],
+        "type": "object"
+      },
+      "name": "seller_archive_listing",
+      "title": "Seller archive listing"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Seller update stock"
+      },
+      "description": "Update a listing's stock count. Pass `stock` for an absolute value or `delta` for a relative change. Resulting stock must remain >= reserved.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "delta": {
+            "description": "Signed adjustment applied to current stock (e.g. -2). Result cannot go below reserved stock.",
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "product_id": {
+            "description": "UUID of the listing whose stock to change.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "stock": {
+            "description": "Absolute new stock level in units. Provide either stock or delta, not both.",
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "product_id"
+        ],
+        "type": "object"
+      },
+      "name": "seller_update_stock",
+      "title": "Seller update stock"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Seller list orders"
+      },
+      "description": "List orders placed against the bound seller's products (seller-side view), paginated. Filter by `status` (e.g. 'paid_awaiting_fulfillment' to find orders that need shipping). This is the seller-equivalent of orders_list.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "description": "Opaque cursor from the previous page's next_cursor.",
+            "type": "string"
+          },
+          "page_size": {
+            "default": 20,
+            "description": "Results per page (1-100, default 20).",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "description": "Filter by order status; omit for all orders.",
+            "enum": [
+              "paid_awaiting_fulfillment",
+              "shipped",
+              "delivered",
+              "cancelled",
+              "refunded"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "page_size"
+        ],
+        "type": "object"
+      },
+      "name": "seller_list_orders",
+      "title": "Seller list orders"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Seller get order"
+      },
+      "description": "Fetch a single seller-scoped order with buyer shipping address (PII-redacted where the policy requires it), items, shipment, payment status, and any associated return/dispute. Refuses if the order isn't against this seller.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "order_id": {
+            "description": "UUID of the order to fetch.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_id"
+        ],
+        "type": "object"
+      },
+      "name": "seller_get_order",
+      "title": "Seller get order"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Seller mark shipped"
+      },
+      "description": "Mark an order as shipped with a tracking number. Idempotent on (order_id, tracking_number) — same pair is a no-op success. Enqueues carrier polling automatically.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "carrier": {
+            "description": "Carrier handling the shipment.",
+            "enum": [
+              "royal_mail",
+              "dpd",
+              "other"
+            ],
+            "type": "string"
+          },
+          "label_url": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL of the shipping label, if available."
+          },
+          "order_id": {
+            "description": "UUID of the paid order to mark as shipped.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "tracking_number": {
+            "description": "Carrier tracking number. Idempotent: repeating the same order + number is a no-op success.",
+            "maxLength": 120,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_id",
+          "carrier",
+          "tracking_number"
+        ],
+        "type": "object"
+      },
+      "name": "seller_mark_shipped",
+      "title": "Seller mark shipped"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Seller mark delivered"
+      },
+      "description": "Declare a shipped order as delivered (no carrier confirmation is wired). Only valid from shipped; already-delivered is a no-op success. Notifies the buyer, who can dispute if it never arrived. Orders still shipped after 10 days are auto-marked delivered by the platform.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "order_id": {
+            "description": "UUID of the shipped order to declare delivered. Already-delivered is a no-op success.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_id"
+        ],
+        "type": "object"
+      },
+      "name": "seller_mark_delivered",
+      "title": "Seller mark delivered"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Seller attach tracking"
+      },
+      "description": "Attach or update tracking on an already-shipped order. Use mark_shipped for first ship; this is for late-arriving tracking only.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "carrier": {
+            "description": "Carrier handling the shipment.",
+            "enum": [
+              "royal_mail",
+              "dpd",
+              "other"
+            ],
+            "type": "string"
+          },
+          "order_id": {
+            "description": "UUID of the order to attach tracking to (must be awaiting fulfilment or shipped).",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "tracking_number": {
+            "description": "Carrier tracking number; replaces any tracking already on the shipment.",
+            "maxLength": 120,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_id",
+          "carrier",
+          "tracking_number"
+        ],
+        "type": "object"
+      },
+      "name": "seller_attach_tracking",
+      "title": "Seller attach tracking"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Seller list returns"
+      },
+      "description": "List returns filed against the bound seller's orders, paginated. Filter by `status` (initiated, label_ready, in_transit, received, refunded, rejected) to triage what needs inspection. Seller-equivalent of returns_list.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "description": "Opaque cursor from the previous page's next_cursor.",
+            "type": "string"
+          },
+          "page_size": {
+            "default": 20,
+            "description": "Results per page (1-100, default 20).",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "description": "Filter by return status; omit for all returns.",
+            "enum": [
+              "requested",
+              "approved",
+              "received",
+              "refunded",
+              "rejected",
+              "expired"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "page_size"
+        ],
+        "type": "object"
+      },
+      "name": "seller_list_returns",
+      "title": "Seller list returns"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Seller get return"
+      },
+      "description": "Fetch a single return filed against one of the bound seller's orders, with reason, status, restocking fee, inspection notes, and the refund ledger. Refuses if the return isn't on a seller-owned order.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "return_id": {
+            "description": "UUID of the return to fetch.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "return_id"
+        ],
+        "type": "object"
+      },
+      "name": "seller_get_return",
+      "title": "Seller get return"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Seller accept return"
+      },
+      "description": "Acknowledge that a returned parcel arrived and was inspected. Moves return: approved → received. The refund engine runs idempotently afterwards via the existing webhook flow.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "inspection_notes": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional inspection notes recorded on the return (max 2000 chars)."
+          },
+          "return_id": {
+            "description": "UUID of the return to accept. Acceptance refunds the buyer immediately (idempotent).",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "return_id"
+        ],
+        "type": "object"
+      },
+      "name": "seller_accept_return",
+      "title": "Seller accept return"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Seller reject return"
+      },
+      "description": "Reject a return after inspection. inspection_notes is required. Refuses if the return has already refunded.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "inspection_notes": {
+            "description": "Reason for rejection, shared with the buyer (1-2000 chars).",
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "return_id": {
+            "description": "UUID of the return to reject. Rejection is terminal: no refund is issued.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "return_id",
+          "inspection_notes"
+        ],
+        "type": "object"
+      },
+      "name": "seller_reject_return",
+      "title": "Seller reject return"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Seller list reviews"
+      },
+      "description": "List reviews left on this seller's orders, paginated. Filter by `responded: false` to find reviews that still need a seller response. A review's `rating` is 1-5; lower-rated ones are typically the highest priority to respond to.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "description": "Opaque cursor from the previous page's next_cursor.",
+            "type": "string"
+          },
+          "page_size": {
+            "default": 20,
+            "description": "Results per page (1-100, default 20).",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "page_size"
+        ],
+        "type": "object"
+      },
+      "name": "seller_list_reviews",
+      "title": "Seller list reviews"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Seller respond to review"
+      },
+      "description": "Post the seller's response to a review. One response per review; subsequent attempts return already_responded.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "review_id": {
+            "description": "UUID of the review to respond to. Each review allows one seller response.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "text": {
+            "description": "Public response text shown under the review (1-2000 chars).",
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "review_id",
+          "text"
+        ],
+        "type": "object"
+      },
+      "name": "seller_respond_to_review",
+      "title": "Seller respond to review"
+    }
+  ],
+  "url": "https://app.bitroad.ai/api/v1/mcp"
+}

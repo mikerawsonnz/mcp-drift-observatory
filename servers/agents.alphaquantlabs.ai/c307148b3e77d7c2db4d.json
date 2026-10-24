@@ -1,0 +1,126 @@
+{
+  "canon_version": "1",
+  "full_hash": "c4965cc00b8b1f606a0094b7dca6d19bdc6cd2ffa4fa68f720ca5c7df9fee171",
+  "name": "ai.alphaquantlabs/propertycheck",
+  "observed_at": "2026-10-14T02:05:56.306019Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 2,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Check a Gold Coast or Brisbane address (free)"
+      },
+      "description": "FREE, no key. Use when you have one specific street address in the City of Gold Coast or Brisbane City (Queensland, Australia) and need to understand the property and what surrounds it before renting, buying, relocating, working or studying there. Returns coverage and a short summary: up to five findings and up to two items that could not be verified, each with a status; source where available. Depending on the address and available evidence, findings may cover hazards or planning. Brisbane findings may include the street and its traffic, parking, frontage or road-reserve context, or parent-building height where verified. Gold Coast free checks do not promise paid-only physical context, including frontage, carriageway width, parking or building measurements. Any suburb of those two councils works, for example Surfers Paradise, Robina, Coomera, Kangaroo Point, New Farm or Chapel Hill. Addresses elsewhere are reported as outside coverage. Not for listing search, valuations, mortgages or price forecasts. Never charges.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "address": {
+            "description": "One street address with number and suburb, e.g. \"9 Hamilton Avenue, Surfers Paradise QLD 4217\" or \"222 Margaret Street, Brisbane City QLD 4000\".",
+            "maxLength": 100,
+            "minLength": 6,
+            "type": "string"
+          }
+        },
+        "required": [
+          "address"
+        ],
+        "type": "object"
+      },
+      "name": "check_address",
+      "title": "Check a Gold Coast or Brisbane address (free)"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Get the full PropertyCheck report"
+      },
+      "description": "Full structured PropertyCheck JSON (propertycheck/2) for one covered address: identity, coverage, capabilities, a summary and up to twelve sections, with status and source details where available. Call after check_address shows a full report is available. No account or API key is required for one-off purchase: x402 returns a standard PaymentRequired (A$1.39 incl. GST); retry the same call with params._meta['x402/payment']. Coverage is checked before any charge, an address outside coverage is never charged, and retrying with the same idempotency_key or the same payment never charges twice. If the user has no wallet, ask for explicit agreement to the A$4.95 card price, then call the same tool with payment_method='card'; give checkout_url only to the human and poll this same tool with the returned purchase_id and access_token. Never create a second checkout for that purchase. Existing B2B API-key accounts remain supported. After an API-key or x402 purchase, pass report_id instead of address to re-view the same report at zero cost; x402 re-view also carries the original payment proof. Optional sections limits the output; detail='full' restores heavy enumerations from the same stored report, with no second charge.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "access_token": {
+            "description": "Private card-report retrieval token. Keep it inside the agent session and use only with its purchase_id.",
+            "pattern": "^[A-Za-z0-9_-]{43}$",
+            "type": "string"
+          },
+          "address": {
+            "description": "One street address with number and suburb, e.g. \"9 Hamilton Avenue, Surfers Paradise QLD 4217\" or \"222 Margaret Street, Brisbane City QLD 4000\".",
+            "maxLength": 100,
+            "minLength": 6,
+            "type": "string"
+          },
+          "detail": {
+            "description": "Optional. standard (default) keeps all decision-useful facts; full also restores available heavy enumerations from the same stored report.",
+            "enum": [
+              "standard",
+              "full"
+            ],
+            "type": "string"
+          },
+          "idempotency_key": {
+            "description": "Optional, API-key path. Reusing it returns the same report without a second charge.",
+            "pattern": "^[A-Za-z0-9._:-]{1,128}$",
+            "type": "string"
+          },
+          "payment_method": {
+            "description": "Optional for a new address. Default x402 (A$1.39). Use card only after the human explicitly agrees to A$4.95.",
+            "enum": [
+              "x402",
+              "card"
+            ],
+            "type": "string"
+          },
+          "purchase_id": {
+            "description": "Private card-report purchase id returned by this tool. Poll with purchase_id plus access_token; do not send the address again.",
+            "pattern": "^acr_[a-f0-9]{32}$",
+            "type": "string"
+          },
+          "report_id": {
+            "description": "An already purchased report to re-view at zero cost. Use address OR report_id, never both.",
+            "maxLength": 80,
+            "pattern": "^rpt_[A-Za-z0-9]+$",
+            "type": "string"
+          },
+          "sections": {
+            "description": "Optional. Only these sections (identity, coverage, summary and sources are always included). Same price.",
+            "items": {
+              "enum": [
+                "hazards",
+                "building_surroundings",
+                "roads_traffic",
+                "parking_access",
+                "mobility",
+                "planning",
+                "property",
+                "education",
+                "health",
+                "safety",
+                "change",
+                "area"
+              ],
+              "type": "string"
+            },
+            "maxItems": 12,
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "get_full_report",
+      "title": "Get the full PropertyCheck report"
+    }
+  ],
+  "url": "https://agents.alphaquantlabs.ai/v1/mcp"
+}

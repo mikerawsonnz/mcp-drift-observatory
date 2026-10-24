@@ -1,0 +1,1206 @@
+{
+  "canon_version": "1",
+  "full_hash": "79aeaa2fb5b72a6bccd0da48b6b8887c8aafb089abd53070dffd2c012e253371",
+  "name": "ai.annsa/annsa",
+  "observed_at": "2026-10-21T02:05:54.315079Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 8,
+  "tools": [
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Priorities"
+      },
+      "description": "Lists the ranked active priorities (open, ready, building) with trend, confidence and evidence counts. `stage` reads shipped, shared or closed instead. `weekly: true` returns the weekly digest; `view: 'radar'` what is rising, shipped and quiet. `priority_number` returns one row, `mine: true` this seat's rows, `picked: true` a person's picked list, `release_number` one release. Rows carry `next_action` when something waits on an agent; the spec carries the open asks (`decision`), principles and authority; a shipped priority that customers report again comes back open with `came_back`. A read. [production · app.annsa.ai]",
+      "inputSchema": {
+        "properties": {
+          "bet": {
+            "description": "A bet id, or 'unplaced' for the proposal inbox",
+            "type": "string"
+          },
+          "category": {
+            "description": "Filter by category: 'Bug', 'Feature', 'Improvement', 'Praise', 'Question'",
+            "enum": [
+              "Bug",
+              "Feature",
+              "Improvement",
+              "Praise",
+              "Question"
+            ],
+            "type": "string"
+          },
+          "include_parked": {
+            "default": false,
+            "type": "boolean"
+          },
+          "label": {
+            "maxLength": 60,
+            "type": "string"
+          },
+          "lens": {
+            "default": "volume",
+            "enum": [
+              "volume",
+              "urgency",
+              "revenue",
+              "retention",
+              "delight",
+              "feature"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "default": 5,
+            "description": "Default 5, max 100",
+            "type": "number"
+          },
+          "mine": {
+            "description": "Only the rows this seat holds; the reply carries `needs_me`",
+            "type": "boolean"
+          },
+          "offset": {
+            "default": 0,
+            "type": "number"
+          },
+          "person": {
+            "type": "string"
+          },
+          "picked": {
+            "description": "A person's picked list; `person` says whose",
+            "type": "boolean"
+          },
+          "priority_id": {
+            "type": "string"
+          },
+          "priority_number": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "release_number": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "segment": {
+            "default": "all",
+            "description": "enterprise, smb or all",
+            "type": "string"
+          },
+          "stage": {
+            "enum": [
+              "open",
+              "ready",
+              "building",
+              "shipped",
+              "shared",
+              "closed"
+            ],
+            "type": "string"
+          },
+          "topic": {
+            "description": "Matches a priority's wording and its feedback",
+            "type": "string"
+          },
+          "view": {
+            "enum": [
+              "radar"
+            ],
+            "type": "string"
+          },
+          "weekly": {
+            "type": "boolean"
+          },
+          "window": {
+            "default": "7d",
+            "enum": [
+              "7d",
+              "14d",
+              "30d"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "annsa_priorities"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Spec"
+      },
+      "description": "Full engineering spec for a priority. The document has 5 sections: Problem, Signals and direction, What to build, Files to touch, Done When. Alongside it, as linked records rather than prose: Verification status, Decision, Evidence, Activity, Details. Takes priority_number, priority_id or spec_id. The read is short: Problem, What to build, Done When, `ruled_out`, and `decision` (the open asks), `authority` (what a sign delegated: may_decide, must_come_back, answered_by) and `principles` when a person set them; an escalate on a may_decide topic is not raised. `include_signals` adds Signals and direction, Files to touch and `evidence`; `include: repo_rules` adds the repo's agent files. Pending section changes come back as `updates`. `batch: true` exports specs as markdown by stage and ship date; `status: 'shipped'` with no id lists what shipped, and empty means nothing has. `investigate: true` returns a deep dive instead: trajectory, linked feedback, memory, related briefs. A read. [production · app.annsa.ai]",
+      "inputSchema": {
+        "properties": {
+          "batch": {
+            "type": "boolean"
+          },
+          "format": {
+            "enum": [
+              "list",
+              "full"
+            ],
+            "type": "string"
+          },
+          "include": {
+            "description": "repo_rules adds the full text of the repo's agent files",
+            "enum": [
+              "repo_rules"
+            ],
+            "type": "string"
+          },
+          "include_feedback": {
+            "default": true,
+            "type": "boolean"
+          },
+          "include_history": {
+            "default": true,
+            "type": "boolean"
+          },
+          "include_memory": {
+            "default": true,
+            "type": "boolean"
+          },
+          "include_signals": {
+            "default": false,
+            "description": "Adds Signals and direction, Files to touch and the evidence quotes",
+            "type": "boolean"
+          },
+          "investigate": {
+            "type": "boolean"
+          },
+          "label": {
+            "maxLength": 60,
+            "type": "string"
+          },
+          "limit": {
+            "default": 10,
+            "description": "Default 10, max 50",
+            "type": "number"
+          },
+          "priority_id": {
+            "type": "string"
+          },
+          "priority_number": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "since": {
+            "description": "ISO date or 'last month'",
+            "type": "string"
+          },
+          "spec_id": {
+            "type": "string"
+          },
+          "spec_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "stage": {
+            "enum": [
+              "open",
+              "ready",
+              "building",
+              "shipped",
+              "shared",
+              "closed"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "open",
+              "ready",
+              "building",
+              "shipped",
+              "shared",
+              "closed",
+              "done"
+            ],
+            "type": "string"
+          },
+          "until": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "annsa_spec"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Ask"
+      },
+      "description": "Answers a question about your feedback data (the default): search and synthesis across feedback, priorities, specs and outcomes, such as rankings, 'what can I safely park?', 'what should I ship next?', 'what am I missing?', 'did feedback go quiet after we shipped X?'. about='annsa': how Annsa works, from its docs, or a file with `topic`. about='surveys': every survey, where it runs and its response count. about='customer': one person's feedback, priorities, ships, transcripts and account facts; give `customer` (name, email or id), and `account` to narrow; an ambiguous name returns candidates. A read. Names and quotes follow the workspace's per-surface setting. annsa.help and annsa.surveys are older names for two modes. [production · app.annsa.ai]",
+      "inputSchema": {
+        "properties": {
+          "about": {
+            "enum": [
+              "feedback",
+              "annsa",
+              "surveys",
+              "customer"
+            ],
+            "type": "string"
+          },
+          "account": {
+            "description": "Narrows `customer` to one company",
+            "type": "string"
+          },
+          "customer": {
+            "description": "With about='customer': a name, email or id",
+            "type": "string"
+          },
+          "days": {
+            "type": "integer"
+          },
+          "do_we_have": {
+            "description": "The text you are about to file; returns the nearest priorities",
+            "type": "string"
+          },
+          "have_version": {
+            "description": "The version of your saved copy of the file",
+            "type": "string"
+          },
+          "include_archived": {
+            "type": "boolean"
+          },
+          "kind": {
+            "description": "With do_we_have: a customer's words or an observed finding",
+            "enum": [
+              "quote",
+              "finding"
+            ],
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          },
+          "topic": {
+            "description": "Returns a skill file instead of an answer; no question needed",
+            "enum": [
+              "working",
+              "spec-skill",
+              "decisions",
+              "welcome"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "annsa_ask"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Work"
+      },
+      "description": "Do the work on a priority, and settle routine asks with undo. Ship records completion; it deploys nothing. Skill: annsa-working (annsa.ask topic=working). [production · app.annsa.ai]",
+      "inputSchema": {
+        "properties": {
+          "action": {
+            "description": "build: Old name for claim. ship: Records completion, with pr_url and learned. Deploys nothing; retract undoes it. claim: Takes the seat, mints a thin spec and returns holder_key (send it on write and ship); work another holds needs takeover and a reason. note: Appends a note; sets next_action and pr_url. A correction is a new note with supersedes. handoff: Passes the held spec to another agent or person. release: Puts the work down with a reason; nothing is marked shipped. write: Replaces one spec section as a new version; text for a section that is not yours is recorded as an update. verify: Records how a line was checked, by proof kind. No ship gate. escalate: Raises a three-line ask with a trigger in a person's Needs you; decides nothing. Needs `checked`: a fact you can check is not asked. One open ask per priority; the same topic updates it. settle: Settles what Annsa's principles hand to agents; returns use_id for undo. undo: Puts back your own settle by use_id.",
+            "enum": [
+              "build",
+              "ship",
+              "claim",
+              "note",
+              "handoff",
+              "release",
+              "write",
+              "verify",
+              "escalate",
+              "settle",
+              "undo"
+            ],
+            "type": "string"
+          },
+          "ask": {
+            "type": "string"
+          },
+          "assigned_to": {
+            "description": "An agent client or a member's email; empty unassigns",
+            "type": "string"
+          },
+          "checked": {
+            "description": "escalate: what you checked, 'what — result'",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "done_when_index": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "feedback_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "holder_key": {
+            "type": "string"
+          },
+          "how": {
+            "enum": [
+              "test",
+              "staging",
+              "prod",
+              "manual"
+            ],
+            "type": "string"
+          },
+          "into": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "decision",
+              "help",
+              "gap",
+              "update"
+            ],
+            "type": "string"
+          },
+          "label": {
+            "maxLength": 60,
+            "type": "string"
+          },
+          "learned": {
+            "maxLength": 10000,
+            "type": "string"
+          },
+          "next_action": {
+            "maxLength": 400,
+            "type": "string"
+          },
+          "options": {
+            "description": "Short labels, for a decision",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "outcome": {
+            "enum": [
+              "keep_both",
+              "close_settled",
+              "dismiss_came_back",
+              "move_row"
+            ],
+            "type": "string"
+          },
+          "pr_url": {
+            "description": "GitHub URL; the PR body carries 'Annsa-Spec: <spec id>'",
+            "type": "string"
+          },
+          "principle": {
+            "description": "The rule that would settle this class next time",
+            "type": "string"
+          },
+          "priority_id": {
+            "type": "string"
+          },
+          "priority_number": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "reason": {
+            "description": "Required for takeover, release, retract, correct and an agent's severity",
+            "type": "string"
+          },
+          "recommend": {
+            "type": "string"
+          },
+          "request": {
+            "description": "Ask a person to park or retract; needs reason",
+            "enum": [
+              "park",
+              "retract"
+            ],
+            "type": "string"
+          },
+          "ruled_out": {
+            "description": "One 'label — why' per entry",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "same_as_priority_number": {
+            "description": "Proposes a merge for a person to answer",
+            "minimum": 1,
+            "type": "integer"
+          },
+          "section": {
+            "description": "write: the_problem, signals_and_direction, what_to_build, files_to_touch, done_when. note: build, how_it_works, spec.",
+            "type": "string"
+          },
+          "security": {
+            "description": "True for a security question; a principle does not settle it",
+            "type": "boolean"
+          },
+          "spec_id": {
+            "description": "Required for verify; priority_number does not stand in for it",
+            "type": "string"
+          },
+          "supersedes": {
+            "description": "The note or principle this replaces",
+            "type": "string"
+          },
+          "takeover": {
+            "description": "Another session of your own client counts as someone else; needs a reason",
+            "type": "boolean"
+          },
+          "text": {
+            "type": "string"
+          },
+          "topic": {
+            "type": "string"
+          },
+          "trigger": {
+            "description": "scope, customers, principle or options. Anything else is settled, not raised.",
+            "enum": [
+              "scope",
+              "customers",
+              "principle",
+              "options"
+            ],
+            "type": "string"
+          },
+          "use_id": {
+            "type": "string"
+          },
+          "verdict": {
+            "description": "On a shipped priority: still_broken or fixed. On release, false_positive does NOT close the row.",
+            "enum": [
+              "false_positive",
+              "still_broken",
+              "fixed"
+            ],
+            "type": "string"
+          },
+          "where": {
+            "description": "A runnable test node id (path::test) or a URL; no notes",
+            "maxLength": 500,
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "name": "annsa_work"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "File"
+      },
+      "description": "Put new rows into the record: feedback or a finding, a priority from a title, a transcript, a direction doc's lines. Returns where each row went. Skill: annsa-working (annsa.ask topic=working). [production · app.annsa.ai]",
+      "inputSchema": {
+        "properties": {
+          "action": {
+            "description": "submit: Lands one feedback row; an agent's is a finding. With priority_number it attaches there; with stand_alone it proposes a new priority, Unplaced unless `bet` names one. transcript: Adds a transcript to the customer corpus. import_direction: Two-phase: proposes a strategy doc's lines, then lands the selected ones as ideas. adopt_priority: Old name for submit stand_alone.",
+            "enum": [
+              "submit",
+              "transcript",
+              "import_direction",
+              "adopt_priority"
+            ],
+            "type": "string"
+          },
+          "adjudicated": {
+            "description": "Raw scanner output is refused unless someone checked it",
+            "type": "boolean"
+          },
+          "bet": {
+            "description": "Title or id; with stand_alone",
+            "type": "string"
+          },
+          "category": {
+            "description": "For adopt_priority: the kind of row. Default Feature.",
+            "enum": [
+              "Bug",
+              "Feature",
+              "Improvement",
+              "Praise",
+              "Question"
+            ],
+            "type": "string"
+          },
+          "customer_email": {
+            "type": "string"
+          },
+          "customer_name": {
+            "type": "string"
+          },
+          "detail": {
+            "description": "The longer words of the row, up to 20000 characters",
+            "maxLength": 20000,
+            "type": "string"
+          },
+          "doc_id": {
+            "type": "string"
+          },
+          "doc_title": {
+            "type": "string"
+          },
+          "document_text": {
+            "description": "At least 50 characters",
+            "type": "string"
+          },
+          "feedback": {
+            "description": "The words, verbatim",
+            "type": "string"
+          },
+          "insist": {
+            "default": false,
+            "description": "Mints without the match check",
+            "type": "boolean"
+          },
+          "label": {
+            "maxLength": 60,
+            "type": "string"
+          },
+          "line": {
+            "type": "integer"
+          },
+          "origin_ref": {
+            "type": "string"
+          },
+          "parent": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "priority_id": {
+            "type": "string"
+          },
+          "priority_number": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "proposal_id": {
+            "description": "For import_direction: the id phase 1 returned, to land phase 2",
+            "type": "string"
+          },
+          "reason": {
+            "description": "Required for takeover, release, retract, correct and an agent's severity",
+            "type": "string"
+          },
+          "reference": {
+            "description": "A followable link (PR, URL, log line); findings need one",
+            "type": "string"
+          },
+          "revenue_band": {
+            "description": "An amount ('499') or a tier word",
+            "type": "string"
+          },
+          "revenue_period": {
+            "enum": [
+              "monthly",
+              "annual"
+            ],
+            "type": "string"
+          },
+          "root_cause": {
+            "description": "When ___, ___ can't ___ because ___; sent on the submit. Max 300 characters",
+            "type": "string"
+          },
+          "rule": {
+            "type": "string"
+          },
+          "selection": {
+            "description": "Titles to land in phase 2; omitted lands all",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "severity": {
+            "description": "0 broken, 1 poor, 2 could be better, 3 minor. Sent on every finding, with severity_reason. From an agent: a proposal until a person types the P.",
+            "maximum": 3,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "severity_reason": {
+            "description": "Why this P; sent on the submit with severity",
+            "type": "string"
+          },
+          "signal_class": {
+            "enum": [
+              "customer_voice",
+              "dogfood",
+              "agent",
+              "idea"
+            ],
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "source": {
+            "default": "mcp",
+            "type": "string"
+          },
+          "stand_alone": {
+            "description": "Mints a new priority from this row; not with priority_number",
+            "type": "boolean"
+          },
+          "text": {
+            "type": "string"
+          },
+          "theme": {
+            "description": "One of the workspace's themes",
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "interview",
+              "sales_call",
+              "support",
+              "other"
+            ],
+            "type": "string"
+          },
+          "verdict": {
+            "description": "On a shipped priority: still_broken or fixed. On release, false_positive does NOT close the row.",
+            "enum": [
+              "false_positive",
+              "still_broken",
+              "fixed"
+            ],
+            "type": "string"
+          },
+          "with_spec": {
+            "default": false,
+            "description": "Also mints a ready spec and returns its spec_id",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "name": "annsa_file"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Decide"
+      },
+      "description": "Answer a Needs you question, sign a decision, approve or dismiss a proposed spec update, propose or retire a principle. Skill: annsa-working (annsa.ask topic=working). [production · app.annsa.ai]",
+      "inputSchema": {
+        "properties": {
+          "action": {
+            "description": "approve: Writes another writer's proposed section text. dismiss: Keeps the current section text. accept: Old name for approve. decline: Old name for dismiss. answer: Records a person's answer, typed or relayed with person_words; an option that names an act applies it. ask_back: A person asks the agent something back. adjudicate: Records a person's pick on a Needs you question: one arm, or neither. sign: Records a person's decision: do_this, do_nothing, park or dismiss. principle: Decision memory. propose is an agent's and applies at once; write, retire and activate are a person's.",
+            "enum": [
+              "approve",
+              "dismiss",
+              "accept",
+              "decline",
+              "answer",
+              "ask_back",
+              "adjudicate",
+              "sign",
+              "principle"
+            ],
+            "type": "string"
+          },
+          "answer": {
+            "type": "string"
+          },
+          "answered_by": {
+            "type": "string"
+          },
+          "area": {
+            "type": "string"
+          },
+          "because": {
+            "type": "string"
+          },
+          "decision": {
+            "enum": [
+              "do_this",
+              "do_nothing",
+              "park",
+              "dismiss"
+            ],
+            "type": "string"
+          },
+          "decision_until": {
+            "description": "YYYY-MM-DD",
+            "type": "string"
+          },
+          "disagreement_id": {
+            "type": "string"
+          },
+          "falsifier": {
+            "type": "string"
+          },
+          "falsifier_due": {
+            "description": "YYYY-MM-DD",
+            "type": "string"
+          },
+          "label": {
+            "maxLength": 60,
+            "type": "string"
+          },
+          "may_decide": {
+            "description": "Needs answered_by",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "must_come_back": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "op": {
+            "description": "For action 'principle': 'propose' (an agent's), 'write', 'retire', 'activate' (a person's), 'list'.",
+            "enum": [
+              "propose",
+              "write",
+              "retire",
+              "activate",
+              "list"
+            ],
+            "type": "string"
+          },
+          "option": {
+            "type": "string"
+          },
+          "person": {
+            "description": "Email or user id of the member whose words they are",
+            "type": "string"
+          },
+          "person_words": {
+            "description": "The person's exact words, not a summary; recorded as their quote",
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "principle": {
+            "description": "The rule that would settle this class next time",
+            "type": "string"
+          },
+          "principle_id": {
+            "type": "string"
+          },
+          "priority_id": {
+            "type": "string"
+          },
+          "priority_number": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "review_condition": {
+            "type": "string"
+          },
+          "ruled_out": {
+            "description": "One 'label — why' per entry",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "scope": {
+            "description": "area needs `area`; area or company also writes a principle",
+            "enum": [
+              "priority",
+              "area",
+              "company"
+            ],
+            "type": "string"
+          },
+          "supersedes": {
+            "description": "The note or principle this replaces",
+            "type": "string"
+          },
+          "take": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "topic": {
+            "type": "string"
+          },
+          "update_id": {
+            "type": "string"
+          },
+          "while_waiting": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "name": "annsa_decide"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Board"
+      },
+      "description": "Arrange the board: stage, severity, merge, regroup, park, correct, bets, assign, retract, pick, cut, direction. Returns the change and its undo. Skill: annsa-working (annsa.ask topic=working). [production · app.annsa.ai]",
+      "inputSchema": {
+        "properties": {
+          "action": {
+            "description": "status: Sets the planning stage, checked against expected_stage. assign: Sets who a spec is assigned to. correct: Fixes a title, detail or ruled-out entry, keeping the old version. park: Takes a priority out of consideration. unpark: Puts a parked priority back. retract: Unfiles feedback and marks a ship not shipped; refused once customers were told. regroup: Moves priorities between groups; the reply carries the undo. merge: Folds losers into `into`; their numbers are retired. Refuses shipped priorities. bet: Lists, creates, updates, reorders or deletes bets, or places priorities on one. direction: Reads, or writes a new version of, the direction doc. severity: Sets P0-P3; an agent's is a proposal. cut: Closes a release and writes its changelog. pick: Sets a person's short list, up to 7. release_findings: Lands agent findings held past the daily limit; the owner's.",
+            "enum": [
+              "status",
+              "assign",
+              "correct",
+              "park",
+              "unpark",
+              "retract",
+              "regroup",
+              "merge",
+              "bet",
+              "direction",
+              "severity",
+              "cut",
+              "pick",
+              "release_findings"
+            ],
+            "type": "string"
+          },
+          "allow_shared": {
+            "description": "Retract is refused once customers were told, unless true",
+            "type": "boolean"
+          },
+          "assigned_to": {
+            "description": "An agent client or a member's email; empty unassigns",
+            "type": "string"
+          },
+          "at": {
+            "type": "string"
+          },
+          "bet_id": {
+            "type": "string"
+          },
+          "bet_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "channel": {
+            "enum": [
+              "email",
+              "widget",
+              "both",
+              "skip",
+              "changelog",
+              "marketing"
+            ],
+            "type": "string"
+          },
+          "confirm": {
+            "description": "Without it retract only shows the plan",
+            "type": "boolean"
+          },
+          "corrected": {
+            "type": "string"
+          },
+          "correction_type": {
+            "description": "'category' is a person's; the old wording is kept",
+            "enum": [
+              "category",
+              "title",
+              "detail",
+              "ruled_out"
+            ],
+            "type": "string"
+          },
+          "doc_id": {
+            "type": "string"
+          },
+          "doc_title": {
+            "type": "string"
+          },
+          "document_id": {
+            "type": "string"
+          },
+          "document_text": {
+            "description": "At least 50 characters",
+            "type": "string"
+          },
+          "evidence": {
+            "type": "string"
+          },
+          "expected_stage": {
+            "enum": [
+              "open",
+              "ready",
+              "closed"
+            ],
+            "type": "string"
+          },
+          "feedback_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "into": {
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "properties": {
+                "priority_id": {
+                  "type": "string"
+                },
+                "theme": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "priority_id",
+                "theme"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "label": {
+            "maxLength": 60,
+            "type": "string"
+          },
+          "losers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "metric_label": {
+            "type": "string"
+          },
+          "metric_query": {
+            "type": "string"
+          },
+          "metric_source": {
+            "type": "string"
+          },
+          "metric_value": {
+            "type": "number"
+          },
+          "op": {
+            "description": "For action 'bet': 'list', 'create' (title + metric_label; last for agents), 'update' (bet_id), 'delete', 'reorder', 'place' (priority_ids). For action 'direction': 'get', 'list', 'update' (document_text + reason), 'accept' and 'reject' (document_id + reason; a person's). For action 'cut': 'publish' (release_number, channel changelog or marketing, live annsa.ai url) marks the release's rows Shared; it sends nothing.",
+            "enum": [
+              "list",
+              "create",
+              "update",
+              "delete",
+              "reorder",
+              "place",
+              "get",
+              "accept",
+              "reject",
+              "publish"
+            ],
+            "type": "string"
+          },
+          "original": {
+            "type": "string"
+          },
+          "owner_user_id": {
+            "description": "'none' clears the owner",
+            "type": "string"
+          },
+          "parent": {
+            "type": "string"
+          },
+          "park_reason": {
+            "type": "string"
+          },
+          "person": {
+            "description": "Email or user id of the member whose words they are",
+            "type": "string"
+          },
+          "person_words": {
+            "description": "The person's exact words, not a summary; recorded as their quote",
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "picks": {
+            "items": {
+              "properties": {
+                "action": {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                "priority_number": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "priority_number",
+                "action"
+              ],
+              "type": "object"
+            },
+            "maxItems": 7,
+            "type": "array"
+          },
+          "priority_id": {
+            "type": "string"
+          },
+          "priority_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "priority_number": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "rank": {
+            "type": "integer"
+          },
+          "reason": {
+            "description": "Required for takeover, release, retract, correct and an agent's severity",
+            "type": "string"
+          },
+          "release_number": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "severity": {
+            "description": "0 broken, 1 poor, 2 could be better, 3 minor. Sent on every finding, with severity_reason. From an agent: a proposal until a person types the P.",
+            "maximum": 3,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "since": {
+            "type": "string"
+          },
+          "spec_id": {
+            "description": "Required for verify; priority_number does not stand in for it",
+            "type": "string"
+          },
+          "stage": {
+            "enum": [
+              "open",
+              "ready",
+              "closed"
+            ],
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "until": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "why_now": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "name": "annsa_board"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Share"
+      },
+      "description": "Tell the customers who asked that their priority shipped, by email or the widget. An email cannot be unsent. Skill: annsa-working (annsa.ask topic=working). [production · app.annsa.ai]",
+      "inputSchema": {
+        "properties": {
+          "action": {
+            "description": "share: Emails or notifies the customers who asked that it shipped. An email cannot be unsent.",
+            "enum": [
+              "share"
+            ],
+            "type": "string"
+          },
+          "channel": {
+            "enum": [
+              "email",
+              "widget",
+              "both",
+              "skip",
+              "changelog",
+              "marketing"
+            ],
+            "type": "string"
+          },
+          "label": {
+            "maxLength": 60,
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "spec_id": {
+            "description": "Required for verify; priority_number does not stand in for it",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "name": "annsa_share"
+    }
+  ],
+  "url": "https://app.annsa.ai/mcp"
+}

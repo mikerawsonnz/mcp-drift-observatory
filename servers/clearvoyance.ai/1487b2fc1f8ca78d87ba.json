@@ -1,0 +1,1173 @@
+{
+  "canon_version": "1",
+  "full_hash": "2109aa5cf3ccea6c946cee168ad300abd6154524559705266502c08648d3827c",
+  "name": "ai.clearvoyance/clearvoyance",
+  "observed_at": "2026-10-06T02:05:15.074400Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 27,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "The price list as data: a flat price per campaign by size (open link: 10/50/100/200 answers; targeted: 10–200 people), charged from your prepaid balance in full when a campaign launches, whatever it receives. Also the fee on crypto rewards and how unclaimed rewards are returned. Also the top-up rules and how the sandbox works. Public — no key needed. Call this first.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_pricing",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "type": "object"
+      },
+      "title": "Price list"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Creates an agent account and returns its API key ONCE — store it; it is not kept anywhere and cannot be shown again. No email, no password, nothing personal: the account is a key and a balance. mode 'sandbox' gives a cv_test_ key with $20.00 of notional balance — the same API, no money moves, no email is sent (a sandbox targeted campaign returns its invitation links instead of sending them). mode 'live' (default) starts at $0 and needs a top-up before a campaign can launch. Free; limited to 10 accounts per hour per address.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "description": "Optional name for the account, chosen by you (e.g. 'acme-shop post-purchase bot')",
+            "maxLength": 80,
+            "type": "string"
+          },
+          "mode": {
+            "description": "Default 'live'. Use 'sandbox' to try everything with a notional balance.",
+            "enum": [
+              "live",
+              "sandbox"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "create_account",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "type": "object"
+      },
+      "title": "Create an account"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "The account behind a key: mode, balance, what is available to launch with, the declared deposit wallet.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "apiKey": {
+            "description": "Your Clearvoyance API key (cv_live_… or cv_test_…), from create_account",
+            "type": "string"
+          }
+        },
+        "required": [
+          "apiKey"
+        ],
+        "type": "object"
+      },
+      "name": "get_account",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "type": "object"
+      },
+      "title": "Account and balance"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Every movement of money on the account, newest first: top-ups, each campaign's price (set aside and charged at launch), refunds. The balance after each row.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "apiKey": {
+            "description": "Your Clearvoyance API key (cv_live_… or cv_test_…), from create_account",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Rows to return, default 100",
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "apiKey"
+        ],
+        "type": "object"
+      },
+      "name": "get_ledger",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "type": "object"
+      },
+      "title": "Ledger"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Creates a Stripe Checkout link for a PERSON to pay with a card; hand them the checkoutUrl. Live accounts only, $4.99 to $1,000.00. Nothing is credited until they pay. Then call check_topup with the sessionId until credited is true — the balance is credited once, by whichever of Stripe's webhook, check_topup or the payer's own page sees the payment first.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "amountCents": {
+            "description": "US cents, e.g. 2000 for $20.00. Minimum 499.",
+            "type": "integer"
+          },
+          "apiKey": {
+            "description": "Your Clearvoyance API key (cv_live_… or cv_test_…), from create_account",
+            "type": "string"
+          }
+        },
+        "required": [
+          "apiKey",
+          "amountCents"
+        ],
+        "type": "object"
+      },
+      "name": "create_card_topup",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "type": "object"
+      },
+      "title": "Top up by card"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Whether a card top-up session has been paid and credited. Safe to call repeatedly; credits at most once.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "apiKey": {
+            "description": "Your Clearvoyance API key (cv_live_… or cv_test_…), from create_account",
+            "type": "string"
+          },
+          "sessionId": {
+            "description": "The sessionId create_card_topup returned (cs_…)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "apiKey",
+          "sessionId"
+        ],
+        "type": "object"
+      },
+      "name": "check_topup",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "type": "object"
+      },
+      "title": "Check a card top-up"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Checks a campaign BEFORE launching it, for free: every problem at once (not just the first), any adjustments we would make, the flat price that launching would charge, and whether your balance covers it (and by how much it is short). For targeted campaigns pass cohortSize (the number of people), never the addresses. Always quote before launch_campaign.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "apiKey": {
+            "description": "Your Clearvoyance API key (cv_live_… or cv_test_…), from create_account",
+            "type": "string"
+          },
+          "cohortSize": {
+            "description": "targeted only: how many people you will invite (10–200). The number, not the addresses.",
+            "type": "integer"
+          },
+          "description": {
+            "description": "What you want to learn. Steers the AI analysis; participants do not see it.",
+            "type": "string"
+          },
+          "expiresInDays": {
+            "description": "1–42. Default 14 for open_link, 7 for targeted.",
+            "type": "integer"
+          },
+          "giftText": {
+            "description": "Shown to a participant after answering: a promo code, a thank-you, a link. Optional.",
+            "maxLength": 500,
+            "type": "string"
+          },
+          "kind": {
+            "description": "open_link: a share link anyone can answer, closing at responseCap — put it in your own post-purchase email. targeted: we email one invitation per address in cohortEmails.",
+            "enum": [
+              "open_link",
+              "targeted"
+            ],
+            "type": "string"
+          },
+          "minPercent": {
+            "description": "targeted only: results unlock once this share of the list has answered. Floored at 50.",
+            "type": "integer"
+          },
+          "questions": {
+            "description": "1–10 questions participants answer by voice or text. No links or phone numbers.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "minItems": 1,
+            "type": "array"
+          },
+          "responseCap": {
+            "description": "open_link only: 10, 50, 100 or 200 — the link closes at that many answers. Sets the tier: $4.99 / $17.99 / $29.99 / $49.99.",
+            "type": "integer"
+          },
+          "senderName": {
+            "description": "Who is asking, as participants see it (your shop or product name). Required for open_link.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Shown to participants, e.g. 'How was your order?'",
+            "type": "string"
+          }
+        },
+        "required": [
+          "apiKey",
+          "kind",
+          "title",
+          "description",
+          "questions"
+        ],
+        "type": "object"
+      },
+      "name": "quote_campaign",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "type": "object"
+      },
+      "title": "Quote a campaign"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Creates the campaign and makes it live at once, charging its flat price from your balance (quote_campaign tells you the price). open_link returns shareUrl — the link to put in front of the people you want to hear from; it closes at responseCap or on expiry. targeted sends one invitation per address in cohortEmails from clearvoyance.ai (a sandbox account gets inviteLinks back instead and nothing is emailed). The flat price for the campaign's size is charged from your balance in full at launch, whatever it receives; it is not refunded for fewer answers. Refused with INSUFFICIENT_BALANCE (shortfallCents) if the balance does not cover the tier, or INVALID_CAMPAIGN (problems[]) if the quote would fail.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "apiKey": {
+            "description": "Your Clearvoyance API key (cv_live_… or cv_test_…), from create_account",
+            "type": "string"
+          },
+          "cohortEmails": {
+            "description": "targeted only: the addresses to invite (10–200). Duplicates are folded. The list is discarded once every invitation is queued; only hashes are kept.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 500,
+            "type": "array"
+          },
+          "description": {
+            "description": "What you want to learn. Steers the AI analysis; participants do not see it.",
+            "type": "string"
+          },
+          "expiresInDays": {
+            "description": "1–42. Default 14 for open_link, 7 for targeted.",
+            "type": "integer"
+          },
+          "giftText": {
+            "description": "Shown to a participant after answering: a promo code, a thank-you, a link. Optional.",
+            "maxLength": 500,
+            "type": "string"
+          },
+          "kind": {
+            "description": "open_link: a share link anyone can answer, closing at responseCap — put it in your own post-purchase email. targeted: we email one invitation per address in cohortEmails.",
+            "enum": [
+              "open_link",
+              "targeted"
+            ],
+            "type": "string"
+          },
+          "minPercent": {
+            "description": "targeted only: results unlock once this share of the list has answered. Floored at 50.",
+            "type": "integer"
+          },
+          "questions": {
+            "description": "1–10 questions participants answer by voice or text. No links or phone numbers.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "minItems": 1,
+            "type": "array"
+          },
+          "responseCap": {
+            "description": "open_link only: 10, 50, 100 or 200 — the link closes at that many answers. Sets the tier: $4.99 / $17.99 / $29.99 / $49.99.",
+            "type": "integer"
+          },
+          "senderName": {
+            "description": "Who is asking, as participants see it (your shop or product name). Required for open_link.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Shown to participants, e.g. 'How was your order?'",
+            "type": "string"
+          }
+        },
+        "required": [
+          "apiKey",
+          "kind",
+          "title",
+          "description",
+          "questions"
+        ],
+        "type": "object"
+      },
+      "name": "launch_campaign",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "type": "object"
+      },
+      "title": "Launch a campaign"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Every campaign on this account with its status, answers so far, the share link (open link), and what it has cost so far.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "apiKey": {
+            "description": "Your Clearvoyance API key (cv_live_… or cv_test_…), from create_account",
+            "type": "string"
+          }
+        },
+        "required": [
+          "apiKey"
+        ],
+        "type": "object"
+      },
+      "name": "list_my_campaigns",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "type": "object"
+      },
+      "title": "List campaigns"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "One campaign: status, answers so far, invitations sent or the cap, the share link, the privacy threshold and whether it is met, and the price charged.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "apiKey": {
+            "description": "Your Clearvoyance API key (cv_live_… or cv_test_…), from create_account",
+            "type": "string"
+          },
+          "campaignId": {
+            "description": "A campaign id from launch_campaign or list_my_campaigns",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "apiKey",
+          "campaignId"
+        ],
+        "type": "object"
+      },
+      "name": "get_campaign",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "type": "object"
+      },
+      "title": "Campaign status"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "The answers, once the privacy threshold is met (open link: 5 answers; targeted: minPercent of the list). Below it the count and what is still needed. Each transcript is anonymous by construction — no field links an answer to a person. Includes the AI report if analyze_campaign has run. Answers are deleted 30 days after the campaign closes (dataDeletesAt).",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "apiKey": {
+            "description": "Your Clearvoyance API key (cv_live_… or cv_test_…), from create_account",
+            "type": "string"
+          },
+          "campaignId": {
+            "description": "A campaign id from launch_campaign or list_my_campaigns",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "apiKey",
+          "campaignId"
+        ],
+        "type": "object"
+      },
+      "name": "get_campaign_results",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "type": "object"
+      },
+      "title": "Campaign results"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Runs the AI analysis over every answer so far and returns an executive summary with themes, sentiment and quotes; the report is then also part of get_campaign_results. Re-running with no new answers returns the same report. A sandbox campaign gets the illustrative sample report, marked sample: true.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "apiKey": {
+            "description": "Your Clearvoyance API key (cv_live_… or cv_test_…), from create_account",
+            "type": "string"
+          },
+          "campaignId": {
+            "description": "A campaign id from launch_campaign or list_my_campaigns",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "apiKey",
+          "campaignId"
+        ],
+        "type": "object"
+      },
+      "name": "analyze_campaign",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "type": "object"
+      },
+      "title": "Analyse the answers"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Ends the campaign now: no more answers are accepted. The price was charged at launch, so closing early refunds nothing. Campaigns also close on their own at the cap or on expiry. Closing twice changes nothing.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "apiKey": {
+            "description": "Your Clearvoyance API key (cv_live_… or cv_test_…), from create_account",
+            "type": "string"
+          },
+          "campaignId": {
+            "description": "A campaign id from launch_campaign or list_my_campaigns",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "apiKey",
+          "campaignId"
+        ],
+        "type": "object"
+      },
+      "name": "close_campaign",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "type": "object"
+      },
+      "title": "Close a campaign"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Closes the account and refunds what is left of the balance to the card(s) that paid, newest top-up first, less Stripe's processing fee on each payment refunded (Stripe keeps it; the account owner bears it). Call it WITHOUT confirm first: that only previews the refund per card and moves nothing. Then, only if the account owner has agreed, call again with confirm: true. Every campaign must be closed first. A refund the card refuses stays as credit, and the key keeps working while any credit remains. Once the balance is zero the key is revoked for good. Sandbox accounts: the key is revoked and nothing is refunded (the credit is notional). If Stripe does not answer, call again to finish.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "apiKey": {
+            "description": "Your Clearvoyance API key (cv_live_… or cv_test_…), from create_account",
+            "type": "string"
+          },
+          "confirm": {
+            "description": "true to actually close and refund. Omit or false to preview only.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "apiKey"
+        ],
+        "type": "object"
+      },
+      "name": "close_account",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "type": "object"
+      },
+      "title": "Close the account and refund the balance"
+    },
+    {
+      "description": "LEGACY wallet flow — new integrations should use create_account and launch_campaign (API key + prepaid balance, no wallet). Returns the agent session configuration: whether a session fee applies (paymentRequired), the fee in cents, the accepted token mint (USDC on Solana) and the treasury wallet address.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_agent_config"
+    },
+    {
+      "description": "LEGACY wallet flow — new integrations should use create_account and launch_campaign (API key + prepaid balance, no wallet). First step of creating a campaign session. Returns the exact message you must sign with your Solana wallet, and the nonce inside it. Pass the message and your base58 signature to initialize_session. Nonces expire after 5 minutes, and a message signed for the dashboard will not work here.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "walletAddress": {
+            "description": "Your Solana wallet public key (base58)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "walletAddress"
+        ],
+        "type": "object"
+      },
+      "name": "get_session_nonce"
+    },
+    {
+      "description": "LEGACY wallet flow — new integrations should use create_account and launch_campaign (API key + prepaid balance, no wallet). Creates a new agent session, proving the wallet with a signature from get_session_nonce. Returns a sessionId and paymentRequired. While sessions are free (paymentRequired false), the response also carries the one-time accessToken for create_campaign, and no payment step follows. If paymentRequired is true, send the stated USDC amount to the treasury address on-chain, then call verify_payment with the transaction signature to receive the access token. The wallet you prove here becomes the campaign's creator, and is the only wallet that will be able to read its results from the dashboard.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "message": {
+            "description": "Exact message string returned by get_session_nonce (must match byte for byte)",
+            "type": "string"
+          },
+          "signature": {
+            "description": "Base58-encoded Ed25519 signature of the message returned by get_session_nonce",
+            "type": "string"
+          },
+          "walletAddress": {
+            "description": "Your Solana wallet public key (base58)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "walletAddress",
+          "signature",
+          "message"
+        ],
+        "type": "object"
+      },
+      "name": "initialize_session"
+    },
+    {
+      "description": "LEGACY wallet flow — new integrations should use create_account and launch_campaign (API key + prepaid balance, no wallet). Only when initialize_session returned paymentRequired true: verifies your on-chain USDC payment to the treasury and returns a one-time access token. A free session needs no payment and is refused here. The access token is required for create_campaign and expires after 1 hour. The token is single-use — it is consumed when create_campaign is called.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "sessionId": {
+            "description": "Session ID returned by initialize_session",
+            "type": "integer"
+          },
+          "txSignature": {
+            "description": "Solana transaction signature of your USDC payment to treasury",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sessionId",
+          "txSignature"
+        ],
+        "type": "object"
+      },
+      "name": "verify_payment"
+    },
+    {
+      "description": "LEGACY wallet flow — new integrations should use create_account and launch_campaign (API key + prepaid balance, no wallet). (quote_campaign is its equivalent for the key flow.) Checks a campaign BEFORE you pay for anything. Free, and needs no session or access token. Returns whether it is valid, every problem at once (not just the first), any adjustments we would make (expiry clamped, privacy threshold raised, empty questions dropped), and what it will cost — the escrow total for incentivized campaigns (rewards only: the campaign price is paid at activation), or the activation fee for no-reward ones. Call this first, fix anything it reports, and only then call get_session_nonce and pay. Pass the cohort SIZE, not the addresses: this endpoint never receives contact details.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "cohortSize": {
+            "description": "How many participants — the number, not the email addresses",
+            "type": "number"
+          },
+          "description": {
+            "description": "What you want to learn",
+            "type": "string"
+          },
+          "expiresInDays": {
+            "description": "1-42, default 7",
+            "type": "number"
+          },
+          "incentiveCents": {
+            "description": "Reward per participant in cents (incentivized campaigns)",
+            "type": "number"
+          },
+          "minPercent": {
+            "description": "Privacy threshold; floored at 50",
+            "type": "number"
+          },
+          "questions": {
+            "description": "1-10 questions with non-empty text",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "text": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "rewardMint": {
+            "description": "SPL token mint for the reward; defaults to USDC",
+            "type": "string"
+          },
+          "rewardMode": {
+            "description": "Defaults to INCENTIVIZED",
+            "enum": [
+              "INCENTIVIZED",
+              "NO_REWARD"
+            ],
+            "type": "string"
+          },
+          "title": {
+            "description": "Campaign title, shown to participants",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "validate_campaign"
+    },
+    {
+      "description": "LEGACY wallet flow — new integrations should use create_account and launch_campaign (API key + prepaid balance, no wallet). (launch_campaign is its equivalent for the key flow.) Creates a new anonymous audio feedback campaign. Two modes: (a) INCENTIVIZED — participants earn USDC rewards; you must fund an escrow address     returned in the response, then call verify_campaign_funding. Participants have 30 days after     the campaign ends to claim; anything unclaimed then goes back to the wallet you signed in with. (b) NO_REWARD — survey only, no crypto rewards; you pay a flat Stripe activation fee     (returned in activationRequired), then call verify_campaign_activation. The accessToken is single-use and is consumed on success. Privacy threshold: minPercent enforces the minimum response rate before results are unlocked (minimum 50%). Campaign expiry: 1–42 days (default 7).",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "accessToken": {
+            "description": "One-time access token from initialize_session (free sessions) or verify_payment",
+            "type": "string"
+          },
+          "cohortEmails": {
+            "description": "Email addresses of participants (minimum 2 for privacy)",
+            "items": {
+              "format": "email",
+              "type": "string"
+            },
+            "minItems": 2,
+            "type": "array"
+          },
+          "description": {
+            "description": "Short description of the campaign purpose",
+            "type": "string"
+          },
+          "digitalGiftText": {
+            "description": "Optional digital gift description shown to NO_REWARD participants (e.g. a discount code)",
+            "type": "string"
+          },
+          "expiresInDays": {
+            "description": "Campaign duration in days (1–42, default 7)",
+            "maximum": 42,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "incentiveCents": {
+            "description": "Reward per participant in cents (e.g. 500 = $5.00). Required for INCENTIVIZED.",
+            "type": "integer"
+          },
+          "minPercent": {
+            "description": "Minimum response rate (%) required to unlock results. Defaults to 50.",
+            "maximum": 100,
+            "minimum": 50,
+            "type": "number"
+          },
+          "questions": {
+            "description": "List of audio questions for participants to answer",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "text": {
+                  "description": "Question text",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text"
+              ],
+              "type": "object"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "rewardMint": {
+            "description": "SPL token mint address for rewards. Defaults to USDC if omitted.",
+            "type": "string"
+          },
+          "rewardMode": {
+            "description": "INCENTIVIZED: crypto rewards per response. NO_REWARD: survey only, flat activation fee.",
+            "enum": [
+              "INCENTIVIZED",
+              "NO_REWARD"
+            ],
+            "type": "string"
+          },
+          "title": {
+            "description": "Campaign title (shown to participants)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "accessToken",
+          "title",
+          "description",
+          "questions",
+          "cohortEmails",
+          "rewardMode"
+        ],
+        "type": "object"
+      },
+      "name": "create_campaign"
+    },
+    {
+      "description": "LEGACY wallet flow — new integrations should use create_account and launch_campaign (API key + prepaid balance, no wallet). For INCENTIVIZED campaigns only. After you have funded the escrow wallet returned by create_campaign, call this with the funding transaction signature to launch the campaign LIVE. Invite emails are sent to all cohort participants automatically. This call is idempotent — safe to retry if you are unsure whether it succeeded.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "campaignId": {
+            "description": "Campaign ID from create_campaign",
+            "type": "integer"
+          },
+          "txSignature": {
+            "description": "Solana transaction signature of your USDC transfer to the escrow address",
+            "type": "string"
+          },
+          "walletAddress": {
+            "description": "Your Solana wallet public key (must match the campaign creator)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "campaignId",
+          "txSignature",
+          "walletAddress"
+        ],
+        "type": "object"
+      },
+      "name": "verify_campaign_funding"
+    },
+    {
+      "description": "LEGACY wallet flow — new integrations should use create_account and launch_campaign (API key + prepaid balance, no wallet). For NO_REWARD campaigns only. After you have paid the flat USDC activation fee (returned in activationRequired by create_campaign), call this with the payment transaction signature to launch the campaign LIVE. Invite emails are sent to all cohort participants automatically. This call is idempotent — safe to retry.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "campaignId": {
+            "description": "Campaign ID from create_campaign",
+            "type": "integer"
+          },
+          "txSignature": {
+            "description": "Solana transaction signature of your USDC activation fee payment to treasury",
+            "type": "string"
+          },
+          "walletAddress": {
+            "description": "Your Solana wallet public key (must match the campaign creator)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "campaignId",
+          "txSignature",
+          "walletAddress"
+        ],
+        "type": "object"
+      },
+      "name": "verify_campaign_activation"
+    },
+    {
+      "description": "LEGACY wallet flow — new integrations should use create_account and launch_campaign (API key + prepaid balance, no wallet). First step of dashboard authentication. Returns a nonce and a message string that you must sign with your Solana wallet. The signed message is then passed to verify_login_signature to receive a session token. Nonces expire after 5 minutes.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "walletAddress": {
+            "description": "Your Solana wallet public key (base58)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "walletAddress"
+        ],
+        "type": "object"
+      },
+      "name": "get_login_nonce"
+    },
+    {
+      "description": "LEGACY wallet flow — new integrations should use create_account and launch_campaign (API key + prepaid balance, no wallet). Second step of dashboard authentication. Verifies your wallet signature against the nonce message from get_login_nonce. Returns a sessionToken (valid 24 hours) and your campaign list. Pass the sessionToken to list_campaigns, get_campaign_details, and export_campaign_data.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "message": {
+            "description": "Exact message string returned by get_login_nonce (must match exactly)",
+            "type": "string"
+          },
+          "signature": {
+            "description": "Base58-encoded Ed25519 signature of the message returned by get_login_nonce",
+            "type": "string"
+          },
+          "walletAddress": {
+            "description": "Your Solana wallet public key (base58)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "walletAddress",
+          "signature",
+          "message"
+        ],
+        "type": "object"
+      },
+      "name": "verify_login_signature"
+    },
+    {
+      "description": "LEGACY wallet flow — new integrations should use create_account and launch_campaign (API key + prepaid balance, no wallet). (list_my_campaigns is its equivalent for the key flow.) Lists all campaigns created by your wallet. Requires the sessionToken from verify_login_signature. Returns campaign IDs, titles, statuses, cohort sizes, and data expiry dates.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "sessionToken": {
+            "description": "Session token from verify_login_signature",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sessionToken"
+        ],
+        "type": "object"
+      },
+      "name": "list_campaigns"
+    },
+    {
+      "description": "LEGACY wallet flow — new integrations should use create_account and launch_campaign (API key + prepaid balance, no wallet). (get_campaign is its equivalent for the key flow.) Returns detailed stats for a specific campaign: invite count, response count, completion rate, question definitions, and campaign status. Only campaigns owned by your wallet are accessible. Requires the sessionToken from verify_login_signature.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "campaignId": {
+            "description": "Campaign ID to inspect",
+            "type": "integer"
+          },
+          "sessionToken": {
+            "description": "Session token from verify_login_signature",
+            "type": "string"
+          }
+        },
+        "required": [
+          "campaignId",
+          "sessionToken"
+        ],
+        "type": "object"
+      },
+      "name": "get_campaign_details"
+    },
+    {
+      "description": "LEGACY wallet flow — new integrations should use create_account and launch_campaign (API key + prepaid balance, no wallet). (get_campaign_results is its equivalent for the key flow, as JSON with the AI report.) Exports raw response data for a completed campaign as CSV text. Each row contains a response ID, submission timestamp, and one column per question with the participant's audio transcription as the value. Only available after campaign expiry. AI insight reports are not included (raw data only). Data is deleted 30 days after the first export — check agentDataExpiresAt from get_campaign_details. Requires the sessionToken from verify_login_signature.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "campaignId": {
+            "description": "Campaign ID to export",
+            "type": "integer"
+          },
+          "sessionToken": {
+            "description": "Session token from verify_login_signature",
+            "type": "string"
+          }
+        },
+        "required": [
+          "campaignId",
+          "sessionToken"
+        ],
+        "type": "object"
+      },
+      "name": "export_campaign_data"
+    }
+  ],
+  "url": "https://clearvoyance.ai/mcp"
+}

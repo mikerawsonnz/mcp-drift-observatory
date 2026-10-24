@@ -1,0 +1,409 @@
+{
+  "canon_version": "1",
+  "full_hash": "793d273f8636655d0646b98155b20ad01317268dd27a2cf05827a2ece3a4f91f",
+  "name": "ai.booqer/booqer",
+  "observed_at": "2026-10-22T02:06:05.546110Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 8,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Search businesses"
+      },
+      "description": "Use this when the user wants to find a local home-service business or appointment: plumber, HVAC, electrician, gate, fence, or security install, pole barn, or builder. Searches the Booqer directory of enrolled home-service businesses by name, category, service, location, or phone. Coverage is limited to enrolled businesses (currently Florida pole barn and gate/security). Returns id, name, domain, booking URL, and booking status. A trade that is not enrolled returns no businesses and the message says no shop is available. A city outside a business's service area is left out. booqer-demo-shop is omitted unless the query is that shop's exact name or id.",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "description": "What the user wants found. Examples: \"pole barn Clermont\", \"gate repair Winter Garden\", \"plumber Orlando\". At least 2 characters.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_businesses",
+      "outputSchema": {
+        "description": "Search hits. available is false when no enrolled shop matches.",
+        "properties": {
+          "available": {
+            "description": "False when no shop is available.",
+            "type": "boolean"
+          },
+          "businesses": {
+            "description": "Matching businesses. Empty when none are enrolled for that search.",
+            "type": "array"
+          },
+          "message": {
+            "description": "Says no shop is available when the list is empty.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "businesses"
+        ],
+        "type": "object"
+      },
+      "title": "Search businesses"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get a business"
+      },
+      "description": "Use this when the user wants to read one enrolled local home-service business and search_businesses or resolve_business already returned its id. Returns one enrolled shop as JSON: id, brand, legal_name, page, booking_url, phone when published, sms, services as id and name, hours, timezone, verification status and verify_url, and booking_rules and emergency_phone when that shop has them.",
+      "inputSchema": {
+        "properties": {
+          "shop_id": {
+            "description": "Enrolled shop id from search_businesses. Examples: florida-pole-barn, florida-security-concepts, booqer-demo-shop.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "shop_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_business",
+      "outputSchema": {
+        "description": "One enrolled shop.",
+        "properties": {
+          "booking_url": {
+            "description": "Booking page URL.",
+            "type": "string"
+          },
+          "hours": {
+            "description": "Published hours for this shop.",
+            "type": "string"
+          },
+          "id": {
+            "description": "Shop id.",
+            "type": "string"
+          },
+          "services": {
+            "description": "Published services, each with id and name.",
+            "type": "array"
+          },
+          "timezone": {
+            "description": "IANA timezone for the hours and slots.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "title": "Get a business"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Resolve a business"
+      },
+      "description": "Use this when the user wants to resolve one enrolled local home-service business from a domain, a place, or a phone number. An ambiguous match is refused. Returns that one identity. No phone, email, or street address is returned.",
+      "inputSchema": {
+        "properties": {
+          "domain": {
+            "description": "Business website domain. Example: floridapolebarn.com.",
+            "type": "string"
+          },
+          "phone": {
+            "description": "Published phone number. Example: (352) 282-0692.",
+            "type": "string"
+          },
+          "place": {
+            "description": "City or county. Example: Orange County. Refuses a place that matches more than one shop.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "resolve_business",
+      "outputSchema": {
+        "description": "One resolved identity, or an ambiguous or empty match.",
+        "properties": {
+          "business_name": {
+            "description": "Brand name when the match is verified.",
+            "type": "string"
+          },
+          "enrolled": {
+            "description": "True when the business is in the Booqer directory.",
+            "type": "boolean"
+          },
+          "identity_match": {
+            "description": "verified, none, or ambiguous.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "enrolled",
+          "identity_match"
+        ],
+        "type": "object"
+      },
+      "title": "Resolve a business"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Check availability"
+      },
+      "description": "Use this when the user wants to check availability for a local home-service appointment before booking. Lists the open 30-minute slots for one shop and one date. Booked and blocked times are left out. Each start and end is ISO-8601 with an offset. The shop timezone is America/New_York. date is YYYY-MM-DD, or start is an ISO-8601 timestamp. offering selects that shop's rules from get_business. Does not reserve a slot. Rate limited per IP and per shop.",
+      "inputSchema": {
+        "properties": {
+          "date": {
+            "description": "Calendar date in the shop timezone, America/New_York. Format YYYY-MM-DD. Example: 2026-10-21. Provide date or start.",
+            "type": "string"
+          },
+          "offering": {
+            "description": "Service id from get_business. Example: project_consult.",
+            "type": "string"
+          },
+          "shop_id": {
+            "description": "Enrolled shop id from search_businesses. Examples: florida-pole-barn, florida-security-concepts, booqer-demo-shop.",
+            "type": "string"
+          },
+          "start": {
+            "description": "ISO-8601 timestamp with an offset. Example: 2026-10-20T14:00:00-04:00. At least 2 hours ahead and no more than 21 days ahead.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "shop_id"
+        ],
+        "type": "object"
+      },
+      "name": "check_availability",
+      "outputSchema": {
+        "description": "JSON object returned in the text content.",
+        "type": "object"
+      },
+      "title": "Check availability"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Request a consult"
+      },
+      "description": "Use this when the user wants to book a local home-service appointment and has already chosen an open time. Confirms a free consult when the slot is open. Calling this again with the same details can create a second booking; if unsure, check get_booking_status first. Requires consent: before calling, show the user the consent text in the consent field and get their agreement. Also requires a name, a valid email, and a problem description. service_address is optional for a phone consult and required for an on-site visit. Disposable, reserved, and blocked email domains are rejected. job_summary falls back to problem. service_area is inferred from the address or city, otherwise the shop city. A phone consult accepts a street, a city and ZIP, or a PO Box. An on-site visit needs a street address. Shop-specific booking rules and emergency_phone come from get_business. offering is an id from get_business. start is an ISO-8601 timestamp, for example 2026-10-20T14:00:00-04:00. The start is at least 2 hours ahead and no more than 21 days ahead. A start outside that window names the field start. Returns status confirmed, a cancel link, and verify_url when the signed receipt is ready. The receipt page does not show the customer. An optional idempotency_key repeats the same result for that shop. Rate limited per IP and per shop, with a per-shop daily cap.",
+      "inputSchema": {
+        "properties": {
+          "consent": {
+            "description": "Required. Before you call this tool, show the user this exact text and get their agreement: \"I agree to Booqer's Terms and Privacy Policy and consent to Booqer sharing my request with this shop so they can contact me about it.\" Terms: https://booqer.ai/terms. Privacy Policy: https://booqer.ai/privacy. Set true only after the user agrees. Without consent true the call is rejected and nothing is stored.",
+            "type": "boolean"
+          },
+          "email": {
+            "description": "Customer email on a real domain. Example: ada@gmail.com. Disposable and example.com addresses are rejected.",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "description": "Optional key of 8 to 80 letters, numbers, dots, underscores, colons, or hyphens. A repeat with the same key and shop returns the first booking instead of creating another.",
+            "type": "string"
+          },
+          "job_summary": {
+            "description": "Short job summary. Falls back to problem when omitted.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Customer name. Example: Ada Lovelace.",
+            "type": "string"
+          },
+          "offering": {
+            "description": "Service id from get_business. Example: project_consult.",
+            "type": "string"
+          },
+          "phone": {
+            "description": "Customer phone. Example: 3525550100. Optional.",
+            "type": "string"
+          },
+          "problem": {
+            "description": "What is wrong, in the customer's words. Example: Gate will not close.",
+            "type": "string"
+          },
+          "service_address": {
+            "description": "Street, city and ZIP, or PO Box. Optional for a phone consult. Required for an on-site visit. Example: 100 Demo Drive, Clermont FL 34711.",
+            "type": "string"
+          },
+          "service_area": {
+            "description": "City or county. Inferred from the address when omitted. Example: Clermont.",
+            "type": "string"
+          },
+          "shop_id": {
+            "description": "Enrolled shop id from search_businesses. Examples: florida-pole-barn, florida-security-concepts, booqer-demo-shop.",
+            "type": "string"
+          },
+          "start": {
+            "description": "ISO-8601 timestamp with an offset. Example: 2026-10-20T14:00:00-04:00. At least 2 hours ahead and no more than 21 days ahead.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "shop_id",
+          "offering",
+          "name",
+          "email",
+          "start",
+          "consent",
+          "problem"
+        ],
+        "type": "object"
+      },
+      "name": "request_booking",
+      "outputSchema": {
+        "description": "JSON object returned in the text content.",
+        "type": "object"
+      },
+      "title": "Request a consult"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Booking status"
+      },
+      "description": "Use this when the user wants to check the status of a local home-service appointment. status is confirmed, pending, canceled, or failed. No customer name, phone, or email.",
+      "inputSchema": {
+        "properties": {
+          "request_id": {
+            "description": "Booking id returned by request_booking. UUID. Example: 11111111-1111-4111-8111-111111111111.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_booking_status",
+      "outputSchema": {
+        "description": "JSON object returned in the text content.",
+        "type": "object"
+      },
+      "title": "Booking status"
+    },
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://widget/request-service.html",
+        "ui": {
+          "resourceUri": "ui://widget/request-service.html"
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Request a quote"
+      },
+      "description": "Use this when the user wants to open a quote form for a local home-service business rather than book a confirmed appointment time. Opens the quote widget for one enrolled business. business_id is the provider_business_id from the business feed. shop_id is accepted when business_id is empty. The widget is ui://widget/request-service.html. This call does not store a request and does not confirm a booking. It is rate-limited.",
+      "inputSchema": {
+        "properties": {
+          "business_id": {
+            "description": "Enrolled business id from search_businesses. Example: florida-pole-barn.",
+            "type": "string"
+          },
+          "shop_id": {
+            "description": "Enrolled shop id. Used only when business_id is empty. Example: florida-security-concepts.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id"
+        ],
+        "type": "object"
+      },
+      "name": "request_service",
+      "outputSchema": {
+        "description": "Opens the quote form. Does not store a request or confirm a booking.",
+        "type": "object"
+      },
+      "title": "Request a quote"
+    },
+    {
+      "_meta": {
+        "openai/widgetAccessible": true,
+        "ui": {
+          "visibility": [
+            "app"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Submit a service request"
+      },
+      "description": "Sends the user's quote request (name, email, optional phone, service location, preferred time) to the chosen business. Called by the quote form only.",
+      "inputSchema": {
+        "properties": {
+          "business_id": {
+            "description": "Enrolled business id. Example: florida-pole-barn.",
+            "type": "string"
+          },
+          "consent": {
+            "description": "Required. Before you call this tool, show the user this exact text and get their agreement: \"I agree to Booqer's Terms and Privacy Policy and consent to Booqer sharing my request with this shop so they can contact me about it.\" Terms: https://booqer.ai/terms. Privacy Policy: https://booqer.ai/privacy. Set true only after the user agrees. Without consent true the call is rejected and nothing is stored.",
+            "type": "boolean"
+          },
+          "email": {
+            "description": "Customer email on a real domain. Example: ada@gmail.com.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Customer name. Example: Ada Lovelace.",
+            "type": "string"
+          },
+          "offering": {
+            "description": "Service id from get_business. Example: project_consult.",
+            "type": "string"
+          },
+          "phone": {
+            "description": "Customer phone. Optional when an email is present. Example: 3525550100.",
+            "type": "string"
+          },
+          "service_address": {
+            "description": "Street address. Optional for a phone consult. Required for an on-site visit. Example: 100 Demo Drive, Clermont FL 34711.",
+            "type": "string"
+          },
+          "start": {
+            "description": "Preferred time as an ISO-8601 timestamp. Example: 2026-10-21T14:00:00-04:00.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "offering",
+          "name",
+          "email",
+          "start",
+          "consent"
+        ],
+        "type": "object"
+      },
+      "name": "submit_service_request",
+      "outputSchema": {
+        "description": "stored is true when the request was saved.",
+        "type": "object"
+      },
+      "title": "Submit a service request"
+    }
+  ],
+  "url": "https://booqer.ai/mcp"
+}

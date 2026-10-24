@@ -1,0 +1,315 @@
+{
+  "canon_version": "1",
+  "full_hash": "bdecb9ac372796cc76c08010d16f194e6d57a5de584469cbb78884e726e8e0bd",
+  "name": "ai.chinaapi/chinaapi",
+  "observed_at": "2026-10-06T02:05:14.020053Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 4,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Estimate a ChinaAPI cost"
+      },
+      "description": "Estimate the USD cost of a workload on one model from its published per-meter prices: Standard, and Paid where it is lower. Pass quantities in the model's own units — tokens for text models, characters for speech synthesis, audio seconds for transcription, requests, images or video seconds for per-call and per-second models; a quantity the model does not price is refused. Tiered models are estimated tier by tier. The result is an estimate, not a quote.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "audio_input_tokens": {
+            "description": "Quantity in tokens for the audio_input meter (models billed in tokens).",
+            "maximum": 1000000000000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "audio_output_tokens": {
+            "description": "Quantity in tokens for the audio_output meter (models billed in tokens).",
+            "maximum": 1000000000000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "audio_seconds": {
+            "description": "Quantity in audio seconds for the input meter (models billed in audio_duration).",
+            "maximum": 100000000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "cache_read_tokens": {
+            "description": "Quantity in tokens for the cache_read meter (models billed in tokens).",
+            "maximum": 1000000000000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "cache_write_1h_tokens": {
+            "description": "Quantity in tokens for the cache_write_1h meter (models billed in tokens).",
+            "maximum": 1000000000000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "cache_write_tokens": {
+            "description": "Quantity in tokens for the cache_write meter (models billed in tokens).",
+            "maximum": 1000000000000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "characters": {
+            "description": "Quantity in characters for the input meter (models billed in characters).",
+            "maximum": 10000000000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "context_tokens": {
+            "description": "Input context length used to choose a context-length tier. Only for models whose tiers depend on context length; defaults to the input and cache tokens.",
+            "maximum": 1000000000000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "image_input_tokens": {
+            "description": "Quantity in tokens for the image_input meter (models billed in tokens).",
+            "maximum": 1000000000000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "image_output_tokens": {
+            "description": "Quantity in tokens for the image_output meter (models billed in tokens).",
+            "maximum": 1000000000000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "images": {
+            "description": "Quantity in images for the image_n meter.",
+            "maximum": 100000000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "input_tokens": {
+            "description": "Quantity in tokens for the input meter (models billed in tokens).",
+            "maximum": 1000000000000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "model": {
+            "description": "Exact, case-sensitive model ID as returned by chinaapi_list_models.",
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$",
+            "type": "string"
+          },
+          "output_tokens": {
+            "description": "Quantity in tokens for the output meter (models billed in tokens).",
+            "maximum": 1000000000000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "requests": {
+            "description": "Quantity in requests for the per_call meter.",
+            "maximum": 100000000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "video_seconds": {
+            "description": "Quantity in seconds for the video_second meter.",
+            "maximum": 100000000,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "model"
+        ],
+        "type": "object"
+      },
+      "name": "chinaapi_estimate_cost",
+      "title": "Estimate a ChinaAPI cost"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get a ChinaAPI model"
+      },
+      "description": "Get one model by its exact ID: base URL and endpoints, the Standard and Paid price snapshot per meter with the time it was read and the price-book versions, context window and modalities, capability contract, limits, and ChinaAPI links (model page, a start link to try it, the agents guide). The live price on the model page is authoritative.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "model": {
+            "description": "Exact, case-sensitive model ID as returned by chinaapi_list_models.",
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "model"
+        ],
+        "type": "object"
+      },
+      "name": "chinaapi_get_model",
+      "title": "Get a ChinaAPI model"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get a ChinaAPI request recipe"
+      },
+      "description": "Get a runnable request for one model — endpoint, headers, JSON body or multipart form, a curl command, and for video the polling step — exactly as ChinaAPI's /agents page shows it. Optionally include the configuration that points a coding agent (Claude Code, Codex, Cursor, …) at ChinaAPI. The request uses $CHINAAPI_KEY; never put a real key into it.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent": {
+            "description": "Also return the configuration that points this coding agent at ChinaAPI, as ChinaAPI's /agents page shows it.",
+            "enum": [
+              "Hermes Agent",
+              "Claude Code",
+              "Cline",
+              "Kilo Code",
+              "pi",
+              "Codex",
+              "Oh-My-Pi",
+              "OpenClaw",
+              "DeepSeek Harness",
+              "OpenHands",
+              "Cursor",
+              "Zed Editor",
+              "Strix",
+              "goose",
+              "Qwen Code",
+              "GitHub Copilot",
+              "opencode",
+              "Open Interpreter",
+              "Crush"
+            ],
+            "type": "string"
+          },
+          "capability": {
+            "description": "Which of the model's capabilities the request is for; defaults to its first published capability.",
+            "enum": [
+              "text-multimodal",
+              "image",
+              "video",
+              "audio-speech",
+              "decision"
+            ],
+            "type": "string"
+          },
+          "model": {
+            "description": "Exact, case-sensitive model ID as returned by chinaapi_list_models.",
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$",
+            "type": "string"
+          },
+          "protocol": {
+            "description": "Inbound protocol for text models: openai (/v1/chat/completions), anthropic (/v1/messages) or responses (/v1/responses). Defaults to the agent's protocol, else openai.",
+            "enum": [
+              "anthropic",
+              "openai",
+              "responses"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "model"
+        ],
+        "type": "object"
+      },
+      "name": "chinaapi_get_recipe",
+      "title": "Get a ChinaAPI request recipe"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List ChinaAPI models"
+      },
+      "description": "List the models ChinaAPI serves, optionally filtered by capability, task, maker or a model-ID substring. Each entry has the exact model ID, maker, capabilities and tasks, context window, headline Standard prices (and Paid prices where they are lower) and the model's ChinaAPI page. Sorted by maker, then model ID; page with cursor. Use chinaapi_get_model for one model's endpoints, full prices and limits.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "capability": {
+            "description": "Capability direction: text-multimodal (chat, reasoning, coding, vision), image, video, audio-speech or decision.",
+            "enum": [
+              "text-multimodal",
+              "image",
+              "video",
+              "audio-speech",
+              "decision"
+            ],
+            "type": "string"
+          },
+          "cursor": {
+            "description": "next_cursor from the previous page.",
+            "pattern": "^[0-9]{1,6}$",
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "description": "Models per page.",
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "maker": {
+            "description": "Maker name exactly as returned in maker (case-insensitive), e.g. DeepSeek.",
+            "maxLength": 64,
+            "minLength": 1,
+            "type": "string"
+          },
+          "query": {
+            "description": "Case-insensitive substring of the model ID.",
+            "maxLength": 64,
+            "minLength": 2,
+            "pattern": "^[A-Za-z0-9._:/-]+$",
+            "type": "string"
+          },
+          "task": {
+            "description": "A task within a capability, e.g. image-to-video or transcription. Must belong to capability when both are given.",
+            "enum": [
+              "chat",
+              "reasoning",
+              "coding",
+              "vision",
+              "file-video-understanding",
+              "text-to-image",
+              "image-to-image",
+              "image-editing",
+              "high-resolution",
+              "text-to-video",
+              "image-to-video",
+              "first-last-frame",
+              "reference-to-video",
+              "video-editing",
+              "video-with-audio",
+              "text-to-speech",
+              "transcription",
+              "voice-cloning",
+              "voice-design",
+              "audio-understanding",
+              "music-generation",
+              "audio-generation",
+              "structured-decision"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "chinaapi_list_models",
+      "title": "List ChinaAPI models"
+    }
+  ],
+  "url": "https://api.chinaapi.ai/mcp"
+}

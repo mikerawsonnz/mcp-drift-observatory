@@ -1,0 +1,668 @@
+{
+  "canon_version": "1",
+  "full_hash": "982bc84d381d7944e92f6c318c1f5e1ef66c509e63cd541b5c016b1b80241089",
+  "name": "ai.edgechat/edgepedia",
+  "observed_at": "2026-10-08T02:05:57.194390Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 5,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Search Edgepedia"
+      },
+      "description": "Search an encyclopedia for facts about a person, place, thing, event, or concept: Edgepedia, over 300k articles with citations. Pass the subject's name (\"Mount Fuji\", \"photosynthesis\"), not a question; other names and misspellings match, and when no title matches, articles whose text does follow, marked `match: fulltext`. Returns results with id, title, url, and preview text, plus a `topic:` result when the query names a topic (\"painters\"); pass an id to `fetch`. `limit` and `page` reach further results.",
+      "icons": [
+        {
+          "mimeType": "image/png",
+          "sizes": [
+            "1130x1130"
+          ],
+          "src": "https://www.edgechat.ai/assets/edgechat-chestnut-orange-logo-v2.png"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "first": {
+            "description": "true = only the best match.",
+            "type": "boolean"
+          },
+          "limit": {
+            "description": "Results a page, 1 to 30 (default 10).",
+            "maximum": 30,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "page": {
+            "description": "Which page of results, from 1.",
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "description": "The name of a subject, or words from an article title.",
+            "type": "string"
+          },
+          "sort": {
+            "description": "central = the most-linked subjects first.",
+            "enum": [
+              "relevance",
+              "central"
+            ],
+            "type": "string"
+          },
+          "topic": {
+            "description": "Only articles under this topic id (as `fetch` topic:… names it, without \"topic:\").",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search",
+      "outputSchema": {
+        "properties": {
+          "did_you_mean": {
+            "type": "string"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "pages": {
+            "description": "Pages of results at this limit; pass `page` for the next.",
+            "type": "integer"
+          },
+          "results": {
+            "items": {
+              "properties": {
+                "articles": {
+                  "description": "A topic only: the articles under it.",
+                  "type": "integer"
+                },
+                "canonical_id": {
+                  "description": "The article's permanent id (ep…); `fetch` takes it, and it outlives an address change.",
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "text": {
+                  "description": "The corpus snippet when available, otherwise the article opening; for a topic its article count and place in the tree.",
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "url"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "results"
+        ],
+        "type": "object"
+      },
+      "title": "Search Edgepedia"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Fetch an Edgepedia article"
+      },
+      "description": "Read an encyclopedia article in full: one Edgepedia article as Markdown with its citations, by a `search` result's id. Returns id, title, text, url, and metadata (topic path, license, credit). A `topic:` id lists that topic's parent, narrower topics, and articles, 120 a page; `topic:root` is the top of the tree, `topic:geo` the geography tree. `citations: false` gives [n] markers instead of inline source links. Show the `credit` line with any text you quote.",
+      "icons": [
+        {
+          "mimeType": "image/png",
+          "sizes": [
+            "1130x1130"
+          ],
+          "src": "https://www.edgechat.ai/assets/edgechat-chestnut-orange-logo-v2.png"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "chunks": {
+            "description": "true = the text as paragraphs with stable ids, in `chunks`.",
+            "type": "boolean"
+          },
+          "citations": {
+            "description": "Default true. false = [n] markers instead of inline source links; the numbered reference list stays.",
+            "type": "boolean"
+          },
+          "cite": {
+            "description": "Add a reference in this format (csl, bibtex, ris, apa, mla, chicago, harvard).",
+            "enum": [
+              "csl",
+              "bibtex",
+              "ris",
+              "apa",
+              "mla",
+              "chicago",
+              "harvard"
+            ],
+            "type": "string"
+          },
+          "cursor": {
+            "description": "Where to continue, from a cut text's `next_cursor`.",
+            "type": "string"
+          },
+          "format": {
+            "description": "The text as plain text, HTML, JSON-LD, or Turtle instead of Markdown.",
+            "enum": [
+              "text",
+              "html",
+              "jsonld",
+              "turtle"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "description": "The id of a search result (the last part of the article's address, such as \"mount-fuji\", or a topic's \"topic:…\" id).",
+            "type": "string"
+          },
+          "ids": {
+            "description": "More ids to fetch with `id` in one call, up to 10 in all.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "length": {
+            "description": "snippet or lead for a short text; full (default) for the whole article.",
+            "enum": [
+              "snippet",
+              "lead",
+              "full"
+            ],
+            "type": "string"
+          },
+          "links": {
+            "description": "Add the articles linking here (in), the links it makes (out), or both.",
+            "enum": [
+              "in",
+              "out",
+              "both"
+            ],
+            "type": "string"
+          },
+          "links_page": {
+            "description": "With links \"in\" or \"both\": which 30 articles linking here, from 1.",
+            "minimum": 1,
+            "type": "integer"
+          },
+          "max_tokens": {
+            "description": "Cut the text at a section boundary to about this many tokens; pass `next_cursor` as `cursor` for the rest.",
+            "type": "integer"
+          },
+          "outline": {
+            "description": "true = add the list of the article's headings.",
+            "type": "boolean"
+          },
+          "page": {
+            "description": "A topic only: which page of its articles, from 1.",
+            "type": "integer"
+          },
+          "query": {
+            "description": "Only the 3 passages that best match these words, each with a `cite_url`.",
+            "type": "string"
+          },
+          "quote": {
+            "description": "A sentence from the article, or a chunk id: adds a `cite_url` that opens the page at it.",
+            "type": "string"
+          },
+          "section": {
+            "description": "Only this section, by its heading (\"Etymology\", \"History\").",
+            "type": "string"
+          },
+          "tables": {
+            "description": "true = add the article's tables as JSON and CSV.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "fetch",
+      "outputSchema": {
+        "anyOf": [
+          {
+            "required": [
+              "id",
+              "title",
+              "text",
+              "url"
+            ]
+          },
+          {
+            "required": [
+              "results"
+            ]
+          }
+        ],
+        "properties": {
+          "canonical_id": {
+            "description": "The article's permanent id (ep…); `fetch` takes it, and it outlives an address change.",
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object"
+          },
+          "moved_from": {
+            "description": "The id asked for, when the article has since moved; store `id` or `canonical_id` instead.",
+            "type": "string"
+          },
+          "results": {
+            "description": "With `ids`: one entry per id, in order: that fetch's answer, or { id, error: { code, message } }.",
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "text": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Fetch an Edgepedia article"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Related Edgepedia articles"
+      },
+      "description": "Find encyclopedia articles related to an Edgepedia article: its topic-mates, a few from each neighboring topic, and its geography neighbors. Pass its id, as for `fetch`. Returns groups of results; `fetch` a group's `topic` id for more.",
+      "icons": [
+        {
+          "mimeType": "image/png",
+          "sizes": [
+            "1130x1130"
+          ],
+          "src": "https://www.edgechat.ai/assets/edgechat-chestnut-orange-logo-v2.png"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "by": {
+            "description": "\"links\" = articles cited together with it, and articles linking to what it links to.",
+            "enum": [
+              "links"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "description": "An article's id, as `search` returns it (such as \"mount-fuji\").",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "related",
+      "outputSchema": {
+        "anyOf": [
+          {
+            "required": [
+              "id",
+              "title",
+              "url",
+              "siblings",
+              "cousins",
+              "geo"
+            ]
+          },
+          {
+            "required": [
+              "id",
+              "title",
+              "url",
+              "by",
+              "cocited",
+              "coupled"
+            ]
+          }
+        ],
+        "properties": {
+          "by": {
+            "enum": [
+              "links"
+            ],
+            "type": "string"
+          },
+          "cocited": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "coupled": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "cousins": {
+            "type": "array"
+          },
+          "geo": {
+            "type": "array"
+          },
+          "id": {
+            "type": "string"
+          },
+          "siblings": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Related Edgepedia articles"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Connect two Edgepedia articles"
+      },
+      "description": "Find the shortest chain of in-text links from one Edgepedia article to another (at most 6 hops), with the sentence that makes each hop; pass two ids as `search` returns them.",
+      "icons": [
+        {
+          "mimeType": "image/png",
+          "sizes": [
+            "1130x1130"
+          ],
+          "src": "https://www.edgechat.ai/assets/edgechat-chestnut-orange-logo-v2.png"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "from": {
+            "description": "The starting article's id (such as \"koala\"), its ep… id, or its title.",
+            "type": "string"
+          },
+          "to": {
+            "description": "The target article, named the same ways.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ],
+        "type": "object"
+      },
+      "name": "connect",
+      "outputSchema": {
+        "properties": {
+          "found": {
+            "type": "boolean"
+          },
+          "from": {
+            "type": "string"
+          },
+          "hops": {
+            "type": "integer"
+          },
+          "path": {
+            "items": {
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "steps": {
+            "items": {
+              "properties": {
+                "anchor": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "from": {
+                  "type": "string"
+                },
+                "sentence": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "to": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "text": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "found",
+          "text"
+        ],
+        "type": "object"
+      },
+      "title": "Connect two Edgepedia articles"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Resolve a name to an Edgepedia article"
+      },
+      "description": "Find which encyclopedia article a name means: Edgepedia's best match for a person, place, thing, or concept named in a text, with a confidence, whether the name is ambiguous, and the alternatives. Pass the name (\"Mercury\"), and optionally words from the text around it (`context`: \"planet orbit\") or a topic id the article must sit under (`type`). Returns `result` (id, title, url) and `alternatives`; pass an id to `fetch`.",
+      "icons": [
+        {
+          "mimeType": "image/png",
+          "sizes": [
+            "1130x1130"
+          ],
+          "src": "https://www.edgechat.ai/assets/edgechat-chestnut-orange-logo-v2.png"
+        }
+      ],
+      "inputSchema": {
+        "properties": {
+          "context": {
+            "description": "Words from the text around the name, which favor the article they fit.",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Candidates to return, 1 to 10 (default 5).",
+            "maximum": 10,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "name": {
+            "description": "The name as the text gives it.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Only articles under this topic id (as `fetch` topic:… names it, without \"topic:\").",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "resolve",
+      "outputSchema": {
+        "properties": {
+          "alternatives": {
+            "items": {
+              "properties": {
+                "canonical_id": {
+                  "type": "string"
+                },
+                "confidence": {
+                  "type": "number"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "match": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "url"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "ambiguous": {
+            "type": "boolean"
+          },
+          "confidence": {
+            "type": "number"
+          },
+          "match": {
+            "enum": [
+              "exact",
+              "alias",
+              "anchor",
+              "partial",
+              "none"
+            ],
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "properties": {
+                  "canonical_id": {
+                    "type": "string"
+                  },
+                  "confidence": {
+                    "type": "number"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "match": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "title",
+                  "url"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "query",
+          "match",
+          "confidence",
+          "ambiguous",
+          "result",
+          "alternatives"
+        ],
+        "type": "object"
+      },
+      "title": "Resolve a name to an Edgepedia article"
+    }
+  ],
+  "url": "https://www.edgechat.ai/mcp"
+}

@@ -1,0 +1,5544 @@
+{
+  "canon_version": "1",
+  "full_hash": "fcb8fdef040b660dedba2d350aea70603f51ead07812511b78773fa38c5c3cec",
+  "name": "ai.easyterritory/ezt-mcp",
+  "observed_at": "2026-10-11T02:05:00.458108Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 47,
+  "tools": [
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://easyterritory/map-viewer"
+        }
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Open Map"
+      },
+      "description": "Opens the interactive territory map (Map Component) and returns map_url and map_session_id. Opens a blank map, or shows the latest state of an existing Territory Solution (e.g. yesterday's work) from ts, ts_handle, or a completed job_id. Idempotent per user_id: a second call returns the same map. new_project=true replaces the open workspace with an empty project. presentation.view_name: empty | points_only | review | selection. Apps-capable hosts render the map in chat (ui://easyterritory/map-viewer); other clients open map_url in a browser. Later map tools take map_session_id. ensure_map_viewer reports when the person has the map open.",
+      "inputSchema": {
+        "properties": {
+          "active_tal_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Active Tal Id"
+          },
+          "expiry_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expiry Seconds"
+          },
+          "interaction_flags": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Interaction Flags"
+          },
+          "job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Job Id"
+          },
+          "mode": {
+            "default": "view",
+            "title": "Mode",
+            "type": "string"
+          },
+          "new_project": {
+            "default": false,
+            "title": "New Project",
+            "type": "boolean"
+          },
+          "presentation": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Presentation"
+          },
+          "ts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "User Id"
+          }
+        },
+        "title": "get_map_visualizationArguments",
+        "type": "object"
+      },
+      "name": "get_map_visualization",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "get_map_visualizationDictOutput",
+        "type": "object"
+      },
+      "title": "Open Map"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Startup Guidance"
+      },
+      "description": "Returns the EZT MCP operating guide: the cross-tool workflow order and shared rules (result.text, same text as the server instructions), result.server_version, and result.seat for the caller's key (plan standard|trial, key_expires_at, and quota_remaining for geocoding, routing, and isochrone requests). Read-only. Useful at the start of a session or for a host that does not show server instructions.",
+      "inputSchema": {
+        "properties": {},
+        "title": "get_guidanceArguments",
+        "type": "object"
+      },
+      "name": "get_guidance",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "get_guidanceDictOutput",
+        "type": "object"
+      },
+      "title": "Get Startup Guidance"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Discover Workflow Intent"
+      },
+      "description": "Maps a free-text territory request to a workflow. Read-only keyword routing; no compute. Returns intent_category, the recommended tool order, the main tool (tier1_tool, null when the request is ambiguous) and alternatives, required_inputs, clarifying_questions for missing inputs, and the workflow guide inline as guidance {uri, title, excerpt}. Covers building territories (auto_build, account_build, direct_build, cluster_points, seed_build), editing (realign, split, merge, rebalance), analyze, geocoding and ingest, showing a ZIP or part layer, routes, drive-time areas (isochrone_build), recurring visit schedules (schedule_visits), and moving a Territory Solution to or from EasyTerritory Designer.",
+      "inputSchema": {
+        "properties": {
+          "context": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Context"
+          },
+          "user_request": {
+            "title": "User Request",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_request"
+        ],
+        "title": "discover_intentArguments",
+        "type": "object"
+      },
+      "name": "discover_intent",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "discover_intentDictOutput",
+        "type": "object"
+      },
+      "title": "Discover Workflow Intent"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Next Workflow Step"
+      },
+      "description": "Returns the next tool call for a multi-step workflow, given where the workflow stands. Read-only state machine; executes nothing. intent_category: build_from_accounts | account_grouping | known_assignments | realign_existing | restructure | load_part_layer | route_stops | reachable_area | periodic_scheduling. state: viewer_connected, point_layer, part_layer, tal_present, analysis_fresh, plus selection/realign or restructure flags. inputs: the values known so far (part_layer, territory_count, tal_id, operation, route_type, origins, visit_frequency_field, ...); missing_inputs names the keys still needed. Returns next_tool with drafted next_args, missing_inputs (reported, never invented), blocked_by, remaining_steps, and the workflow guide inline as guidance. Order rules applied: map before compute, viewer connected before compute, ingest before build, analyze after an edit when a point layer exists. Calling it after each step with the updated state walks the whole workflow.",
+      "inputSchema": {
+        "properties": {
+          "inputs": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Inputs"
+          },
+          "intent_category": {
+            "title": "Intent Category",
+            "type": "string"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "State"
+          }
+        },
+        "required": [
+          "intent_category"
+        ],
+        "title": "workflow_advisorArguments",
+        "type": "object"
+      },
+      "name": "workflow_advisor",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "workflow_advisorDictOutput",
+        "type": "object"
+      },
+      "title": "Get Next Workflow Step"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Search Expert Pack"
+      },
+      "description": "Semantic search over the EZT MCP Expert Pack (EMEP): workflow guidance, concepts, interfaces, and common mistakes. Returns ranked markdown chunks with source files; atoms pulled in via `requires` are flagged requires_expanded. Degrades to the ezt://guidance/... resources if retrieval is unavailable. Examples: 'build balanced territories from accounts', 'viewer not connected before compute', 'auto_build vs account_build'.",
+      "inputSchema": {
+        "properties": {
+          "max_results": {
+            "default": 6,
+            "title": "Max Results",
+            "type": "integer"
+          },
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Tags"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Type"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "ep_searchArguments",
+        "type": "object"
+      },
+      "name": "ep_search",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "ep_searchDictOutput",
+        "type": "object"
+      },
+      "title": "Search Expert Pack"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List Expert Pack Topics"
+      },
+      "description": "Lists EMEP topics grouped by type (concept, workflow, interface, troubleshooting, decision). Optional `type` filter.",
+      "inputSchema": {
+        "properties": {
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Type"
+          }
+        },
+        "title": "ep_list_topicsArguments",
+        "type": "object"
+      },
+      "name": "ep_list_topics",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "ep_list_topicsDictOutput",
+        "type": "object"
+      },
+      "title": "List Expert Pack Topics"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Traverse Expert Pack Links"
+      },
+      "description": "Traverses the EMEP knowledge graph from a topic file (e.g. 'workflows/realign-by-selection.md') to related guidance, up to `depth` hops. Returns no edges unless the pack ships a _graph.yaml.",
+      "inputSchema": {
+        "properties": {
+          "depth": {
+            "default": 1,
+            "title": "Depth",
+            "type": "integer"
+          },
+          "edge_kinds": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Edge Kinds"
+          },
+          "file_path": {
+            "title": "File Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file_path"
+        ],
+        "title": "ep_graph_traverseArguments",
+        "type": "object"
+      },
+      "name": "ep_graph_traverse",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "ep_graph_traverseDictOutput",
+        "type": "object"
+      },
+      "title": "Traverse Expert Pack Links"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Wait for Map Viewer"
+      },
+      "description": "Reports whether the person has the map open (viewer_status.connected) for a map_session_id from get_map_visualization, waiting up to wait_seconds (max 30 s per call; the result reports requested_wait_seconds and max_wait_seconds). Works the same for the in-chat map and the map_url tab. Returns VIEWER_NOT_CONNECTED while the map is still closed; the same call can be repeated while the person opens it. Build, analyze, and selection results paint live once the viewer is connected.",
+      "inputSchema": {
+        "properties": {
+          "map_session_id": {
+            "title": "Map Session Id",
+            "type": "string"
+          },
+          "poll_interval_ms": {
+            "default": 500,
+            "title": "Poll Interval Ms",
+            "type": "integer"
+          },
+          "wait_seconds": {
+            "default": 0.0,
+            "title": "Wait Seconds",
+            "type": "number"
+          }
+        },
+        "required": [
+          "map_session_id"
+        ],
+        "title": "ensure_map_viewerArguments",
+        "type": "object"
+      },
+      "name": "ensure_map_viewer",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "ensure_map_viewerDictOutput",
+        "type": "object"
+      },
+      "title": "Wait for Map Viewer"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Submit Feedback"
+      },
+      "description": "Sends product feedback to EasyTerritory: a blocked or partial workflow, a workaround, a confusing response, or a missing capability. Returns an acknowledgement with feedback_id. Secrets, emails, Territory Solution JSON, GeoJSON, and account/CSV tables are stripped before storage; the text is meant for a description of what happened, not data.",
+      "inputSchema": {
+        "$defs": {
+          "FeedbackCategoryParam": {
+            "enum": [
+              "product_gap",
+              "mcp_tool_gap",
+              "documentation_gap",
+              "data_issue",
+              "workflow_confusion",
+              "bug",
+              "suggestion",
+              "other"
+            ],
+            "type": "string"
+          },
+          "FeedbackConfidenceParam": {
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "type": "string"
+          },
+          "FeedbackProductAreaParam": {
+            "enum": [
+              "territory_planning",
+              "alignment",
+              "mapping",
+              "routing",
+              "powerbi",
+              "d365",
+              "data_import",
+              "geocoding",
+              "map_component",
+              "mcp",
+              "other"
+            ],
+            "type": "string"
+          },
+          "FeedbackSeverityParam": {
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "blocking"
+            ],
+            "type": "string"
+          }
+        },
+        "properties": {
+          "category": {
+            "$ref": "#/$defs/FeedbackCategoryParam",
+            "default": "other"
+          },
+          "client_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Client Name"
+          },
+          "client_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Client Version"
+          },
+          "confidence": {
+            "$ref": "#/$defs/FeedbackConfidenceParam",
+            "default": "medium"
+          },
+          "context_summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Context Summary"
+          },
+          "correlation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Correlation Id"
+          },
+          "expected_capability": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Capability"
+          },
+          "include_context": {
+            "default": false,
+            "title": "Include Context",
+            "type": "boolean"
+          },
+          "related_product_area": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/FeedbackProductAreaParam"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "related_tool": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Related Tool"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Session Id"
+          },
+          "severity": {
+            "$ref": "#/$defs/FeedbackSeverityParam",
+            "default": "medium"
+          },
+          "suggested_improvement": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Suggested Improvement"
+          },
+          "user_goal": {
+            "title": "User Goal",
+            "type": "string"
+          },
+          "what_happened": {
+            "title": "What Happened",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_goal",
+          "what_happened"
+        ],
+        "title": "submit_feedbackArguments",
+        "type": "object"
+      },
+      "name": "submit_feedback",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "submit_feedbackDictOutput",
+        "type": "object"
+      },
+      "title": "Submit Feedback"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Query Territory Parts"
+      },
+      "description": "Returns attributes (no geometry) for parts of a part layer listed at ezt://part-layers. Takes exactly one of filter (e.g. {state_abbr: TX}) or part_ids; neither or both returns INVALID_REQUEST. Paged with page_token.",
+      "inputSchema": {
+        "properties": {
+          "filter": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Filter"
+          },
+          "max_results": {
+            "default": 100,
+            "title": "Max Results",
+            "type": "integer"
+          },
+          "page_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Page Token"
+          },
+          "part_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Part Ids"
+          },
+          "part_layer": {
+            "title": "Part Layer",
+            "type": "string"
+          }
+        },
+        "required": [
+          "part_layer"
+        ],
+        "title": "query_partsArguments",
+        "type": "object"
+      },
+      "name": "query_parts",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "query_partsDictOutput",
+        "type": "object"
+      },
+      "title": "Query Territory Parts"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Build Territories from Assignments"
+      },
+      "description": "Builds territories from known part-to-territory assignments (a ZIP-to-territory sheet or file, including a three-level region/district/territory hierarchy via territory_path) and adds them to the Territory Solution as a new alignment (TAL). Assignments come inline or as an assignments_handle (aup_...) from request_assignment_upload. Sheets with Postal Code plus Territory/Region/Division columns are mapped automatically. Duplicate part_ids follow duplicate_part_policy (default keep_first). Returns a task; the result carries tal_id and ts_handle and paints the open map. Location points load with ingest_accounts; balanced partitions come from auto_build; grouping by a column is account_build.",
+      "inputSchema": {
+        "properties": {
+          "assignments": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Assignments"
+          },
+          "assignments_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Assignments Handle"
+          },
+          "duplicate_part_policy": {
+            "default": "keep_first",
+            "title": "Duplicate Part Policy",
+            "type": "string"
+          },
+          "expected_revision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Revision"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "missing_part_policy": {
+            "default": "fail",
+            "title": "Missing Part Policy",
+            "type": "string"
+          },
+          "part_layer": {
+            "title": "Part Layer",
+            "type": "string"
+          },
+          "repair_policy": {
+            "default": "default",
+            "description": "Topology repair for dissolved territories. default fills interior holes in the dissolved geometry (no part is added or reassigned; repair_summary.changed_part_ids lists the territories' own parts). report_only detects holes and changes nothing (warning REPAIR_AVAILABLE). strict fails with REPAIR_REQUIRED when a hole is found.",
+            "enum": [
+              "default",
+              "strict",
+              "report_only"
+            ],
+            "title": "Repair Policy",
+            "type": "string"
+          },
+          "tal_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Tal Id"
+          },
+          "tal_label": {
+            "title": "Tal Label",
+            "type": "string"
+          },
+          "ts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          }
+        },
+        "required": [
+          "part_layer",
+          "tal_label"
+        ],
+        "title": "direct_buildArguments",
+        "type": "object"
+      },
+      "name": "direct_build",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "direct_buildDictOutput",
+        "type": "object"
+      },
+      "title": "Build Territories from Assignments"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Auto-Build Territories"
+      },
+      "description": "Partitions ingested account points into balanced sales territories with equal workload, metric, or count over a part layer (e.g. ZIPs) and adds them as a new alignment (TAL); existing alignments stay. Needs the user's choices: build_mode (fixed_territory_count + territory_count, fixed_workload_target + target_workload in hours, or scoped_split), objective (workload_bias for workload = drive time + dwell; metric + metric_bias for a column such as Revenue; biases sum to 100), and dwell_time (a column or a scalar the user states). Each missing choice returns CLARIFICATION_REQUIRED with the question in ask_user; a declared visit-frequency column also needs visit_frequency_field or ignore_visit_frequency. part_scope: bbox_intersect (default; parts near the accounts, can reach national scale) or explicit with part_filter, e.g. {state_abbr: TX}. With map_session_id the open map is the input; ts and ts_handle are not needed. Returns a task; the result carries tal_id, ts_handle, and shape figures (min_solidity, polsby_popper). analyze reports the statistics.",
+      "inputSchema": {
+        "properties": {
+          "build_mode": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Build Mode"
+          },
+          "dwell_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Dwell Time"
+          },
+          "expected_revision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Revision"
+          },
+          "ignore_visit_frequency": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ignore Visit Frequency"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "objective": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Objective"
+          },
+          "output_mode": {
+            "default": "tal",
+            "description": "tal is the default. assignments returns assignments_artifact plus an authenticated download_url; no ts_handle, tal_id, or map_refresh.",
+            "enum": [
+              "tal",
+              "assignments"
+            ],
+            "title": "Output Mode",
+            "type": "string"
+          },
+          "part_filter": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Part Filter"
+          },
+          "part_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Part Ids"
+          },
+          "part_layer": {
+            "title": "Part Layer",
+            "type": "string"
+          },
+          "part_scope": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Part Scope"
+          },
+          "point_layer": {
+            "title": "Point Layer",
+            "type": "string"
+          },
+          "repair_policy": {
+            "default": "default",
+            "description": "Topology repair for dissolved territories. default fills interior holes in the dissolved geometry (no part is added or reassigned; repair_summary.changed_part_ids lists the territories' own parts). report_only detects holes and changes nothing (warning REPAIR_AVAILABLE). strict fails with REPAIR_REQUIRED when a hole is found.",
+            "enum": [
+              "default",
+              "strict",
+              "report_only"
+            ],
+            "title": "Repair Policy",
+            "type": "string"
+          },
+          "tal_label": {
+            "title": "Tal Label",
+            "type": "string"
+          },
+          "ts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          },
+          "visit_frequency_field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Visit Frequency Field"
+          }
+        },
+        "required": [
+          "point_layer",
+          "part_layer",
+          "tal_label"
+        ],
+        "title": "auto_buildArguments",
+        "type": "object"
+      },
+      "name": "auto_build",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "auto_buildDictOutput",
+        "type": "object"
+      },
+      "title": "Auto-Build Territories"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Cluster Points"
+      },
+      "description": "Groups the points of one ingested layer into balanced clusters directly, with no ZIP or part layer and no territory alignment. Writes group_field (default group_id) on every point and colors the layer by it, replacing any prior color classification (size and shape channels stay). Needs build_mode (fixed_territory_count or fixed_workload_target), objective, and dwell_time, as in auto_build; a missing one returns CLARIFICATION_REQUIRED with the question. point_filter (e.g. {STATE: FL}) clusters a subset of the layer; unmatched points stay, ungrouped. Max 10,000 points after the filter. seed_point_layer, a second point layer such as technician homes, anchors one group per seed (the seed count matches the group count, else seed_count_mismatch); seed_attraction 0-100 (default 70) is the pull of each seed on its group. Returns a task; the result lists groups with point_count, workload_hours, and point_ids.",
+      "inputSchema": {
+        "properties": {
+          "build_mode": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Build Mode"
+          },
+          "dwell_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Dwell Time"
+          },
+          "expected_revision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Revision"
+          },
+          "group_field": {
+            "default": "group_id",
+            "title": "Group Field",
+            "type": "string"
+          },
+          "group_label_prefix": {
+            "default": "Group",
+            "title": "Group Label Prefix",
+            "type": "string"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "metric_fields": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Metric Fields"
+          },
+          "objective": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Objective"
+          },
+          "point_filter": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Point Filter"
+          },
+          "point_layer": {
+            "title": "Point Layer",
+            "type": "string"
+          },
+          "seed_attraction": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Seed Attraction"
+          },
+          "seed_point_layer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Seed Point Layer"
+          },
+          "ts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          },
+          "visit_frequency_field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Visit Frequency Field"
+          }
+        },
+        "required": [
+          "point_layer"
+        ],
+        "title": "cluster_pointsArguments",
+        "type": "object"
+      },
+      "name": "cluster_points",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "cluster_pointsDictOutput",
+        "type": "object"
+      },
+      "title": "Cluster Points"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Schedule Visits"
+      },
+      "description": "Schedules recurring visits: expands each account's cadence (e.g. every 7 days, twice a month) across a horizon and packs the visits into daily work clusters (buckets) under a technician-day cap. Decides which day each visit happens (auto_build and cluster_points divide accounts among people instead); creates no alignment and assigns no technician. Needs point_layer (ingested, with the cadence column declared, else UNDECLARED_FIELD), visit_frequency_field, dwell_time, and daily_capacity (e.g. {mode: not_to_exceed, hours: 8}); missing dwell or capacity returns CLARIFICATION_REQUIRED with the question. frequency_unit: interval_days (max days between visits) or visits_per_horizon. never_visit_values (default 0, null, empty) are excluded and listed in excluded_accounts. bucket_workload_hours is in-bucket drive plus dwell, a different measure from territory workload and route_workload_hours. The same visit_layer_name replaces a schedule; a new name adds one. Returns a task. calculate_route over one bucket_id drives that day.",
+      "inputSchema": {
+        "properties": {
+          "cadence_flexibility_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cadence Flexibility Pct"
+          },
+          "daily_capacity": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Daily Capacity"
+          },
+          "dwell_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Dwell Time"
+          },
+          "emit_visit_layer": {
+            "default": true,
+            "title": "Emit Visit Layer",
+            "type": "boolean"
+          },
+          "expected_revision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Revision"
+          },
+          "frequency_unit": {
+            "default": "interval_days",
+            "title": "Frequency Unit",
+            "type": "string"
+          },
+          "horizon": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Horizon"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "max_buckets_per_day": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Max Buckets Per Day"
+          },
+          "never_visit_values": {
+            "anyOf": [
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Never Visit Values"
+          },
+          "objective": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Objective"
+          },
+          "point_layer": {
+            "title": "Point Layer",
+            "type": "string"
+          },
+          "schedule_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Schedule Label"
+          },
+          "ts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          },
+          "visit_frequency_field": {
+            "title": "Visit Frequency Field",
+            "type": "string"
+          },
+          "visit_layer_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Visit Layer Name"
+          }
+        },
+        "required": [
+          "point_layer",
+          "visit_frequency_field"
+        ],
+        "title": "schedule_visitsArguments",
+        "type": "object"
+      },
+      "name": "schedule_visits",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "schedule_visitsDictOutput",
+        "type": "object"
+      },
+      "title": "Schedule Visits"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Build Territories by Account Field"
+      },
+      "description": "Builds territories that follow an account column, such as rep name or territory code from CRM: each part goes to the group holding most of its accounts (conflict_policy). Adds a new alignment (TAL). Needs an ingested point_layer, grouping_field, part_layer, and tal_label. Grouping values are labels, not balance metrics. part_scope: bbox_intersect (default; parts near the accounts) or explicit with part_filter, e.g. {state_abbr: TX}. A declared visit-frequency column needs visit_frequency_field or ignore_visit_frequency (CLARIFICATION_REQUIRED otherwise). With map_session_id the open map is the input. Returns a task; the result carries tal_id and ts_handle. analyze reports the statistics.",
+      "inputSchema": {
+        "properties": {
+          "conflict_policy": {
+            "default": "plurality_account_count",
+            "title": "Conflict Policy",
+            "type": "string"
+          },
+          "expected_revision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Revision"
+          },
+          "grouping_field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Grouping Field"
+          },
+          "ignore_visit_frequency": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ignore Visit Frequency"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "output_mode": {
+            "default": "tal",
+            "description": "tal is the default. assignments returns assignments_artifact plus an authenticated download_url; no ts_handle, tal_id, or map_refresh.",
+            "enum": [
+              "tal",
+              "assignments"
+            ],
+            "title": "Output Mode",
+            "type": "string"
+          },
+          "part_filter": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Part Filter"
+          },
+          "part_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Part Ids"
+          },
+          "part_layer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Part Layer"
+          },
+          "part_scope": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Part Scope"
+          },
+          "point_layer": {
+            "title": "Point Layer",
+            "type": "string"
+          },
+          "repair_policy": {
+            "default": "default",
+            "description": "Topology repair for dissolved territories. default fills interior holes in the dissolved geometry (no part is added or reassigned; repair_summary.changed_part_ids lists the territories' own parts). report_only detects holes and changes nothing (warning REPAIR_AVAILABLE). strict fails with REPAIR_REQUIRED when a hole is found.",
+            "enum": [
+              "default",
+              "strict",
+              "report_only"
+            ],
+            "title": "Repair Policy",
+            "type": "string"
+          },
+          "tal_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Tal Label"
+          },
+          "ts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          },
+          "visit_frequency_field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Visit Frequency Field"
+          }
+        },
+        "required": [
+          "point_layer"
+        ],
+        "title": "account_buildArguments",
+        "type": "object"
+      },
+      "name": "account_build",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "account_buildDictOutput",
+        "type": "object"
+      },
+      "title": "Build Territories by Account Field"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Realign Parts"
+      },
+      "description": "Moves ZIPs or other parts (typed ids or ones selected on the map) from one territory into another within one alignment (tal_id): a ZIP move. moves=[{part_id, to_territory_id}], or realign_operation with part_ids. The Territory Solution comes from map_session_id (the open map), ts_handle, or ts; expected_revision adds optimistic concurrency (STALE_TS_REVISION when the map changed). to_territory_id is a leaf territory_id or that leaf's exact, unique display name; an unknown or ambiguous value returns UNKNOWN_TERRITORY_ID or AMBIGUOUS_TERRITORY with available_leaf_territories. A committed map selection is read with get_map_selection; request_part_selection lets the person pick parts on the map. remove_empty_territories drops leaves left with no parts. Returns a task; the open map repaints. analyze refreshes statistics when the map has account points.",
+      "inputSchema": {
+        "properties": {
+          "expected_revision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Revision"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "moves": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Moves"
+          },
+          "part_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Part Ids"
+          },
+          "part_layer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Part Layer"
+          },
+          "realign_operation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Realign Operation"
+          },
+          "remove_empty_territories": {
+            "default": false,
+            "title": "Remove Empty Territories",
+            "type": "boolean"
+          },
+          "repair_policy": {
+            "default": "default",
+            "description": "Topology repair for dissolved territories. default fills interior holes in the dissolved geometry (no part is added or reassigned; repair_summary.changed_part_ids lists the territories' own parts). report_only detects holes and changes nothing (warning REPAIR_AVAILABLE). strict fails with REPAIR_REQUIRED when a hole is found.",
+            "enum": [
+              "default",
+              "strict",
+              "report_only"
+            ],
+            "title": "Repair Policy",
+            "type": "string"
+          },
+          "tal_id": {
+            "title": "Tal Id",
+            "type": "string"
+          },
+          "ts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          }
+        },
+        "required": [
+          "tal_id"
+        ],
+        "title": "realignArguments",
+        "type": "object"
+      },
+      "name": "realign",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "realignDictOutput",
+        "type": "object"
+      },
+      "title": "Realign Parts"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Delete Alignment"
+      },
+      "description": "Deletes one whole territory alignment (TAL: 'the territory layer', 'all territories') from the Territory Solution and the open map, in one synchronous call. Needs tal_id or the TAL's exact unique label, plus map_session_id or ts_handle. Points, part-layer overlays, and routes stay; the map switches to a remaining alignment or to points only. A TAL that is already gone returns ok with already_absent=true; an ambiguous label returns AMBIGUOUS_TAL. One territory is removed with delete_territory instead.",
+      "inputSchema": {
+        "properties": {
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "tal_id": {
+            "title": "Tal Id",
+            "type": "string"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          }
+        },
+        "required": [
+          "tal_id"
+        ],
+        "title": "delete_talArguments",
+        "type": "object"
+      },
+      "name": "delete_tal",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "delete_talDictOutput",
+        "type": "object"
+      },
+      "title": "Delete Alignment"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Delete Territory"
+      },
+      "description": "Deletes one leaf territory from an alignment; its parts become unassigned. Needs tal_id, territory_id (the leaf id or its exact unique display name), and the Territory Solution from map_session_id, ts_handle, or ts. A territory that is already gone returns ok with already_absent=true and no task; otherwise returns a task and the open map repaints. Related: territory_merge hands a leaving rep's territory to its neighbors; delete_tal removes a whole alignment in one call.",
+      "inputSchema": {
+        "properties": {
+          "expected_revision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Revision"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "part_layer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Part Layer"
+          },
+          "repair_policy": {
+            "default": "default",
+            "description": "Topology repair for dissolved territories. default fills interior holes in the dissolved geometry (no part is added or reassigned; repair_summary.changed_part_ids lists the territories' own parts). report_only detects holes and changes nothing (warning REPAIR_AVAILABLE). strict fails with REPAIR_REQUIRED when a hole is found.",
+            "enum": [
+              "default",
+              "strict",
+              "report_only"
+            ],
+            "title": "Repair Policy",
+            "type": "string"
+          },
+          "tal_id": {
+            "title": "Tal Id",
+            "type": "string"
+          },
+          "territory_id": {
+            "title": "Territory Id",
+            "type": "string"
+          },
+          "ts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          }
+        },
+        "required": [
+          "tal_id",
+          "territory_id"
+        ],
+        "title": "delete_territoryArguments",
+        "type": "object"
+      },
+      "name": "delete_territory",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "delete_territoryDictOutput",
+        "type": "object"
+      },
+      "title": "Delete Territory"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Split Territory"
+      },
+      "description": "Territory split: divides one territory (e.g. an oversized one) into two while changing the rest of the alignment as little as possible (N to N+1 territories). Needs source_tal_id and target_territory_id, plus the Territory Solution from map_session_id (the open map), ts_handle, or ts. Workload balance needs dwell_time; a missing id or dwell returns CLARIFICATION_REQUIRED with the question. Writes a new derived alignment; the source stays. Returns a task; the result carries disruption_summary (retention_pct).",
+      "inputSchema": {
+        "properties": {
+          "balance_tolerance": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Balance Tolerance"
+          },
+          "disruption_weight": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Disruption Weight"
+          },
+          "dwell_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Dwell Time"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "new_tal_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "New Tal Label"
+          },
+          "new_territory_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "New Territory Label"
+          },
+          "objective": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Objective"
+          },
+          "part_layer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Part Layer"
+          },
+          "point_layer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Point Layer"
+          },
+          "repair_policy": {
+            "default": "default",
+            "description": "Topology repair for dissolved territories. default fills interior holes in the dissolved geometry (no part is added or reassigned; repair_summary.changed_part_ids lists the territories' own parts). report_only detects holes and changes nothing (warning REPAIR_AVAILABLE). strict fails with REPAIR_REQUIRED when a hole is found.",
+            "enum": [
+              "default",
+              "strict",
+              "report_only"
+            ],
+            "title": "Repair Policy",
+            "type": "string"
+          },
+          "source_tal_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Source Tal Id"
+          },
+          "target_territory_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Target Territory Id"
+          },
+          "ts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          },
+          "visit_frequency_field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Visit Frequency Field"
+          }
+        },
+        "title": "territory_splitArguments",
+        "type": "object"
+      },
+      "name": "territory_split",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "territory_splitDictOutput",
+        "type": "object"
+      },
+      "title": "Split Territory"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Merge Territories"
+      },
+      "description": "Merges a pair of adjacent territories and rebalances the rest of the alignment with minimal disruption (N to N-1 territories), e.g. when a rep leaves and the neighbors absorb the territory. territory_id_b is the territory that goes away; territory_id_a is an adjacent neighbor that keeps its id. The same job rebalances every remaining territory. One call removes one territory; non-adjacent ids return NON_ADJACENT_TERRITORIES. Needs source_tal_id and the Territory Solution from map_session_id, ts_handle, or ts; workload balance needs dwell_time (CLARIFICATION_REQUIRED otherwise). Writes a new derived alignment. Returns a task.",
+      "inputSchema": {
+        "properties": {
+          "balance_tolerance": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Balance Tolerance"
+          },
+          "disruption_weight": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Disruption Weight"
+          },
+          "dwell_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Dwell Time"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "new_tal_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "New Tal Label"
+          },
+          "objective": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Objective"
+          },
+          "part_layer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Part Layer"
+          },
+          "point_layer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Point Layer"
+          },
+          "repair_policy": {
+            "default": "default",
+            "description": "Topology repair for dissolved territories. default fills interior holes in the dissolved geometry (no part is added or reassigned; repair_summary.changed_part_ids lists the territories' own parts). report_only detects holes and changes nothing (warning REPAIR_AVAILABLE). strict fails with REPAIR_REQUIRED when a hole is found.",
+            "enum": [
+              "default",
+              "strict",
+              "report_only"
+            ],
+            "title": "Repair Policy",
+            "type": "string"
+          },
+          "source_tal_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Source Tal Id"
+          },
+          "territory_id_a": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Territory Id A"
+          },
+          "territory_id_b": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Territory Id B"
+          },
+          "ts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          },
+          "visit_frequency_field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Visit Frequency Field"
+          }
+        },
+        "title": "territory_mergeArguments",
+        "type": "object"
+      },
+      "name": "territory_merge",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "territory_mergeDictOutput",
+        "type": "object"
+      },
+      "title": "Merge Territories"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Rebalance Territories"
+      },
+      "description": "Rebalances an existing alignment after the account data changed, keeping it as close to the current alignment as possible. Needs source_tal_id and the Territory Solution from map_session_id, ts_handle, or ts. point_layer defaults to the alignment's build layer or the only point layer; otherwise CLARIFICATION_REQUIRED (ambiguous_point_layer, with details.point_layers). Workload balance needs dwell_time; zero_workload means no account maps to a part. The current alignment is the baseline: when nothing improves the objective the result is NO_IMPROVING_REBALANCE_FOUND and nothing changes. Writes a new derived alignment. Returns a task with retention_pct and solver_diagnostics.",
+      "inputSchema": {
+        "properties": {
+          "balance_tolerance": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Balance Tolerance"
+          },
+          "disruption_weight": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Disruption Weight"
+          },
+          "dwell_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Dwell Time"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "new_tal_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "New Tal Label"
+          },
+          "objective": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Objective"
+          },
+          "part_layer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Part Layer"
+          },
+          "point_layer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Point Layer"
+          },
+          "repair_policy": {
+            "default": "default",
+            "description": "Topology repair for dissolved territories. default fills interior holes in the dissolved geometry (no part is added or reassigned; repair_summary.changed_part_ids lists the territories' own parts). report_only detects holes and changes nothing (warning REPAIR_AVAILABLE). strict fails with REPAIR_REQUIRED when a hole is found.",
+            "enum": [
+              "default",
+              "strict",
+              "report_only"
+            ],
+            "title": "Repair Policy",
+            "type": "string"
+          },
+          "source_tal_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Source Tal Id"
+          },
+          "ts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          },
+          "visit_frequency_field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Visit Frequency Field"
+          }
+        },
+        "title": "territory_rebalanceArguments",
+        "type": "object"
+      },
+      "name": "territory_rebalance",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "territory_rebalanceDictOutput",
+        "type": "object"
+      },
+      "title": "Rebalance Territories"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Extract Alignment Branch"
+      },
+      "description": "Extracts one regional branch of a hierarchical alignment (by branch_rollup_territory_id or branch_territory_path) into its own Territory Solution, so a delegate can edit just that region. Returns the extract plus branch_metadata, which reintegrate_branch needs later. exclude_locked (default true) leaves locked territories out.",
+      "inputSchema": {
+        "properties": {
+          "branch_rollup_territory_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Branch Rollup Territory Id"
+          },
+          "branch_territory_path": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Branch Territory Path"
+          },
+          "delegate_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Delegate Ref"
+          },
+          "exclude_locked": {
+            "default": true,
+            "title": "Exclude Locked",
+            "type": "boolean"
+          },
+          "expected_content_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Content Hash"
+          },
+          "expected_revision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Revision"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "tal_id": {
+            "title": "Tal Id",
+            "type": "string"
+          },
+          "ts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          }
+        },
+        "required": [
+          "tal_id"
+        ],
+        "title": "extract_tal_branchArguments",
+        "type": "object"
+      },
+      "name": "extract_tal_branch",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "extract_tal_branchDictOutput",
+        "type": "object"
+      },
+      "title": "Extract Alignment Branch"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Reintegrate Alignment Branch"
+      },
+      "description": "Merges an edited branch (proposal Territory Solution from extract_tal_branch) back into the master. Needs branch_metadata and expected_master_revision; returns STALE_TS_REVISION when the master changed since the extract, in which case a fresh extract is needed. Merges apply one at a time.",
+      "inputSchema": {
+        "properties": {
+          "branch_metadata": {
+            "additionalProperties": true,
+            "title": "Branch Metadata",
+            "type": "object"
+          },
+          "expected_master_content_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Master Content Hash"
+          },
+          "expected_master_revision": {
+            "title": "Expected Master Revision",
+            "type": "integer"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "master_ts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Master Ts"
+          },
+          "master_ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Master Ts Handle"
+          },
+          "proposal_ts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Proposal Ts"
+          },
+          "proposal_ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Proposal Ts Handle"
+          }
+        },
+        "required": [
+          "expected_master_revision",
+          "branch_metadata"
+        ],
+        "title": "reintegrate_branchArguments",
+        "type": "object"
+      },
+      "name": "reintegrate_branch",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "reintegrate_branchDictOutput",
+        "type": "object"
+      },
+      "title": "Reintegrate Alignment Branch"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://easyterritory/map-viewer"
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Request Part Selection"
+      },
+      "description": "Lets the person adjust boundaries by picking parts (e.g. ZIPs) on the map: puts the open map into select mode on a part_layer, for purpose realign, a new territory, or a plain list. Returns selection_task_id; get_part_selection reports status (awaiting_user_selection, then committed, expired, or cancelled) and the committed part_ids, and its response carries recommended_poll_delay_ms. The commit happens on the map, not in chat. destination_territory_id and realign_operation pre-set a realign. Works on the in-chat map and the map_url tab. A selection the person started from the map legend is read with get_map_selection.",
+      "inputSchema": {
+        "properties": {
+          "active_tal_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Active Tal Id"
+          },
+          "destination_territory_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Destination Territory Id"
+          },
+          "expiry_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expiry Seconds"
+          },
+          "new_territory": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "New Territory"
+          },
+          "part_layer": {
+            "title": "Part Layer",
+            "type": "string"
+          },
+          "prompt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Prompt"
+          },
+          "purpose": {
+            "default": "generic",
+            "title": "Purpose",
+            "type": "string"
+          },
+          "realign_operation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Realign Operation"
+          },
+          "remove_empty_territories": {
+            "default": false,
+            "title": "Remove Empty Territories",
+            "type": "boolean"
+          },
+          "ts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "User Id"
+          }
+        },
+        "required": [
+          "part_layer"
+        ],
+        "title": "request_part_selectionArguments",
+        "type": "object"
+      },
+      "name": "request_part_selection",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "request_part_selectionDictOutput",
+        "type": "object"
+      },
+      "title": "Request Part Selection"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Part Selection"
+      },
+      "description": "Returns the state of a map selection task (selection_task_id from request_part_selection, or active_selection_task_id in ezt://map-sessions/{id}/state): status awaiting_user_selection, committed, expired, or cancelled, and once committed the selected part_ids (with assigned and unassigned part_ids when a TAL is active). While awaiting, the response carries recommended_poll_delay_ms. Committed part_ids feed realign, create_territory_from_parts, or analyze.",
+      "inputSchema": {
+        "properties": {
+          "selection_task_id": {
+            "title": "Selection Task Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "selection_task_id"
+        ],
+        "title": "get_part_selectionArguments",
+        "type": "object"
+      },
+      "name": "get_part_selection",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "get_part_selectionDictOutput",
+        "type": "object"
+      },
+      "title": "Get Part Selection"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Create Territory from Parts"
+      },
+      "description": "Creates one leaf territory from a list of part_ids (e.g. a committed map selection), in a new alignment or an existing one (tal_id). With map_session_id the live map's Territory Solution is updated and repainted; otherwise ts_handle (a new ts_handle is returned). map_session_id wins when both are passed. territory_name is a display label; the result's created_territory.territory_id is the stable id for later edits, plus leaf_territories and selection_summary (duplicate_part_ids). Dwell is optional here and is not inherited from an earlier auto_build; dwell_time is recorded for later analyze. Without it, analyze reports every statistic except workload and returns workload_omitted.ask_user. Returns a task.",
+      "inputSchema": {
+        "properties": {
+          "conflict_policy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Conflict Policy"
+          },
+          "dwell_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Dwell Time"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "part_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Part Ids",
+            "type": "array"
+          },
+          "part_layer": {
+            "title": "Part Layer",
+            "type": "string"
+          },
+          "tal_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Tal Id"
+          },
+          "territory_name": {
+            "title": "Territory Name",
+            "type": "string"
+          },
+          "territory_path": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Territory Path"
+          },
+          "ts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          }
+        },
+        "required": [
+          "part_layer",
+          "part_ids",
+          "territory_name"
+        ],
+        "title": "create_territory_from_partsArguments",
+        "type": "object"
+      },
+      "name": "create_territory_from_parts",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "create_territory_from_partsDictOutput",
+        "type": "object"
+      },
+      "title": "Create Territory from Parts"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Analyze Territories"
+      },
+      "description": "Computes territory statistics for one or more alignments, i.e. how balanced the territories are and how alignments compare: account counts, declared metric totals (e.g. Revenue), workload hours, balance scores, and cross-TAL comparison; hypothetical_moves previews a realign. Input: map_session_id (the open map as it is now), ts_handle, ts, or a completed build job_id (pass tal_ids when several TALs exist). metrics: omit for every declared column, or name them; workload and account_count are always available. Workload needs dwell (dwell_time, the build's recorded dwell, or the layer's dwell_time_field); without it the result has every other statistic, no workload, and workload_omitted.ask_user, the question for the user. analysis_panel=single with map_session_id fills the map's analysis dock (analysis_panel.status=pushed). territories[].workload_total is minutes; hours are in territory_metric_grids. Drive-time alignments count accounts inside each polygon. Returns a task.",
+      "inputSchema": {
+        "properties": {
+          "analysis_panel": {
+            "anyOf": [
+              {
+                "description": "single fills the open map's analysis dock with this result (needs map_session_id). The dock shows one alignment at a time: with several tal_ids each TAL gets its own dock entry and the dock follows the map's active TAL. comparison_slot does the same and also returns cross_tal_comparison. none or omitted pushes nothing.",
+                "enum": [
+                  "none",
+                  "single",
+                  "comparison_slot"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Analysis Panel"
+          },
+          "compare_tals": {
+            "default": false,
+            "title": "Compare Tals",
+            "type": "boolean"
+          },
+          "dwell_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Dwell Time"
+          },
+          "hypothetical_moves": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Hypothetical Moves"
+          },
+          "job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Job Id"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "max_depth": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Max Depth"
+          },
+          "metrics": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Metrics"
+          },
+          "part_layer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Part Layer"
+          },
+          "scope": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Scope"
+          },
+          "tal_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Tal Ids"
+          },
+          "ts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          },
+          "visit_frequency_field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Visit Frequency Field"
+          }
+        },
+        "title": "analyzeArguments",
+        "type": "object"
+      },
+      "name": "analyze",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "analyzeDictOutput",
+        "type": "object"
+      },
+      "title": "Analyze Territories"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Ingest Accounts"
+      },
+      "description": "Account ingest: loads account or location rows (CRM records, a CSV, a spreadsheet) as point data on a named point layer of the Territory Solution, to add them to the map, geocoding rows that lack coordinates. Rows come inline (rows) or as accounts_handle from request_account_upload, which handles large files; a client file path is not readable by the server. Coordinate headers latitude/lat and longitude/lon/lng pass through; other names need latitude_field/longitude_field, and unused coordinate-like columns return CLARIFICATION_REQUIRED (needs_coordinate_fields) instead of a bulk geocode. id_field is a unique key (default row_id, synthesized when absent); duplicates return needs_unique_row_id. Only declared columns are kept: metric_fields, workload_fields, dwell_time_field, visit_frequency_field, grouping_fields, display_fields, search_fields; later use of an undeclared column returns UNDECLARED_FIELD. Returns a task; the result reports failed_rows, map_refresh, and any geocode quota shortfall.",
+      "inputSchema": {
+        "properties": {
+          "accept_suboptimal_geocodes": {
+            "default": true,
+            "title": "Accept Suboptimal Geocodes",
+            "type": "boolean"
+          },
+          "accounts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Accounts Handle"
+          },
+          "country_hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Country Hint"
+          },
+          "display_fields": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Display Fields"
+          },
+          "dwell_time_field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Dwell Time Field"
+          },
+          "force_regeocode": {
+            "default": false,
+            "title": "Force Regeocode",
+            "type": "boolean"
+          },
+          "grouping_fields": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Grouping Fields"
+          },
+          "id_field": {
+            "default": "row_id",
+            "title": "Id Field",
+            "type": "string"
+          },
+          "label": {
+            "default": "Accounts",
+            "title": "Label",
+            "type": "string"
+          },
+          "label_field": {
+            "default": "label",
+            "title": "Label Field",
+            "type": "string"
+          },
+          "latitude_field": {
+            "default": "latitude",
+            "title": "Latitude Field",
+            "type": "string"
+          },
+          "longitude_field": {
+            "default": "longitude",
+            "title": "Longitude Field",
+            "type": "string"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "metric_fields": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Metric Fields"
+          },
+          "min_confidence": {
+            "default": 0.0,
+            "title": "Min Confidence",
+            "type": "number"
+          },
+          "point_layer": {
+            "default": "accounts",
+            "title": "Point Layer",
+            "type": "string"
+          },
+          "region_hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Region Hint"
+          },
+          "rows": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Rows"
+          },
+          "search_fields": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Search Fields"
+          },
+          "ts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          },
+          "use_cache": {
+            "default": true,
+            "title": "Use Cache",
+            "type": "boolean"
+          },
+          "visit_frequency_field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Visit Frequency Field"
+          },
+          "workload_fields": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Workload Fields"
+          }
+        },
+        "title": "ingest_accountsArguments",
+        "type": "object"
+      },
+      "name": "ingest_accounts",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "ingest_accountsDictOutput",
+        "type": "object"
+      },
+      "title": "Ingest Accounts"
+    },
+    {
+      "_meta": {
+        "openai/fileParams": [
+          "csv_file"
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Request Account Upload"
+      },
+      "description": "Stages account rows for ingest_accounts and returns upload_handle, csv_headers, and suggested_ingest args with a geocode_plan. Four ways in: POST the CSV file to the returned upload_url (no API key; expires in 15 minutes; fastest for large files), csv_file (a host file parameter), csv_text (raw CSV, up to 16 MB, newlines preserved), or rows chunks appended with upload_handle. A local path in csv_file returns UNREADABLE_FILE_REFERENCE; an expired URL returns UPLOAD_TOKEN_EXPIRED and a call with upload_handle issues a new one. The handle is single-use (claimed by ingest_accounts) and expires after 1 hour by default.",
+      "inputSchema": {
+        "properties": {
+          "csv_file": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Csv File"
+          },
+          "csv_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Csv Text"
+          },
+          "rows": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Rows"
+          },
+          "ttl_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ttl Seconds"
+          },
+          "upload_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Upload Handle"
+          }
+        },
+        "title": "request_account_uploadArguments",
+        "type": "object"
+      },
+      "name": "request_account_upload",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "request_account_uploadDictOutput",
+        "type": "object"
+      },
+      "title": "Request Account Upload"
+    },
+    {
+      "_meta": {
+        "openai/fileParams": [
+          "csv_file"
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Request Assignment Upload"
+      },
+      "description": "Stages part-to-territory assignment rows (e.g. a ZIP-to-territory spreadsheet with Postal Code plus Territory/Region/Division) for direct_build and returns upload_handle. Same four ways in as request_account_upload: POST the file to upload_url (no API key; 15 minutes), csv_file, csv_text (newlines preserved), or assignment chunks appended with upload_handle. Legacy columns map to part_id and territory_path automatically. A file of locations rather than assignments is redirected to request_account_upload. The handle is single-use and expires after 1 hour by default.",
+      "inputSchema": {
+        "properties": {
+          "assignments": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Assignments"
+          },
+          "csv_file": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Csv File"
+          },
+          "csv_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Csv Text"
+          },
+          "ttl_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ttl Seconds"
+          },
+          "upload_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Upload Handle"
+          }
+        },
+        "title": "request_assignment_uploadArguments",
+        "type": "object"
+      },
+      "name": "request_assignment_upload",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "request_assignment_uploadDictOutput",
+        "type": "object"
+      },
+      "title": "Request Assignment Upload"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Geocode Addresses"
+      },
+      "description": "Geocodes a list of customer addresses to coordinates with match confidence, without loading them as a point layer. Accepts address/address_line1/street, city, state, and postal columns (common CRM headers are mapped). accept_suboptimal_geocodes=true accepts ZIP-centroid matches. Cached addresses are free; billable lookups count against a monthly per-key quota, and past it the result is PROVIDER_QUOTA_EXCEEDED with limit, used, remaining, and period_resets_at. Returns geocoded_rows, which ingest_accounts can load. ingest_accounts also geocodes on its own.",
+      "inputSchema": {
+        "properties": {
+          "accept_suboptimal_geocodes": {
+            "default": false,
+            "title": "Accept Suboptimal Geocodes",
+            "type": "boolean"
+          },
+          "country_hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Country Hint"
+          },
+          "force_regeocode": {
+            "default": false,
+            "title": "Force Regeocode",
+            "type": "boolean"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "min_confidence": {
+            "default": 0.0,
+            "title": "Min Confidence",
+            "type": "number"
+          },
+          "region_hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Region Hint"
+          },
+          "rows": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "use_cache": {
+            "default": true,
+            "title": "Use Cache",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "rows"
+        ],
+        "title": "geocode_addressArguments",
+        "type": "object"
+      },
+      "name": "geocode_address",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "geocode_addressDictOutput",
+        "type": "object"
+      },
+      "title": "Geocode Addresses"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Calculate Route"
+      },
+      "description": "Sequences and drives a set of stops, e.g. a technician from home to the depot, then the day's calls, and back home: returns the order, road distance, drive time, per-leg timings, and geometry from TomTom or Azure Maps, and draws the path with numbered stops on the open map (map_session_id). Creates no territory and changes no assignment. route_type is the user's choice: circuit (returns to start), tour (ends at the required end stop), or open_tour (one way). stop_sets are visited in the order given and no stop moves between sets; order is optimize or as_given; group_by_field adds priority bands. Stops are inline coordinates or point-layer references (e.g. source.filter.territory_id). A new route_id adds a second route; recalculating an existing route_id replaces it, e.g. to drop a stop. dwell_time is stored for analyze_routes. Route drive time is a different measure from territory workload. No provider key returns ROUTING_NOT_CONFIGURED; past the monthly quota, PROVIDER_QUOTA_EXCEEDED. Returns a task.",
+      "inputSchema": {
+        "properties": {
+          "depart_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Depart At"
+          },
+          "dwell_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Dwell Time"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "End"
+          },
+          "include_geometry": {
+            "default": true,
+            "title": "Include Geometry",
+            "type": "boolean"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "route_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Route Id"
+          },
+          "route_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Route Label"
+          },
+          "route_type": {
+            "title": "Route Type",
+            "type": "string"
+          },
+          "start": {
+            "additionalProperties": true,
+            "title": "Start",
+            "type": "object"
+          },
+          "stop_sets": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Stop Sets",
+            "type": "array"
+          },
+          "travel_mode": {
+            "default": "car",
+            "title": "Travel Mode",
+            "type": "string"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          }
+        },
+        "required": [
+          "route_type",
+          "start",
+          "stop_sets"
+        ],
+        "title": "calculate_routeArguments",
+        "type": "object"
+      },
+      "name": "calculate_route",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "calculate_routeDictOutput",
+        "type": "object"
+      },
+      "title": "Calculate Route"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Build Drive-Time Area"
+      },
+      "description": "Draws the area reachable by driving from one or more origins within a time or distance budget (drive-time area, service area, catchment) and adds each area as a territory in a drive-time alignment. origins: inline {latitude, longitude} or a point-layer reference. bands: [{time_budget_seconds} or {distance_budget_meters}], one unit per call (MIXED_BUDGET_TYPES otherwise); one band gives one area per origin, several give nested areas. Limits: 25 origins, 5 bands, 6 hours, 500 km; travel_mode car or truck; depart_at supported. Areas are the provider polygons and may overlap; analyze counts accounts in every area containing them. realign/split/merge/rebalance return ISOCHRONE_TAL_NOT_EDITABLE. A band budget is not territory workload or route time. No provider key returns ISOCHRONE_NOT_CONFIGURED; the full call count is checked against the monthly quota first (PROVIDER_QUOTA_EXCEEDED). Returns a task.",
+      "inputSchema": {
+        "properties": {
+          "avoid": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Avoid"
+          },
+          "bands": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Bands",
+            "type": "array"
+          },
+          "depart_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Depart At"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "origins": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Origins",
+            "type": "array"
+          },
+          "route_type": {
+            "default": "fastest",
+            "title": "Route Type",
+            "type": "string"
+          },
+          "tal_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Tal Id"
+          },
+          "tal_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Tal Label"
+          },
+          "traffic": {
+            "default": true,
+            "title": "Traffic",
+            "type": "boolean"
+          },
+          "travel_mode": {
+            "default": "car",
+            "title": "Travel Mode",
+            "type": "string"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          }
+        },
+        "required": [
+          "origins",
+          "bands"
+        ],
+        "title": "isochrone_buildArguments",
+        "type": "object"
+      },
+      "name": "isochrone_build",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "isochrone_buildDictOutput",
+        "type": "object"
+      },
+      "title": "Build Drive-Time Area"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Grow Territory from Seed"
+      },
+      "description": "Grows one territory outward from a seed {longitude, latitude} over a part layer until it holds a target: {type: location_count, value: N} or {type: metric_sum, field: <declared metric>, value: X}, counted from an ingested point layer. Adds the territory as a leaf of tal_id, or as a new alignment. Fit is closest: target_status is reached, closest_under, closest_over, frontier_exhausted, or max_parts_reached, with SEED_TARGET_UNDERSHOT/OVERSHOT warnings and the difference. Parts already in that alignment are never taken; the territory grows around them (blocked_part_count, seed_offset_km), and a seed inside an assigned part returns SEED_PART_ASSIGNED. part_scope=explicit with part_filter confines growth to an area. One seed per call. An undeclared metric field returns UNDECLARED_FIELD. Returns a task with created_territory and ts_handle; the open map repaints with map_session_id.",
+      "inputSchema": {
+        "properties": {
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "max_parts": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Max Parts"
+          },
+          "part_filter": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Part Filter"
+          },
+          "part_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Part Ids"
+          },
+          "part_layer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Part Layer"
+          },
+          "part_scope": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Part Scope"
+          },
+          "point_layer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Point Layer"
+          },
+          "seed": {
+            "additionalProperties": true,
+            "title": "Seed",
+            "type": "object"
+          },
+          "tal_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Tal Id"
+          },
+          "tal_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Tal Label"
+          },
+          "target": {
+            "additionalProperties": true,
+            "title": "Target",
+            "type": "object"
+          },
+          "territory_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Territory Name"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "User Id"
+          }
+        },
+        "required": [
+          "seed",
+          "target"
+        ],
+        "title": "seed_buildArguments",
+        "type": "object"
+      },
+      "name": "seed_build",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "seed_buildDictOutput",
+        "type": "object"
+      },
+      "title": "Grow Territory from Seed"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Delete Route"
+      },
+      "description": "Route delete: removes one whole route from the Territory Solution and the open map, in one synchronous call. Needs route_id or the route's exact unique label, plus map_session_id or ts_handle. A route that is already gone returns ok with already_absent=true; an ambiguous label returns AMBIGUOUS_ROUTE with matching_route_ids. A single stop is removed by recalculating the same route_id with calculate_route.",
+      "inputSchema": {
+        "properties": {
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "route_id": {
+            "title": "Route Id",
+            "type": "string"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          }
+        },
+        "required": [
+          "route_id"
+        ],
+        "title": "delete_routeArguments",
+        "type": "object"
+      },
+      "name": "delete_route",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "delete_routeDictOutput",
+        "type": "object"
+      },
+      "title": "Delete Route"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Analyze Routes"
+      },
+      "description": "Returns the total hours for each of the routes calculate_route has drawn: drive hours, dwell hours, route_workload_hours (provider drive time plus dwell, no visit-frequency multiplier), stop coordinates, centroid, and bbox. Synchronous. Needs map_session_id or ts_handle, and dwell from dwell_time or the dwell recorded on the route; unresolved dwell returns CLARIFICATION_REQUIRED (needs_dwell). A circuit's stop_count includes the return to the start, so that stop's dwell counts twice. Facts only: no capacity, ranking, or overload flags. These hours are a different measure from territory and cluster workload; territory statistics come from analyze.",
+      "inputSchema": {
+        "properties": {
+          "dwell_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Dwell Time"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "route_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Route Ids"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          }
+        },
+        "title": "analyze_routesArguments",
+        "type": "object"
+      },
+      "name": "analyze_routes",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "analyze_routesDictOutput",
+        "type": "object"
+      },
+      "title": "Analyze Routes"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Cancel Task"
+      },
+      "description": "Tool equivalent of the native MCP tasks/cancel, listed for clients without the Tasks capability. Requests cooperative cancellation of a task_id and returns the Task status document. Whether the Territory Solution is unchanged or partially updated follows the originating tool.",
+      "inputSchema": {
+        "properties": {
+          "task_id": {
+            "title": "Task Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id"
+        ],
+        "title": "tasks_cancelArguments",
+        "type": "object"
+      },
+      "name": "tasks_cancel",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "tasks_cancelDictOutput",
+        "type": "object"
+      },
+      "title": "Cancel Task"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Task Status"
+      },
+      "description": "Tool equivalent of the native MCP tasks/get, listed for clients without the Tasks capability. Returns the Task status document for a task_id. next_action is sleep_and_poll (wait sleep_ms, then one tasks_get), consume_result (one tasks_result call), or stop_error. status=cancelled means the user stopped it. While queued, _meta carries queue_position, queue_depth, queue_lane, and estimated_start_ms, which is advisory and not a wait time. Polling never starts work.",
+      "inputSchema": {
+        "properties": {
+          "task_id": {
+            "title": "Task Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id"
+        ],
+        "title": "tasks_getArguments",
+        "type": "object"
+      },
+      "name": "tasks_get",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "tasks_getDictOutput",
+        "type": "object"
+      },
+      "title": "Get Task Status"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Task Result"
+      },
+      "description": "Tool equivalent of the native MCP tasks/result, listed for clients without the Tasks capability. Returns the originating tool's terminal result once the task status is completed (consume_result): ts_handle, counts, timings, and map binding, never an inline Territory Solution when a handle exists. A build's ts_handle or task_id (as job_id) is the input analyze takes.",
+      "inputSchema": {
+        "properties": {
+          "task_id": {
+            "title": "Task Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id"
+        ],
+        "title": "tasks_resultArguments",
+        "type": "object"
+      },
+      "name": "tasks_result",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "tasks_resultDictOutput",
+        "type": "object"
+      },
+      "title": "Get Task Result"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Set Map State"
+      },
+      "description": "Changes the open map's session state: mode, active alignment (active_tal_id), pending job reference, or camera (center [longitude, latitude] and zoom 0-24). Session only: the Territory Solution is not changed (configure_map sets a durable default view). The result's render_ack is read at publish time, so sent_unconfirmed one version behind is normal; render_ack_hint says whether to reread ezt://map-sessions/{map_session_id}/state or resend. camera reports the view in effect and its source (requested, session, map_config, or viewer_current). A set camera stays until changed; switching alignment does not refit.",
+      "inputSchema": {
+        "properties": {
+          "active_tal_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Active Tal Id"
+          },
+          "center": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Center"
+          },
+          "map_session_id": {
+            "title": "Map Session Id",
+            "type": "string"
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Mode"
+          },
+          "pending_job_reference": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Pending Job Reference"
+          },
+          "zoom": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Zoom"
+          }
+        },
+        "required": [
+          "map_session_id"
+        ],
+        "title": "set_map_stateArguments",
+        "type": "object"
+      },
+      "name": "set_map_state",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "set_map_stateDictOutput",
+        "type": "object"
+      },
+      "title": "Set Map State"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Map Selection"
+      },
+      "description": "Returns the most recent committed selection on an open map session (map_session_id): part_layer, part_ids, and selection_task_id when the selection came from request_part_selection. Covers selections the person started from the map legend. realign takes these part_ids as moves with a leaf territory_id.",
+      "inputSchema": {
+        "properties": {
+          "map_session_id": {
+            "title": "Map Session Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "map_session_id"
+        ],
+        "title": "get_map_selectionArguments",
+        "type": "object"
+      },
+      "name": "get_map_selection",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "get_map_selectionDictOutput",
+        "type": "object"
+      },
+      "title": "Get Map Selection"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://easyterritory/map-viewer"
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Load Analysis Panel"
+      },
+      "description": "Shows a completed analyze result in the open map's analysis dock (single or compare). Needs map_session_id and the analyze task_id/job_id or the full analyze result (with tal_analyses and ts_identity; a partial object returns INVALID_REQUEST). presentation_mode: single, compare, executive, or diagnostic. dismiss=true hides the dock and keeps the statistics on the session. Changes nothing in the Territory Solution. analyze with analysis_panel=single fills the dock in the same call.",
+      "inputSchema": {
+        "properties": {
+          "analyses": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Analyses"
+          },
+          "dismiss": {
+            "default": false,
+            "title": "Dismiss",
+            "type": "boolean"
+          },
+          "job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Job Id"
+          },
+          "labels": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Labels"
+          },
+          "map_session_id": {
+            "title": "Map Session Id",
+            "type": "string"
+          },
+          "presentation_mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Presentation Mode"
+          },
+          "roles": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Roles"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Task Id"
+          }
+        },
+        "required": [
+          "map_session_id"
+        ],
+        "title": "load_analysis_panelArguments",
+        "type": "object"
+      },
+      "name": "load_analysis_panel",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "load_analysis_panelDictOutput",
+        "type": "object"
+      },
+      "title": "Load Analysis Panel"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Configure Map"
+      },
+      "description": "Updates durable map settings on the Territory Solution and refreshes the live map: project_name (map heading), loaded_part_layers ([] hides ZIP/part outlines; builds never load them), active_part_layer, active_tal_id, center and zoom (default view; the live map jumps there), and point symbology. point_layer_classifications entries are {point_layer, field, method: quantile | equal_interval | categorical | manual, class_count 2-12, channel: color | size | shape, optional colors/sizes/shapes/style}; the server computes the breaks and returns per-class counts. One classification per channel per layer; clear:true removes one. Shapes include circle, square, triangle, diamond, star, cross, house, pin, flag, hexagon, pentagon, shield, arrow_up, building. classification without a point_layer is a project-level setting that does not color points. Input: map_session_id (the live map), ts_handle, or ts.",
+      "inputSchema": {
+        "properties": {
+          "active_part_layer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Active Part Layer"
+          },
+          "active_tal_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Active Tal Id"
+          },
+          "center": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Center"
+          },
+          "classification": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Classification"
+          },
+          "expected_content_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Content Hash"
+          },
+          "expected_revision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Revision"
+          },
+          "loaded_part_layers": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Loaded Part Layers"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "merge_strategy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Merge Strategy"
+          },
+          "point_layer_classifications": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Point Layer Classifications"
+          },
+          "presentation": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Presentation"
+          },
+          "project_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Project Name"
+          },
+          "ts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          },
+          "zoom": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Zoom"
+          }
+        },
+        "title": "configure_mapArguments",
+        "type": "object"
+      },
+      "name": "configure_map",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "configure_mapDictOutput",
+        "type": "object"
+      },
+      "title": "Configure Map"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://easyterritory/map-viewer"
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Show Map Overlay"
+      },
+      "description": "Shows or hides something on the open map from a plain request ('add US zip codes', 'hide the zips', 'show my accounts') or overlay_kind (part_layer, point_layer, tal, route) with overlay_id. Part layers load at a zoom where they are visible (visibility.camera_action); hiding a part layer leaves territories unchanged. Point layers must already be ingested; a layer in the Territory Solution but missing from the map is re-pushed (status=refreshed, with render_ack). route re-shows or hides routes calculate_route drew (route_id targets one); with no route yet it returns blocked_by=needs_route. When the user named a camera, do_this_next carries the configure_map call that sets it. Input: map_session_id (preferred), ts_handle, or ts.",
+      "inputSchema": {
+        "properties": {
+          "expected_content_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Content Hash"
+          },
+          "expected_revision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Revision"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "merge_strategy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Merge Strategy"
+          },
+          "overlay_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Overlay Id"
+          },
+          "overlay_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Overlay Kind"
+          },
+          "route_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Route Id"
+          },
+          "ts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          },
+          "user_request": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "User Request"
+          }
+        },
+        "title": "show_map_overlayArguments",
+        "type": "object"
+      },
+      "name": "show_map_overlay",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "show_map_overlayDictOutput",
+        "type": "object"
+      },
+      "title": "Show Map Overlay"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Export GeoJSON"
+      },
+      "description": "Exports the territory solution as one GeoJSON file to share, archive, or open in EasyTerritory Designer: territory polygons with part_ids, points, and routes with numbered stops, each carrying its displayed style. tal_ids, point_layers, and route_layers narrow it; include_points / include_routes omit a family. Input: map_session_id, ts_handle, or a completed build job_id. Returns a task whose result is geojson_artifact plus a download_url (GET with the API key; gzip unless zip=false), not an inline body. import_geojson reopens the file.",
+      "inputSchema": {
+        "properties": {
+          "include_points": {
+            "default": true,
+            "title": "Include Points",
+            "type": "boolean"
+          },
+          "include_routes": {
+            "default": true,
+            "title": "Include Routes",
+            "type": "boolean"
+          },
+          "job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Job Id"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "point_layers": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Point Layers"
+          },
+          "route_layers": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Route Layers"
+          },
+          "tal_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Tal Ids"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          },
+          "zip": {
+            "default": true,
+            "title": "Zip",
+            "type": "boolean"
+          }
+        },
+        "title": "export_geojsonArguments",
+        "type": "object"
+      },
+      "name": "export_geojson",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "export_geojsonDictOutput",
+        "type": "object"
+      },
+      "title": "Export GeoJSON"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Import GeoJSON"
+      },
+      "description": "Opens a GeoJSON FeatureCollection (plain points, or a territory file this server produced, plain or gzip/zip) as a Territory Solution and returns ts_handle and a summary. Input: geojson (object), geojson_text, or geojson_gzip (base64). Territory polygons without part_ids return TERRITORY_POLYGONS_WITHOUT_PART_IDS unless part_layer plus overlay_policy=centroid_within assigns parts by centroid. point_layer names imported points; tal_label names the alignment. EasyTerritory Designer projects (REST/Agent/Projects/{projectId}/TerritorySolution) import as geojson_gzip.",
+      "inputSchema": {
+        "properties": {
+          "geojson": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Geojson"
+          },
+          "geojson_gzip": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Geojson Gzip"
+          },
+          "geojson_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Geojson Text"
+          },
+          "overlay_policy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Overlay Policy"
+          },
+          "part_layer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Part Layer"
+          },
+          "point_layer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Point Layer"
+          },
+          "tal_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Tal Label"
+          }
+        },
+        "title": "import_geojsonArguments",
+        "type": "object"
+      },
+      "name": "import_geojson",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "import_geojsonDictOutput",
+        "type": "object"
+      },
+      "title": "Import GeoJSON"
+    },
+    {
+      "_meta": {
+        "openai/fileParams": [
+          "csv_file"
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "EasyTerritory Assistant"
+      },
+      "description": "Plain-language orchestrator: takes request (the goal) and runs the matching workflow in one call, optionally with csv_file (a host file parameter), accounts_handle, assignments_handle, map_session_id, or ts_handle. An uploaded CSV is parsed, staged, and ingested onto the open map. target_hours / workload_target map to a fixed-workload auto_build. Missing build inputs (part layer, alignment name, sizing, balance, dwell) return CLARIFICATION_REQUIRED with the questions. The granular tools do the same steps individually.",
+      "inputSchema": {
+        "properties": {
+          "accounts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Accounts Handle"
+          },
+          "args": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Args"
+          },
+          "assignments_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Assignments Handle"
+          },
+          "csv_file": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Csv File"
+          },
+          "map_session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Map Session Id"
+          },
+          "request": {
+            "title": "Request",
+            "type": "string"
+          },
+          "state_facts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "State Facts"
+          },
+          "ts_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ts Handle"
+          }
+        },
+        "required": [
+          "request"
+        ],
+        "title": "eztArguments",
+        "type": "object"
+      },
+      "name": "ezt",
+      "outputSchema": {
+        "additionalProperties": true,
+        "title": "eztDictOutput",
+        "type": "object"
+      },
+      "title": "EasyTerritory Assistant"
+    }
+  ],
+  "url": "https://mcp.easyterritory.ai"
+}

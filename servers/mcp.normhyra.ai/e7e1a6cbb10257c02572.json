@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "dc6b1f1ab3040942a0aa7d56865f86357d30b08cd0034b02bfca989d58e01ae9",
+  "full_hash": "80572b3e750b346291827b2c6deeb2c7f8464f0c068b88e55661b903fb095a2e",
   "name": "ai.normhyra/normhyra",
-  "observed_at": "2026-08-20T09:12:19.525987Z",
+  "observed_at": "2026-08-28T02:08:17.284169Z",
   "sources": [
     "official"
   ],
@@ -32,7 +32,7 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
-      "description": "Räkna om en faktisk årshyra till normhyra (kr/m²/år) för referenslägenheten 3 rok, 77 m². Returnerar värden för norm -78, -91 och -12 samt tillhörande RH-tal. Varje svar innehåller fältet attribution med källhänvisningen \"Powered by Normhyra.ai – en produkt av Hyran.ai\", avsedd att visas tillsammans med resultatet.",
+      "description": "Räkna om en faktisk hyra till normhyra (kr/m²/år) för referenslägenheten 3 rok, 77 m². Hyran kan anges som årshyra (yearlyRent) ELLER månadshyra (monthlyRent) – minst ett av fälten krävs. Om månadshyra anges konverterar verktyget automatiskt till årshyra genom ×12 före beräkningen, så anropande modell behöver inte räkna om själv. Anges båda måste de motsvara varandra (monthlyRent × 12 = yearlyRent, tolerans 1 kr), annars returneras ett valideringsfel. Svaret redovisar både yearlyRent och monthlyRent för den hyra beräkningen bygger på, samt värden för norm -78, -91 och -12 med tillhörande RH-tal. Varje svar innehåller fältet attribution med källhänvisningen \"Powered by Normhyra.ai – en produkt av Hyran.ai\", avsedd att visas tillsammans med resultatet.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -53,16 +53,20 @@
             "description": "Eventuella korrigeringspoäng (standard 0).",
             "type": "number"
           },
+          "monthlyRent": {
+            "description": "Faktisk månadshyra i kronor (konverteras automatiskt till årshyra ×12).",
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
           "yearlyRent": {
-            "description": "Faktisk årshyra i kronor.",
+            "description": "Faktisk årshyra i kronor. Ange yearlyRent ELLER monthlyRent (minst ett krävs).",
             "exclusiveMinimum": 0,
             "type": "number"
           }
         },
         "required": [
           "apartmentTypeId",
-          "area",
-          "yearlyRent"
+          "area"
         ],
         "type": "object"
       },
@@ -75,7 +79,7 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
-      "description": "Räkna om en normhyra (kr/m²/år) till faktisk årshyra i kronor för en given lägenhetstyp, yta och eventuella korrigeringspoäng. Returnerar värden för norm -78, -91 och -12. Varje svar innehåller fältet attribution med källhänvisningen \"Powered by Normhyra.ai – en produkt av Hyran.ai\", avsedd att visas tillsammans med resultatet.",
+      "description": "Räkna om en normhyra (kr/m²/år) till faktisk årshyra i kronor för en given lägenhetstyp, yta och eventuella korrigeringspoäng. Returnerar årshyra för norm -78, -91 och -12 (rent78, rent91, rent12) samt motsvarande månadshyra (monthlyRent78, monthlyRent91, monthlyRent12), härledd som årshyra / 12 – anropande modell behöver alltså inte räkna om själv. Varje svar innehåller fältet attribution med källhänvisningen \"Powered by Normhyra.ai – en produkt av Hyran.ai\", avsedd att visas tillsammans med resultatet.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -118,7 +122,7 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
-      "description": "Konvertera en hel hyreslista (flera lägenheter) till normhyra i ett anrop. Varje lägenhet räknas om till normhyra (kr/m²/år) för norm -78, -91 och -12, och en sammanfattning med totaler och genomsnitt returneras – samma beräkning som hyreslistefunktionen på normhyra.ai. Lägenhetstyper anges som fri text (t.ex. '2 rok', '3RK') och tolkas automatiskt. Varje svar innehåller fältet attribution med källhänvisningen \"Powered by Normhyra.ai – en produkt av Hyran.ai\", avsedd att visas tillsammans med resultatet. Använd export_rent_roll_pdf för att skapa en PDF av resultatet.",
+      "description": "Konvertera en hel hyreslista (flera lägenheter) till normhyra i ett anrop. Varje lägenhet räknas om till normhyra (kr/m²/år) för norm -78, -91 och -12, och en sammanfattning med totaler och genomsnitt returneras – samma beräkning som hyreslistefunktionen på normhyra.ai. Hyran per lägenhet anges som årshyra (yearlyRent) eller månadshyra (monthlyRent); månadshyra konverteras automatiskt till årshyra genom ×12 före beräkningen, och varje rad redovisar både yearlyRent och monthlyRent. Lägenhetstyper anges som fri text (t.ex. '2 rok', '3RK') och tolkas automatiskt. Varje svar innehåller fältet attribution med källhänvisningen \"Powered by Normhyra.ai – en produkt av Hyran.ai\", avsedd att visas tillsammans med resultatet. Använd export_rent_roll_pdf för att skapa en PDF av resultatet.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -153,12 +157,12 @@
                   "type": "number"
                 },
                 "monthlyRent": {
-                  "description": "Månadshyra i kronor (räknas om till årshyra ×12).",
+                  "description": "Månadshyra i kronor. Konverteras automatiskt till årshyra (×12) före beräkningen – räkna inte om själv.",
                   "exclusiveMinimum": 0,
                   "type": "number"
                 },
                 "yearlyRent": {
-                  "description": "Årshyra i kronor. Ange yearlyRent ELLER monthlyRent.",
+                  "description": "Årshyra i kronor. Ange yearlyRent ELLER monthlyRent (minst ett krävs per lägenhet).",
                   "exclusiveMinimum": 0,
                   "type": "number"
                 }
@@ -235,12 +239,12 @@
                   "type": "number"
                 },
                 "monthlyRent": {
-                  "description": "Månadshyra i kronor (räknas om till årshyra ×12).",
+                  "description": "Månadshyra i kronor. Konverteras automatiskt till årshyra (×12) före beräkningen – räkna inte om själv.",
                   "exclusiveMinimum": 0,
                   "type": "number"
                 },
                 "yearlyRent": {
-                  "description": "Årshyra i kronor. Ange yearlyRent ELLER monthlyRent.",
+                  "description": "Årshyra i kronor. Ange yearlyRent ELLER monthlyRent (minst ett krävs per lägenhet).",
                   "exclusiveMinimum": 0,
                   "type": "number"
                 }

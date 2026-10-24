@@ -1,0 +1,124 @@
+{
+  "canon_version": "1",
+  "full_hash": "b5988950db7b67831b152c790b488fa75f6d1e359e1b22b0d6391b20f64d9f14",
+  "name": "ai.aislabs/recorder",
+  "observed_at": "2026-09-02T02:06:31.005250Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 5,
+  "tools": [
+    {
+      "description": "Agent Flight Recorder — FREE (1 monitor per alert target) / Gateway key (20 monitors + stored capsules + fleet view). Register an agent or scheduled job to be watched: you get a monitor_id + secret; the agent then calls heartbeat every period_minutes. If heartbeats stop for period + grace, the alert target (Discord/HTTPS webhook and/or email) is notified with the last state capsule and a resume link.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "alert_email": {
+            "description": "Email address to alert (Gateway key tier only; capped at 10 emails/monitor/day)",
+            "type": "string"
+          },
+          "alert_webhook": {
+            "description": "Discord webhook URL or any HTTPS webhook (receives JSON)",
+            "type": "string"
+          },
+          "grace_minutes": {
+            "description": "How late a heartbeat may be before alerting (default 5)",
+            "type": "number"
+          },
+          "name": {
+            "description": "What is being watched, e.g. \"nightly ETL loop\"",
+            "type": "string"
+          },
+          "period_minutes": {
+            "description": "Expected heartbeat interval in minutes (default 10)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "register_monitor"
+    },
+    {
+      "description": "Agent Flight Recorder — \"still alive\" ping for a registered monitor. Include capsule (any JSON ≤32KB: current step, done, next, ids) so a dead-man alert can carry resume state (stored on the key tier). status:\"fail\" reports a failure immediately.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "capsule": {
+            "description": "Resume state: { step, done: [...], next, ids: {...} } — anything JSON",
+            "type": "object"
+          },
+          "monitor_id": {
+            "type": "string"
+          },
+          "secret": {
+            "description": "Monitor secret from register_monitor (not needed when calling with the owning Gateway key)",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "fail"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "monitor_id"
+        ],
+        "type": "object"
+      },
+      "name": "heartbeat"
+    },
+    {
+      "description": "Agent Flight Recorder (Gateway key) — get the last state capsule a monitored agent sent, to resume from where it died.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "monitor_id": {
+            "type": "string"
+          },
+          "secret": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "monitor_id"
+        ],
+        "type": "object"
+      },
+      "name": "fetch_capsule"
+    },
+    {
+      "description": "Agent Flight Recorder (Gateway key) — every monitor you own: alive / late / dead, last heartbeat, capsule preview.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "fleet_status"
+    },
+    {
+      "description": "Agent Flight Recorder — remove a monitor (needs its secret or the owning key).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "monitor_id": {
+            "type": "string"
+          },
+          "secret": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "monitor_id"
+        ],
+        "type": "object"
+      },
+      "name": "delete_monitor"
+    }
+  ],
+  "url": "https://api.aislabs.ai/recorder/mcp"
+}

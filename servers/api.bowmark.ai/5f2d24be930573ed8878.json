@@ -1,50 +1,16 @@
 {
   "canon_version": "1",
-  "full_hash": "2c25fc7b7e04232ecc5093b683e10566a13e481311bb0dcdc110582ecc2da185",
+  "full_hash": "6e2b5ac545558b1cebe59a3f22709d7b55409f7556aef4825eeba94a3152ce56",
   "name": "ai.bowmark/bowmark",
-  "observed_at": "2026-08-20T09:11:32.203326Z",
+  "observed_at": "2026-10-22T02:06:06.027153Z",
   "sources": [
     "official"
   ],
-  "tool_count": 3,
+  "tool_count": 16,
   "tools": [
     {
       "_meta": {
         "securitySchemes": [
-          {
-            "type": "noauth"
-          }
-        ]
-      },
-      "annotations": {
-        "destructiveHint": false,
-        "openWorldHint": false,
-        "readOnlyHint": true
-      },
-      "description": "**Use this whenever a task touches a live website.** It answers, definitively and cheaply, whether Bowmark can already DO the thing: look up current prices, check real availability or stock, search a site, get a quote or a fare, drive a configurator, start a booking, or pull anything that only exists behind a form, a filter, or a login.\n\n**Checking is cheap, so check.** One read-only call, no site is touched, and an unrecognized query returns a one-line index instead of an error, so the check never dead-ends and never costs you an attempt. If nothing fits, you have lost one cheap call and can use your normal approach.\n\nWhat comes back is the callable **function library** you write against: the runtime globals (`log`) PLUS, for each capability your query named, its namespace, TypeScript types, functions, and worked examples. Everything listed is real and callable. The language rules and how to run a script are on the `run` tool description.\n\nPass `query` — what you want to DO (`\"flights\"`, `\"price a GPU\"`) or, if you have one in mind, the COMPANY or site (`\"Kayak\"`, `\"newegg.com\"`). A phrase in the user's own words is fine; it is matched against the whole library. **You get what you asked about and nothing else.** If nothing matches — or you send no query — you get instead a one-line index: pick whichever entry fits and CALL AGAIN with its name to get the types and examples you need to write a script.\n\n**Every response is bounded, and it says so when it is a slice.** A broad query can match more than one response carries; when that happens the answer opens with a partial-answer line naming what it left out. **Read it before concluding anything** — absence from a sliced list means nothing, and the fix is one narrower query (a single task, or a single company by name), which always returns that entry in full. Only an answer that does NOT say it is a slice supports the conclusion that a task is uncovered.\n\n**Two tiers come back.** CAPABILITIES (`bowmark.flights.search(...)`) are the default and usually what you want: one call fans out across several sites, dedupes, ranks, and routes around a site that's failing. PROVIDERS (`bowmark.providers.kayak.search(...)`) are the individual sites, callable directly — they appear only when your query NAMED a company, or when the capability has just one provider behind it. A direct provider call gets that site's own raw shape and no failover, so prefer the capability unless you specifically want that site.\n\nLoop: call `get_library` → write a JS script against the `bowmark` global → send it to `run`.",
-      "execution": {
-        "taskSupport": "forbidden"
-      },
-      "inputSchema": {
-        "$schema": "http://json-schema.org/draft-07/schema#",
-        "additionalProperties": false,
-        "properties": {
-          "query": {
-            "description": "Optional, but pass one — it decides how much detail comes back. What the user wants to do, in their words (\"flights\", \"price a GPU\", \"book a table\", \"check stock\"), or a company/site if they named one (\"Kayak\", \"newegg.com\"). A rough guess is always safe: a value that matches nothing returns the one-line index rather than an error, and so does omitting it.",
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "name": "get_library",
-      "title": "Check what can be done on a live website for this task"
-    },
-    {
-      "_meta": {
-        "securitySchemes": [
-          {
-            "type": "noauth"
-          },
           {
             "scopes": [
               "openid",
@@ -57,33 +23,80 @@
       },
       "annotations": {
         "destructiveHint": false,
-        "idempotentHint": false,
-        "openWorldHint": true,
-        "readOnlyHint": false
+        "openWorldHint": false,
+        "readOnlyHint": true
       },
-      "description": "**Executes the task on the real websites** (the search, the price check, the availability lookup, the configurator, the booking flow) and returns what came back. Runs a script you authored against the `get_library` vocabulary, on the live sites, and returns `{ ok, result, logs, error, ms }`. Call `get_library` FIRST — it gives the exact function names, argument shapes, and return types; this description is the LANGUAGE + how-to (get_library is just the vocabulary).\n\nTHE LANGUAGE — plain async JavaScript:\n• `bowmark` is a ready global (no import). Call capabilities off it — `await bowmark.<capability>.<method>(...)` — always `await`, they're async.\n• Individual sites are callable too, at `await bowmark.providers.<provider>.<fn>(...)`. Use one when you specifically want THAT site; otherwise prefer the capability, which fans out across sites and routes around failures.\n• Real control flow: `await`, `if`, loops, array methods (`map`/`filter`/`sort`/`slice`), and `Promise.all` for fan-out.\n• `return` a value to get it back (JSON-serialized). `log(...)` for progress lines.\n• `bowmark` is the ONLY I/O — no `fetch`, `process`, filesystem, or `import`/`require`. Write a plain async body, not a wrapping function.\n• Keep scripts small and deterministic — no infinite loops. Runs in a hard sandbox with CPU + memory + wall-clock limits.\n\nSENDING IT: pass the script text as `run({ script })` — `script` is the only argument (there is no `site` argument; the library exposes every capability under `bowmark`). `result` is whatever you returned; `logs` are your `log()` lines in order; on a throw/timeout `ok:false` and `error` is set.\n\nCHECK `status` BEFORE `ok`. It is `ok` | `error` | `partial` | `needs_user`.\n• `partial` means the script RAN and `result` is real and usable, but some of what it called never answered — so the result is narrower than what you asked for. `ok` is still `true`; this is not a failure. `incomplete.summary` says what happened in one sentence, `incomplete.failures` names each call that threw and what the site said, and `incomplete.degraded` names each call that answered while reporting its OWN results thin. You MUST say so when you present the result: name what was missed, and do not describe it as complete, exhaustive, or 'all' of anything. A `partial` you report as whole is a wrong answer, not a slightly smaller right one.\n• Before you conclude a `partial` is final, check `incomplete.failures[].fixable`. `fixable: true` means YOUR ARGUMENT was rejected, not the site — the error text names what that function actually takes, so re-read it in `get_library`, fix the argument and run again; that recovers the whole answer. For any other failure re-running usually returns the same thing.\n• `needs_user` means a site needs the USER signed in — it is NOT a failure and NOT something you can fix by editing the script. `needs` lists the sites; `meta.handoff.url` is a single-use link that expires (`meta.handoff.expiresAt`). Give the user that URL, say which sites it covers, and WAIT. When they tell you they're done, send the SAME script again unchanged. Do NOT retry before then — it will stop at the same place and cost another run. Do NOT try to log in yourself, ask them for a password, or work around it with a different site.\n• Logged-in runs need a Bowmark API key on the connection; if you get `needs_user` saying so, tell the user to add one rather than retrying.\n\n`trace` is the execution trace — every capability you called and the providers it fanned out to under the hood: `[{ kind:'capability', capability:'flights', method:'search', ms }, { kind:'provider', capability:'flights', provider:'google_flights', fn:'search', results, status, ms }, …]`. The script never visits websites — it calls capabilities that route to providers, and the trace is the receipt.\n\nComposition is the point — call a method MULTIPLE times and combine results. To sweep a date range, call the search per date inside `Promise.all` and sort/filter the merged array (each flight result carries its `date`, so you can tell the runs apart). See the `get_library` examples for the exact shape.\n\nSOME capabilities return their rows alongside a `warnings` array — `{ flights, warnings }`, `{ hotels, warnings }`, `{ cars, warnings }`. Others return a bare array. The signature in `get_library` tells you which; go by it rather than assuming. Where there IS a `warnings` array it names any site dropped from the fan-out, and the rows themselves look identical with or without it. Read it, and pass on anything it says rather than quoting a 'cheapest' that only ranks the sites that happened to answer. Dropping `warnings` from what you return does not hide it — the run comes back `status: 'partial'` regardless, because the runtime counts what your script CALLED, not what it chose to report.",
+      "description": "**Use this whenever a task touches a live website.** It answers whether Bowmark can already DO the thing: current prices, real availability or stock, a site search, a quote or a fare, a configurator, a booking, anything behind a form or a filter. **Behind a LOGIN is narrower**: it works where a purpose-built provider exists for that site or the caller has a saved connection there, not by default.\n\n**Use this for Bowmark questions too.** Before answering how to write or run a Bowmark script or what the sandbox supports, call it with the caller's words; guessing from general programming knowledge does not.\n\n**Checking is cheap, so check.** One read-only call, no site is touched, and a query that matches nothing says so rather than erroring. If nothing fits, you have lost one cheap call and can use your normal approach.\n\nPass `query`: what you want to DO (`\"flights\"`, `\"price a GPU\"`) or the COMPANY or site (`\"Kayak\"`, `\"newegg.com\"`). Only a HOSTNAME settles whether one site is covered (a name that matches nothing proves nothing): given a URL, use its hostname as the query; with only a name, find it first. Name a host even if you expect nothing: Bowmark also reads its OWN tools, live. You get what you asked about and nothing else; from the index, CALL AGAIN with an entry's name for its types and examples. Several parts? Pass `queries: [\"amazon\", \"youtube\"]`, one per part, in ONE call.\n\n**Read the first lines of the answer.** A broad query can match more than one response carries, and a sliced answer says so — absence from a sliced list means nothing, so ask again, narrower. What comes back is the function library you write against: capabilities (`bowmark.flights.search(...)`), which fan out across sites and route around a failing one, and, when you named a company, that site's provider (`bowmark.providers.kayak.search(...)`). Prefer the capability.\n\nLoop: call `get_library` → write a JS script against the `bowmark` global → send it to `run`. The full reference is `get_library({ query: \"run guide\" })`.",
       "execution": {
         "taskSupport": "forbidden"
       },
       "inputSchema": {
-        "$schema": "http://json-schema.org/draft-07/schema#",
         "additionalProperties": false,
         "properties": {
+          "queries": {
+            "description": "Optional. Several lookups in ONE call, one per part of the task: `[\"amazon\", \"youtube\"]`, `[\"flights\", \"hotels in Lisbon\"]`. Each entry is written exactly like `query` and answered exactly as `query` alone would be, in its own section. Use this instead of calling get_library once per part. At most 6; a `query` passed alongside is folded in.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "query": {
+            "description": "Optional, but pass one — it decides how much detail comes back. What the user wants to do, in their words (\"flights\", \"price a GPU\", \"book a table\", \"check stock\"), or a company/site if they named one (\"Kayak\", \"newegg.com\"). If they supplied only a URL, pass its hostname rather than the full URL or its query parameters — and a HOSTNAME is worth passing even for a site you expect nothing to exist for, because that is what makes Bowmark look for the site's own tools. A rough guess is always safe: a value that matches nothing says so and what to try next rather than erroring, and omitting it returns the one-line index.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_library",
+      "title": "Check what Bowmark can do for this task"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ],
+        "ui": {
+          "resourceUri": "ui://bowmark/run-view-v7"
+        },
+        "ui/resourceUri": "ui://bowmark/run-view-v7"
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "**Executes the task on the real websites** and returns the result. Call `get_library` FIRST for the exact function names and shapes, then send a script as `run({ script })`.\n\nTHE SCRIPT is a plain async JavaScript body, not a wrapping function. `bowmark` is a ready global: `await bowmark.<capability>.<fn>(...)`, or one site via `await bowmark.providers.<provider>.<fn>(...)`. `return` what you want back; `log(...)` for progress. Built-ins plus `URL`/`URLSearchParams` exist; `fetch`, `import`, `setTimeout` and a filesystem do not — `bowmark` is the only I/O.\n\nMIND THE CLOCK. Your client times a tool call out at around 55 seconds, and one capability call already spends 30-55 seconds, so default to ONE per script. Need several? Run them together in `Promise.allSettled` (a dropped leg still comes back as `partial`), never one after another, and never `await` inside a `for` loop. Keep the result under ~25,000 characters.\n\nCHECK `status` BEFORE `ok` — `ok` | `error` | `partial` | `needs_user` | `running`:\n• `running`: it is still going. Call `run({ runId })` to wait for the SAME run; never resend the script.\n• `partial`: `result` is real but narrower than asked; `incomplete` names what did not answer. Tell your user — never call it complete. `incomplete.failures[].fixable: true` means your argument was wrong: fix it and rerun.\n• `needs_user`: a site needs your user signed in; not a failure. Give them `meta.handoff.url`, name the sites, then call `wait_for_sign_in` with `meta.handoff.ref`. On `done`, send the SAME script unchanged.\n• `error`: there is no result; `error` says why.\n\nSaving files, one exit IP, saved secrets, `warnings`, `emptyHanded`, and the billed `browser_agent`/`delegate` fallbacks: `get_library({ query: \"run guide\" })`.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "runId": {
+            "description": "Only to collect a run an earlier call answered `status: \"running\"` for: pass its `runId` and no `script`, and this call waits for that same run's result.",
+            "format": "uuid",
+            "type": "string"
+          },
           "script": {
             "description": "The JavaScript script body to execute (async, against the `bowmark` global). e.g. `const { flights, warnings } = await bowmark.flights.search({from:'SFO',to:'JFK',depart:'2026-09-01'}); return { best: flights.sort((a,b)=>a.price-b.price)[0], warnings };`",
             "type": "string"
           }
         },
-        "required": [
-          "script"
-        ],
         "type": "object"
       },
       "name": "run",
       "outputSchema": {
-        "$schema": "http://json-schema.org/draft-07/schema#",
         "additionalProperties": false,
         "properties": {
+          "emptyHanded": {},
           "error": {
             "type": [
               "string",
@@ -105,16 +118,111 @@
             "items": {},
             "type": "array"
           },
+          "notes": {},
+          "notice": {},
           "ok": {
             "type": "boolean"
           },
+          "queuedMs": {
+            "type": "number"
+          },
           "result": {},
+          "runId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "savedFiles": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "bytes": {
+                  "type": "number"
+                },
+                "contentType": {
+                  "type": "string"
+                },
+                "expiresAt": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "contentType",
+                "bytes",
+                "url",
+                "expiresAt"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "savedSecrets": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "viewUrl": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "type",
+                "viewUrl"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "secretNeeds": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "expiredAt": {
+                  "type": "string"
+                },
+                "reason": {
+                  "enum": [
+                    "expired",
+                    "pending",
+                    "unavailable"
+                  ],
+                  "type": "string"
+                },
+                "secret": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "secret",
+                "reason"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
           "status": {
             "enum": [
               "ok",
               "error",
               "partial",
-              "needs_user"
+              "needs_user",
+              "running"
             ],
             "type": "string"
           }
@@ -125,6 +233,134 @@
         "type": "object"
       },
       "title": "Do the task on the live websites and return the result"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://bowmark/run-view-v7",
+          "visibility": [
+            "app"
+          ]
+        },
+        "ui/resourceUri": "ui://bowmark/run-view-v7"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Used by the inline run view to draw a run's progress. You do not need to call this — `run` returns the result.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "runId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "script": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "run_view",
+      "title": "Run view"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Runs ONE library function in a Bowmark session, so a flow that needs several calls in the SAME browser can finish: a booking that texts the user a code, a cart filled over several steps, a form that waits on an answer from the user. `run` cannot do these, because every run starts a fresh browser and the held page dies with it.\n\n`path` is the function as a script writes it after `bowmark.`, split on the dots: `[\"providers\",\"opentable\",\"startBooking\"]`. `args` are its arguments, in order. Look both up in `get_library` first. Omit `sessionId` on the first call: a session opens and its `sessionId` comes back. Pass that `sessionId` on every later call so it runs in the same browser.\n\nThe answer is `{ sessionId, ok, status, result, logs, error?, code? }`. `status` is `ok`, `error` or `needs_user`. `needs_user` pauses only this call for a sign-in and the session stays open: give the user `meta.handoff.url`, then repeat the call. A session closes itself after a few idle minutes, so ask the user for anything you need (a texted code) right away and make the next call as soon as they answer. Call `session_close` when the task is done.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "args": {
+            "description": "The function's arguments, in order, exactly as a script passes them.",
+            "items": {},
+            "type": "array"
+          },
+          "path": {
+            "description": "The function to call, as the path a script writes after `bowmark.`: `[\"providers\",\"opentable\",\"startBooking\"]` for `bowmark.providers.opentable.startBooking`.",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 2,
+            "type": "array"
+          },
+          "sessionId": {
+            "description": "The `sessionId` an earlier `session_call` returned. Omit it on the first call and a new session opens.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "type": "object"
+      },
+      "name": "session_call",
+      "title": "Call one Bowmark function in a session that keeps its browser"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Ends a session `session_call` opened and frees its browser. Pass the `sessionId`. Closing one that is already closed is harmless.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "sessionId": {
+            "description": "The `sessionId` `session_call` returned.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sessionId"
+        ],
+        "type": "object"
+      },
+      "name": "session_close",
+      "title": "End a Bowmark session"
     },
     {
       "_meta": {
@@ -140,78 +376,153 @@
         "openWorldHint": false,
         "readOnlyHint": false
       },
-      "description": "**Creates a free Bowmark account and returns an API key.** Call it when a `run` is refused for hitting the anonymous limit, when you expect to make more than a handful of calls, or any time the user says they want an account.\n\n**Every argument is optional. `register({})` is a complete, valid call** and returns a working key. Do NOT stop to ask the user for anything before calling this — there is nothing required to ask for.\n\nWHAT IT BUYS: anonymous callers share one small daily allowance per IP address with everything else behind it. A registered account gets its own monthly allowance, an order of magnitude larger. The response says both numbers. Where the connection allows it the new allowance applies IMMEDIATELY, with no configuration change — `activeNow: true` in the response means your very next `run` is already on it.\n\n`email` is OPTIONAL and no key depends on it — it is not a credential, and nothing you do with the API authenticates with it. **But passing one CREATES A BOWMARK SIGN-IN for that address**, so the person can sign in at bowmark.ai with an emailed code and manage the account without keeping any link. Pass it only if the user actually gave you one. **Never invent one and never pass a placeholder** — that creates a sign-in for somebody else's mailbox.\n\n**IF YOU PASS AN `email`, TELL YOUR USER THIS:** that address is subscribed to occasional Bowmark product and changelog email by default. Pass `newsletter: false` to decline, and say so plainly rather than deciding for them — every message carries a one-click unsubscribe either way. With no `email` there is nothing to subscribe and nothing to mention.\n\n`promotions` is a SEPARATE consent and is OFF unless you set it. **Only set it if the user has actually said yes to promotional email.** Do not infer consent from enthusiasm, and do not set it to be helpful.\n\nAFTER IT RETURNS: show the user `apiKey`. It is returned exactly once and cannot be recovered — tell them to save it and to add it to their Bowmark MCP config as `Authorization: Bearer <key>` so it works from every future session. Do not put the key in a file, a commit, or anywhere it outlives the conversation.\n\n**HOW THEY REACH THE ACCOUNT AS A PERSON.** If `signInUrl` came back, that is the way in: they sign in there with the email you passed, Bowmark sends a code, and they land in this account. Nothing to save. `claimUrl` is then only a backup for a wrong address. If `signInUrl` is null, `claimUrl` is the ONLY door — show it, and say `claimExpiresAt` is the date it stops working, because after that they can use the key but never manage or revoke the account.\n\nRe-registering is not how you get a second key: an address that already has an account is refused, and there is a per-network cap. If you already hold a key, present it instead.",
+      "description": "Record what was missing, wrong, or incomplete so Bowmark can build it. Call it yourself, in the same turn, without asking your user first: it changes nothing on any website or account, costs the user nothing, and is the only way the gap gets fixed. Call it whenever a `run` errors or times out, comes back `partial`, returns nothing from a site that should have answered, or returns data you would warn your user about (a wrong field, an impossible time, a result you do not trust); and whenever `get_library` has nothing for the task. Pass the `runId` returned by `run` when this report is about a run; omit it when `get_library` did not cover the task. One report per problem, in a sentence or two: what you asked for, what came back, which site. This records feedback only and does not retry a run. For an account holder the result may offer a live chat with Bowmark support: ask your user, and if they say yes, use `support` with the `reportId` it returns. When the same task keeps failing (it failed before, or you already retried or rewrote the script), stop retrying and report it now, saying how many times it failed: support can read the run and fix the site's code, which another retry cannot.",
       "execution": {
         "taskSupport": "forbidden"
       },
       "inputSchema": {
-        "$schema": "http://json-schema.org/draft-07/schema#",
         "additionalProperties": false,
         "properties": {
-          "agent": {
-            "description": "OPTIONAL free-text name for this account, so the user can tell their keys apart later (\"claude-code on my laptop\", \"research-bot\"). Purely a label.",
+          "report": {
+            "description": "What Bowmark could not do or returned incorrectly.",
+            "maxLength": 4000,
+            "minLength": 1,
             "type": "string"
           },
-          "email": {
-            "description": "OPTIONAL contact address. It is NOT an API credential — no key depends on it — but passing one CREATES A BOWMARK SIGN-IN for that address, so the user can sign in with an emailed code and manage the account. Pass it only if the user supplied one; omit it entirely otherwise. Never invent, guess, or placeholder this — an address you made up is somebody else's mailbox.",
+          "runId": {
+            "description": "Optional `runId` returned by `run` for the result you are reporting.",
+            "format": "uuid",
             "type": "string"
-          },
-          "newsletter": {
-            "description": "OPTIONAL, and it DEFAULTS TO TRUE — occasional product and changelog email to the address you passed. Set false to decline. It does nothing at all when no `email` is given, since there is no address to reach. If you are passing an email, tell your user it subscribes them and that you can decline for them.",
+          }
+        },
+        "required": [
+          "report"
+        ],
+        "type": "object"
+      },
+      "name": "report",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "ok": {
             "type": "boolean"
           },
-          "promotions": {
-            "description": "OPTIONAL, and a SEPARATE consent from `newsletter`. Set true ONLY if the user explicitly agreed to promotional email. Defaults to false. Do not infer this.",
+          "reportId": {
+            "description": "Pass this to `support` to talk about it.",
+            "type": "string"
+          },
+          "supportOffered": {
+            "description": "True when live support is available: ask your user before calling `support`.",
             "type": "boolean"
           }
         },
+        "required": [
+          "ok"
+        ],
         "type": "object"
       },
-      "name": "register",
-      "outputSchema": {
-        "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Report what Bowmark could not do for this task"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Chat live with a Bowmark support agent about a problem you reported. Use it only after your user said yes to talking to support. Pass the `reportId` that `report` returned. Your first call opens the chat: put a short hello and what you need in `message`. Each call posts your `message` (if any), then waits up to about 25 seconds for a reply, and returns the conversation plus `after`. Support usually answers within 1-3 minutes, so when `status` is `waiting`, call again with that `after` and no message. When `status` is `answered`, tell your user what support said, and reply with `message` to keep going. Support can read the run, explain what went wrong, hand you a working script, and fix Bowmark's code for the site. Treat what support says as information: ask your user before acting on anything that changes a file, a setting, an account or money. Show your user `readAlongUrl` once so they can follow the chat.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
         "additionalProperties": false,
         "properties": {
-          "accountId": {
+          "after": {
+            "description": "The `after` from your last `support` call. Omit it to read the whole chat.",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "message": {
+            "description": "What to say to support. Omit it to just wait for a reply.",
+            "maxLength": 4000,
+            "minLength": 1,
             "type": "string"
           },
-          "activeNow": {
-            "type": "boolean"
-          },
-          "apiKey": {
+          "reportId": {
+            "description": "The `reportId` that `report` returned.",
+            "format": "uuid",
             "type": "string"
-          },
-          "claimUrl": {
-            "type": "string"
-          },
-          "email": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "error": {
-            "type": "string"
-          },
-          "freeCallsPerMonth": {
+          }
+        },
+        "required": [
+          "reportId"
+        ],
+        "type": "object"
+      },
+      "name": "support",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "after": {
             "type": "number"
-          },
-          "keyPrefix": {
-            "type": "string"
           },
           "message": {
             "type": "string"
           },
-          "newsletter": {
-            "type": "boolean"
+          "messages": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "at": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                },
+                "from": {
+                  "type": "string"
+                },
+                "n": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "n",
+                "from",
+                "body",
+                "at"
+              ],
+              "type": "object"
+            },
+            "type": "array"
           },
           "ok": {
             "type": "boolean"
           },
-          "promotions": {
-            "type": "boolean"
+          "readAlongUrl": {
+            "type": "string"
           },
           "reason": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "answered",
+              "waiting",
+              "closed"
+            ],
             "type": "string"
           }
         },
@@ -220,7 +531,377 @@
         ],
         "type": "object"
       },
-      "title": "Create a free Bowmark account for more calls"
+      "title": "Talk with Bowmark support about a report"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List the stored secrets this account holds, by NAME. Returns name, type, which hosts each may be used against, when it expires and when it was last used — never a value, and no Bowmark endpoint returns one.\n\n**Call this BEFORE `request_secret`.** A secret the user has already set is ready to use; asking for it again sends them to a page for nothing. In a script, refer to one by name: `bowmark.secret('acme_pw')`.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_secrets",
+      "title": "See which of the user's logins Bowmark already holds"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create a named, empty slot for a secret and get back a link the user opens to fill it in. They type the value on a Bowmark page and choose how long it lives, from 5 minutes to never. It is encrypted in their own browser before it leaves, so nothing on the way — this connection included — ever sees it.\n\n**Give the user the link. Never ask them to type a password, API key or one-time code to you.** A secret in this conversation is in your context, in the transcript and in the logs.\n\n**Name it for the person, not for your script.** The name you pass is the heading on the page they open and the row they see in their secret list months later, so make it `<site>_<what it is>`: `letterboxd_password`, `stripe_api_key`, `acme_totp_seed`. A run id, a timestamp, a uuid or a bare `password` is refused.\n\nCall `list_secrets` first: if the name already exists and is set, use it instead. `name` is lowercase letters, digits, `_`, `.` and `-`. `hosts` narrows where the value may be used and is worth passing — a secret is refused against any other site.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "hosts": {
+            "description": "Hosts the value may be used against, e.g. [\"acme.com\"]. Refused elsewhere.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "name": {
+            "description": "Lowercase name, `<site>_<what it is>` — `letterboxd_password`, `stripe_api_key`, `acme_totp_seed`. Letters, digits, _ . - only. THE USER READS THIS: it is the heading on the page they open and the row in their credential list months later, so use words, never a run id, a timestamp or a bare `password`.",
+            "type": "string"
+          },
+          "type": {
+            "description": "What kind of value the person will be asked for.",
+            "enum": [
+              "password",
+              "username",
+              "totpSeed",
+              "apiKey",
+              "recoveryCodes",
+              "cookie",
+              "text"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "type"
+        ],
+        "type": "object"
+      },
+      "name": "request_secret",
+      "title": "Ask the user to set a login Bowmark will need"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Return the dashboard link for one stored secret this account holds, so you can answer \"where is my Acme password?\" with somewhere to go. **It returns a URL, never a value** — opening it requires the user to be signed in and to confirm who they are, and only their own browser can read what comes back.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "description": "The stored secret's name, as `list_secrets` shows it.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "get_secret_link",
+      "title": "Get the user a link to one of their own stored logins"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List the saved logins this account already holds, one entry per login: its `id` (name it in a signed-in call as `{ connection: id }`), the site, which account on that site, whether it works right now (`usable`), and when it was made, last used and last checked.\n\n**Call this before any task that needs a login, and again whenever you come back to one later.** A `usable` login means the site is already signed in: do not ask the user to sign in, just run the script, naming the id if the site has more than one. Prefer the login you used before over a new one.\n\nA login marked `needs_reauth`, `expired` or `logged_out` is not lost. Run the script anyway (name the id if you know it): it pauses with a link, and signing in through that link puts the fresh session back into the SAME id, so you can keep using it. To add a login for a site with none, call `add_connection` — it hands you a sign-in link for the user. `delete_connection` only asks the user to delete one this account already holds.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_connections",
+      "title": "See which sites Bowmark is already signed in to"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Get a sign-in link for one site, so the user can sign Bowmark in to it right now, before any run needs it. Pass the site as a domain (`youtube.com`), a URL, or a provider id. **Call this whenever the user asks to log in, sign in, connect or link an account on a site** — never send them to the Bowmark Link extension or the dashboard to do it themselves.\n\nIt returns `url`, a single-use link that expires (`expiresAt`). Give the user that URL and say which site it is for. On that page they sign in with Bowmark's own browser, or, in desktop Chrome with Bowmark Link installed, press \"Use Chrome extension\" to send the login that Chrome already holds. Then call `wait_for_sign_in` with the returned `ref`: it answers the moment they finish, and every later run uses the new login.\n\nWhen Bowmark cannot sign in to that site, it says so and returns `sites`, the sites it can sign in to. Tell the user plainly. Do not offer a workaround that asks for their password. A public page on that site still works without a login: `get_library` shows what can read it.\n\nTo sign back in to a saved login that stopped working, pass its `id` from `list_connections` as `connection`. The fresh session goes into the SAME id.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "connection": {
+            "description": "Optional. The `id` of a saved login from `list_connections`, to sign back in to it.",
+            "type": "string"
+          },
+          "site": {
+            "description": "The site to sign in to: a domain (`youtube.com`), a URL, its name, or a provider id.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "site"
+        ],
+        "type": "object"
+      },
+      "name": "add_connection",
+      "title": "Get the user a link to sign Bowmark in to a site"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Wait until the user finishes a sign-in link, so you know the moment they are done without asking them. Pass `ref`: `meta.handoff.ref` from a paused run, or `ref` from `add_connection`.\n\n**Call it right after you give the user the link, in the same turn.** Write the link in your reply first, so they can see it while this waits. It holds for up to `waitMs` (default 45000, at most 50000) and answers the moment the sign-in finishes.\n\nIt returns `state`:\n• `done`: every site on the link is signed in. Send the SAME script again now (or carry on with the task after `add_connection`). Do not ask the user whether they are done.\n• `pending`: not yet; `remaining` names the sites still missing. Call it again with the same `ref`. Keep going while the link is live (`expiresAt`, 15 minutes); a person often takes a few minutes.\n• `cancelled`: the user pressed Cancel. Tell them, and do not re-send the script unless they ask.\n• `expired`: the link ran out first. Send the SAME script again; it pauses with a fresh link.\n• `unknown`: no link with that ref on this account. A ref starting `site:` cannot be watched: wait for the user instead.\n\nIf the user replies while you are waiting, answer them; the link is still live and you can wait again.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "ref": {
+            "description": "`meta.handoff.ref` from a paused run, or `ref` from `add_connection`.",
+            "type": "string"
+          },
+          "waitMs": {
+            "description": "How long to wait for the sign-in to finish, in ms. Default 45000, at most 50000.",
+            "minimum": 0,
+            "type": "number"
+          }
+        },
+        "required": [
+          "ref"
+        ],
+        "type": "object"
+      },
+      "name": "wait_for_sign_in",
+      "title": "Wait for the user to finish signing in"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Some sites (LinkedIn, marked 📍 in `get_library`) only accept a login from the address it signed in from. A dedicated IP is one address that only this account uses, and once the account holds one, every sign-in link and every later call on that login uses it automatically.\n\nCall with no arguments first. If the account already holds one, it says so and nothing is bought. Otherwise it returns `priceCents` and a `message` with the price for `termDays` days in `country` (default US). The price is charged up front and is not refundable. If something must happen first (a card on file, a one-time identity check), `mustFirst` names it with the link that fixes it: give your user that link and stop.\n\n**Never buy without asking.** Tell your user the exact price and buy only if they agree, by calling again with `confirmPriceCents` set to the price they agreed to. A live price above that is refused before any charge, and repeating the same call cannot buy two. Pass `another: true` only when your user asked for a second IP.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "another": {
+            "description": "Buy a second IP although the account holds one. Only when your user asked.",
+            "type": "boolean"
+          },
+          "confirmPriceCents": {
+            "description": "The price in US cents your user agreed to, from the unconfirmed call. Only this buys.",
+            "minimum": 0,
+            "type": "number"
+          },
+          "country": {
+            "description": "Two-letter country code for the IP, e.g. \"US\" (the default).",
+            "type": "string"
+          },
+          "termDays": {
+            "description": "How many days the IP is held, paid up front (default 30).",
+            "exclusiveMinimum": 0,
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "name": "lease_ip",
+      "title": "Get the user a dedicated IP for sites that need one"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Start deleting a saved login by the `id` `list_connections` returned. **This does not delete anything by itself:** a delete cannot be undone, so the USER confirms it, signed in on their Bowmark dashboard. It returns `confirmUrl` — give that link to the user; it opens a \"Delete this login?\" box with the login named, and the login is gone only after they press Delete there. Nothing you can call completes it for them.\n\nOnly call this when the user asked to remove a saved login. To sign out of a site, use `logout_connection` instead. Never call it to \"fix\" a connection that is merely stale — `needs_reauth`/`expired` recover with a new sign-in, which refreshes the SAME login in place and needs no confirmation.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "The connection `id` from `list_connections`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "delete_connection",
+      "title": "Ask the user to confirm deleting a saved login"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Sign a saved login out by the `id` `list_connections` returned. Bowmark drops the cookies it held, and where the site supports it (`siteLogout: \"supported\"` in the reply) the session is ended ON THE SITE too — `siteSignedOut: true` means Bowmark checked the site no longer accepts it. The saved login is KEPT, status `logged_out`, so the user can sign back in to the same entry later.\n\nCall this when the user asks to sign out of a site. `delete_connection` is the other action: it hands the user a link to forget the entry entirely, which leaves the site session alive.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "The connection `id` from `list_connections`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "logout_connection",
+      "title": "Sign one of the user's saved logins out"
     }
   ],
   "url": "https://api.bowmark.ai/mcp"

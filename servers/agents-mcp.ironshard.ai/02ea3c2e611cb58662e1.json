@@ -1,0 +1,891 @@
+{
+  "canon_version": "1",
+  "full_hash": "281ea68e339ed1fb4b4b7347b9bcd8f672e04b41f1f10c36bd14b056c44192f4",
+  "name": "ai.ironshard/agent-storage-sandbox",
+  "observed_at": "2026-09-04T02:08:07.099548Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 8,
+  "tools": [
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Creates a 30-day bucket and its secret bearer token.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "create_bucket",
+      "outputSchema": {
+        "description": "Credentials for a newly created sandbox bucket.",
+        "properties": {
+          "bucket_name": {
+            "description": "Name of the newly created bucket.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "bucket_token": {
+            "description": "Bearer credential required with the bucket name for all other operations.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "bucket_name",
+          "bucket_token"
+        ],
+        "type": "object"
+      },
+      "title": "Create Bucket"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Return currently permitted buckets and operations.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "bucket_name": {
+            "description": "Bucket to operate on.",
+            "examples": [
+              "photos"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "bucket_token": {
+            "description": "Secret bearer token returned with the public bucket.",
+            "examples": [
+              "<bucket-token>"
+            ],
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "bucket_name",
+          "bucket_token"
+        ],
+        "type": "object"
+      },
+      "name": "get_bucket_permissions",
+      "outputSchema": {
+        "description": "What operations are allowed on which buckets",
+        "properties": {
+          "buckets": {
+            "items": {
+              "properties": {
+                "bucketRef": {
+                  "anyOf": [
+                    {
+                      "description": "An existing bucket owned by the grantee's team.",
+                      "properties": {
+                        "bucketName": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "const": "existing",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "bucketName"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "description": "A named bucket to create while installing the policy.",
+                      "properties": {
+                        "bucketName": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "const": "provisioned",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "bucketName"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "description": "Buckets the credential holder may create while using the policy.",
+                      "properties": {
+                        "type": {
+                          "const": "__new__",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                },
+                "permissions": {
+                  "items": {
+                    "enum": [
+                      "read",
+                      "write",
+                      "delete"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "bucketRef",
+                "permissions"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "buckets"
+        ],
+        "type": "object"
+      },
+      "title": "Get Bucket Permissions"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Return bucket details with storage and egress usage.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "bucket_name": {
+            "description": "Bucket to operate on.",
+            "examples": [
+              "photos"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "bucket_token": {
+            "description": "Secret bearer token returned with the public bucket.",
+            "examples": [
+              "<bucket-token>"
+            ],
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "bucket_name",
+          "bucket_token"
+        ],
+        "type": "object"
+      },
+      "name": "get_bucket",
+      "outputSchema": {
+        "description": "Public bucket details including its bucket-scoped quota and usage.",
+        "properties": {
+          "bucket_name": {
+            "description": "Bucket to operate on.",
+            "examples": [
+              "photos"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "created_at": {
+            "description": "UTC creation time",
+            "format": "date-time",
+            "type": "string"
+          },
+          "egress": {
+            "description": "Monthly egress quota and current UTC-calendar-month usage in bytes.",
+            "properties": {
+              "quota": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "usage": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "quota",
+              "usage"
+            ],
+            "type": "object"
+          },
+          "object_count": {
+            "description": "Number of objects",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "storage": {
+            "description": "Storage quota and current usage in bytes.",
+            "properties": {
+              "quota": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "usage": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "quota",
+              "usage"
+            ],
+            "type": "object"
+          },
+          "versioning_enabled": {
+            "description": "Whether object versioning is enabled.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "bucket_name",
+          "created_at",
+          "object_count",
+          "versioning_enabled",
+          "storage",
+          "egress"
+        ],
+        "type": "object"
+      },
+      "title": "Get Bucket"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Return a secret, short-lived PUT URL for an object up to 5 GB.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "bucket_name": {
+            "description": "Bucket to operate on.",
+            "examples": [
+              "photos"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "bucket_token": {
+            "description": "Secret bearer token returned with the public bucket.",
+            "examples": [
+              "<bucket-token>"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "object_key": {
+            "description": "Complete object key, including path-like prefixes.",
+            "examples": [
+              "data.parquet",
+              "reports/summary.json"
+            ],
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "bucket_name",
+          "object_key",
+          "bucket_token"
+        ],
+        "type": "object"
+      },
+      "name": "upload_object",
+      "outputSchema": {
+        "description": "A short-lived URL and the HTTP method required to use it.",
+        "properties": {
+          "http_method": {
+            "description": "HTTP method that must be used with the presigned URL.",
+            "enum": [
+              "GET",
+              "PUT"
+            ],
+            "type": "string"
+          },
+          "url": {
+            "description": "Short-lived presigned HTTPS URL containing all authorization information.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "http_method"
+        ],
+        "type": "object"
+      },
+      "title": "Upload Object"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Return a secret, short-lived GET URL for an object's bytes.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "bucket_name": {
+            "description": "Bucket to operate on.",
+            "examples": [
+              "photos"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "bucket_token": {
+            "description": "Secret bearer token returned with the public bucket.",
+            "examples": [
+              "<bucket-token>"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "object_key": {
+            "description": "Complete object key, including path-like prefixes.",
+            "examples": [
+              "data.parquet",
+              "reports/summary.json"
+            ],
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "bucket_name",
+          "object_key",
+          "bucket_token"
+        ],
+        "type": "object"
+      },
+      "name": "download_object",
+      "outputSchema": {
+        "description": "A short-lived URL and the HTTP method required to use it.",
+        "properties": {
+          "http_method": {
+            "description": "HTTP method that must be used with the presigned URL.",
+            "enum": [
+              "GET",
+              "PUT"
+            ],
+            "type": "string"
+          },
+          "url": {
+            "description": "Short-lived presigned HTTPS URL containing all authorization information.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "http_method"
+        ],
+        "type": "object"
+      },
+      "title": "Download Object"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List one page of objects and path-like prefixes, ordered by key.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "bucket_name": {
+            "description": "Bucket to operate on.",
+            "examples": [
+              "photos"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "bucket_token": {
+            "description": "Secret bearer token returned with the public bucket.",
+            "examples": [
+              "<bucket-token>"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "page_size": {
+            "default": 100,
+            "description": "Maximum objects to return, from 1 to 1000.",
+            "examples": [
+              100
+            ],
+            "maximum": 1000,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "page_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Opaque continuation token from the preceding page.",
+            "examples": [
+              "<next-page-token>"
+            ]
+          },
+          "prefix": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Only return keys beginning with this prefix.",
+            "examples": [
+              "reports/"
+            ]
+          },
+          "recursive": {
+            "default": false,
+            "description": "True for a flat listing; false for immediate children.",
+            "examples": [
+              false
+            ],
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "bucket_name",
+          "bucket_token"
+        ],
+        "type": "object"
+      },
+      "name": "list_objects",
+      "outputSchema": {
+        "description": "One page of objects and the token needed to retrieve the next page.",
+        "properties": {
+          "bucket_name": {
+            "description": "Bucket to operate on.",
+            "examples": [
+              "photos"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "common_prefixes": {
+            "description": "Immediate child prefixes when recursive is false. They behave like directories, although object storage has no real directories.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "next_page_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Opaque token for the next page. Pass it unchanged as page_token; null means there are no more results."
+          },
+          "objects": {
+            "items": {
+              "description": "Compact information about an object returned by a listing.",
+              "properties": {
+                "content_type": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "etag": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Storage entity tag; it is not always a content checksum."
+                },
+                "last_modified": {
+                  "anyOf": [
+                    {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "UTC time of the most recent modification."
+                },
+                "object_key": {
+                  "description": "Complete object key, including path-like prefixes.",
+                  "examples": [
+                    "data.parquet",
+                    "reports/summary.json"
+                  ],
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "size_bytes": {
+                  "description": "Object size in bytes.",
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "version_id": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                }
+              },
+              "required": [
+                "object_key",
+                "size_bytes"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "bucket_name"
+        ],
+        "type": "object"
+      },
+      "title": "List Objects"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Delete an object; versioned buckets may retain older versions.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "bucket_name": {
+            "description": "Bucket to operate on.",
+            "examples": [
+              "photos"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "bucket_token": {
+            "description": "Secret bearer token returned with the public bucket.",
+            "examples": [
+              "<bucket-token>"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "object_key": {
+            "description": "Complete object key, including path-like prefixes.",
+            "examples": [
+              "data.parquet",
+              "reports/summary.json"
+            ],
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "bucket_name",
+          "object_key",
+          "bucket_token"
+        ],
+        "type": "object"
+      },
+      "name": "delete_object",
+      "outputSchema": {
+        "description": "Confirmation that an object was deleted.",
+        "properties": {
+          "bucket_name": {
+            "description": "Bucket to operate on.",
+            "examples": [
+              "photos"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "deleted": {
+            "description": "True when the object was deleted.",
+            "type": "boolean"
+          },
+          "object_key": {
+            "description": "Complete object key, including path-like prefixes.",
+            "examples": [
+              "data.parquet",
+              "reports/summary.json"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "bucket_name",
+          "object_key",
+          "deleted"
+        ],
+        "type": "object"
+      },
+      "title": "Delete Object"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Return an object's size, timestamps, ETag, content type, metadata, and tags.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "bucket_name": {
+            "description": "Bucket to operate on.",
+            "examples": [
+              "photos"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "bucket_token": {
+            "description": "Secret bearer token returned with the public bucket.",
+            "examples": [
+              "<bucket-token>"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "object_key": {
+            "description": "Complete object key, including path-like prefixes.",
+            "examples": [
+              "data.parquet",
+              "reports/summary.json"
+            ],
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "bucket_name",
+          "object_key",
+          "bucket_token"
+        ],
+        "type": "object"
+      },
+      "name": "get_object_metadata",
+      "outputSchema": {
+        "description": "Detailed metadata for one object.",
+        "properties": {
+          "bucket_name": {
+            "description": "Bucket to operate on.",
+            "examples": [
+              "photos"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "content_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "etag": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Storage entity tag; it is not always a content checksum."
+          },
+          "last_modified": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "UTC time of the most recent modification."
+          },
+          "metadata": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "User-defined object metadata.",
+            "type": "object"
+          },
+          "object_key": {
+            "description": "Complete object key, including path-like prefixes.",
+            "examples": [
+              "data.parquet",
+              "reports/summary.json"
+            ],
+            "minLength": 1,
+            "type": "string"
+          },
+          "size_bytes": {
+            "description": "Object size in bytes.",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "tags": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "object_key",
+          "size_bytes",
+          "bucket_name"
+        ],
+        "type": "object"
+      },
+      "title": "Get Object Metadata"
+    }
+  ],
+  "url": "https://agents-mcp.ironshard.ai/mcp"
+}

@@ -1,0 +1,415 @@
+{
+  "canon_version": "1",
+  "full_hash": "2c0bea3928fba235498745fdc3060b161eb4add7cada2285ba3344ce83932374",
+  "name": "ai.context-link/context-link",
+  "observed_at": "2026-09-13T02:05:41.687674Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 4,
+  "tools": [
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://widget/context-sources.html",
+        "openai/toolInvocation/invoked": "Got context",
+        "openai/toolInvocation/invoking": "Getting context",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "context:read"
+            ],
+            "type": "oauth2"
+          }
+        ],
+        "ui": {
+          "resourceUri": "ui://widget/context-sources.html"
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get Context"
+      },
+      "description": "Get context from the user's connected workspaces and websites. The attached widget displays only the list of sources consulted — it does not show the retrieved content, so use the returned context to answer the user directly.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "connection_type": {
+            "description": "Optional comma-separated list of connection types to restrict retrieval to (e.g. \"site,email\"). Only content from those sources is considered. Valid types: basecamp, custom, email, files, google_doc, memory, monday, notion, one_drive, site, webmention, youtube.",
+            "type": "string"
+          },
+          "mode": {
+            "description": "Optional mode to weight results (e.g. 'customer-support')",
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "get_context",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "context": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sources": {
+            "items": {
+              "properties": {
+                "chunks_count": {
+                  "type": "integer"
+                },
+                "connection_type": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "integer"
+                },
+                "kind": {
+                  "enum": [
+                    "success",
+                    "no_content",
+                    "signup_required"
+                  ],
+                  "type": "string"
+                },
+                "logo": {
+                  "type": "string"
+                },
+                "post_titles": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "sources",
+          "context"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "context:read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Get Context"
+    },
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://widget/context-sources.html",
+        "openai/toolInvocation/invoked": "Got answer",
+        "openai/toolInvocation/invoking": "Asking Context Link",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "context:read"
+            ],
+            "type": "oauth2"
+          }
+        ],
+        "ui": {
+          "resourceUri": "ui://widget/context-sources.html"
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Ask Question"
+      },
+      "description": "Ask a question about the user's connected workspaces and websites and receive a concise answer with citations. The attached widget displays only the list of sources consulted — it does not show the answer, so always relay the answer text in your reply.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "connection_type": {
+            "description": "Optional comma-separated list of connection types to restrict retrieval to (e.g. \"site,email\"). Only content from those sources is considered. Valid types: basecamp, custom, email, files, google_doc, memory, monday, notion, one_drive, site, webmention, youtube.",
+            "type": "string"
+          },
+          "mode": {
+            "description": "Optional mode to weight results (e.g. 'customer-support')",
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "ask_question",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "answer": {
+            "description": "Concise paragraph answer; empty string when success is false",
+            "type": "string"
+          },
+          "citations": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "n": {
+                  "type": "integer"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "n",
+                "title"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "reason": {
+            "enum": [
+              "ok",
+              "no_context",
+              "llm_error",
+              "empty_input",
+              "auth_required",
+              "signup_required",
+              "pro_required",
+              "allowance_exceeded",
+              "invalid_connection_type"
+            ],
+            "type": "string"
+          },
+          "sources": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "chunks_count": {
+                  "type": "integer"
+                },
+                "connection_type": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "integer"
+                },
+                "kind": {
+                  "enum": [
+                    "success",
+                    "no_content",
+                    "signup_required"
+                  ],
+                  "type": "string"
+                },
+                "logo": {
+                  "type": "string"
+                },
+                "post_titles": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "answer",
+          "citations",
+          "success",
+          "reason",
+          "sources"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "context:read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Ask Question"
+    },
+    {
+      "_meta": {
+        "openai/toolInvocation/invoked": "Saved to memory",
+        "openai/toolInvocation/invoking": "Saving to memory",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "context:write"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Save Memory"
+      },
+      "description": "Save content to the user's memory for later retrieval. Use this when the user wants to save information, notes, or conversation content.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "content": {
+            "description": "The content to save. Can be plain text, markdown, or structured content.",
+            "type": "string"
+          },
+          "namespace": {
+            "description": "A name/label for this memory (use-dashes-for-spaces). If omitted, a timestamped name is generated.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "content"
+        ],
+        "type": "object"
+      },
+      "name": "save_memory",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "namespace": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "namespace"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "context:write"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Save Memory"
+    },
+    {
+      "_meta": {
+        "openai/toolInvocation/invoked": "Retrieved memory",
+        "openai/toolInvocation/invoking": "Retrieving memory",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "context:read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Memory"
+      },
+      "description": "Retrieve previously saved memory content by its namespace. Use this when the user wants to recall saved content.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "namespace": {
+            "description": "The namespace/name of the saved memory to retrieve",
+            "type": "string"
+          }
+        },
+        "required": [
+          "namespace"
+        ],
+        "type": "object"
+      },
+      "name": "get_memory",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "found": {
+            "type": "boolean"
+          },
+          "namespace": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "content",
+          "namespace",
+          "found"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "context:read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Get Memory"
+    }
+  ],
+  "url": "https://www.context-link.ai/mcp"
+}

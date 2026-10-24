@@ -1,15 +1,15 @@
 {
   "canon_version": "1",
-  "full_hash": "923410ef40518c5de6e39c38f5d13b7a108309d07915df3d8bf76a1cc749d14e",
+  "full_hash": "94d0f9fb1e14c5af0553fb20661724bec1c595a80f0848c22a0d1caf5f6202cb",
   "name": "ai.maximem/synap",
-  "observed_at": "2026-08-20T09:12:06.933904Z",
+  "observed_at": "2026-08-27T02:04:19.800985Z",
   "sources": [
     "official"
   ],
   "tool_count": 4,
   "tools": [
     {
-      "description": "After each user message, send the exchange here so it can be remembered. You do not need to decide what is important — just forward the user message (and your reply, if you have one) and Synap will keep what matters. If your app serves more than one end-user, pass that person's stable id as user_id (or an organization id as customer_id) so each person's memory stays separate; if every conversation is the same single user, omit them. Logging is fire-and-forget by default; set wait_for_processing=true only when you need to confirm the memory finished extracting before continuing.",
+      "description": "After each user message, send the exchange here so it can be remembered. You do not need to decide what is important, just forward the user message (and your reply, if you have one) and Synap will keep what matters. If your app serves more than one end-user, pass that person's stable id as user_id so each person's memory stays separate; if every conversation is the same single user, omit it. SCOPING: customer_id is B2B ONLY. On a B2B instance (user_context_isolation=strict) it is REQUIRED and a user_id on its own is an error. On a B2C instance (user_context_isolation=equals_customer) it is NOT accepted: the API rejects it with HTTP 400, customer-scoped retrieval does not exist there, and user_id is the whole identity. If you do not know which mode this instance is in, send user_id only and no customer_id; GET /api/v1/auth/whoami reports the mode as user_context_isolation. Logging is fire-and-forget by default; set wait_for_processing=true only when you need to confirm the memory finished extracting before continuing.",
       "inputSchema": {
         "properties": {
           "assistant_message": {
@@ -39,6 +39,7 @@
               }
             ],
             "default": null,
+            "description": "B2B ONLY. Required on a B2B instance (user_context_isolation=strict), where a user_id on its own is an error. NOT accepted on a B2C instance (user_context_isolation=equals_customer): the API rejects it with HTTP 400 and there is no customer scope to read from. When in doubt leave this out and send user_id alone. GET /api/v1/auth/whoami reports the mode.",
             "title": "Customer Id"
           },
           "user_id": {
@@ -51,6 +52,7 @@
               }
             ],
             "default": null,
+            "description": "Stable id of the end-user this call belongs to. On a B2C instance this is the ONLY identifier you send and it is the whole identity. On a B2B instance send it together with customer_id. Omit both if every conversation is the same single user.",
             "title": "User Id"
           },
           "user_message": {
@@ -85,7 +87,7 @@
       }
     },
     {
-      "description": "Check whether a logged exchange has finished processing. Pass the ingestion_id returned by log_exchange. Returns the processing status and how many memories were extracted. Useful to confirm a save completed (extraction is asynchronous).",
+      "description": "Check whether a logged exchange has finished processing. Pass the ingestion_id returned by log_exchange. Returns the processing status and how many memories were extracted. Useful to confirm a save completed (extraction is asynchronous). Takes no user_id or customer_id: an ingestion_id already identifies the write, so the identifier contract does not apply here.",
       "inputSchema": {
         "properties": {
           "ingestion_id": {
@@ -115,7 +117,7 @@
       }
     },
     {
-      "description": "Before replying, call this to recall anything already known about this user from past conversations. Use the user's latest message as the query. If you serve multiple end-users, pass the same user_id (or customer_id) you log with so you recall the right person's memory.",
+      "description": "Before replying, call this to recall anything already known about this user from past conversations. Use the user's latest message as the query. If you serve multiple end-users, pass the same user_id you log with so you recall the right person's memory. SCOPING: customer_id is B2B ONLY. On a B2B instance (user_context_isolation=strict) it is REQUIRED and a user_id on its own is an error. On a B2C instance (user_context_isolation=equals_customer) it is NOT accepted: the API rejects it with HTTP 400, customer-scoped retrieval does not exist there, and user_id is the whole identity. If you do not know which mode this instance is in, send user_id only and no customer_id; GET /api/v1/auth/whoami reports the mode as user_context_isolation.",
       "inputSchema": {
         "properties": {
           "customer_id": {
@@ -128,6 +130,7 @@
               }
             ],
             "default": null,
+            "description": "B2B ONLY. Required on a B2B instance (user_context_isolation=strict), where a user_id on its own is an error. NOT accepted on a B2C instance (user_context_isolation=equals_customer): the API rejects it with HTTP 400 and there is no customer scope to read from. When in doubt leave this out and send user_id alone. GET /api/v1/auth/whoami reports the mode.",
             "title": "Customer Id"
           },
           "max_results": {
@@ -156,6 +159,7 @@
               }
             ],
             "default": null,
+            "description": "Stable id of the end-user this call belongs to. On a B2C instance this is the ONLY identifier you send and it is the whole identity. On a B2B instance send it together with customer_id. Omit both if every conversation is the same single user.",
             "title": "User Id"
           }
         },
@@ -181,7 +185,7 @@
       }
     },
     {
-      "description": "List recent things remembered about this user. Useful for debugging or to confirm that memory is working. Pass user_id/customer_id to scope to one person.",
+      "description": "List recent things remembered about this user. Useful for debugging or to confirm that memory is working. Pass user_id to scope to one person. SCOPING: customer_id is B2B ONLY. On a B2B instance (user_context_isolation=strict) it is REQUIRED and a user_id on its own is an error. On a B2C instance (user_context_isolation=equals_customer) it is NOT accepted: the API rejects it with HTTP 400, customer-scoped retrieval does not exist there, and user_id is the whole identity. If you do not know which mode this instance is in, send user_id only and no customer_id; GET /api/v1/auth/whoami reports the mode as user_context_isolation.",
       "inputSchema": {
         "properties": {
           "customer_id": {
@@ -194,6 +198,7 @@
               }
             ],
             "default": null,
+            "description": "B2B ONLY. Required on a B2B instance (user_context_isolation=strict), where a user_id on its own is an error. NOT accepted on a B2C instance (user_context_isolation=equals_customer): the API rejects it with HTTP 400 and there is no customer scope to read from. When in doubt leave this out and send user_id alone. GET /api/v1/auth/whoami reports the mode.",
             "title": "Customer Id"
           },
           "max_results": {
@@ -211,6 +216,7 @@
               }
             ],
             "default": null,
+            "description": "Stable id of the end-user this call belongs to. On a B2C instance this is the ONLY identifier you send and it is the whole identity. On a B2B instance send it together with customer_id. Omit both if every conversation is the same single user.",
             "title": "User Id"
           }
         },

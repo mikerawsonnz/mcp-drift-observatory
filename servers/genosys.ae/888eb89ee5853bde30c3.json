@@ -1,0 +1,610 @@
+{
+  "canon_version": "1",
+  "full_hash": "9248b9bafac7368e0e7d1b33a52eed6f1d6f576693a9afd00a214d29c8285377",
+  "name": "ae.genosys/genosys",
+  "observed_at": "2026-10-13T02:05:23.838488Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 11,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Search the live GENOSYS UAE catalog (Korean professional skincare, haircare, devices, beauty boxes). Use for any \"what do you have for...\" question. Accepts plain language in English, Russian or Arabic, plus optional filters. Returns name, price in AED (VAT included), size, stock, concerns and the product link.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "category": {
+            "description": "Category filter, e.g. Serum, Cream, Mask, Cleanser, Toner/Mist, Sun, Cushion BB, Eye care, Scalp/Hair, Beauty Boxes, Device, Microneedling, PRO Solution. Call list_categories for the full list.",
+            "maxLength": 60,
+            "type": "string"
+          },
+          "concern": {
+            "description": "Skin concern, e.g. hydration, anti-aging, sensitivity, pore-care, brightening, acne-blemishes, eye-care, hair-loss, sun-protection.",
+            "maxLength": 60,
+            "type": "string"
+          },
+          "in_stock_only": {
+            "type": "boolean"
+          },
+          "limit": {
+            "description": "Default 8.",
+            "maximum": 25,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "locale": {
+            "description": "Language of descriptions and links: en (default), ru or ar. Product names stay in English.",
+            "enum": [
+              "en",
+              "ru",
+              "ar"
+            ],
+            "type": "string"
+          },
+          "max_price_aed": {
+            "description": "Only products at or below this price (AED, VAT included).",
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "query": {
+            "description": "What the shopper wants, e.g. \"serum for dry skin\", \"SPF cushion\", \"hair loss shampoo\".",
+            "maxLength": 200,
+            "type": "string"
+          },
+          "skin_type": {
+            "enum": [
+              "dry",
+              "oily",
+              "combination",
+              "normal",
+              "sensitive",
+              "mature"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "search_products",
+      "title": "Search GENOSYS products"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Full details for one product: description, key features, benefits, key ingredients and actives, step-by-step how to use, sizes or shades with prices, and an add-to-bag link. Use the id from search_products (e.g. \"18\" or \"68\").",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "locale": {
+            "description": "Language of descriptions and links: en (default), ru or ar. Product names stay in English.",
+            "enum": [
+              "en",
+              "ru",
+              "ar"
+            ],
+            "type": "string"
+          },
+          "product_id": {
+            "description": "Product id from search_products, e.g. \"18\".",
+            "maxLength": 64,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_product",
+      "title": "Get GENOSYS product details"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Ranked product picks for a shopper's skin type and concerns, the same scoring as the skin quiz on genosys.ae. Use when someone describes their skin and asks what to use.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "age_group": {
+            "enum": [
+              "teen",
+              "young-adult",
+              "adult",
+              "mature"
+            ],
+            "type": "string"
+          },
+          "at_home_only": {
+            "description": "True (default) leaves out professional clinic-only products.",
+            "type": "boolean"
+          },
+          "concerns": {
+            "description": "e.g. [\"hydration\",\"anti-aging\"]. Tags: hydration, anti-aging, sensitivity, pore-care, brightening, acne-blemishes, eye-care, hair, hair-loss.",
+            "items": {
+              "maxLength": 40,
+              "type": "string"
+            },
+            "maxItems": 6,
+            "type": "array"
+          },
+          "limit": {
+            "description": "Default 6.",
+            "maximum": 12,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "locale": {
+            "description": "Language of descriptions and links: en (default), ru or ar. Product names stay in English.",
+            "enum": [
+              "en",
+              "ru",
+              "ar"
+            ],
+            "type": "string"
+          },
+          "skin_type": {
+            "enum": [
+              "dry",
+              "oily",
+              "combination",
+              "normal",
+              "sensitive"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "recommend_routine",
+      "title": "Recommend a GENOSYS routine"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "All product categories and skin concerns in the live catalog, with product counts. Use to orient before searching.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_categories",
+      "title": "List GENOSYS categories"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Build one link that opens genosys.ae with these items already in the shopper's bag, ready to check out. Use when the shopper decides to buy. Products with sizes or shades (see get_product options) need one picked: pass size, or color as its label or value (e.g. \"#01 Bright\").",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "items": {
+            "items": {
+              "properties": {
+                "color": {
+                  "maxLength": 60,
+                  "type": "string"
+                },
+                "product_id": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "quantity": {
+                  "maximum": 20,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "size": {
+                  "maxLength": 40,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "product_id"
+              ],
+              "type": "object"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "type": "object"
+      },
+      "name": "create_bag_link",
+      "title": "Create a GENOSYS bag link"
+    },
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://genosys/checkout-v1.html",
+        "openai/toolInvocation/invoked": "Checkout ready",
+        "openai/toolInvocation/invoking": "Preparing checkout…",
+        "openai/widgetAccessible": true,
+        "ui": {
+          "resourceUri": "ui://genosys/checkout-v1.html"
+        },
+        "ui/resourceUri": "ui://genosys/checkout-v1.html"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Show the shopper a checkout form for these items: shade picker where needed, quantities, delivery details (name, email, phone, emirate, address), live total and a button that creates the order and opens secure Stripe payment. Use when the shopper wants to buy. Pass any details the shopper already gave as prefill.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "items": {
+            "items": {
+              "properties": {
+                "color": {
+                  "maxLength": 60,
+                  "type": "string"
+                },
+                "product_id": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "quantity": {
+                  "maximum": 20,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "size": {
+                  "maxLength": 40,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "product_id"
+              ],
+              "type": "object"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "type": "array"
+          },
+          "locale": {
+            "description": "Language of descriptions and links: en (default), ru or ar. Product names stay in English.",
+            "enum": [
+              "en",
+              "ru",
+              "ar"
+            ],
+            "type": "string"
+          },
+          "prefill": {
+            "properties": {
+              "address": {
+                "maxLength": 500,
+                "type": "string"
+              },
+              "email": {
+                "maxLength": 200,
+                "type": "string"
+              },
+              "emirate": {
+                "enum": [
+                  "Dubai",
+                  "Abu Dhabi",
+                  "Sharjah",
+                  "Ajman",
+                  "Ras Al Khaimah",
+                  "Fujairah",
+                  "Umm Al Quwain"
+                ],
+                "type": "string"
+              },
+              "name": {
+                "maxLength": 100,
+                "type": "string"
+              },
+              "notes": {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              "phone": {
+                "maxLength": 30,
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "type": "object"
+      },
+      "name": "open_checkout",
+      "title": "Open GENOSYS checkout"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Create a GENOSYS UAE order from this chat and get a secure Stripe payment link (card, Apple Pay, Google Pay). Call only after the shopper has confirmed the items, the total and their delivery details. The order is confirmed by email once paid; unpaid orders are not shipped. Delivery is UAE only. Prices are retail AED including VAT.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "customer": {
+            "properties": {
+              "address": {
+                "description": "Building or villa, street, area, and apartment number.",
+                "maxLength": 500,
+                "minLength": 8,
+                "type": "string"
+              },
+              "email": {
+                "description": "Receipt and order updates go here. If it matches a GENOSYS account, the order appears in that account.",
+                "format": "email",
+                "maxLength": 200,
+                "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+                "type": "string"
+              },
+              "emirate": {
+                "enum": [
+                  "Dubai",
+                  "Abu Dhabi",
+                  "Sharjah",
+                  "Ajman",
+                  "Ras Al Khaimah",
+                  "Fujairah",
+                  "Umm Al Quwain"
+                ],
+                "type": "string"
+              },
+              "name": {
+                "description": "Full name of the person receiving the order.",
+                "maxLength": 100,
+                "minLength": 2,
+                "type": "string"
+              },
+              "phone": {
+                "description": "For the courier: UAE number or one with its country code.",
+                "maxLength": 30,
+                "minLength": 7,
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "email",
+              "phone",
+              "emirate",
+              "address"
+            ],
+            "type": "object"
+          },
+          "items": {
+            "items": {
+              "properties": {
+                "color": {
+                  "description": "Shade label or value, e.g. \"#01 Bright\".",
+                  "maxLength": 60,
+                  "type": "string"
+                },
+                "product_id": {
+                  "description": "Id from search_products / get_product.",
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "quantity": {
+                  "maximum": 20,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "size": {
+                  "maxLength": 40,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "product_id"
+              ],
+              "type": "object"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "type": "array"
+          },
+          "locale": {
+            "description": "Language of descriptions and links: en (default), ru or ar. Product names stay in English.",
+            "enum": [
+              "en",
+              "ru",
+              "ar"
+            ],
+            "type": "string"
+          },
+          "notes": {
+            "description": "Delivery notes, e.g. preferred time.",
+            "maxLength": 1000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "items",
+          "customer"
+        ],
+        "type": "object"
+      },
+      "name": "place_order",
+      "title": "Place a GENOSYS order"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Status and payment of a GENOSYS order. Needs the order number and the email used for the order.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "email": {
+            "format": "email",
+            "maxLength": 200,
+            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+            "type": "string"
+          },
+          "order_number": {
+            "maxLength": 40,
+            "minLength": 6,
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_number",
+          "email"
+        ],
+        "type": "object"
+      },
+      "name": "order_status",
+      "title": "Check a GENOSYS order"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Delivery areas, times and fees, payment methods, returns, contact (WhatsApp, email), apps and policies for GENOSYS UAE.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "locale": {
+            "description": "Language of descriptions and links: en (default), ru or ar. Product names stay in English.",
+            "enum": [
+              "en",
+              "ru",
+              "ar"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "store_info",
+      "title": "GENOSYS store information"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Search GENOSYS products and skincare articles. Returns ids to pass to fetch. (\"product:<id>\" for products, \"blog:<slug>\" for articles.)",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "query": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search",
+      "title": "Search GENOSYS"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Full text of a result from search, by id (\"product:18\" or \"blog:<slug>\").",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "id": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "fetch",
+      "title": "Fetch a GENOSYS product or article"
+    }
+  ],
+  "url": "https://genosys.ae/mcp"
+}

@@ -1,23 +1,68 @@
 {
   "canon_version": "1",
-  "full_hash": "1d87a8df10472e63a6fef94e12d60494b1b704d082ae78674fc5174a5765e8b6",
+  "full_hash": "b35f62fac3b8e81bae03e7f086e04fe5bf51b3df0be376b9c23d8fbfcf7776eb",
   "name": "ai.agentplaybooks/agentplaybooks",
-  "observed_at": "2026-08-20T09:11:19.657808Z",
+  "observed_at": "2026-09-12T02:05:06.301168Z",
   "sources": [
     "official"
   ],
-  "tool_count": 47,
+  "tool_count": 50,
   "tools": [
     {
-      "description": "List playbooks owned by or shared with the authenticated user, including access role and content counts.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List playbooks owned by or shared with the authenticated user, including access role and content counts. Read-only; it does not create or modify playbooks. Use get_playbook when you need the singleton persona, skills, connected servers, and memory for one playbook. Requires playbooks:read or full permission.",
       "inputSchema": {
         "properties": {},
         "type": "object"
       },
-      "name": "list_playbooks"
+      "name": "list_playbooks",
+      "outputSchema": {
+        "properties": {
+          "playbooks": {
+            "items": {
+              "additionalProperties": true,
+              "properties": {
+                "current_user_role": {
+                  "type": "string"
+                },
+                "guid": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "persona_count": {
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "playbooks"
+        ],
+        "type": "object"
+      },
+      "title": "List playbooks"
     },
     {
-      "description": "Create a new playbook. A playbook is a container for personas (AI personalities), skills (capabilities), and memory (persistent storage).",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create a new playbook container for a singleton persona, skills, and memory. Each call inserts a new playbook; it does not upsert by name. Requires playbooks:write or full permission. Use update_playbook to change an existing playbook, not this tool.",
       "inputSchema": {
         "properties": {
           "description": {
@@ -67,10 +112,17 @@
         ],
         "type": "object"
       },
-      "name": "create_playbook"
+      "name": "create_playbook",
+      "title": "Create playbook"
     },
     {
-      "description": "Get a playbook with its singleton persona, skills, connected MCP servers, and memory.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Get a playbook with its singleton persona, skills, connected MCP servers, and memory. This is the only persona retrieval tool; there is no get_persona. Read-only. Requires playbooks:read or full permission. Use list_playbooks to discover IDs first, and get_skill when you need one skill's full content rather than the playbook summary.",
       "inputSchema": {
         "properties": {
           "playbook_id": {
@@ -83,10 +135,17 @@
         ],
         "type": "object"
       },
-      "name": "get_playbook"
+      "name": "get_playbook",
+      "title": "Get playbook"
     },
     {
-      "description": "Delete a playbook and all its contents (personas, skills, memory, API keys). This action cannot be undone!",
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Permanently delete a playbook and all of its contents (persona, skills, memory, API keys, canvas, and secrets). This cannot be undone. Requires playbooks:write or full permission, and only the owner may delete. Do not use this to reset a persona (delete_persona) or remove a single skill or memory; those have dedicated tools.",
       "inputSchema": {
         "properties": {
           "playbook_id": {
@@ -99,10 +158,17 @@
         ],
         "type": "object"
       },
-      "name": "delete_playbook"
+      "name": "delete_playbook",
+      "title": "Delete playbook"
     },
     {
-      "description": "Set the singleton persona (AI identity and system prompt) for a playbook. Backward-compatible alias for updating persona fields.",
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Set the playbook's singleton persona name and system prompt. This does not add a second persona; it is a backward-compatible alias that overwrites those fields. Requires personas:write or full permission. Prefer update_persona to change a subset of fields. Use update_playbook only when you also need playbook name, visibility, config, or project instructions. Do not use delete_persona unless you intend to reset to the default Assistant.",
       "inputSchema": {
         "properties": {
           "metadata": {
@@ -129,10 +195,17 @@
         ],
         "type": "object"
       },
-      "name": "create_persona"
+      "name": "create_persona",
+      "title": "Create persona"
     },
     {
-      "description": "Update a persona's name, system prompt, or metadata.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Update the singleton persona's name, system prompt, or metadata without resetting to defaults. persona_id must equal playbook_id because the persona is stored on the playbook row. Requires personas:write or full permission. Use create_persona to replace name and system prompt together, delete_persona to reset to the default Assistant, and update_playbook when changing playbook-level fields as well.",
       "inputSchema": {
         "properties": {
           "metadata": {
@@ -144,7 +217,7 @@
             "type": "string"
           },
           "persona_id": {
-            "description": "UUID of the persona",
+            "description": "Must equal playbook_id; the persona is a singleton stored on the playbook",
             "type": "string"
           },
           "playbook_id": {
@@ -162,14 +235,21 @@
         ],
         "type": "object"
       },
-      "name": "update_persona"
+      "name": "update_persona",
+      "title": "Update persona"
     },
     {
-      "description": "Reset the singleton persona to the default assistant. The playbook always retains one logical persona.",
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Reset the playbook's singleton persona to the default Assistant name and system prompt. Despite the delete_* name, this is not a hard delete: each playbook always keeps exactly one logical persona, so the fields are overwritten rather than removed. persona_id must equal playbook_id because the persona is stored on the playbook row. Custom name, system prompt, and metadata are permanently replaced and cannot be undone. Requires personas:write or full permission. Use update_persona to change fields without resetting, create_persona to set a new identity, and delete_playbook only when the entire playbook should be removed.",
       "inputSchema": {
         "properties": {
           "persona_id": {
-            "description": "UUID of the persona to delete",
+            "description": "Must equal playbook_id; the persona is a singleton stored on the playbook",
             "type": "string"
           },
           "playbook_id": {
@@ -183,10 +263,80 @@
         ],
         "type": "object"
       },
-      "name": "delete_persona"
+      "name": "delete_persona",
+      "title": "Delete persona"
     },
     {
-      "description": "List all skills (capabilities/rules) in this playbook Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Search this playbook's complete tool catalog by keyword: the built-in playbook tools (memory, skills, canvas, workflow runs, secrets) and every connected server's federated tools (names like supabase__execute_sql or cloudflare__search). Matches against tool names and descriptions; a name match ranks above a description match. Returns up to `limit` (default 10, max 25) entries with name, description, and full input schema. Every returned tool can be called directly by name even when it is absent from tools/list — the advertised list is a view, not a boundary, unless this connection was pinned with ?toolset=. Read-only and free of side effects. Use this when the tool you need is not in your current list, before concluding a capability is missing. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "Maximum matches to return (default 10, max 25)",
+            "type": "number"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "query": {
+            "description": "Keywords to match against tool names and descriptions, e.g. 'sql tables' or 'archive memory'",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "find_tools",
+      "outputSchema": {
+        "properties": {
+          "matches": {
+            "items": {
+              "properties": {
+                "description": {
+                  "type": "string"
+                },
+                "inputSchema": {
+                  "type": "object"
+                },
+                "name": {
+                  "description": "Callable tool name",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "description",
+                "inputSchema"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "matches"
+        ],
+        "type": "object"
+      },
+      "title": "Find tools"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List every skill currently attached to this playbook, returning id, name, description, content, licence, and priority ordered by priority descending. Read-only; it does not create or change skills. Use this to discover skill_id values before get_skill, update_skill, or delete_skill. Do not use list_skill_versions, which lists historical revisions of a single skill, or get_playbook, which only summarizes skills. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "playbook_id": {
@@ -199,10 +349,70 @@
         ],
         "type": "object"
       },
-      "name": "list_skills"
+      "name": "list_skills",
+      "outputSchema": {
+        "properties": {
+          "skills": {
+            "items": {
+              "properties": {
+                "content": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "description": "Skill UUID",
+                  "type": "string"
+                },
+                "licence": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "priority": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "publisher_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "skills"
+        ],
+        "type": "object"
+      },
+      "title": "List skills"
     },
     {
-      "description": "Get detailed information about a specific skill Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Return the full definition of one skill in this playbook, including name, description, content, priority, and attachments. Identify the skill with skill_id, which may be a UUID or the skill's kebab-case name. This lookup does not modify the skill. Use list_skills first to discover IDs and names. Do not use list_skill_versions (historical revisions) or get_playbook (persona and summaries, not full skill content). Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "playbook_id": {
@@ -220,10 +430,70 @@
         ],
         "type": "object"
       },
-      "name": "get_skill"
+      "name": "get_skill",
+      "outputSchema": {
+        "properties": {
+          "content": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "licence": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "playbook_id": {
+            "type": "string"
+          },
+          "priority": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "publisher_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "skill_attachments": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Get skill"
     },
     {
-      "description": "Read a specific memory entry by key. Automatically increments access count. Memory supports 3 tiers: 'working' (active scratch pad), 'contextual' (recent context), 'longterm' (archived). Use 'hierarchical' memory_type for complex task graphs with parallel threads. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Read one memory entry by key and return its value, tags, tier, summary, and metadata. This is not a pure read: it increments access_count and updates last_accessed_at as a side effect, without changing the stored value. There is no update_memory; use write_memory to overwrite a key. Use search_memory to find keys, get_memory_context for a tiered summary, or get_memory_tree for hierarchical task graphs. Do not pass memory_type; that filter belongs to search_memory. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "key": {
@@ -241,16 +511,96 @@
         ],
         "type": "object"
       },
-      "name": "read_memory"
+      "name": "read_memory",
+      "outputSchema": {
+        "properties": {
+          "access_count": {
+            "type": "number"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "is_archived": {
+            "type": "boolean"
+          },
+          "key": {
+            "type": "string"
+          },
+          "memory_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "parent_key": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "priority": {
+            "type": "number"
+          },
+          "summary": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "tier": {
+            "enum": [
+              "working",
+              "contextual",
+              "longterm"
+            ],
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          },
+          "value": {}
+        },
+        "type": "object"
+      },
+      "title": "Read memory"
     },
     {
-      "description": "Search memories by text, tags, tier, or type. Returns summaries for large memories. Use tags for categorical search; use tier to focus on active vs archived data; use memory_type to find task graphs. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Search memory keys, JSON values, descriptions and summaries. Defaults to current, non-archived memories. scope='archived' searches archived entries and previous versions; scope='all' searches both. Results include memory_at and history_id (null for current entries). Use get_memory_history for one key's previous versions, or read_memory for its current value. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
+          "after": {
+            "description": "Inclusive lower bound on memory_at",
+            "format": "date-time",
+            "type": "string"
+          },
+          "before": {
+            "description": "Inclusive upper bound on memory_at",
+            "format": "date-time",
+            "type": "string"
+          },
           "include_children": {
             "default": false,
             "description": "Include child memories in results",
             "type": "boolean"
+          },
+          "limit": {
+            "default": 100,
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
           },
           "memory_type": {
             "description": "Filter by memory type",
@@ -260,12 +610,26 @@
             ],
             "type": "string"
           },
+          "offset": {
+            "default": 0,
+            "minimum": 0,
+            "type": "integer"
+          },
           "playbook_id": {
             "description": "UUID or GUID of the target playbook",
             "type": "string"
           },
+          "scope": {
+            "default": "active",
+            "enum": [
+              "active",
+              "archived",
+              "all"
+            ],
+            "type": "string"
+          },
           "search": {
-            "description": "Search in keys, descriptions, and summaries",
+            "description": "Literal text in keys, JSON values, descriptions and summaries",
             "type": "string"
           },
           "status": {
@@ -301,18 +665,76 @@
         ],
         "type": "object"
       },
-      "name": "search_memory"
+      "name": "search_memory",
+      "title": "Search memory"
     },
     {
-      "description": "Write a memory entry. Use tier='working' for active tasks, 'contextual' for background context, 'longterm' for completed work. Set memory_type='hierarchical' and parent_key to build task graphs. Use status to track task progress in parallel workflows. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Read previous versions of a memory by its current key, including original memory_at and saved contents. History is excluded from normal search. To restore a version, write its contents and memory_at with write_memory and is_archived=false. Read-only. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
+      "inputSchema": {
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "limit": {
+            "default": 100,
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "search": {
+            "description": "Optional text within this memory's history",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "key"
+        ],
+        "type": "object"
+      },
+      "name": "get_memory_history",
+      "title": "Memory history"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create or update a memory by key; previous contents are saved automatically and readable with get_memory_history. memory_at is optional and defaults to this save's time; supply an ISO timestamp to preserve an earlier time. is_archived=true hides the entry from normal search/context; false restores it. Tier controls context priority independently of archiving. Requires memory:write or full permission. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "description": {
             "description": "Human-readable description",
             "type": "string"
           },
+          "is_archived": {
+            "description": "Hide from normal search; false restores an archived entry",
+            "type": "boolean"
+          },
           "key": {
             "description": "Memory key",
+            "type": "string"
+          },
+          "memory_at": {
+            "description": "Memory time including timezone; defaults to save time",
+            "format": "date-time",
             "type": "string"
           },
           "memory_type": {
@@ -371,8 +793,7 @@
             "type": "string"
           },
           "value": {
-            "description": "Value to store",
-            "type": "object"
+            "description": "JSON value to store"
           }
         },
         "required": [
@@ -382,10 +803,17 @@
         ],
         "type": "object"
       },
-      "name": "write_memory"
+      "name": "write_memory",
+      "title": "Write memory"
     },
     {
-      "description": "Delete a memory entry (requires API key) Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Permanently delete a memory and its saved history. Requires memory:write or full permission. To hide an entry while retaining its content, use archive_memories instead. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "key": {
@@ -403,10 +831,17 @@
         ],
         "type": "object"
       },
-      "name": "delete_memory"
+      "name": "delete_memory",
+      "title": "Delete memory"
     },
     {
-      "description": "Consolidate multiple related memories into a parent memory with summary. Reduces context size while preserving detail access via children. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Consolidate related memories under a new parent memory with a summary. Child rows stay readable; by default they are archived to the longterm tier rather than deleted. Requires memory:write or full permission. Use delete_memory only when a key should be destroyed, and archive_memories to move entries to longterm without creating a parent. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "archive_children": {
@@ -449,10 +884,17 @@
         ],
         "type": "object"
       },
-      "name": "consolidate_memories"
+      "name": "consolidate_memories",
+      "title": "Consolidate memories"
     },
     {
-      "description": "Promote a memory to a higher tier or boost its priority for active use. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Restore a memory's visibility, promote it to a higher tier or boost its priority for active use. This tool cannot demote; use archive_memories to archive entries. Repeating the call with priority_boost increases priority again. Requires memory:write or full permission. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "key": {
@@ -483,10 +925,17 @@
         ],
         "type": "object"
       },
-      "name": "promote_memory"
+      "name": "promote_memory",
+      "title": "Promote memory"
     },
     {
-      "description": "Get a context-optimized view of memories. Returns full working memory, summaries for contextual, and keys only for longterm. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Get a context-optimized view of memories: full working memory, summaries for contextual, and keys only for longterm. Read-only. Use this to pack a prompt; use read_memory for one key, search_memory to filter, and get_memory_tree for parent-child task graphs. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "expand_keys": {
@@ -530,17 +979,46 @@
         ],
         "type": "object"
       },
-      "name": "get_memory_context"
+      "name": "get_memory_context",
+      "outputSchema": {
+        "properties": {
+          "tiers": {
+            "additionalProperties": {
+              "items": {
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "type": "object"
+          },
+          "total_items": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "tiers",
+          "total_items"
+        ],
+        "type": "object"
+      },
+      "title": "Get memory context"
     },
     {
-      "description": "Archive memories from working/contextual to longterm tier. Useful for cleaning up after completing tasks. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Hide matching memories from normal search and context, retaining them in the longterm tier. Search scope='archived' to find them or read_memory by key. Filters combine as AND; older_than_hours uses memory_at. Permanent-retention entries are skipped. promote_memory restores visibility. Requires memory:write or full permission. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "from_tier": {
             "description": "Only archive from this tier",
             "enum": [
               "working",
-              "contextual"
+              "contextual",
+              "longterm"
             ],
             "type": "string"
           },
@@ -577,10 +1055,17 @@
         ],
         "type": "object"
       },
-      "name": "archive_memories"
+      "name": "archive_memories",
+      "title": "Archive memories"
     },
     {
-      "description": "Get hierarchical tree view of memories showing parent-child relationships. Use this to visualize task graphs and track parallel operations. Includes status for each node. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Get a hierarchical tree of memories showing parent-child relationships and per-node status. Read-only. Use this to visualize task graphs; use search_memory to filter flat lists, get_memory_context for a tiered prompt view, and read_memory for a single key's full value. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "include_values": {
@@ -607,10 +1092,42 @@
         ],
         "type": "object"
       },
-      "name": "get_memory_tree"
+      "name": "get_memory_tree",
+      "outputSchema": {
+        "properties": {
+          "root": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "total_nodes": {
+            "type": "number"
+          },
+          "tree": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "root",
+          "tree",
+          "total_nodes"
+        ],
+        "type": "object"
+      },
+      "title": "Get memory tree"
     },
     {
-      "description": "Create a hierarchical task plan in one call. Creates a parent 'plan' memory with children for each subtask. Use this for complex multi-threaded work that agent swarms can coordinate on. Each subtask gets its own memory node with status tracking. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create a hierarchical task plan in one call: a parent plan memory plus a child node per subtask. Upserts by key, so repeating the same plan_key overwrites the previous graph. Requires memory:write or full permission. Use write_memory for a single node, update_task_status to move a node through pending/running/completed, and get_memory_tree to inspect the graph. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "plan_key": {
@@ -680,10 +1197,17 @@
         ],
         "type": "object"
       },
-      "name": "create_task_graph"
+      "name": "create_task_graph",
+      "title": "Create task graph"
     },
     {
-      "description": "Update the status of a task node in a hierarchical plan. When all children of a parent are 'completed', the parent is auto-updated. Returns the current subtree state. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Update the status of a task node in a hierarchical plan. When all children of a parent are completed, the parent is auto-updated. Returns the current subtree state. Requires memory:write or full permission. Use create_task_graph to build the plan, not this tool. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "key": {
@@ -721,10 +1245,17 @@
         ],
         "type": "object"
       },
-      "name": "update_task_status"
+      "name": "update_task_status",
+      "title": "Update task status"
     },
     {
-      "description": "List canvas documents in a workflow run. Canvas documents are collaborative markdown files that multiple agents can edit in parallel. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List canvas documents in a workflow run. Canvas documents are collaborative markdown files that multiple agents can edit in parallel. Omit run_id to list documents across all runs. Read-only. Use read_canvas for content and get_canvas_toc for section IDs. There is no get_run; list_runs returns run records. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "playbook_id": {
@@ -741,10 +1272,54 @@
         ],
         "type": "object"
       },
-      "name": "list_canvas"
+      "name": "list_canvas",
+      "outputSchema": {
+        "properties": {
+          "documents": {
+            "items": {
+              "properties": {
+                "metadata": {
+                  "type": "object"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "run_id": {
+                  "type": "string"
+                },
+                "slug": {
+                  "type": "string"
+                },
+                "sort_order": {
+                  "type": "number"
+                },
+                "updated_at": {
+                  "type": "string"
+                },
+                "version": {
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "documents"
+        ],
+        "type": "object"
+      },
+      "title": "List canvas documents"
     },
     {
-      "description": "Read a canvas document. Returns full content, sections structure, and metadata. Optionally read a specific section by ID. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Read a canvas document. Returns full content, sections structure, and metadata. Optionally read a specific section by ID. Read-only. Use get_canvas_toc to discover section IDs before patch_canvas_section, and list_canvas to find slugs. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "playbook_id": {
@@ -771,10 +1346,17 @@
         ],
         "type": "object"
       },
-      "name": "read_canvas"
+      "name": "read_canvas",
+      "title": "Read canvas document"
     },
     {
-      "description": "Create or fully replace a canvas document. Markdown headings are auto-parsed into sections for parallel editing. Use patch_canvas_section for partial updates. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create or fully replace a canvas document. Markdown headings are auto-parsed into sections for parallel editing. A replace overwrites prior content and cannot be undone. Requires canvas:write or full permission. Use patch_canvas_section for partial updates and lock_canvas_section before multi-agent edits. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "content": {
@@ -811,10 +1393,17 @@
         ],
         "type": "object"
       },
-      "name": "write_canvas"
+      "name": "write_canvas",
+      "title": "Write canvas document"
     },
     {
-      "description": "Edit a specific section of a canvas document. Parallel-safe: only updates the targeted section. Lock the section first for safety in multi-agent scenarios. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Edit a specific section of a canvas document. Parallel-safe: only the targeted section is updated. Requires canvas:write or full permission. Lock the section first in multi-agent scenarios. Use write_canvas only when replacing the whole document, and get_canvas_toc to obtain section_id. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "content": {
@@ -851,10 +1440,17 @@
         ],
         "type": "object"
       },
-      "name": "patch_canvas_section"
+      "name": "patch_canvas_section",
+      "title": "Patch canvas section"
     },
     {
-      "description": "Get the table of contents for a canvas document. Returns section IDs, headings, and levels for navigation and patch_canvas_section. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Get the table of contents for a canvas document. Returns section IDs, headings, and levels for navigation and patch_canvas_section. Read-only. Use read_canvas for full markdown and list_canvas to discover slugs. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "playbook_id": {
@@ -877,10 +1473,56 @@
         ],
         "type": "object"
       },
-      "name": "get_canvas_toc"
+      "name": "get_canvas_toc",
+      "outputSchema": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "toc": {
+            "items": {
+              "properties": {
+                "heading": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "level": {
+                  "type": "number"
+                },
+                "locked_by": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "slug",
+          "toc"
+        ],
+        "type": "object"
+      },
+      "title": "Canvas table of contents"
     },
     {
-      "description": "Lock a section for exclusive editing. Prevents other agents from modifying it. Remember to unlock when done. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Lock a section for exclusive editing so other agents cannot modify it. Requires canvas:write or full permission. Always unlock_canvas_section when finished. Do not use this to edit content; pair it with patch_canvas_section. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "locked_by": {
@@ -913,10 +1555,17 @@
         ],
         "type": "object"
       },
-      "name": "lock_canvas_section"
+      "name": "lock_canvas_section",
+      "title": "Lock canvas section"
     },
     {
-      "description": "Unlock a previously locked section so other agents can edit it. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Unlock a previously locked canvas section so other agents can edit it. Requires canvas:write or full permission. Use lock_canvas_section to take the lock; this tool does not change section content. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "playbook_id": {
@@ -944,10 +1593,17 @@
         ],
         "type": "object"
       },
-      "name": "unlock_canvas_section"
+      "name": "unlock_canvas_section",
+      "title": "Unlock canvas section"
     },
     {
-      "description": "Create a new skill for this playbook. Use this to expand capabilities. Requires full or skills:write permission. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create a new skill for this playbook. Use this to expand capabilities. Requires full or skills:write permission. Use update_skill to change an existing skill and list_skills to check for name collisions first. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "content": {
@@ -978,10 +1634,17 @@
         ],
         "type": "object"
       },
-      "name": "create_skill"
+      "name": "create_skill",
+      "title": "Create skill"
     },
     {
-      "description": "Update an existing skill in this playbook. Requires full or skills:write permission. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Update an existing skill in this playbook. Requires full or skills:write permission. Use create_skill to add a skill, list_skill_versions before a risky edit, and rollback_skill to restore a previous version. Do not use this to delete a skill. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "content": {
@@ -1015,10 +1678,17 @@
         ],
         "type": "object"
       },
-      "name": "update_skill"
+      "name": "update_skill",
+      "title": "Update skill"
     },
     {
-      "description": "Delete a skill from this playbook. Requires full or skills:write permission. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Permanently delete a skill from this playbook. This cannot be undone except by recreating the skill. Requires full or skills:write permission. Use rollback_skill to restore a previous version instead of deleting, and update_skill to change content in place. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "playbook_id": {
@@ -1036,10 +1706,17 @@
         ],
         "type": "object"
       },
-      "name": "delete_skill"
+      "name": "delete_skill",
+      "title": "Delete skill"
     },
     {
-      "description": "List historical versions of a skill for auditing or rollback. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List historical versions of a skill for auditing or rollback. Read-only. Use this before rollback_skill; use get_skill for the current definition and list_skills for every skill in the playbook. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "limit": {
@@ -1061,10 +1738,17 @@
         ],
         "type": "object"
       },
-      "name": "list_skill_versions"
+      "name": "list_skill_versions",
+      "title": "List skill versions"
     },
     {
-      "description": "Rollback a skill to a previous version. Requires full or skills:write permission. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Rollback a skill to a previous version recorded by list_skill_versions. The current definition is replaced and cannot be recovered except by rolling forward to another stored version. Requires full or skills:write permission. Do not use delete_skill when you only need to revert. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "playbook_id": {
@@ -1082,10 +1766,17 @@
         ],
         "type": "object"
       },
-      "name": "rollback_skill"
+      "name": "rollback_skill",
+      "title": "Roll back skill"
     },
     {
-      "description": "Update the persona/system prompt or the project instructions of this playbook. Handle with extreme care! Requires full or playbooks:write permission. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Update this playbook's name, description, visibility, tags, config, singleton persona fields, or always-on project instructions. Replacement fields overwrite previous values. Handle with extreme care. Requires full or playbooks:write permission. Changing persona_system_prompt here overlaps with update_persona and create_persona; use those when only the persona should change. There is no separate get_persona: read the persona via get_playbook. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "config": {
@@ -1142,10 +1833,17 @@
         ],
         "type": "object"
       },
-      "name": "update_playbook"
+      "name": "update_playbook",
+      "title": "Update playbook"
     },
     {
-      "description": "List the MCP and OpenAPI servers connected to this playbook, including transport metadata and discovered capability counts. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List the MCP and OpenAPI servers connected to this playbook, including transport metadata and discovered capability counts. Read-only. There is no get_mcp_server; this list is the detail view. Do not use this to invoke a connected tool—use call_connected_tool. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "playbook_id": {
@@ -1158,10 +1856,17 @@
         ],
         "type": "object"
       },
-      "name": "list_mcp_servers"
+      "name": "list_mcp_servers",
+      "title": "List MCP servers"
     },
     {
-      "description": "Call a tool on one of this playbook's connected MCP servers. This stable wrapper lets the user control plane apply newly created playbooks without dynamically changing its own tool list. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Call a tool on one of this playbook's connected MCP or OpenAPI servers. Arguments are forwarded as-is and the result mirrors the connected tool, including any side effects that tool has in the outside world. Requires tools:call or full permission. Use list_mcp_servers to discover server_id and tool_name. Do not use this to manage connection records; use create_mcp_server, update_mcp_server, or delete_mcp_server. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "arguments": {
@@ -1188,10 +1893,17 @@
         ],
         "type": "object"
       },
-      "name": "call_connected_tool"
+      "name": "call_connected_tool",
+      "title": "Call a connected tool"
     },
     {
-      "description": "Connect an MCP or OpenAPI server to this playbook. Requires playbooks:write or full permission. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Connect an MCP or OpenAPI server to this playbook by storing its transport configuration. This writes playbook state; it does not by itself invoke remote tools. Requires playbooks:write or full permission. Use call_connected_tool to invoke a discovered tool, and list_mcp_servers to inspect connections. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "description": {
@@ -1241,10 +1953,17 @@
         ],
         "type": "object"
       },
-      "name": "create_mcp_server"
+      "name": "create_mcp_server",
+      "title": "Add MCP server"
     },
     {
-      "description": "Update a connected MCP or OpenAPI server. Requires playbooks:write or full permission. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Update a connected MCP or OpenAPI server's stored name, description, tools, resources, or transport. Requires playbooks:write or full permission. Use call_connected_tool to invoke a tool, and delete_mcp_server to disconnect. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "description": {
@@ -1298,10 +2017,17 @@
         ],
         "type": "object"
       },
-      "name": "update_mcp_server"
+      "name": "update_mcp_server",
+      "title": "Update MCP server"
     },
     {
-      "description": "Disconnect an MCP or OpenAPI server from this playbook. Requires playbooks:write or full permission. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Disconnect an MCP or OpenAPI server from this playbook. The remote server is not shut down; only this playbook's connection record is removed. Requires playbooks:write or full permission. Use update_mcp_server to change configuration without disconnecting. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "playbook_id": {
@@ -1319,10 +2045,17 @@
         ],
         "type": "object"
       },
-      "name": "delete_mcp_server"
+      "name": "delete_mcp_server",
+      "title": "Remove MCP server"
     },
     {
-      "description": "List workflow runs for this playbook. Runs isolate canvas artifacts and execution context. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List workflow runs for this playbook. Runs isolate canvas artifacts and execution context. Read-only. There is no get_run; this list returns the run records. Use create_run to start isolated canvas context and list_canvas to see documents in a run. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "playbook_id": {
@@ -1335,10 +2068,17 @@
         ],
         "type": "object"
       },
-      "name": "list_runs"
+      "name": "list_runs",
+      "title": "List runs"
     },
     {
-      "description": "Create a workflow run so this playbook can be applied immediately with isolated context and canvas artifacts. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create a workflow run so this playbook can be applied immediately with isolated context and canvas artifacts. Requires canvas:write or full permission. Use list_runs to inspect existing runs (there is no get_run) and update_run to change status. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "context": {
@@ -1360,10 +2100,17 @@
         ],
         "type": "object"
       },
-      "name": "create_run"
+      "name": "create_run",
+      "title": "Create run"
     },
     {
-      "description": "Update a workflow run's name, status, or context. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Update a workflow run's name, status, or context. Requires canvas:write or full permission. Use list_runs to find run_id (there is no get_run) and delete_run to remove the run and its canvas artifacts. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "context": {
@@ -1398,10 +2145,17 @@
         ],
         "type": "object"
       },
-      "name": "update_run"
+      "name": "update_run",
+      "title": "Update run"
     },
     {
-      "description": "Delete a workflow run and its isolated canvas artifacts. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Permanently delete a workflow run and its isolated canvas artifacts. This cannot be undone. Requires canvas:write or full permission. Use update_run with status=archived to keep artifacts, and delete_playbook only when the whole playbook should go. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "playbook_id": {
@@ -1419,10 +2173,17 @@
         ],
         "type": "object"
       },
-      "name": "delete_run"
+      "name": "delete_run",
+      "title": "Delete run"
     },
     {
-      "description": "List all secret names and metadata in this playbook. Does NOT return values — secret values are never exposed to agents. Requires secrets:read permission. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List all secret names and metadata in this playbook. Does not return values — secret values are never exposed to agents. Requires secrets:read or full permission. Use use_secret to make an authenticated HTTP request, store_secret to add a value, and rotate_secret to replace one. Do not use this tool expecting plaintext credentials. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "category": {
@@ -1447,18 +2208,79 @@
         ],
         "type": "object"
       },
-      "name": "list_secrets"
+      "name": "list_secrets",
+      "outputSchema": {
+        "properties": {
+          "secrets": {
+            "items": {
+              "properties": {
+                "category": {
+                  "type": "string"
+                },
+                "created_at": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "expires_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "type": "string"
+                },
+                "last_used_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "rotated_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "updated_at": {
+                  "type": "string"
+                },
+                "use_count": {
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "secrets"
+        ],
+        "type": "object"
+      },
+      "title": "List secrets"
     },
     {
-      "description": "Make an HTTP request with a secret injected as a header. The secret value is NEVER returned to the agent — it is decrypted and used server-side only. Use this to authenticate API calls without exposing credentials. Example: use_secret({secret_name: 'OPENAI_API_KEY', url: 'https://api.openai.com/v1/models'}) sends GET with 'Authorization: Bearer <key>'. Requires secrets:read permission. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Send a GET or HEAD request with a secret injected as a header, and return the response. The secret value is never returned to the agent — it is decrypted and used server-side only. Reads the remote API; it cannot change anything there, because only safe methods are accepted. The URL is chosen by the caller, so the target is whichever API the secret belongs to — see that API's own documentation for paths. Requires secrets:read or full permission. Example: use_secret({secret_name: 'OPENAI_API_KEY', url: 'https://api.openai.com/v1/models'}) sends GET with 'Authorization: Bearer <key>'. Use list_secrets to discover names, use_secret_write to send POST/PUT/PATCH/DELETE, and store_secret or rotate_secret to change a stored value. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
-          "body": {
-            "description": "JSON request body (for POST/PUT/PATCH)",
-            "type": "object"
-          },
           "extra_headers": {
-            "description": "Additional headers (e.g. {\"Content-Type\": \"application/json\"})",
+            "description": "Additional headers (e.g. {\"Accept\": \"application/json\"})",
             "type": "object"
           },
           "header_name": {
@@ -1470,13 +2292,10 @@
             "type": "string"
           },
           "method": {
-            "description": "HTTP method (default: GET)",
+            "description": "HTTP method (default: GET). For POST/PUT/PATCH/DELETE use use_secret_write.",
             "enum": [
               "GET",
-              "POST",
-              "PUT",
-              "PATCH",
-              "DELETE"
+              "HEAD"
             ],
             "type": "string"
           },
@@ -1504,10 +2323,80 @@
         ],
         "type": "object"
       },
-      "name": "use_secret"
+      "name": "use_secret",
+      "title": "Read through a secret"
     },
     {
-      "description": "Store a new encrypted secret. The value is encrypted with AES-256-GCM using a per-user derived key and never stored or returned in plaintext. Requires secrets:write permission. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Send a POST, PUT, PATCH or DELETE request with a secret injected as a header, and return the response. The secret value is never returned to the agent — it is decrypted and used server-side only. This changes state in the remote API and cannot be undone from here. The URL is chosen by the caller, so the target is whichever API the secret belongs to — see that API's own documentation for paths and payloads. Requires secrets:read or full permission. Use use_secret for GET and HEAD, list_secrets to discover names, and store_secret or rotate_secret to change a stored value rather than send a request. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
+      "inputSchema": {
+        "properties": {
+          "body": {
+            "description": "JSON request body (for POST/PUT/PATCH)",
+            "type": "object"
+          },
+          "extra_headers": {
+            "description": "Additional headers (e.g. {\"Content-Type\": \"application/json\"})",
+            "type": "object"
+          },
+          "header_name": {
+            "description": "Header name to inject the secret into (default: Authorization)",
+            "type": "string"
+          },
+          "header_prefix": {
+            "description": "Prefix before the secret value (default: 'Bearer '). Use empty string for raw value.",
+            "type": "string"
+          },
+          "method": {
+            "description": "HTTP method (default: POST). For GET/HEAD use use_secret.",
+            "enum": [
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ],
+            "type": "string"
+          },
+          "playbook_id": {
+            "description": "UUID or GUID of the target playbook",
+            "type": "string"
+          },
+          "secret_name": {
+            "description": "Name of the secret to use (e.g. DEPLOY_API_KEY)",
+            "type": "string"
+          },
+          "timeout_ms": {
+            "description": "Request timeout in milliseconds (default: 30000, max: 60000)",
+            "type": "number"
+          },
+          "url": {
+            "description": "The URL to send the HTTP request to",
+            "type": "string"
+          }
+        },
+        "required": [
+          "playbook_id",
+          "secret_name",
+          "url"
+        ],
+        "type": "object"
+      },
+      "name": "use_secret_write",
+      "title": "Write through a secret"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Store a new encrypted secret. The value is encrypted with AES-256-GCM using a per-user derived key and never stored or returned in plaintext. Requires secrets:write or full permission. Use rotate_secret to replace an existing value and list_secrets to confirm the name. Do not use this to send an authenticated request; use use_secret. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "category": {
@@ -1550,10 +2439,17 @@
         ],
         "type": "object"
       },
-      "name": "store_secret"
+      "name": "store_secret",
+      "title": "Store secret"
     },
     {
-      "description": "Rotate (update) an existing secret with a new value. The old value is permanently replaced and cannot be recovered. Requires secrets:write permission. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Rotate an existing secret with a new value. The old value is permanently replaced and cannot be recovered. Requires secrets:write or full permission. Use store_secret to create a name that does not exist yet, and delete_secret to remove the secret entirely. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "name": {
@@ -1576,10 +2472,17 @@
         ],
         "type": "object"
       },
-      "name": "rotate_secret"
+      "name": "rotate_secret",
+      "title": "Rotate secret"
     },
     {
-      "description": "Permanently delete a secret. Cannot be undone. Requires secrets:write permission. Target a playbook with playbook_id.",
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Permanently delete a secret. Cannot be undone. Requires secrets:write or full permission. Use rotate_secret to replace the value without removing the name, and list_secrets to confirm the name first. This does not revoke the credential at the upstream provider. Pass playbook_id as the UUID or GUID of the playbook this call should target.",
       "inputSchema": {
         "properties": {
           "name": {
@@ -1597,7 +2500,8 @@
         ],
         "type": "object"
       },
-      "name": "delete_secret"
+      "name": "delete_secret",
+      "title": "Delete secret"
     }
   ],
   "url": "https://agentplaybooks.ai/api/mcp/manage"

@@ -1,0 +1,140 @@
+{
+  "canon_version": "1",
+  "full_hash": "827dabcc59172059798eaf1aab0c3ff6e495fcf312a58a0a78595bdaab75ac14",
+  "name": "ai.everymcp/every-mcp",
+  "observed_at": "2026-10-06T02:05:21.461830Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 3,
+  "tools": [
+    {
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "description": "Search the public MCP server universe by what you want a server to do. Returns compact summaries; call get_server for a full record. This data comes from the Official MCP Registry.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "filters": {
+            "properties": {
+              "has_remote": {
+                "description": "True for servers that publish a hosted endpoint, false for those that do not.",
+                "type": "boolean"
+              },
+              "publisher": {
+                "description": "Restrict to one publisher namespace, such as io.github.someone.",
+                "type": "string"
+              },
+              "transport": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "stdio",
+                      "sse",
+                      "streamable-http",
+                      "mixed"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "items": {
+                      "enum": [
+                        "stdio",
+                        "sse",
+                        "streamable-http",
+                        "mixed"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                ],
+                "description": "Restrict to servers offering these transports."
+              }
+            },
+            "type": "object"
+          },
+          "limit": {
+            "description": "How many servers to return. Default 10, maximum 50.",
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "description": "What the server should do, in words. A phrase works as well as a keyword.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_tools",
+      "title": "Search MCP servers"
+    },
+    {
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "description": "Return the full registry record for one MCP server, its verification facts, and which clients it can be installed into. This data comes from the Official MCP Registry.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "id": {
+            "description": "The full registry name, such as io.github.someone/their-server.",
+            "type": "string"
+          },
+          "search_id": {
+            "description": "The search_id from the search_tools result that led you here. Optional. Passing it lets us count which searches actually found something.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_server",
+      "title": "Get an MCP server record"
+    },
+    {
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "description": "Return a ready-to-run install command, or the exact configuration fragment, for one MCP server and one client. This data comes from the Official MCP Registry.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "client": {
+            "description": "The MCP client the configuration is for.",
+            "enum": [
+              "claude-code",
+              "claude-desktop",
+              "cursor",
+              "chatgpt"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "description": "The full registry name, such as io.github.someone/their-server.",
+            "type": "string"
+          },
+          "search_id": {
+            "description": "The search_id from the search_tools result that led you here. Optional. Passing it lets us count which searches actually found something.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "client"
+        ],
+        "type": "object"
+      },
+      "name": "get_install_config",
+      "title": "Get an install command or config"
+    }
+  ],
+  "url": "https://everymcp.ai/mcp"
+}

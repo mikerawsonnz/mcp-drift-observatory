@@ -1,0 +1,567 @@
+{
+  "canon_version": "1",
+  "full_hash": "c32ffb1440b335796bc9268adf99db683e452b19eb700d4607a5dd67b5e9801b",
+  "name": "ai.agentese.lifeclaw/lifeclaw",
+  "observed_at": "2026-10-14T02:05:53.350586Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 16,
+  "tools": [
+    {
+      "description": "Search businesses (restaurants, salons, clinics, hotels…) by free text.\n\n`location` is REQUIRED and decides which country is searched — a city or\ncountry name (\"Tokyo\", \"Singapore\"). Returns up to `limit` places with a\n`cid` to pass to get_place. Costs 5 points.\n",
+      "inputSchema": {
+        "properties": {
+          "language": {
+            "default": "en",
+            "title": "Language",
+            "type": "string"
+          },
+          "limit": {
+            "default": 5,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "location": {
+            "title": "Location",
+            "type": "string"
+          },
+          "query": {
+            "title": "Query",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query",
+          "location"
+        ],
+        "title": "search_placesArguments",
+        "type": "object"
+      },
+      "name": "search_places"
+    },
+    {
+      "description": "Full details for one place from search_places: phone, hours, rating,\nwebsite, booking link. Pass the same `location` you searched with.\n\n`phone_ref` is the handle call_business needs; when it is null the place\ncannot be called and `phone_ref_unavailable_reason` says why — show the\nuser `detail.phone` / `detail.booking_url` instead. Costs 15 points.\n",
+      "inputSchema": {
+        "properties": {
+          "cid": {
+            "title": "Cid",
+            "type": "string"
+          },
+          "language": {
+            "default": "en",
+            "title": "Language",
+            "type": "string"
+          },
+          "location": {
+            "default": "",
+            "title": "Location",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "cid"
+        ],
+        "title": "get_placeArguments",
+        "type": "object"
+      },
+      "name": "get_place"
+    },
+    {
+      "description": "Phone a business and wait for the outcome.\n\n`action=\"book\"`: reserve. Required: merchant_name, date (YYYY-MM-DD),\ntime_ (HH:MM, 24h), party_size, name; recommended: contact_phone (E.164).\nBoth are the MERCHANT's local time.\n`action=\"inquiry\"`: ask something — put the question in `purpose`; the\nanswer comes back in `result.summary`.\n\n`reply_language` is the language of the result fields (the call itself\nis spoken in the merchant's language). `idempotency_key`: reuse the same\nkey to recover this attempt; after a terminal no-answer or busy result,\na deliberate new call needs a new key. Do not redial a `failed` result:\nits cause may be unknown. Without a key, the same arguments derive the\nsame key for the UTC day and return the original task.\n\nFor personal accounts, a verified and enabled Caller ID is shown to the\nbusiness when the route permits it. Otherwise a LifeClaw number is used.\nCaller ID setup is optional for business calls.\n\nReturns the flat result (`result.status` is confirmed / rejected /\npending / no_answer / busy / unclear / timeout / failed, plus summary,\ndetails, conditions, transcript) or `status: in_progress` with a task_id\nfor wait_for_call.\nCosts 300 points per minute, minimum one minute, nothing on no answer.\n",
+      "inputSchema": {
+        "properties": {
+          "action": {
+            "default": "book",
+            "title": "Action",
+            "type": "string"
+          },
+          "contact_phone": {
+            "default": "",
+            "title": "Contact Phone",
+            "type": "string"
+          },
+          "date": {
+            "default": "",
+            "title": "Date",
+            "type": "string"
+          },
+          "fallback_instructions": {
+            "default": "",
+            "title": "Fallback Instructions",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "default": "",
+            "title": "Idempotency Key",
+            "type": "string"
+          },
+          "merchant_name": {
+            "default": "",
+            "title": "Merchant Name",
+            "type": "string"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          },
+          "party_size": {
+            "default": 0,
+            "title": "Party Size",
+            "type": "integer"
+          },
+          "phone_ref": {
+            "title": "Phone Ref",
+            "type": "string"
+          },
+          "predicted_qa": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Predicted Qa"
+          },
+          "purpose": {
+            "title": "Purpose",
+            "type": "string"
+          },
+          "reply_language": {
+            "default": "en",
+            "title": "Reply Language",
+            "type": "string"
+          },
+          "special_requests": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Special Requests"
+          },
+          "time_": {
+            "default": "",
+            "title": "Time",
+            "type": "string"
+          },
+          "wait_seconds": {
+            "default": 120,
+            "title": "Wait Seconds",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "phone_ref",
+          "purpose"
+        ],
+        "title": "call_businessArguments",
+        "type": "object"
+      },
+      "name": "call_business"
+    },
+    {
+      "description": "Phone the venue to cancel or reschedule a confirmed booking from\nlist_bookings. `action` is \"cancel\" or \"reschedule\"; reschedule needs\nnew_date and/or new_time (merchant local). When the venue confirms, the\nbooking record is updated for you. Same waiting and idempotency rules as\ncall_business.\n",
+      "inputSchema": {
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "booking_id": {
+            "title": "Booking Id",
+            "type": "integer"
+          },
+          "idempotency_key": {
+            "default": "",
+            "title": "Idempotency Key",
+            "type": "string"
+          },
+          "new_date": {
+            "default": "",
+            "title": "New Date",
+            "type": "string"
+          },
+          "new_time": {
+            "default": "",
+            "title": "New Time",
+            "type": "string"
+          },
+          "purpose": {
+            "title": "Purpose",
+            "type": "string"
+          },
+          "reply_language": {
+            "default": "en",
+            "title": "Reply Language",
+            "type": "string"
+          },
+          "wait_seconds": {
+            "default": 120,
+            "title": "Wait Seconds",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "booking_id",
+          "action",
+          "purpose"
+        ],
+        "title": "modify_bookingArguments",
+        "type": "object"
+      },
+      "name": "modify_booking"
+    },
+    {
+      "description": "Keep waiting for a call that call_business / modify_booking / call_person / call_me\nreported as in_progress. Returns the flat result once the call ends, or\nin_progress again — just call it again.",
+      "inputSchema": {
+        "properties": {
+          "task_id": {
+            "title": "Task Id",
+            "type": "integer"
+          },
+          "wait_seconds": {
+            "default": 55,
+            "title": "Wait Seconds",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "task_id"
+        ],
+        "title": "wait_for_callArguments",
+        "type": "object"
+      },
+      "name": "wait_for_call"
+    },
+    {
+      "description": "The account's bookings (confirmed, cancelled, answered inquiries).\n`status` filters: \"confirmed\", \"cancelled\", \"answered\", or \"\" for all.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "default": 20,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "status": {
+            "default": "",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "title": "list_bookingsArguments",
+        "type": "object"
+      },
+      "name": "list_bookings"
+    },
+    {
+      "description": "Points balance, display name, and the selected receiving\nnumber for call_me (masked). Use receiving_phone_status for setup and\ncaller_id_status for outbound display and\noutbound-display state. 300 points ≈ one minute of calling.",
+      "inputSchema": {
+        "properties": {},
+        "title": "account_statusArguments",
+        "type": "object"
+      },
+      "name": "account_status"
+    },
+    {
+      "description": "Check where call_me would ring (masked). A number must be explicitly\nselected and verified by voice; SMS login alone does not qualify. The user\ncan set it in the web app without enabling outbound Caller ID. Direct them\nto setup_url if no receiving number is ready.",
+      "inputSchema": {
+        "properties": {},
+        "title": "receiving_phone_statusArguments",
+        "type": "object"
+      },
+      "name": "receiving_phone_status"
+    },
+    {
+      "description": "Check the owner's outbound Caller ID. Verified plus enabled display\nenables call_person. call_me uses a separate receiving number.\nIf setup is needed, direct the user to `setup_url`: Settings → Caller ID,\nbind their own phone, answer Twilio's verification call and enter its code.\nThen check again. Business calls do not need this setup.",
+      "inputSchema": {
+        "properties": {},
+        "title": "caller_id_statusArguments",
+        "type": "object"
+      },
+      "name": "caller_id_status"
+    },
+    {
+      "description": "List the token owner's saved contacts with masked phone numbers.\n\nEach contact_ref pins the current name and number for call_contact. If two\nnames could match a request, ask the user to choose one exact name.\nNever repeat a full contact number in chat.\n",
+      "inputSchema": {
+        "properties": {},
+        "title": "list_contactsArguments",
+        "type": "object"
+      },
+      "name": "list_contacts"
+    },
+    {
+      "description": "Add or update one contact after confirming name and number with the user.\n\nphone_number must be E.164, e.g. +85291234567. This updates the same\naddress book used by the web app. The result masks the number; do not echo\nthe full number in a chat reply. Set user_confirmed only after agreement.\n",
+      "inputSchema": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "phone_number": {
+            "title": "Phone Number",
+            "type": "string"
+          },
+          "user_confirmed": {
+            "title": "User Confirmed",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "phone_number",
+          "user_confirmed"
+        ],
+        "title": "save_contactArguments",
+        "type": "object"
+      },
+      "name": "save_contact"
+    },
+    {
+      "description": "Edit a saved contact's name and/or E.164 phone number atomically.\n\nConfirm the existing contact and proposed change with the user first.\nA name conflict refuses instead of overwriting another person. Return\nvalues mask the number; do not repeat a full number in chat.\n",
+      "inputSchema": {
+        "properties": {
+          "new_name": {
+            "title": "New Name",
+            "type": "string"
+          },
+          "old_name": {
+            "title": "Old Name",
+            "type": "string"
+          },
+          "phone_number": {
+            "title": "Phone Number",
+            "type": "string"
+          },
+          "user_confirmed": {
+            "title": "User Confirmed",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "old_name",
+          "new_name",
+          "phone_number",
+          "user_confirmed"
+        ],
+        "title": "update_contactArguments",
+        "type": "object"
+      },
+      "name": "update_contact"
+    },
+    {
+      "description": "Delete a saved contact by exact name after the user confirms deletion.",
+      "inputSchema": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "user_confirmed": {
+            "title": "User Confirmed",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "user_confirmed"
+        ],
+        "title": "delete_contactArguments",
+        "type": "object"
+      },
+      "name": "delete_contact"
+    },
+    {
+      "description": "Call one private person and relay one message from the user.\n\nAsk the user to confirm the recipient, E.164 number and exact spoken\nmessage first, then set user_confirmed=true. `original_message` is the\nuser's unedited request; `message` is the faithful sentence spoken aloud.\nBoth are screened. The AI identifies itself and passes on the message;\nthis tool is not an open-ended conversation or a broadcast tool.\n\nRequires the user's verified, enabled outbound Caller ID. Call\ncaller_id_status for readiness and setup link. Verification means answering\na call and entering a code; call_me uses a separately selected receiving number.\nNever substitute call_business for a private recipient. If the Caller ID\nis refused by the carrier, the call fails without a platform-number retry.\nUp to 10 private calls per account per rolling 24h. Billed per minute.\nReuse the same idempotency_key to recover this attempt; wait_for_call if\nin_progress. Only after a terminal no-answer or busy result with no contact\nshould your workflow consider another call, using a new key and respecting\nthe user's instructions and the recipient's local time. Do not redial a\n`failed` result because it does not establish that nobody was reached.\n",
+      "inputSchema": {
+        "properties": {
+          "idempotency_key": {
+            "default": "",
+            "title": "Idempotency Key",
+            "type": "string"
+          },
+          "language": {
+            "default": "",
+            "title": "Language",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "original_message": {
+            "title": "Original Message",
+            "type": "string"
+          },
+          "phone_number": {
+            "title": "Phone Number",
+            "type": "string"
+          },
+          "recipient_name": {
+            "title": "Recipient Name",
+            "type": "string"
+          },
+          "reply_language": {
+            "default": "en",
+            "title": "Reply Language",
+            "type": "string"
+          },
+          "user_confirmed": {
+            "title": "User Confirmed",
+            "type": "boolean"
+          },
+          "wait_seconds": {
+            "default": 120,
+            "title": "Wait Seconds",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "phone_number",
+          "recipient_name",
+          "message",
+          "original_message",
+          "user_confirmed"
+        ],
+        "title": "call_personArguments",
+        "type": "object"
+      },
+      "name": "call_person"
+    },
+    {
+      "description": "Call a saved private contact without passing their full number.\n\nFirst list_contacts and confirm the chosen name, masked number and exact\nspoken message with the user. Pass that contact_ref and user_confirmed=true.\nIf the contact changes before dialing, re-list and confirm again. This\nuses call_person's screening, verified Caller ID, daily cap and strict\nno-platform-number-fallback policy. Check caller_id_status first. Its\nno-answer retry decision and idempotency rules are the same as call_person.\n",
+      "inputSchema": {
+        "properties": {
+          "contact_name": {
+            "title": "Contact Name",
+            "type": "string"
+          },
+          "contact_ref": {
+            "title": "Contact Ref",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "default": "",
+            "title": "Idempotency Key",
+            "type": "string"
+          },
+          "language": {
+            "default": "",
+            "title": "Language",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "original_message": {
+            "title": "Original Message",
+            "type": "string"
+          },
+          "reply_language": {
+            "default": "en",
+            "title": "Reply Language",
+            "type": "string"
+          },
+          "user_confirmed": {
+            "title": "User Confirmed",
+            "type": "boolean"
+          },
+          "wait_seconds": {
+            "default": 120,
+            "title": "Wait Seconds",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "contact_name",
+          "contact_ref",
+          "message",
+          "original_message",
+          "user_confirmed"
+        ],
+        "title": "call_contactArguments",
+        "type": "object"
+      },
+      "name": "call_contact"
+    },
+    {
+      "description": "Ring the user's own phone, read them `message`, and bring back what\nthey say.\n\nA phone call interrupts the user. Follow their explicit instructions about\nwhether and when to call, including an immediate call or a call when a job\nfinishes. Otherwise prefer chat for routine updates; call for a time-sensitive\ndecision only they can make after chat has no explicit answer, or for a\nstill-active important event after the workflow's chosen wait if nobody has\nacknowledged it. There is no fixed waiting period: use the user's timing\nwhen given, otherwise choose one appropriate to the task. For monitoring,\nyour workflow must watch the event, wait for acknowledgment, and decide\nwhen to invoke this tool; LifeClaw cannot do those things or schedule a\nfuture call. An explicit request to call regardless of event status takes\npriority over the default active-and-unacknowledged condition.\nConsider local time and do not repeatedly ring after a missed call. A\nterminal no-answer is for your workflow to assess; LifeClaw will not\nredial it automatically. Do not redial a `failed` result because contact\nmay have occurred. A deliberate later call needs a new\nidempotency_key, and only a workflow that can wait and resume can promise\none. Reuse the original key to recover an uncertain request instead.\n\nExamples: (1) a deployment is blocked on a rollback decision and chat\nhas no explicit answer; ask that one question and use `result.reply`.\n(2) An external monitor confirms a critical incident is still active\nand unacknowledged; call with that incident ID as `idempotency_key`.\n(3) The user asked for a call when a job finishes; call once when your\nworkflow observes completion. Do not call for an ordinary completion\nthe user did not ask to hear by phone.\n\n`wait_for_reply=True`: the assistant asks, listens, reads the answer\nback, and returns it in `result.reply`. `wait_for_reply=False`: deliver\nand hang up. `agent_name` (\"Claude Code\", \"Codex\") is how the assistant\nintroduces itself. `language` is spoken on the call and used for the\nresult; set it to the user's language. Write the message as speech:\nshort sentences, no markdown. Do NOT greet or introduce yourself inside\n`message` — the call already opens with \"I'm your assistant from\n{agent_name}\" / \"我是来自 {agent_name} 的 AI 助手\"; a message that starts\nwith \"Hi, this is Claude Code\" gets introduced twice. Start with the\ncontent (\"Hotpot or sushi tonight?\").\n`keywords` (optional, up to 20 short terms): the words the user is likely\nto say back — the options you offered (\"火锅\", \"日料\"), a ticket or PR\nnumber, a product name. They steer the speech-to-text toward those\nspellings so `result.reply` and the transcript come back right; phone\naudio otherwise mishears short words (火锅 → 哥哥 on a real call). Give\nthem whenever the answer is a choice between named things.\n\nNeeds the account's voice-verified receiving number. Outbound Caller ID\nis separate. If this returns `error: receiving_phone_required`, send the\nuser to the returned setup_url to select a number, answer the voice\nverification call, and enter its code.\nCapped at 4 calls per account per 10 minutes and 30 per 24 hours. Billed\nper minute like any call. For monitoring, pass a stable event ID as\nidempotency_key; a new event needs a new key.\n",
+      "inputSchema": {
+        "properties": {
+          "agent_name": {
+            "default": "",
+            "title": "Agent Name",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "default": "",
+            "title": "Idempotency Key",
+            "type": "string"
+          },
+          "keywords": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Keywords"
+          },
+          "language": {
+            "default": "en",
+            "title": "Language",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "wait_for_reply": {
+            "default": true,
+            "title": "Wait For Reply",
+            "type": "boolean"
+          },
+          "wait_seconds": {
+            "default": 120,
+            "title": "Wait Seconds",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "call_meArguments",
+        "type": "object"
+      },
+      "name": "call_me"
+    }
+  ],
+  "url": "https://api-v2.lifeclaw.agentese.ai/mcp"
+}

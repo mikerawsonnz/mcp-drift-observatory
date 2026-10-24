@@ -1,0 +1,1363 @@
+{
+  "canon_version": "1",
+  "full_hash": "664ee6a354b545cd9ebadb30bbef96a1fc43aef7b95ed5b256a2f35c0c064bad",
+  "name": "ai.autoposter/autoposter",
+  "observed_at": "2026-10-10T02:04:57.365396Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 14,
+  "tools": [
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "accounts:read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Lists all connected social media accounts (X, LinkedIn, Instagram, TikTok, YouTube, Threads, Bluesky, Pinterest, Facebook) in the current Autoposter workspace.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "autoposter_list_accounts",
+      "outputSchema": {
+        "properties": {
+          "accounts": {
+            "description": "List of active connected accounts in the workspace.",
+            "items": {
+              "properties": {
+                "id": {
+                  "description": "Account ID.",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Account display name.",
+                  "type": "string"
+                },
+                "platform": {
+                  "description": "Platform name (e.g. twitter, linkedin, instagram).",
+                  "type": "string"
+                },
+                "username": {
+                  "description": "Account username or handle.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "platform",
+                "name"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "timezone": {
+            "description": "Default timezone for the workspace.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "accounts"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "accounts:read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "List Connected Accounts"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "rules:read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Returns platform publishing constraints including character limits, media format requirements, and guidelines.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "autoposter_get_rules",
+      "outputSchema": {
+        "properties": {
+          "automatedSafeguards": {
+            "description": "Automated media and caption processing safeguards.",
+            "type": "object"
+          },
+          "captionLimits": {
+            "description": "Character limits per platform.",
+            "type": "object"
+          },
+          "guidelines": {
+            "description": "Publishing guidelines and tips.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "mediaRequirements": {
+            "description": "Platform media requirements and constraints.",
+            "type": "object"
+          },
+          "postFormats": {
+            "description": "Supported post format variants per platform (post, reel, story, shorts).",
+            "type": "object"
+          }
+        },
+        "required": [
+          "captionLimits",
+          "mediaRequirements",
+          "guidelines"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "rules:read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Get Platform Rules and Limits"
+    },
+    {
+      "_meta": {
+        "openai/fileParams": [
+          "file"
+        ],
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "posts:create"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Uploads an image or video to Auto Poster media library. Accepts files generated in ChatGPT (e.g. DALL-E images in /mnt/data/), uploaded files, or public image URLs. Direct chat download limit is 100MB. For larger videos or files (>100MB), tell the user to provide a direct public file URL or use autoposter_get_media_upload_url for direct S3 upload up to 5GB. If the image exists only in the chat or on the user's device and cannot be sent here, use autoposter_create_upload_link instead.",
+      "inputSchema": {
+        "$defs": {
+          "MediaFile": {
+            "additionalProperties": false,
+            "properties": {
+              "download_url": {
+                "type": "string"
+              },
+              "file_id": {
+                "type": "string"
+              },
+              "file_name": {
+                "type": "string"
+              },
+              "mime_type": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "download_url",
+              "file_id"
+            ],
+            "type": "object"
+          }
+        },
+        "properties": {
+          "file": {
+            "$ref": "#/$defs/MediaFile",
+            "description": "File object provided by ChatGPT for AI-generated images or uploaded files."
+          },
+          "name": {
+            "description": "Optional display name or title for the media file.",
+            "type": "string"
+          },
+          "url": {
+            "description": "Optional public image or video URL or data URI to upload into media library.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "autoposter_upload_media",
+      "outputSchema": {
+        "properties": {
+          "mediaId": {
+            "description": "ID of the newly uploaded media item.",
+            "type": "string"
+          },
+          "mediaUrl": {
+            "description": "Public URL of the media file to pass in posts.",
+            "type": "string"
+          },
+          "message": {
+            "description": "Upload status message.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Display name or file name.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Media type ('image' or 'video').",
+            "type": "string"
+          },
+          "url": {
+            "description": "Public URL of the media file.",
+            "type": "string"
+          },
+          "usage": {
+            "description": "Guidance on using the media item in posts.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mediaId",
+          "url"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "posts:create"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Upload Media File"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "posts:create"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Only for clients that can perform an HTTP PUT or multipart POST (not chat-only clients such as Gemini): if you cannot make that request yourself, use autoposter_create_upload_link instead. Generates a presigned S3 upload URL for direct, high-speed upload of videos or images up to 5GB without size limits or timeouts. Returns direct PUT url, POST upload fields, and public CDN URL.",
+      "inputSchema": {
+        "properties": {
+          "contentType": {
+            "description": "MIME type of the media (e.g. 'video/mp4', 'image/jpeg', 'image/png').",
+            "type": "string"
+          },
+          "fileName": {
+            "description": "Name of the file including extension (e.g. 'promo_video.mp4', 'photo.jpg').",
+            "type": "string"
+          }
+        },
+        "required": [
+          "fileName",
+          "contentType"
+        ],
+        "type": "object"
+      },
+      "name": "autoposter_get_media_upload_url",
+      "outputSchema": {
+        "properties": {
+          "cdnUrl": {
+            "description": "Public CDN URL after upload.",
+            "type": "string"
+          },
+          "directPutUrl": {
+            "description": "Presigned S3 PUT URL for direct upload.",
+            "type": "string"
+          },
+          "instructions": {
+            "description": "Instructions for completing the direct upload.",
+            "type": "string"
+          },
+          "key": {
+            "description": "S3 object key for the media file.",
+            "type": "string"
+          },
+          "success": {
+            "description": "Whether the upload URL was successfully created.",
+            "type": "boolean"
+          },
+          "uploadPost": {
+            "description": "Presigned POST fields if using multipart upload.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "success",
+          "key",
+          "cdnUrl",
+          "directPutUrl"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "posts:create"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Get Direct S3 Upload URL"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "posts:create"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Creates a short-lived link where the user can upload images from their device into the Auto Poster media library. Use this when the user wants to attach an image that exists only in the chat or on their device (no public URL) and your client cannot send file contents. Give the link to the user, wait until they say the upload is done, then call autoposter_list_media (newest first) and attach the image with mediaIds in autoposter_draft_post or autoposter_schedule_post.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "autoposter_create_upload_link",
+      "outputSchema": {
+        "properties": {
+          "expiresInMinutes": {
+            "description": "Minutes until the link expires.",
+            "type": "number"
+          },
+          "instructions": {
+            "description": "What to tell the user and what to do next.",
+            "type": "string"
+          },
+          "maxFileSizeMb": {
+            "description": "Maximum size per image in MB.",
+            "type": "number"
+          },
+          "uploadUrl": {
+            "description": "Link to give to the user.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "uploadUrl",
+          "expiresInMinutes",
+          "instructions"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "posts:create"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Create Image Upload Link"
+    },
+    {
+      "_meta": {
+        "openai/fileParams": [
+          "files"
+        ],
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "posts:create"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Creates a draft post for human review. If API key lacks direct publish, post is saved as pending_approval and notifications are sent to workspace approvers. Accepts mediaUrls (public URLs) or files (AI-generated images or uploaded files from chat up to 100MB). For large video files over 100MB, tell the user to provide a direct public file URL or use autoposter_get_media_upload_url.",
+      "inputSchema": {
+        "$defs": {
+          "MediaFile": {
+            "additionalProperties": false,
+            "properties": {
+              "download_url": {
+                "type": "string"
+              },
+              "file_id": {
+                "type": "string"
+              },
+              "file_name": {
+                "type": "string"
+              },
+              "mime_type": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "download_url",
+              "file_id"
+            ],
+            "type": "object"
+          }
+        },
+        "properties": {
+          "accountIds": {
+            "description": "List of account IDs from autoposter_list_accounts.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "content": {
+            "description": "Base text content of the post.",
+            "type": "string"
+          },
+          "files": {
+            "description": "Optional files generated in chat or uploaded by user to attach to the post.",
+            "items": {
+              "$ref": "#/$defs/MediaFile"
+            },
+            "type": "array"
+          },
+          "mediaIds": {
+            "description": "Optional list of existing media IDs from workspace media library (from autoposter_list_media).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "mediaUrls": {
+            "description": "Optional public image or video URLs to attach (e.g. from autoposter_upload_media).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "platformContent": {
+            "description": "Optional platform-specific content overrides (e.g. twitter, linkedin).",
+            "type": "object"
+          },
+          "postType": {
+            "description": "Optional target format where applicable: 'post' (default feed post/carousel), 'reel' (Instagram or Facebook Reel; requires video), 'story' (Instagram or Facebook 24h Story; requires image or video), or 'shorts' (YouTube Shorts; vertical video under 60s). Ignored on platforms without format variants.",
+            "enum": [
+              "post",
+              "reel",
+              "story",
+              "shorts"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "accountIds",
+          "content"
+        ],
+        "type": "object"
+      },
+      "name": "autoposter_draft_post",
+      "outputSchema": {
+        "properties": {
+          "draftPosts": {
+            "description": "List of created draft posts per account.",
+            "items": {
+              "properties": {
+                "accountName": {
+                  "description": "Target account name.",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "Draft post ID.",
+                  "type": "string"
+                },
+                "platform": {
+                  "description": "Target social media platform.",
+                  "type": "string"
+                },
+                "postType": {
+                  "description": "Target format ('post', 'reel', 'story', or 'shorts').",
+                  "type": "string"
+                },
+                "scheduledAt": {
+                  "description": "Scheduled timestamp if any.",
+                  "type": "string"
+                },
+                "status": {
+                  "description": "Current post status (drafts or pending_approval).",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "platform",
+                "status"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "instructions": {
+            "description": "Instructions for approving or viewing the draft.",
+            "type": "string"
+          },
+          "message": {
+            "description": "Status message indicating draft creation.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "draftPosts"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "posts:create"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Create Post Draft"
+    },
+    {
+      "_meta": {
+        "openai/fileParams": [
+          "files"
+        ],
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "posts:create"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Schedules a post for a future date/time. Automatically converts local time using workspace/user timezone into UTC. Accepts mediaUrls (public URLs) or files (AI-generated images or uploaded files from chat up to 100MB). For large video files over 100MB, tell the user to provide a direct public file URL or use autoposter_get_media_upload_url.",
+      "inputSchema": {
+        "$defs": {
+          "MediaFile": {
+            "additionalProperties": false,
+            "properties": {
+              "download_url": {
+                "type": "string"
+              },
+              "file_id": {
+                "type": "string"
+              },
+              "file_name": {
+                "type": "string"
+              },
+              "mime_type": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "download_url",
+              "file_id"
+            ],
+            "type": "object"
+          }
+        },
+        "properties": {
+          "accountIds": {
+            "description": "List of account IDs from autoposter_list_accounts.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "content": {
+            "description": "Base text content of the post.",
+            "type": "string"
+          },
+          "files": {
+            "description": "Optional files generated in chat or uploaded by user to attach to the post.",
+            "items": {
+              "$ref": "#/$defs/MediaFile"
+            },
+            "type": "array"
+          },
+          "mediaIds": {
+            "description": "Optional list of existing media IDs from workspace media library (from autoposter_list_media).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "mediaUrls": {
+            "description": "Optional public image or video URLs to attach (e.g. from autoposter_upload_media).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "platformContent": {
+            "description": "Optional platform-specific content overrides (e.g. twitter, linkedin).",
+            "type": "object"
+          },
+          "postType": {
+            "description": "Optional target format where applicable: 'post' (default feed post/carousel), 'reel' (Instagram or Facebook Reel; requires video), 'story' (Instagram or Facebook 24h Story; requires image or video), or 'shorts' (YouTube Shorts; vertical video under 60s). Ignored on platforms without format variants.",
+            "enum": [
+              "post",
+              "reel",
+              "story",
+              "shorts"
+            ],
+            "type": "string"
+          },
+          "scheduledAt": {
+            "description": "Scheduled ISO timestamp or local datetime string, e.g. '2026-10-05T14:00:00'.",
+            "type": "string"
+          },
+          "timezone": {
+            "description": "Optional IANA timezone (e.g. 'America/New_York'). If omitted, defaults to workspace or user timezone.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "accountIds",
+          "content",
+          "scheduledAt"
+        ],
+        "type": "object"
+      },
+      "name": "autoposter_schedule_post",
+      "outputSchema": {
+        "properties": {
+          "message": {
+            "description": "Status message.",
+            "type": "string"
+          },
+          "scheduledAt": {
+            "description": "Scheduled time in UTC.",
+            "type": "string"
+          },
+          "scheduledPosts": {
+            "description": "List of scheduled posts per target account.",
+            "items": {
+              "properties": {
+                "accountName": {
+                  "description": "Target account name.",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "Post ID.",
+                  "type": "string"
+                },
+                "platform": {
+                  "description": "Target platform.",
+                  "type": "string"
+                },
+                "postType": {
+                  "description": "Target format ('post', 'reel', 'story', or 'shorts').",
+                  "type": "string"
+                },
+                "scheduledAt": {
+                  "description": "Scheduled timestamp.",
+                  "type": "string"
+                },
+                "status": {
+                  "description": "Post status.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "platform",
+                "status",
+                "scheduledAt"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "status": {
+            "description": "Status of the scheduled post ('scheduled' or 'pending_approval').",
+            "type": "string"
+          },
+          "success": {
+            "description": "Whether the post was successfully scheduled.",
+            "type": "boolean"
+          },
+          "timezone": {
+            "description": "Timezone applied.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "success",
+          "status",
+          "scheduledAt",
+          "scheduledPosts"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "posts:create"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Schedule Post"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "posts:publish"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Approves and immediately publishes an existing draft or pending post. Requires an API key with direct publish permission.",
+      "inputSchema": {
+        "properties": {
+          "postId": {
+            "description": "The post ID returned by autoposter_draft_post.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "postId"
+        ],
+        "type": "object"
+      },
+      "name": "autoposter_publish_draft",
+      "outputSchema": {
+        "properties": {
+          "message": {
+            "description": "Status message or confirmation.",
+            "type": "string"
+          },
+          "status": {
+            "description": "Target status ('queued' or 'scheduled').",
+            "type": "string"
+          },
+          "success": {
+            "description": "Whether the draft was approved and queued/published.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success",
+          "status"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "posts:publish"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Publish Draft Post"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "posts:read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Checks delivery status of a post and returns live platform links/receipts once published.",
+      "inputSchema": {
+        "properties": {
+          "postId": {
+            "description": "The post ID to query.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "postId"
+        ],
+        "type": "object"
+      },
+      "name": "autoposter_get_post_status",
+      "outputSchema": {
+        "properties": {
+          "errorMessage": {
+            "description": "Error message if post failed.",
+            "type": "string"
+          },
+          "id": {
+            "description": "Post ID.",
+            "type": "string"
+          },
+          "postLink": {
+            "description": "Live URL link to the published post on the platform.",
+            "type": "string"
+          },
+          "postedAt": {
+            "description": "ISO timestamp when the post was published.",
+            "type": "string"
+          },
+          "state": {
+            "description": "Current status: drafts, pending_approval, queued, posted, or failed.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "state"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "posts:read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Get Post Status"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "posts:read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Retrieves a single post by ID including its state (drafts, pending_approval, queued, posted) and live link receipts.",
+      "inputSchema": {
+        "properties": {
+          "postId": {
+            "description": "The post ID to fetch.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "postId"
+        ],
+        "type": "object"
+      },
+      "name": "autoposter_get_post",
+      "outputSchema": {
+        "properties": {
+          "errorMessage": {
+            "description": "Failure error message if any.",
+            "type": "string"
+          },
+          "id": {
+            "description": "Post ID.",
+            "type": "string"
+          },
+          "postLink": {
+            "description": "Live platform URL link if posted.",
+            "type": "string"
+          },
+          "postedAt": {
+            "description": "ISO timestamp when post was published.",
+            "type": "string"
+          },
+          "state": {
+            "description": "Current post state.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "state"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "posts:read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Get Post Details"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "posts:delete"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Deletes or cancels a draft, scheduled, or pending post by ID.",
+      "inputSchema": {
+        "properties": {
+          "postId": {
+            "description": "The post ID to delete or cancel.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "postId"
+        ],
+        "type": "object"
+      },
+      "name": "autoposter_delete_post",
+      "outputSchema": {
+        "properties": {
+          "message": {
+            "description": "Confirmation message.",
+            "type": "string"
+          },
+          "postId": {
+            "description": "Deleted post ID.",
+            "type": "string"
+          },
+          "success": {
+            "description": "Whether the post was deleted successfully.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success",
+          "postId"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "posts:delete"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Delete Post"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "posts:read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Lists posts in the workspace. Supports filtering by state ('drafts', 'scheduled', 'queued', 'posted', 'failed', 'pending_approval'), caption text search, and limit.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "Maximum number of posts to return (default 20, max 50).",
+            "type": "number"
+          },
+          "search": {
+            "description": "Optional keyword to search in post captions.",
+            "type": "string"
+          },
+          "state": {
+            "description": "Optional filter by post state.",
+            "enum": [
+              "drafts",
+              "draft",
+              "scheduled",
+              "queued",
+              "posted",
+              "failed",
+              "pending_approval"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "autoposter_list_posts",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of posts returned.",
+            "type": "number"
+          },
+          "posts": {
+            "description": "List of matching posts.",
+            "items": {
+              "properties": {
+                "accountId": {
+                  "description": "Target account ID.",
+                  "type": "string"
+                },
+                "createdAt": {
+                  "description": "Creation ISO timestamp.",
+                  "type": "string"
+                },
+                "errorMessage": {
+                  "description": "Failure reason if failed.",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "Post ID.",
+                  "type": "string"
+                },
+                "postLink": {
+                  "description": "Live link receipt if posted.",
+                  "type": "string"
+                },
+                "postedAt": {
+                  "description": "Publish time if posted.",
+                  "type": "string"
+                },
+                "scheduledAt": {
+                  "description": "Scheduled time if scheduled.",
+                  "type": "string"
+                },
+                "state": {
+                  "description": "Current post state.",
+                  "type": "string"
+                },
+                "text": {
+                  "description": "Post caption or content.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "state"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "count",
+          "posts"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "posts:read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "List Posts"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "posts:read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Lists media files (images and videos) stored in the workspace media library with public CDN URLs.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "Maximum number of media items to return (default 20, max 50).",
+            "type": "number"
+          },
+          "type": {
+            "description": "Optional filter by media type ('image' or 'video').",
+            "enum": [
+              "image",
+              "video"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "autoposter_list_media",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of media items returned.",
+            "type": "number"
+          },
+          "media": {
+            "description": "List of media items in workspace.",
+            "items": {
+              "properties": {
+                "id": {
+                  "description": "Media ID.",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "File name or title.",
+                  "type": "string"
+                },
+                "thumbnailUrl": {
+                  "description": "Thumbnail image URL if available.",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "Media type ('image' or 'video').",
+                  "type": "string"
+                },
+                "url": {
+                  "description": "Public URL of media file.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "type",
+                "url"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "count",
+          "media"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "posts:read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "List Media Library"
+    },
+    {
+      "_meta": {
+        "openai/profile": true,
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "accounts:read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Return the profile represented by this request's authenticated credentials. The opaque id is unique within this app and remains unchanged across token refresh, reconnection, and display-metadata changes.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_profile",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Opaque profile identifier, unique within this app and unchanged across token refresh, reconnection, and display-metadata changes. Never reassigned to another profile.",
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "name": {
+            "description": "Display name for the authenticated profile.",
+            "type": "string"
+          },
+          "nickname": {
+            "description": "A useful label that helps users distinguish connected profiles.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "accounts:read"
+          ],
+          "type": "oauth2"
+        }
+      ]
+    }
+  ],
+  "url": "https://agent.autoposter.ai/mcp"
+}

@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "f23c5122dd7cdcb16ed4ce060d835c751faa4cba35632d52707bb694b918c9f7",
+  "full_hash": "848f6080bd63d1f5d86cbdb5e46c24e8469a573da2034f41b10ac13b2d905d20",
   "name": "ai.aqta/seal",
-  "observed_at": "2026-08-20T09:11:22.011387Z",
+  "observed_at": "2026-10-23T02:04:25.384648Z",
   "sources": [
     "official"
   ],
@@ -20,15 +20,19 @@
         "readOnlyHint": true,
         "title": "Verify a receipt"
       },
-      "description": "Check a receipt signature against a trusted or embedded key. No Aqta service in the check.",
+      "description": "Check that a record still says what was signed: the permitted or refused decision, unchanged, under Seal's published issuer keys or a key you supply. Handles both formats: ATTESTATION-v1 (a model-call decision) and ACTION-v1 (an agent tool action). No Aqta service in the check.",
       "inputSchema": {
         "properties": {
+          "profile": {
+            "description": "Usually omit this. The record's own signed version tag selects the format, and ATTESTATION-v1 is the default. Pass 'ACTION-v1' only to force an agent-action record to be checked as one.",
+            "type": "string"
+          },
           "public_key": {
-            "description": "Base64url Ed25519 key to trust. Omit to use the key embedded in the receipt, which proves internal consistency only, never provenance.",
+            "description": "Base64url Ed25519 key to check against. Omit it to check against Seal's published issuer keys; a record carrying any other key then fails. A key you supply is used as given, and issuer_key in the result says whether it is a Seal issuer key.",
             "type": "string"
           },
           "receipt": {
-            "description": "The receipt, as a JSON object or a JSON string.",
+            "description": "The record, as a JSON object or a JSON string.",
             "type": [
               "object",
               "string"
@@ -54,6 +58,7 @@
       "inputSchema": {
         "properties": {
           "receipt": {
+            "description": "The receipt, as a JSON object or a JSON string.",
             "type": [
               "object",
               "string"
@@ -140,7 +145,7 @@
         "readOnlyHint": true,
         "title": "Verify a whole evidence pack"
       },
-      "description": "Verify every receipt in a pack. Per-receipt verdicts, never an average.",
+      "description": "Verify a review pack receipt by receipt. Each verdict comes from the signed envelope itself, never from stored state, and results are per-receipt, never an average.",
       "inputSchema": {
         "properties": {
           "pack": {
@@ -151,7 +156,7 @@
             ]
           },
           "public_key": {
-            "description": "Key to pin every receipt against. Omit to use each envelope's embedded key.",
+            "description": "Key to check every receipt against. Omit it to check each receipt against Seal's published issuer keys.",
             "type": "string"
           }
         },
@@ -232,6 +237,7 @@
       "inputSchema": {
         "properties": {
           "attestation_id": {
+            "description": "The attestation_id of one of your receipts.",
             "type": "string"
           }
         },

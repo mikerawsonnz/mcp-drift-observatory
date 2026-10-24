@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "e8bfa7bdf93dd93e8cbbe273d119f9a88c36a1b33640e25917072477c349c2ac",
+  "full_hash": "cfd67f1ff99eb4fb34d046995ddbbda9415e70927102b364c94460a4fdce46ae",
   "name": "ai.myriade/myriade",
-  "observed_at": "2026-08-20T09:12:11.939471Z",
+  "observed_at": "2026-08-26T02:06:33.079487Z",
   "sources": [
     "official"
   ],
-  "tool_count": 12,
+  "tool_count": 18,
   "tools": [
     {
       "annotations": {
@@ -659,12 +659,116 @@
     },
     {
       "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List or search reports (documents) written in Myriade.\n\nWithout ``query`` returns the most recently updated reports first; with\n``query`` returns the best matches first. Only reports the caller may see\nare returned. Read one with myriade_read_report.\n",
+      "inputSchema": {
+        "properties": {
+          "database_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "UUID of the database whose reports to list. Omit for organisation-level reports (not bound to a database).",
+            "title": "Database Id"
+          },
+          "limit": {
+            "default": 20,
+            "description": "Maximum results to return (1-50)",
+            "maximum": 50,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "query": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional search terms (title, description, content); results are ranked by relevance",
+            "title": "Query"
+          }
+        },
+        "title": "list_reportsArguments",
+        "type": "object"
+      },
+      "name": "myriade_list_reports",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "list_reportsOutput",
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Read a report's full markdown content.\n\nApplies the same visibility rule as the web app; a report the caller may\nnot see returns a \"not found\" error. To create or edit a report, use\nmyriade_ask — the analyst agent knows how reports are structured.\n",
+      "inputSchema": {
+        "properties": {
+          "document_id": {
+            "description": "UUID of the report (from myriade_list_reports)",
+            "format": "uuid",
+            "title": "Document Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "document_id"
+        ],
+        "title": "read_reportArguments",
+        "type": "object"
+      },
+      "name": "myriade_read_report",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "read_reportOutput",
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": false,
         "readOnlyHint": false
       },
-      "description": "Ask a natural language question about a database using Myriade's\ndata analyst agent.\n\nThe agent will explore the database schema, search the catalog, run SQL\nqueries, and analyze the results to answer your question. Use this for\ncomplex analytical questions that require multiple steps; for simple\nschema lookups or direct SQL, prefer the other tools.\n\nNote: the agent has access to catalog write operations (create/update\nassets, tags, terms) — it may modify catalog state to record findings.\nUse myriade_query directly for strictly read-only inspection.\n\nRequires AGENTLYS_PROVIDER and the corresponding API key (e.g.\nAGENTLYS_PROVIDER=anthropic + ANTHROPIC_API_KEY).\n",
+      "description": "Ask a natural language question about a database using Myriade's\ndata analyst agent.\n\nThe agent will explore the database schema, search the catalog, run SQL\nqueries, and analyze the results to answer your question. Use this for\ncomplex analytical questions that require multiple steps; for simple\nschema lookups or direct SQL, prefer the other tools.\n\nNote: the agent has access to catalog write operations (create/update\nassets, tags, terms) — it may modify catalog state to record findings.\nIt can also read, create and edit reports (ask it to \"write a report\non ...\" or \"update report <id> with ...\"). Use myriade_query directly\nfor strictly read-only inspection.\n\nRequires AI_PROVIDER and the corresponding API key (e.g.\nAI_PROVIDER=anthropic + ANTHROPIC_API_KEY).\n",
       "inputSchema": {
         "properties": {
           "database_id": {
@@ -700,6 +804,278 @@
           "result"
         ],
         "title": "askOutput",
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Snapshot of a database's monitoring board: check count, standing alerts\n(open / acknowledged / known) with their headlines, recent notifications\nand triage notes, followed by the open alerts as JSON.\n\nAlert ids feed myriade_triage_alert; check ids feed myriade_get_check.\nInvestigation details are redacted unless you manage the database.\n",
+      "inputSchema": {
+        "properties": {
+          "database_id": {
+            "description": "UUID of the database",
+            "format": "uuid",
+            "title": "Database Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "database_id"
+        ],
+        "title": "monitoring_overviewArguments",
+        "type": "object"
+      },
+      "name": "myriade_monitoring_overview",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "monitoring_overviewOutput",
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Get a monitoring check (name, SQL, severity, cadence, status) and its\nmost recent run results, newest first.\n\nOn governed databases the SQL and evidence rows are redacted unless you\nmanage the database or authored the proposal.\n",
+      "inputSchema": {
+        "properties": {
+          "check_id": {
+            "description": "UUID of the monitoring check",
+            "format": "uuid",
+            "title": "Check Id",
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "description": "Run results to return (1-100)",
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "check_id"
+        ],
+        "title": "get_checkArguments",
+        "type": "object"
+      },
+      "name": "myriade_get_check",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "get_checkOutput",
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Propose a monitoring check for the user to review in Myriade.\n\nThis creates a PROPOSAL, never an active check: nothing runs until a\ndatabase owner or org admin accepts it in the app. The SQL is test-run\nonce under your governance context to validate it.\n\nContract for ``check_sql``: it MUST return rows ONLY when something is\nwrong (zero rows = healthy) and use relative time (``now() - interval``),\nnever absolute dates. Minimum cadence is 5 minutes. Names are unique per\ndatabase — read myriade_monitoring_overview before proposing a\nnear-duplicate.\n",
+      "inputSchema": {
+        "properties": {
+          "check_sql": {
+            "description": "SQL returning zero rows when healthy, rows when wrong",
+            "maxLength": 20000,
+            "minLength": 1,
+            "title": "Check Sql",
+            "type": "string"
+          },
+          "database_id": {
+            "description": "UUID of the database",
+            "format": "uuid",
+            "title": "Database Id",
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "description": "One sentence, prospective tense: \"Trips when <condition> (baseline ~X)\"",
+            "maxLength": 2000,
+            "title": "Description",
+            "type": "string"
+          },
+          "group_name": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Cluster to file the check under (reuse an existing group's exact name), or omit to leave it unfiled",
+            "title": "Group Name"
+          },
+          "interval_minutes": {
+            "default": 60,
+            "description": "Cadence in minutes (minimum 5)",
+            "minimum": 5,
+            "title": "Interval Minutes",
+            "type": "integer"
+          },
+          "name": {
+            "description": "Short human-readable name (unique per database)",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "severity": {
+            "default": "MEDIUM",
+            "description": "Severity raised when the check trips",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "CRITICAL"
+            ],
+            "title": "Severity",
+            "type": "string"
+          }
+        },
+        "required": [
+          "database_id",
+          "name",
+          "check_sql"
+        ],
+        "title": "propose_checkArguments",
+        "type": "object"
+      },
+      "name": "myriade_propose_check",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "propose_checkOutput",
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Triage an alert (requires manage access: database owner or org admin).\n\n- ``resolve``: the underlying problem is handled or gone.\n- ``acknowledge``: keep it standing with a ``statement`` of what is\n  happening — only for a situation that may worsen.\n- ``dismiss``: false positive / expected; refused while the check still\n  trips (it would just respawn).\n- ``snooze``: silence for ``hours`` with a ``statement``; reopens by itself\n  if the check still trips afterwards.\n- ``reopen``: send a parked alert back to \"needs action\" with a\n  ``statement`` of what is no longer covered.\n",
+      "inputSchema": {
+        "properties": {
+          "action": {
+            "description": "Transition to apply to the alert",
+            "enum": [
+              "resolve",
+              "acknowledge",
+              "dismiss",
+              "snooze",
+              "reopen"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "alert_id": {
+            "description": "UUID of the alert",
+            "format": "uuid",
+            "title": "Alert Id",
+            "type": "string"
+          },
+          "hours": {
+            "anyOf": [
+              {
+                "maximum": 168,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Snooze window in hours (1-168). Required for snooze.",
+            "title": "Hours"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional note appended to the alert details (resolve, dismiss)",
+            "title": "Note"
+          },
+          "statement": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "One SHORT present-tense plain-text sentence (~120 chars, no Markdown) shown as the alert headline. Required for acknowledge, snooze and reopen.",
+            "title": "Statement"
+          }
+        },
+        "required": [
+          "alert_id",
+          "action"
+        ],
+        "title": "triage_alertArguments",
+        "type": "object"
+      },
+      "name": "myriade_triage_alert",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "triage_alertOutput",
         "type": "object"
       }
     }

@@ -1,0 +1,988 @@
+{
+  "canon_version": "1",
+  "full_hash": "554b5b843ad46cd23f936d0fc4f24fe5be65d1ac8a7a5e8aac1c6a7c1ad7829f",
+  "name": "ai.eykon/intelligence",
+  "observed_at": "2026-09-28T02:05:25.101178Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 26,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Query AIS vessel positions within a geographic area and time window. Returns vessel name, MMSI, type, position, speed, heading, destination.",
+      "inputSchema": {
+        "properties": {
+          "hours": {
+            "description": "Look-back window in hours (default 24)",
+            "type": "number"
+          },
+          "lat_max": {
+            "type": "number"
+          },
+          "lat_min": {
+            "type": "number"
+          },
+          "lon_max": {
+            "type": "number"
+          },
+          "lon_min": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "lat_min",
+          "lat_max",
+          "lon_min",
+          "lon_max"
+        ],
+        "type": "object"
+      },
+      "name": "query_vessels"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Query ADS-B aircraft positions within a geographic area.",
+      "inputSchema": {
+        "properties": {
+          "altitude_max": {
+            "type": "number"
+          },
+          "altitude_min": {
+            "type": "number"
+          },
+          "lat_max": {
+            "type": "number"
+          },
+          "lat_min": {
+            "type": "number"
+          },
+          "lon_max": {
+            "type": "number"
+          },
+          "lon_min": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "lat_min",
+          "lat_max",
+          "lon_min",
+          "lon_max"
+        ],
+        "type": "object"
+      },
+      "name": "query_aircraft"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Query armed-conflict events (GDELT-backed, with ACLED fallback when licensed) by region / date / event type / actor.",
+      "inputSchema": {
+        "properties": {
+          "country": {
+            "type": "string"
+          },
+          "days": {
+            "type": "number"
+          },
+          "event_type": {
+            "type": "string"
+          },
+          "lat_max": {
+            "type": "number"
+          },
+          "lat_min": {
+            "type": "number"
+          },
+          "lon_max": {
+            "type": "number"
+          },
+          "lon_min": {
+            "type": "number"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "query_conflicts"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Query oil refineries from OpenStreetMap (canonical refinery tags only — petroleum_refinery, oil_refinery, refinery). ~700 facilities globally, each with name, operator, product, capacity (when tagged), country, city. Use for questions like \"refineries in Saudi Arabia\", \"oil refining capacity on the Gulf Coast\", \"European refineries near Russian crude pipelines\". Pass country to slice (ISO2 code or country name).",
+      "inputSchema": {
+        "properties": {
+          "country": {
+            "description": "ISO 3166-1 alpha-2 (e.g. \"SA\") or country-name substring (e.g. \"Saudi\"). Filter optional.",
+            "type": "string"
+          },
+          "lat_max": {
+            "type": "number"
+          },
+          "lat_min": {
+            "type": "number"
+          },
+          "limit": {
+            "description": "Default 50, max 500.",
+            "type": "number"
+          },
+          "lon_max": {
+            "type": "number"
+          },
+          "lon_min": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "lat_min",
+          "lat_max",
+          "lon_min",
+          "lon_max"
+        ],
+        "type": "object"
+      },
+      "name": "query_refineries"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Query mineral deposits from the USGS Mineral Resources Data System (MRDS — public-domain US Government, ~304k records globally, archival snapshot frozen at 2011). Each row carries site name, development status (Producer / Past Producer / Prospect / Occurrence / Plant), commodities (commod1/2/3 + commodities array), country, state, deposit type. Default returns only Producer / Past Producer / Plant rows with a known commod1 (significant sites); pass include_minor=true for prospects and occurrences. Use for questions like \"lithium mines in Chile\", \"rare-earth deposits worldwide\", \"active copper producers in Peru\". Pass commodity to filter on the commodities[] array (case-sensitive, e.g. \"Copper\", \"Lithium\", \"Rare Earths\").",
+      "inputSchema": {
+        "properties": {
+          "commodity": {
+            "description": "Commodity name to match in the commodities array (e.g. \"Copper\", \"Lithium\", \"Gold\", \"Rare Earths\", \"Uranium\"). Case-sensitive.",
+            "type": "string"
+          },
+          "country": {
+            "description": "ISO 3166-1 alpha-2 (e.g. \"CL\") or country-name substring. Filter optional.",
+            "type": "string"
+          },
+          "dev_stat": {
+            "description": "Producer | Past Producer | Prospect | Occurrence | Plant | Unknown. Filter optional.",
+            "type": "string"
+          },
+          "include_minor": {
+            "description": "If true, drops the default significant-sites filter and returns prospects/occurrences too.",
+            "type": "boolean"
+          },
+          "lat_max": {
+            "type": "number"
+          },
+          "lat_min": {
+            "type": "number"
+          },
+          "limit": {
+            "description": "Default 50, max 500.",
+            "type": "number"
+          },
+          "lon_max": {
+            "type": "number"
+          },
+          "lon_min": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "lat_min",
+          "lat_max",
+          "lon_min",
+          "lon_max"
+        ],
+        "type": "object"
+      },
+      "name": "query_mines"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Query unit-level power plants from the Global Energy Monitor — Global Integrated Power Tracker (GIPT). ~127k operating units worldwide spanning coal, oil/gas, nuclear, geothermal, bioenergy, utility-scale solar, wind, and hydropower. Each row carries plant name, fuel type, capacity (MW), status, start year, country, owner. Use for questions like \"nuclear plants in France above 1 GW\", \"coal capacity in India\", \"operating bioenergy plants in Brazil\". Pass include_minor=true to bypass the operating-only filter (e.g. to include proposed/retired). Pass fuel to slice to a single fuel_type. The registry is a bulk-loaded snapshot: every result carries `snapshot` (load date, age in days, refresh interval); when snapshot.is_stale is true, a snapshot_note says so — state the load date and never describe a unit's status as current.",
+      "inputSchema": {
+        "properties": {
+          "fuel": {
+            "description": "utility-scale solar | wind | hydropower | geothermal | bioenergy | nuclear | coal | oil/gas",
+            "type": "string"
+          },
+          "include_minor": {
+            "description": "If true, drops the default operating-only filter and capacity floor.",
+            "type": "boolean"
+          },
+          "lat_max": {
+            "type": "number"
+          },
+          "lat_min": {
+            "type": "number"
+          },
+          "limit": {
+            "description": "Default 50, max 500.",
+            "type": "number"
+          },
+          "lon_max": {
+            "type": "number"
+          },
+          "lon_min": {
+            "type": "number"
+          },
+          "min_capacity_mw": {
+            "description": "Minimum capacity in MW",
+            "type": "number"
+          },
+          "status": {
+            "description": "operating (default) | construction | proposed | retired | cancelled | shelved | mothballed",
+            "type": "string"
+          }
+        },
+        "required": [
+          "lat_min",
+          "lat_max",
+          "lon_min",
+          "lon_max"
+        ],
+        "type": "object"
+      },
+      "name": "query_power_plants"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Query gas pipelines (GEM GGIT), oil/NGL pipelines (GEM GOIT), and LNG terminals (GEM GGIT) in one call. Returns a mixed list — each row has infra_subtype=pipeline_gas|pipeline_oil|lng_terminal so you can disambiguate. Pipeline rows carry start/end country, length, capacity (bcm/y for gas, BOEd or raw bpd for oil), status, owner, route accuracy. LNG terminals carry facility_type=import|export, capacity in mtpa, country. Use for questions like \"Russian gas pipelines into Europe\", \"LNG export terminals in Qatar\", \"Trans-Alaska oil pipeline status\", \"Keystone XL\". Pass fuel=gas or fuel=oil to slice to one type. Pass include_minor=true to bypass the operating-only default.",
+      "inputSchema": {
+        "properties": {
+          "facility_type": {
+            "description": "For LNG terminals only: import | export.",
+            "type": "string"
+          },
+          "fuel": {
+            "description": "\"gas\" (returns gas pipelines + LNG terminals) | \"oil\" (returns oil pipelines only). Omit to return all three.",
+            "type": "string"
+          },
+          "include_minor": {
+            "description": "If true, drops the default operating-only filter.",
+            "type": "boolean"
+          },
+          "lat_max": {
+            "type": "number"
+          },
+          "lat_min": {
+            "type": "number"
+          },
+          "limit": {
+            "description": "Default 50, max 500.",
+            "type": "number"
+          },
+          "lon_max": {
+            "type": "number"
+          },
+          "lon_min": {
+            "type": "number"
+          },
+          "status": {
+            "description": "operating (default) | construction | proposed | retired | cancelled | shelved | mothballed",
+            "type": "string"
+          }
+        },
+        "required": [
+          "lat_min",
+          "lat_max",
+          "lon_min",
+          "lon_max"
+        ],
+        "type": "object"
+      },
+      "name": "query_pipelines"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Query airports from OurAirports. Default returns the ~7,500 commercially-significant airports (large airports + medium airports with scheduled service); pass include_minor=true for the full ~85k including small airfields, heliports, etc. Each row carries name, type, IATA/ICAO codes, country, municipality, elevation, scheduled_service. Use for questions like \"airports near recent conflict events\", \"ICAO code for Heathrow\", \"all scheduled-service airports in Ukraine\".",
+      "inputSchema": {
+        "properties": {
+          "include_minor": {
+            "description": "If true, returns all 85k airports including heliports, small airfields, closed.",
+            "type": "boolean"
+          },
+          "iso_country": {
+            "description": "Two-letter ISO country code (e.g. \"FR\", \"US\"). Filter optional.",
+            "type": "string"
+          },
+          "lat_max": {
+            "type": "number"
+          },
+          "lat_min": {
+            "type": "number"
+          },
+          "limit": {
+            "description": "Default 50, max 500.",
+            "type": "number"
+          },
+          "lon_max": {
+            "type": "number"
+          },
+          "lon_min": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "lat_min",
+          "lat_max",
+          "lon_min",
+          "lon_max"
+        ],
+        "type": "object"
+      },
+      "name": "query_airports"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Query commercial seaports from the NGA World Port Index (~3,800 ports worldwide). Each row carries port name, country, harbor size (Large/Medium/Small/Very Small), harbor type, shelter rating, channel depth in metres, repair facilities. Use for questions like \"ports near Bab-el-Mandeb\", \"deepwater ports in West Africa\", \"all large harbors in the Mediterranean\". Pass harbor_size to slice to a single tier.",
+      "inputSchema": {
+        "properties": {
+          "harbor_size": {
+            "description": "Large | Medium | Small | Very Small. Filter optional.",
+            "type": "string"
+          },
+          "lat_max": {
+            "type": "number"
+          },
+          "lat_min": {
+            "type": "number"
+          },
+          "limit": {
+            "description": "Default 50, max 500.",
+            "type": "number"
+          },
+          "lon_max": {
+            "type": "number"
+          },
+          "lon_min": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "lat_min",
+          "lat_max",
+          "lon_min",
+          "lon_max"
+        ],
+        "type": "object"
+      },
+      "name": "query_ports"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Query current weather conditions for a specific location (Open-Meteo).",
+      "inputSchema": {
+        "properties": {
+          "latitude": {
+            "type": "number"
+          },
+          "longitude": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "latitude",
+          "longitude"
+        ],
+        "type": "object"
+      },
+      "name": "query_weather"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Query NASA FIRMS satellite thermal anomalies (VIIRS 375m + MODIS 1km, near-real-time, ~3h latency). Two modes. mode=\"facilities\" (default) reads the pre-aggregated per-facility-per-day rollup — use it for facility-centric questions (\"thermal anomalies at Russian refineries this week\", \"which Gulf refineries lit up\", \"anything at the Kirishi refinery\"). Filter by country, facility_type (refinery | power_plant), facility_name, days. Returns per facility: total detections, max FRP (fire radiative power, MW), nearest detection distance in km, and the monitoring radius used. mode=\"raw\" reads individual detections inside a lat/lon box — use it for geographic questions not anchored to a monitored facility. CRITICAL INTERPRETATION RULES — a FIRMS detection is a SATELLITE HOT PIXEL, nothing more. It is NOT a confirmed fire, NOT a strike, NOT an outage. Most detections at oil and gas infrastructure are ROUTINE GAS FLARES that burn every single day. Attributing a detection to a strike, an attack, an explosion or a production halt is INFERENCE and must be labelled as inference, corroborated with other sources (conflict events, agent reports, news), and never stated as fact. Equally, ABSENCE OF DETECTION DOES NOT MEAN ABSENCE OF FIRE — cloud cover, smoke, and satellite overpass timing routinely hide real fires. Every response carries a `coverage` block: ingest is REGIONAL — 8 boxes (Russia / Ukraine, Arabian Gulf, Europe, East Asia, South Asia, Southeast Asia, North America (east), North America (west)), not global — so facilities outside those boxes report zero detections because they are NOT WATCHED, not because nothing burned. Always read `coverage` before characterising a zero result, and tell the user which of the two it is.",
+      "inputSchema": {
+        "properties": {
+          "country": {
+            "description": "facilities mode: country-name substring (e.g. \"Russia\", \"Saudi\", \"Ukraine\"). Names are full English, NOT ISO codes. Filter optional.",
+            "type": "string"
+          },
+          "days": {
+            "description": "Look-back window in days ending today (default 7, max 30). Note the archive is shallow — check coverage.days_with_data.",
+            "type": "number"
+          },
+          "facility_name": {
+            "description": "facilities mode: facility-name substring (e.g. \"Kirishi\", \"Ras Tanura\"). Filter optional.",
+            "type": "string"
+          },
+          "facility_type": {
+            "description": "facilities mode: refinery | power_plant. Filter optional.",
+            "type": "string"
+          },
+          "lat_max": {
+            "description": "raw mode: required.",
+            "type": "number"
+          },
+          "lat_min": {
+            "description": "raw mode: required.",
+            "type": "number"
+          },
+          "limit": {
+            "description": "Default 50, max 500.",
+            "type": "number"
+          },
+          "lon_max": {
+            "description": "raw mode: required.",
+            "type": "number"
+          },
+          "lon_min": {
+            "description": "raw mode: required.",
+            "type": "number"
+          },
+          "min_detections": {
+            "description": "facilities mode: minimum total detections over the window (default 1, i.e. only facilities that registered something). Pass 0 to include quiet facilities and see what was watched-but-silent.",
+            "type": "number"
+          },
+          "min_frp": {
+            "description": "raw mode: minimum fire radiative power in MW. Higher FRP = more energetic hot pixel, but still not a fire type.",
+            "type": "number"
+          },
+          "mode": {
+            "description": "\"facilities\" (default, pre-aggregated per monitored facility) | \"raw\" (individual detections in a bounding box).",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "query_thermal_anomalies"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Query NASA Black Marble night-lights (VIIRS VNP46A2, ~500 m): moonlight/atmosphere-corrected nighttime radiance sampled nightly at every FIRMS-watched facility, plus significance events judged against each facility's OWN clear-night baseline. Two modes. mode=\"events\" (default) reads SITE-LEVEL significance events — went_dark_lights (a habitually-lit facility dark across several consecutive CLEAR nights: the outage signal), surge (materially brighter than its own norm), first_light (a reliably-dark facility lights up). Use it for \"which power stations went dark last week\", \"unusual lighting activity in Kuwait\". mode=\"radiance\" reads the per-facility nightly radiance rollup — use it for baseline questions (\"how bright is Bandar Abbas at night\", \"clear-night trend at Az Zour\"). CRITICAL INTERPRETATION RULES — RADIANCE IS NOT POWER STATE. A dark pixel is not a confirmed outage: cloud, snow, moon geometry and the ~500 m footprint all hide light, so went_dark_lights requires SUSTAINED absence across multiple confidently-CLEAR nights and is still an inference, never a verdict. Judgements use confident_clear observations ONLY (cloud scatters city light back at the sensor — cloudy readings average ~100x brighter and would fake both surges and collapses). ABSENCE OF A ROW IS ABSENCE OF A LOOK, never darkness. Counts are per PHYSICAL SITE, not per registry row (one plant = many generating-unit rows at identical coordinates). LATENCY: NASA publishes VNP46A2 in stages, typically ~1-2 WEEKS behind — every response carries a coverage block with newest_night and lag_days; answers describe that week, NOT last night, and you must say so. Thermal (FIRMS) and night-lights measure DIFFERENT PHYSICS — infrared heat vs visible emitted light — but they are NOT independent sensors: both are NASA VIIRS-family, and the same clouds and overpass timing blind both. Agreement between them (e.g. a FIRMS went_dark and a went_dark_lights at the same facility) is stronger evidence than either alone, never independent confirmation. Check both before characterising an outage.",
+      "inputSchema": {
+        "properties": {
+          "country": {
+            "description": "Country-name substring (e.g. \"Kuwait\", \"Saudi\"). NOTE: attribution is dense for power plants but sparse for refineries — prefer facility_name for refineries.",
+            "type": "string"
+          },
+          "days": {
+            "description": "Look-back window in days ENDING AT THE NEWEST DATA NIGHT (not today — see coverage.lag_days). Default 14, max 60.",
+            "type": "number"
+          },
+          "event_type": {
+            "description": "events mode: went_dark_lights | surge | first_light. Filter optional.",
+            "type": "string"
+          },
+          "facility_name": {
+            "description": "Facility/site-name substring (e.g. \"Az Zour\", \"Bandar Abbas\"). Filter optional.",
+            "type": "string"
+          },
+          "facility_type": {
+            "description": "radiance mode: refinery | power_plant. Filter optional.",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Default 50, max 500.",
+            "type": "number"
+          },
+          "mode": {
+            "description": "\"events\" (default, site-level significance) | \"radiance\" (per-facility nightly rollup).",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "query_nightlights"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Query eYKON's satellite imagery OBSERVATIONS (Copernicus Sentinel, via CDSE) over watched sites — refinery complexes, LNG terminals, large/medium ports, curated critical-mineral mines, AIS-derived anchorages, strait windows. sensor=\"s2_l2a\" (default): Sentinel-2 optical, metric ndvi_median (median NDVI of clear pixels — a spectral proxy for surface cover, never a tonnage or activity claim). sensor=\"s1_grd\": Sentinel-1 radar, bright_target_area_m2 and vessel_equivalents (an area estimate, not a count) — returned ONLY for sites the Sentinel-1 measurement study admitted; before admission it returns no rows and says so. Every row carries coverage_state. CRITICAL: a look that is not \"clear\" (cloudy, partly_cloudy, partial_swath, no_acquisition, processing_error) has a NULL value — it is NOT zero and NOT \"no activity\"; never add, average or compare values across such looks, say the site was not seen that date. Compare a clear value only with the site's OWN median (ratio_to_baseline, present when baseline_n >= 3). A site missing from the result was not looked at. Pass a bbox, or aoi_id, or kind to narrow. Cite \"Contains modified Copernicus Sentinel data <year>\" with any figure.",
+      "inputSchema": {
+        "properties": {
+          "aoi_id": {
+            "description": "One site, e.g. \"mine:…\", \"port:…\", \"chokepoint:hormuz\".",
+            "type": "string"
+          },
+          "kind": {
+            "description": "refinery_complex | lng_terminal | port | mine | anchorage | chokepoint",
+            "type": "string"
+          },
+          "lat_max": {
+            "type": "number"
+          },
+          "lat_min": {
+            "type": "number"
+          },
+          "limit": {
+            "description": "Max sites returned. Default 25, max 100.",
+            "type": "number"
+          },
+          "lon_max": {
+            "type": "number"
+          },
+          "lon_min": {
+            "type": "number"
+          },
+          "sensor": {
+            "description": "s2_l2a (default) | s1_grd",
+            "type": "string"
+          },
+          "window_days": {
+            "description": "Look-back in days. Default 30, max 120.",
+            "type": "number"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "query_imagery"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Find LIVE public cameras (government operators: TfL London, Hong Kong Transport Dept, Singapore LTA via data.gov.sg, Caltrans California, USGS volcano cams) in a bbox, around a point (lat, lon, radius_km) or next to a watched site (aoi_id). Returns each camera's name, position, operator credit and an eYKON image URL a person can open — never the frame itself and never the operator's own URL. A frame is what the camera recorded when the operator stamped it, not \"now\". Only cameras that passed the latest liveness check are listed; no camera in an area is not evidence of anything. No recognition, counting or recording of people or vehicles. Always cite the attribution.",
+      "inputSchema": {
+        "properties": {
+          "aoi_id": {
+            "description": "Cameras whose nearest watched site is this one (within 5 km).",
+            "type": "string"
+          },
+          "lat": {
+            "description": "Centre latitude (with lon and radius_km).",
+            "type": "number"
+          },
+          "lat_max": {
+            "type": "number"
+          },
+          "lat_min": {
+            "type": "number"
+          },
+          "limit": {
+            "description": "Default 25, max 200.",
+            "type": "number"
+          },
+          "lon": {
+            "description": "Centre longitude.",
+            "type": "number"
+          },
+          "lon_max": {
+            "type": "number"
+          },
+          "lon_min": {
+            "type": "number"
+          },
+          "radius_km": {
+            "description": "Default 25, max 200.",
+            "type": "number"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "query_webcams"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Retrieve recent intelligence reports generated by eYKON Sub-Agents. Returns structured reports with severity, narrative, and entity references.",
+      "inputSchema": {
+        "properties": {
+          "domain": {
+            "description": "air_traffic, maritime, conflict_security, energy_infrastructure, satellite_imagery",
+            "type": "string"
+          },
+          "hours": {
+            "description": "Look-back hours (default 48)",
+            "type": "number"
+          },
+          "severity": {
+            "description": "low | medium | high | critical (minimum)",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "query_agent_reports"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Most recent posture_scores rows per theatre. Returns composite + air, sea, conflict and grid sub-scores. imagery is always null: no imagery is measured yet — never describe it as a domain score.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "type": "number"
+          },
+          "theatre_slug": {
+            "enum": [
+              "black-sea",
+              "gulf-of-guinea",
+              "hormuz",
+              "malacca",
+              "red-sea",
+              "taiwan-strait"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "query_posture_scores"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Recent convergence_events (anomaly-of-anomalies) with synthesis and contributing anomaly IDs.",
+      "inputSchema": {
+        "properties": {
+          "hours": {
+            "description": "Look-back hours (default 24)",
+            "type": "number"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "query_convergences"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Ranked shadow-fleet vessel leads, scored from silence relative to the OWN observed reporting cadence of each vessel (14-day baseline), vanished-under-way, and flag-of-convenience. Vessels without a cadence baseline yet are unscored, not defaulted. Each lead carries silence_hours = hours since its last AIS fix, measured against the data clock. NOTE: the commodity argument is accepted but NOT applied — vessel type is known for under 1% of the tracked fleet, so all values return the same list; do not tell the user results were filtered by commodity. Coverage IS gated: vessels last seen in a coverage box that has itself been silent >12h are VOID, never ranked; the response carries per-box coverage state (live/stale/dead) you should relay when a corridor the user asks about is dark.",
+      "inputSchema": {
+        "properties": {
+          "commodity": {
+            "description": "oil | lng | grain — ACCEPTED BUT NOT APPLIED, see the tool description",
+            "type": "string"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "min_score": {
+            "description": "Minimum composite score (default 0.4)",
+            "type": "number"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "query_shadow_fleet_leads"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Dark-contact EVENTS from the Shadow Fleet board — resolvable observations with a lifecycle, not a leads snapshot. An event opens when a vessel goes silent >=12x its OWN 14-day cadence inside a live coverage box, and resolves within 72 h as: reappeared (a newer fix arrived — positive, feed-wide observation), still_dark (NOT RE-OBSERVED by our coverage — a statement about the instrument, never proof the transponder was off; say \"not re-observed\", never \"confirmed dark\"), or void (the coverage box died mid-event; neither a hit nor a miss). Response carries per-box coverage state and open/24h resolution tallies. Use this for \"what went dark / what came back\" questions; use query_shadow_fleet_leads for the current ranked list.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "Max events (default 50)",
+            "type": "number"
+          },
+          "status": {
+            "description": "open | resolved | void (omit for all)",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "query_dark_contact_events"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "eYKON's own forecast record: Brier and log-loss per TRACK over a window. Three tracks never blend — house (eYKON's own published forecasts), machine (sensor observables) and creator. Each is returned separately with resolved, scored and unscored counts; \"scored\" is the real n. Unscored rows are excluded, never counted as zero. There is deliberately no combined figure.",
+      "inputSchema": {
+        "properties": {
+          "feature": {
+            "description": "posture_shift | conflict_escalation | trade_flow | energy_stress",
+            "type": "string"
+          },
+          "track": {
+            "description": "house | machine | creator. Omit to get every track, reported separately.",
+            "type": "string"
+          },
+          "window_days": {
+            "description": "7 | 30 | 90 (default 90). 90 is the shortest window where the house track carries evidence — n=42 at 90d against 12 at 30d and 6 at 7d — and skill is measured against the track's own base rate INSIDE the window, so a short window computes its yardstick from the same few rows. Check pct_scored_last_7d in the reply: near 100 means the window did not bind.",
+            "enum": [
+              7,
+              30,
+              90
+            ],
+            "type": "number"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "query_calibration"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Nearest precursor_library entries for the given theatre, by cosine similarity.",
+      "inputSchema": {
+        "properties": {
+          "event_type": {
+            "type": "string"
+          },
+          "theatre_slug": {
+            "description": "One of the six theatres eYKON computes posture for.",
+            "enum": [
+              "black-sea",
+              "gulf-of-guinea",
+              "hormuz",
+              "malacca",
+              "red-sea",
+              "taiwan-strait"
+            ],
+            "type": "string"
+          },
+          "top_k": {
+            "description": "Default 3",
+            "type": "number"
+          }
+        },
+        "required": [
+          "theatre_slug"
+        ],
+        "type": "object"
+      },
+      "name": "query_precursor_matches"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Run a chokepoint closure scenario (same model as the Chokepoint Simulator). Returns a computed projection; nothing is persisted on this path. A MODEL, not an observation.",
+      "inputSchema": {
+        "properties": {
+          "assumptions": {
+            "type": "object"
+          },
+          "chokepoint": {
+            "description": "hormuz | bab-el-mandeb | malacca | bosphorus | suez | panama",
+            "type": "string"
+          },
+          "closure_type": {
+            "description": "partial_50 | full | transit_tax_30",
+            "type": "string"
+          },
+          "diversion_lag_hours": {
+            "type": "number"
+          },
+          "duration_days": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "chokepoint",
+          "closure_type",
+          "duration_days"
+        ],
+        "type": "object"
+      },
+      "name": "run_chokepoint_scenario"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Run a sanctions propagation scenario.",
+      "inputSchema": {
+        "properties": {
+          "depth": {
+            "description": "1 | 2 | 3",
+            "type": "number"
+          },
+          "preset": {
+            "type": "string"
+          },
+          "sanctioning_bodies": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "target_entities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "sanctioning_bodies",
+          "preset",
+          "target_entities"
+        ],
+        "type": "object"
+      },
+      "name": "run_sanctions_wargame"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Active regime shifts (30d-vs-60d test) with p-values and effect sizes.",
+      "inputSchema": {
+        "properties": {
+          "region": {
+            "description": "Theatre slug or label",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "query_regime_shifts"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Search the entities registry (vessels, operators, owners, flags, ports, refineries, mines).",
+      "inputSchema": {
+        "properties": {
+          "entity_type": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "q": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "q"
+        ],
+        "type": "object"
+      },
+      "name": "query_entities"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Walk the fleet kinship graph from a seed entity. Returns the nodes and edges within N hops.",
+      "inputSchema": {
+        "properties": {
+          "entity_id": {
+            "type": "string"
+          },
+          "hops": {
+            "description": "1 | 2 | 3 (default 2)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "entity_id"
+        ],
+        "type": "object"
+      },
+      "name": "expand_actor_network"
+    }
+  ],
+  "url": "https://eykon.ai/api/mcp"
+}

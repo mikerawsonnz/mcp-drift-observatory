@@ -1,0 +1,121 @@
+{
+  "canon_version": "1",
+  "full_hash": "0edfab38f45940c63c2d38d919801ac618df9c251b79856258feb2dbc70b0a53",
+  "name": "ai.imaginode/imaginode",
+  "observed_at": "2026-08-26T02:06:28.477145Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 4,
+  "tools": [
+    {
+      "description": "List the available AI models with their kind (image, video), default cost in credits (1 credit = $0.012, or €0.01 when billed in euros) and billable options. Call this before generating if you need a specific model, otherwise sensible defaults are used.",
+      "inputSchema": {
+        "properties": {
+          "kind": {
+            "description": "Only return models of this kind.",
+            "enum": [
+              "image",
+              "video"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_models",
+      "title": "List Imaginode models"
+    },
+    {
+      "description": "Generate an image from a text prompt (optionally with input images for editing or reference). Waits for the result and returns the image URL. Costs credits from the connected Imaginode account; failures are refunded.",
+      "inputSchema": {
+        "properties": {
+          "aspect_ratio": {
+            "description": "Optional aspect ratio like 16:9, 1:1, 9:16.",
+            "type": "string"
+          },
+          "image_urls": {
+            "description": "Optional input image URLs (editing or reference). Must be media hosted on the Imaginode account (Firebase Storage URLs from the media library or previous generations).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "model": {
+            "description": "Model key from list_models (kind image). Default: nano-banana-2.",
+            "type": "string"
+          },
+          "prompt": {
+            "description": "What to generate, in natural language. English works best.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "type": "object"
+      },
+      "name": "generate_image",
+      "title": "Generate an image"
+    },
+    {
+      "description": "Start a video generation from a text prompt (optionally with a start image). Returns immediately with a request_id and the cost in credits: poll get_generation_status every 30 seconds until it completes (typically 1 to 5 minutes, up to 30 for long jobs). Failures are refunded.",
+      "inputSchema": {
+        "properties": {
+          "aspect_ratio": {
+            "description": "Aspect ratio like 16:9 or 9:16 (text-to-video only).",
+            "type": "string"
+          },
+          "audio": {
+            "description": "Generate audio, for models that support it.",
+            "type": "boolean"
+          },
+          "duration": {
+            "description": "Duration in seconds, among the model's durations (see list_models).",
+            "type": "string"
+          },
+          "image_url": {
+            "description": "Optional start image URL (image-to-video). Must be media hosted on the Imaginode account (Firebase Storage URL from the media library or a previous generation).",
+            "type": "string"
+          },
+          "model": {
+            "description": "Model key from list_models (kind video). Default: seedance-2.",
+            "type": "string"
+          },
+          "prompt": {
+            "description": "What to generate, in natural language. English works best.",
+            "type": "string"
+          },
+          "resolution": {
+            "description": "Resolution among the model's resolutions (see list_models).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "type": "object"
+      },
+      "name": "generate_video",
+      "title": "Generate a video"
+    },
+    {
+      "description": "Check a generation started with generate_video (or a generate_image that timed out). Returns running, completed (with output URLs) or failed (refunded).",
+      "inputSchema": {
+        "properties": {
+          "request_id": {
+            "description": "The request_id returned by the generate tool.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_generation_status",
+      "title": "Get generation status"
+    }
+  ],
+  "url": "https://imaginode.ai/api/mcp"
+}

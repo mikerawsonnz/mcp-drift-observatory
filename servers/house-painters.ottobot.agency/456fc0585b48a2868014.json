@@ -1,0 +1,139 @@
+{
+  "canon_version": "1",
+  "full_hash": "b39a2e0848be4eb80f21dab5d05e67fffefe60bfd222aaaac58b06d6729d8665",
+  "name": "agency.ottobot/licensed-house-painters",
+  "observed_at": "2026-09-27T02:05:34.694117Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 3,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Find licensed house painters and painting contractors in a US city (AZ, CA, CT, DE, FL, IA, NV, NY, OR, VA, WA), from state licensing-board records. Each result has the license number and its status with the date it was read from the board's own file, the phone number and website the board lists, and the board's lookup page for re-checking before hiring. Active licenses are listed first. Not a rating or an endorsement. Read-only.",
+      "inputSchema": {
+        "properties": {
+          "city": {
+            "description": "City name, e.g. Sacramento",
+            "pattern": ".*\\S.*",
+            "patternMessage": "argument city must not be blank",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max results, 1 to 25 (default 10)",
+            "type": "integer"
+          },
+          "state": {
+            "description": "Two-letter US state code. Covered: AZ, CA, CT, DE, FL, IA, NV, NY, OR, VA, WA.",
+            "pattern": "^[A-Za-z]{2}$",
+            "patternMessage": "argument state must be a two-letter state code, e.g. CA",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "city"
+        ],
+        "type": "object"
+      },
+      "name": "search_painters",
+      "title": "Find licensed house painters"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Full record for one painter returned by search_painters, by its painter_id: business name, address, phone, website, license number and dated license status, and the state board's lookup page. Read-only.",
+      "inputSchema": {
+        "properties": {
+          "painter_id": {
+            "description": "painter_id from search_painters, e.g. ca/sacramento/acme-painting-sacramento-ca",
+            "type": "string"
+          }
+        },
+        "required": [
+          "painter_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_painter",
+      "title": "Painter details"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Record a homeowner's request for a painting estimate, with their contact details. Only call this after the homeowner has seen what will be shared and agreed to share it, and set homeowner_confirmed to true to say so. The request is stored and the reply lists licensed painters the homeowner can contact directly. This is an early service: no painter is assigned automatically and a reply is not guaranteed.",
+      "inputSchema": {
+        "properties": {
+          "city": {
+            "description": "City where the painting work is",
+            "type": "string"
+          },
+          "contact_email": {
+            "description": "Email address (give this or contact_phone)",
+            "type": "string"
+          },
+          "contact_name": {
+            "description": "Homeowner's name",
+            "type": "string"
+          },
+          "contact_phone": {
+            "description": "Phone number (give this or contact_email)",
+            "type": "string"
+          },
+          "homeowner_confirmed": {
+            "description": "Must be true: the homeowner agreed to share these details",
+            "enum": [
+              true
+            ],
+            "type": "boolean"
+          },
+          "job_description": {
+            "description": "The painting work: interior or exterior, rooms or areas, rough size, condition. 20 to 2000 characters.",
+            "type": "string"
+          },
+          "painter_ids": {
+            "description": "Optional: up to 5 painter_id values the homeowner chose from search_painters",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "preferred_timing": {
+            "description": "Optional, e.g. 'next month' or 'before October 15'",
+            "type": "string"
+          },
+          "state": {
+            "description": "Two-letter US state code. Covered: AZ, CA, CT, DE, FL, IA, NV, NY, OR, VA, WA.",
+            "pattern": "^[A-Za-z]{2}$",
+            "patternMessage": "argument state must be a two-letter state code, e.g. CA",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "city",
+          "job_description",
+          "contact_name",
+          "homeowner_confirmed"
+        ],
+        "type": "object"
+      },
+      "name": "request_estimate",
+      "title": "Request a painting estimate"
+    }
+  ],
+  "url": "https://house-painters.ottobot.agency/mcp"
+}

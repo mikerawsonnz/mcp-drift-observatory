@@ -1,0 +1,257 @@
+{
+  "canon_version": "1",
+  "full_hash": "db45fbe5221f2c65730ab6784460322002693c082bcb3cf7684c77a4ab9caf20",
+  "name": "ai.familyofficeknowledgegraph/fo-kg",
+  "observed_at": "2026-09-18T02:05:28.360468Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 5,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Resolve a family office"
+      },
+      "description": "Resolve an identifier (LEI, legal name, alias or register id) to the family-office records that carry it, with the node that serves each.",
+      "inputSchema": {
+        "properties": {
+          "identifier": {
+            "description": "Record id, LEI, legal name, alias, or a register identifier as it appears on the record (case-insensitive)",
+            "maxLength": 200,
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier"
+        ],
+        "type": "object"
+      },
+      "name": "resolve_family_office",
+      "outputSchema": {
+        "properties": {
+          "identifier": {
+            "type": "string"
+          },
+          "matches": {
+            "items": {
+              "properties": {
+                "legal_name": {
+                  "type": "string"
+                },
+                "lei": {
+                  "type": "string"
+                },
+                "matched_on": {
+                  "type": "string"
+                },
+                "node": {
+                  "type": "string"
+                },
+                "record": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "served_by": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "identifier",
+          "matches"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get a Family Office Record"
+      },
+      "description": "The Family Office Record for one identifier: every field with value, source_url, read_by and state; optionally a named version.",
+      "inputSchema": {
+        "properties": {
+          "identifier": {
+            "description": "Record id, LEI, legal name, alias, or a register identifier as it appears on the record (case-insensitive)",
+            "maxLength": 200,
+            "minLength": 2,
+            "type": "string"
+          },
+          "version": {
+            "description": "record version as listed by list_nodes (e.g. 2026-09-13.1); omit for current",
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier"
+        ],
+        "type": "object"
+      },
+      "name": "get_record",
+      "outputSchema": {
+        "properties": {
+          "record": {
+            "type": "object"
+          },
+          "served_by": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "record"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List events on a record"
+      },
+      "description": "Dated, URL'd events on one record (registrations, renewals, orders, acquisitions), oldest first, optionally since a date, paged by cursor.",
+      "inputSchema": {
+        "properties": {
+          "cursor": {
+            "description": "next_cursor from a previous page",
+            "type": "string"
+          },
+          "identifier": {
+            "description": "Record id, LEI, legal name, alias, or a register identifier as it appears on the record (case-insensitive)",
+            "maxLength": 200,
+            "minLength": 2,
+            "type": "string"
+          },
+          "limit": {
+            "default": 50,
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "since": {
+            "description": "ISO date YYYY-MM-DD; events on or after it",
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier"
+        ],
+        "type": "object"
+      },
+      "name": "list_events_since",
+      "outputSchema": {
+        "properties": {
+          "events": {
+            "type": "array"
+          },
+          "lei": {
+            "type": "string"
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "served_by": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "lei",
+          "events"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List aliases"
+      },
+      "description": "Every name the record carries for one identifier — legal name, register names, other names — each with its source.",
+      "inputSchema": {
+        "properties": {
+          "identifier": {
+            "description": "Record id, LEI, legal name, alias, or a register identifier as it appears on the record (case-insensitive)",
+            "maxLength": 200,
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier"
+        ],
+        "type": "object"
+      },
+      "name": "list_aliases",
+      "outputSchema": {
+        "properties": {
+          "aliases": {
+            "type": "array"
+          },
+          "legal_name": {
+            "type": "object"
+          },
+          "lei": {
+            "type": "string"
+          },
+          "served_by": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "lei",
+          "aliases"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List nodes"
+      },
+      "description": "The graph's nodes — one per jurisdiction — with record counts read from each node's index, the node door and its as-of.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_nodes",
+      "outputSchema": {
+        "properties": {
+          "apex": {
+            "type": "object"
+          },
+          "nodes": {
+            "type": "array"
+          }
+        },
+        "required": [
+          "nodes"
+        ],
+        "type": "object"
+      }
+    }
+  ],
+  "url": "https://mcp.familyofficeknowledgegraph.ai/mcp"
+}

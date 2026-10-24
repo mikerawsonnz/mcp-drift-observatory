@@ -1,25 +1,30 @@
 {
   "canon_version": "1",
-  "full_hash": "b1f255deffb7410d8d66bce2fc78b1a130f85df1deee519d54da1766a4460cd4",
+  "full_hash": "ad0ed1e9dae7b9e89bcfb6508baaddb02ca442526ba8b047591f7a3f008c8e21",
   "name": "ai.agenticfabricationnetwork/ufp",
-  "observed_at": "2026-08-20T09:11:19.342649Z",
+  "observed_at": "2026-10-10T02:04:53.941847Z",
   "sources": [
     "official"
   ],
-  "tool_count": 10,
+  "tool_count": 13,
   "tools": [
     {
       "_meta": {
         "openai/fileParams": [
           "design_file"
         ],
-        "openai/outputTemplate": "ui://widget/quote-compare-v40.html",
+        "openai/outputTemplate": "ui://widget/quote-compare-v41.html",
         "openai/toolInvocation/invoked": "Fetched fabrication offers",
         "openai/toolInvocation/invoking": "Checking fabrication vendors…",
         "openai/widgetAccessible": true,
         "ui": {
-          "resourceUri": "ui://widget/quote-compare-v40.html"
+          "resourceUri": "ui://widget/quote-compare-v41.html"
         }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
       },
       "description": "Get ranked, purchasable offers (price, ETA, preview image) for fabricating a physical item from a design file. process=fdm_print for 3D printing a model (STL/OBJ/PLY/3MF/AMF/STEP/IGES), process=cnc or process=sheetmetal for machined/bent metal parts (STEP, IGES, DXF), process=decal for stickers/decals from artwork (any common image or design file — PNG/JPG/HEIC/TIFF/GIF/BMP/WEBP/AVIF/SVG/PDF/AI/EPS/PSD/CDR, auto-converted). A .ufp file (UFP part container: the design plus saved spec/constraints in one) is accepted anywhere a design file is — its saved intent applies automatically and anything the user states now wins. If the user just drops a file and asks for a price, omit process — UFP routes it. Provide the design either as design_file (an image/file the user attached or you generated — preferred) or file_url (a public URL). REORDERS: if the user has a UFP part number (from a receipt email or a previous session, looks like UFP-… or part_…), pass it as part_number INSTEAD of any file — the stored design and spec are reused and re-shopped across all current vendors. Locked parts additionally require share_key (from the owner's share link). Returns offers across vendors like Google Flights returns flights.",
       "execution": {
@@ -42,6 +47,95 @@
             "description": "Number of bends in the design (bend lines must be in the file). Prices CNC bending; omit for flat parts",
             "exclusiveMinimum": 0,
             "type": "number"
+          },
+          "bends": {
+            "description": "Sheet-metal bend lines, each as TWO POINTS in the part's own mm frame (flat DXF parts use z=0: a bend from (0,12.7) to (76.2,12.7) is p1 [0,12.7,0], p2 [76.2,12.7,0]). angle_deg is the target bend angle (90 = a right-angle flange), direction \"up\"/\"down\" is the fold direction relative to the flat pattern, radius_mm the requested inside radius (omit it — the shop resolves to its tooling and reports what it used). Pass these when the user articulates WHERE the bends go; a bare \"it has 2 bends\" is bend_count, not this.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "angle_deg": {
+                  "exclusiveMaximum": 180,
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "direction": {
+                  "enum": [
+                    "up",
+                    "down"
+                  ],
+                  "type": "string"
+                },
+                "face_id": {
+                  "type": "integer"
+                },
+                "id": {
+                  "maxLength": 32,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "line": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "p1": {
+                      "items": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ],
+                      "maxItems": 3,
+                      "minItems": 3,
+                      "type": "array"
+                    },
+                    "p2": {
+                      "items": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ],
+                      "maxItems": 3,
+                      "minItems": 3,
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "p1",
+                    "p2"
+                  ],
+                  "type": "object"
+                },
+                "radius_mm": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "source": {
+                  "enum": [
+                    "detected",
+                    "user"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "line",
+                "angle_deg",
+                "direction"
+              ],
+              "type": "object"
+            },
+            "maxItems": 50,
+            "type": "array"
           },
           "callouts": {
             "description": "Dimensions you read off the user's drawing that matter (\"hole_diameter 6.5mm ±0.1\"). The tightest tolerance prunes vendors that cannot hold it.",
@@ -80,7 +174,7 @@
             "type": "array"
           },
           "color": {
-            "description": "ONLY a color the user actually asked for — NEVER pick one for them. fdm_print: Filament color for fdm_print (e.g. black, red); resin_print: Resin color for resin_print (e.g. gray, white, black); powder_print: Powder part color: raw gray/white, or a dye (\"black\", \"dark blue\") — vendor-resolved; elastomer_print: Elastomer part color — VCJ parts ship raw; asks resolve with an honest substitution note; print: Print color ask (\"full color\", \"black and white\"). Vendors that only price full color note the substitution; apparel: Garment color for apparel (\"black\", \"heather gray\") — vendor-resolved",
+            "description": "ONLY a color the user actually asked for — NEVER pick one for them. fdm_print: Filament color for fdm_print (e.g. black, red); resin_print: Resin color for resin_print (e.g. gray, white, black); powder_print: Powder part color: raw gray/white, or a dye (\"black\", \"dark blue\") — vendor-resolved; elastomer_print: Elastomer part color — VCJ parts ship raw; asks resolve with an honest substitution note; cnc: Colour for cnc: with finish anodized it is the anodize colour, otherwise the stock's own colour (black Delrin, clear acrylic). Colour WORDS only; each maker resolves the shade and says what it landed on; laser_cut: Colour of the flat stock for laser_cut (black, clear, natural…). Colour WORDS only; each maker quotes the materials it stocks in that colour and drops the ones that cannot be it; print: Print color ask (\"full color\", \"black and white\"). Vendors that only price full color note the substitution; apparel: Garment color for apparel (\"black\", \"heather gray\") — vendor-resolved",
             "type": "string"
           },
           "cut": {
@@ -135,7 +229,7 @@
             "type": "string"
           },
           "finish": {
-            "description": "cnc: CNC surface finish: standard|anodized|polished|bead_blasted (default standard); sheetmetal: as_cut (default) | deburred | powder_coat — powder coat protects mild steel for outdoor use",
+            "description": "cnc: CNC surface finish: standard|anodized|polished|bead_blasted (default standard); sheetmetal: as_cut (default) | deburred | anodized | powder_coat — anodized is aluminum-only; powder coat protects mild steel for outdoor use",
             "type": "string"
           },
           "food_safe": {
@@ -150,6 +244,107 @@
           "high_temp": {
             "description": "Must tolerate sustained heat (vendor heat-resistance claim)",
             "type": "boolean"
+          },
+          "inserts": {
+            "description": "PEM-style hardware inserts pressed into holes of a sheet-metal part — one record per hole. `insert` is the species (nut | flush_nut | standoff | blind_standoff | stud) and `thread` its size (\"M4\", \"1/4-20\"); both are required. When known, add length_mm (standoff/stud post length), the hole's center (located_at_mm, part's own mm frame), its axis, the drilled diameter, and `points` — the signed unit vector the insert's functional side faces (flip = negate). Pass these when the user asks for press-in nuts/standoffs/studs; vendors with a hardware service price them.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "axis": {
+                  "items": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "type": "array"
+                },
+                "depth_mm": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "drilled_diameter_mm": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "face_id": {
+                  "type": "integer"
+                },
+                "hole": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "insert": {
+                  "enum": [
+                    "nut",
+                    "flush_nut",
+                    "standoff",
+                    "blind_standoff",
+                    "stud"
+                  ],
+                  "type": "string"
+                },
+                "length_mm": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "located_at_mm": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "x": {
+                      "type": "number"
+                    },
+                    "y": {
+                      "type": "number"
+                    },
+                    "z": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y",
+                    "z"
+                  ],
+                  "type": "object"
+                },
+                "points": {
+                  "items": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "type": "array"
+                },
+                "thread": {
+                  "maxLength": 32,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "insert",
+                "thread"
+              ],
+              "type": "object"
+            },
+            "maxItems": 200,
+            "type": "array"
           },
           "material": {
             "description": "ONLY a material the user actually asked for — NEVER guess or default one (a silent \"pla\" on a bare file drop prunes every maker that does not stock it; OMIT instead and each process quotes across its stocked materials so every maker can bid). fdm_print: pla|petg|asa (free-form — \"abs\", \"polycarbonate\" asks resolve to the closest stocked filament with a substitution note); resin_print: standard|tough|high_temp|high_detail resin (free-form asks resolve to the closest supported resin); powder_print: Powder-bed nylon: nylon_12|nylon_12_smooth|nylon_11|nylon_12_gf|nylon_12_esd|nylon_12_white|nylon_pa2200|nylon_12_sls|tpu (free-form — \"PA12\", \"glass filled\" resolve to the closest stocked powder); elastomer_print: Jetted elastomer: tepu_30a|tepu_50a (free-form — \"TPU\", \"soft rubber\" resolve to the closest stocked durometer); cnc: aluminum_6061|aluminum_7075|stainless_304|titanium|brass|acetal|delrin|abs|nylon_pa6|peek|acrylic (free-form asks resolve to the closest supported stock); sheetmetal: mild_steel|aluminum_5052|stainless_304 (free-form — \"steel\", \"5052\", \"stainless\" resolve; unknown asks get closest-match offers). Omit to compare the defaults; laser_cut: acrylic|plywood|mdf|delrin|uhmw|hdpe|g10|carbon_fiber|mild_steel|aluminum_5052|stainless_304 (free-form — \"plexiglass\", \"birch\" resolve; unknown asks get closest-match offers); decal: vinyl|holographic|transparent|glitter (free-form — \"chrome\" etc. gets closest matches)",
@@ -296,6 +491,76 @@
             "description": "Must survive submersion in water",
             "type": "boolean"
           },
+          "tapping": {
+            "description": "Tapped (threaded) holes for a sheet-metal part — one record per hole the user wants threads cut into. `thread` is the callout in the user's words (\"M6\", \"M4 x 0.7\", \"1/4-20\") and is all that's required; when known, add the hole's center in the part's own mm frame (located_at_mm), its unit axis, the pre-tap drilled diameter, and depth_mm so the shop taps the right hole. Pass these when the user asks for threaded/tapped holes; vendors with a tapping service price them.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "axis": {
+                  "items": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "type": "array"
+                },
+                "depth_mm": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "drilled_diameter_mm": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "face_id": {
+                  "type": "integer"
+                },
+                "hole": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "located_at_mm": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "x": {
+                      "type": "number"
+                    },
+                    "y": {
+                      "type": "number"
+                    },
+                    "z": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y",
+                    "z"
+                  ],
+                  "type": "object"
+                },
+                "thread": {
+                  "maxLength": 32,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "thread"
+              ],
+              "type": "object"
+            },
+            "maxItems": 200,
+            "type": "array"
+          },
           "thickness_in": {
             "description": "sheetmetal: Sheet thickness in inches (e.g. 0.063 = 14 ga aluminum). Quoted at the nearest stocked thickness; omit for ~16 ga default; laser_cut: Nominal thickness in inches; quoted at the vendor's nearest stocked thickness. Omit for the material's common stock",
             "exclusiveMinimum": 0,
@@ -327,13 +592,18 @@
     },
     {
       "_meta": {
-        "openai/outputTemplate": "ui://widget/quote-compare-v40.html",
+        "openai/outputTemplate": "ui://widget/quote-compare-v41.html",
         "openai/toolInvocation/invoked": "Fetched fabrication offers",
         "openai/toolInvocation/invoking": "Checking fabrication vendors…",
         "openai/widgetAccessible": true,
         "ui": {
-          "resourceUri": "ui://widget/quote-compare-v40.html"
+          "resourceUri": "ui://widget/quote-compare-v41.html"
         }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
       },
       "description": "Narrow an existing quote with new constraints (destination ZIP the user just provided, deadline, outdoor/waterproof/heat/food-safety requirements, budget, vendor reliability, verbatim requirements terms, drawing callouts, a process filter — \"no, I meant in sheet metal\" → processes — a ship-from country filter — \"only US vendors\" → ships_from — or a vendor filter — \"only show A3D Manufacturing\" → vendors) — or CHANGE its spec: material, color, or quantities. Changing material/quantity is a spec change, not a narrowing — pass it via the material/color/quantities args, NOT as a requirements term; the affected lanes re-price with the new spec through warm vendor sessions. For side-by-side comparisons (\"how does carbon steel compare?\"), add a scenario label — labeled refines coexist instead of replacing each other (max 4). \"Organize by\" (\"sort by cheapest\", \"soonest arrival on top\", \"most green first\") is also this tool: sort_by for objective orders, sort_order + sort_label for orders you judged yourself from the previews — presentation only, instant, nothing re-prices. GOING BACK is also this tool: undo_last_step ALONE takes back exactly one refine step (the quote's steps[] names each step, newest first — the network restores the previous stored state exactly); clear removes whole constraints (\"drop the deadline\" → clear [\"deadline\"]); remove_requirements takes back individual requirements terms. Call with ONLY quote_id to re-read the quote (e.g. to pick up preview images that finished rendering).",
       "execution": {
@@ -343,6 +613,110 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "additionalProperties": false,
         "properties": {
+          "bends": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "not": {}
+                  },
+                  {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "angle_deg": {
+                          "exclusiveMaximum": 180,
+                          "exclusiveMinimum": 0,
+                          "type": "number"
+                        },
+                        "direction": {
+                          "enum": [
+                            "up",
+                            "down"
+                          ],
+                          "type": "string"
+                        },
+                        "face_id": {
+                          "type": "integer"
+                        },
+                        "id": {
+                          "maxLength": 32,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "line": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "p1": {
+                              "items": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "number"
+                                }
+                              ],
+                              "maxItems": 3,
+                              "minItems": 3,
+                              "type": "array"
+                            },
+                            "p2": {
+                              "items": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "number"
+                                }
+                              ],
+                              "maxItems": 3,
+                              "minItems": 3,
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "p1",
+                            "p2"
+                          ],
+                          "type": "object"
+                        },
+                        "radius_mm": {
+                          "exclusiveMinimum": 0,
+                          "type": "number"
+                        },
+                        "source": {
+                          "enum": [
+                            "detected",
+                            "user"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "line",
+                        "angle_deg",
+                        "direction"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 50,
+                    "type": "array"
+                  }
+                ],
+                "description": "Sheet-metal bend lines, each as TWO POINTS in the part's own mm frame (flat DXF parts use z=0: a bend from (0,12.7) to (76.2,12.7) is p1 [0,12.7,0], p2 [76.2,12.7,0]). angle_deg is the target bend angle (90 = a right-angle flange), direction \"up\"/\"down\" is the fold direction relative to the flat pattern, radius_mm the requested inside radius (omit it — the shop resolves to its tooling and reports what it used). Pass these when the user articulates WHERE the bends go; a bare \"it has 2 bends\" is bend_count, not this."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "New bend records for this part — a spec change: sheet lanes requote with exactly these bends (the list REPLACES the previous one, never patches it). Same shape as on get_fabrication_quote: each bend is two points in the part's own mm frame (flat DXF parts use z=0) plus angle_deg, direction up|down, and an optional requested radius_mm. Pass null to REMOVE every articulated bend"
+          },
           "callouts": {
             "description": "Dimensions you read off the user's drawing that matter (\"hole_diameter 6.5mm ±0.1\"). The tightest tolerance prunes vendors that cannot hold it.",
             "items": {
@@ -401,16 +775,39 @@
             "type": "array"
           },
           "color": {
-            "description": "New color for this part (spec change — lanes requote)",
-            "type": "string"
+            "description": "New color for this part (spec change — lanes requote). Colour WORDS only ('black', 'green', 'clear'); the network resolves them to each maker's stocked shades, dyes, filaments or coatings — a family word ('blue') brings back EVERY stocked shade of it, and the quote's color_shades_available lists them — never pass a material or a shade you invented. Pass null to REMOVE a previously asked color — back to vendor defaults",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "color_shades": {
+            "anyOf": [
+              {
+                "items": {
+                  "maxLength": 48,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 64,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Narrow the board to these color SHADES exactly as the quote lists them (color_shades_available / \"Colors on this board\") — instant, nothing re-prices, the same quote id comes back with only those shades; pass null to show every shade again. Never invent a shade name."
           },
           "deadline": {
             "description": "Latest acceptable delivery date, ISO YYYY-MM-DD",
             "type": "string"
           },
           "finish": {
-            "description": "New surface finish (\"powder coat\", \"anodized\", \"bead blasted\") — a spec change: finish-capable lanes (sheet metal, CNC, metal print) requote WITH it; 3D-print lanes have no coating step, so they ignore the finish but keep the COLOR. A colored finish ask (\"black powder coat\") should set BOTH finish and color, so every lane lands on the buyer's color",
-            "type": "string"
+            "description": "New surface finish (\"powder coat\", \"anodized\", \"bead blasted\") — a spec change: finish-capable lanes (sheet metal, CNC, metal print) requote WITH it; 3D-print lanes have no coating step, so they ignore the finish but keep the COLOR. A colored finish ask (\"black powder coat\") should set BOTH finish and color, so every lane lands on the buyer's color. Pass null to REMOVE a previously asked finish",
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "food_safe": {
             "type": "boolean"
@@ -418,9 +815,128 @@
           "high_temp": {
             "type": "boolean"
           },
+          "inserts": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "not": {}
+                  },
+                  {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "axis": {
+                          "items": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ],
+                          "maxItems": 3,
+                          "minItems": 3,
+                          "type": "array"
+                        },
+                        "depth_mm": {
+                          "exclusiveMinimum": 0,
+                          "type": "number"
+                        },
+                        "drilled_diameter_mm": {
+                          "exclusiveMinimum": 0,
+                          "type": "number"
+                        },
+                        "face_id": {
+                          "type": "integer"
+                        },
+                        "hole": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "insert": {
+                          "enum": [
+                            "nut",
+                            "flush_nut",
+                            "standoff",
+                            "blind_standoff",
+                            "stud"
+                          ],
+                          "type": "string"
+                        },
+                        "length_mm": {
+                          "exclusiveMinimum": 0,
+                          "type": "number"
+                        },
+                        "located_at_mm": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "x": {
+                              "type": "number"
+                            },
+                            "y": {
+                              "type": "number"
+                            },
+                            "z": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "x",
+                            "y",
+                            "z"
+                          ],
+                          "type": "object"
+                        },
+                        "points": {
+                          "items": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ],
+                          "maxItems": 3,
+                          "minItems": 3,
+                          "type": "array"
+                        },
+                        "thread": {
+                          "maxLength": 32,
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "insert",
+                        "thread"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
+                  }
+                ],
+                "description": "PEM-style hardware inserts pressed into holes of a sheet-metal part — one record per hole. `insert` is the species (nut | flush_nut | standoff | blind_standoff | stud) and `thread` its size (\"M4\", \"1/4-20\"); both are required. When known, add length_mm (standoff/stud post length), the hole's center (located_at_mm, part's own mm frame), its axis, the drilled diameter, and `points` — the signed unit vector the insert's functional side faces (flip = negate). Pass these when the user asks for press-in nuts/standoffs/studs; vendors with a hardware service price them."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "New hardware-insert records for this part — a spec change: sheet lanes requote with exactly these inserts (the list REPLACES the previous one, never patches it). Same shape as on get_fabrication_quote: species (nut|flush_nut|standoff|blind_standoff|stud) and thread required, hole geometry optional. Pass null to REMOVE every insert"
+          },
           "material": {
-            "description": "New material for this part (\"I need it in PLA\" → \"pla\"). A spec change: lanes requote with this material through warm vendor sessions; an explicit material here replaces the quote's material fan-out. Free-form — unstocked asks resolve to the closest stocked material with a substitution note. Do NOT pass material changes as requirements terms",
-            "type": "string"
+            "description": "New material for this part (\"I need it in PLA\" → \"pla\"). A spec change: lanes requote with this material through warm vendor sessions; an explicit material here replaces the quote's material fan-out. Free-form — unstocked asks resolve to the closest stocked material with a substitution note. Do NOT pass material changes as requirements terms. Pass null to REMOVE a previously asked material (\"forget the aluminum ask\") — the ask comes off the record and the process-default material fan returns",
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "max_budget_usd": {
             "exclusiveMinimum": 0,
@@ -455,13 +971,20 @@
             "type": "integer"
           },
           "quantities": {
-            "description": "New quantities the user wants (spec change — lanes requote at the new quantity). Same rules as on get_fabrication_quote: pass the real ask, never inflate it",
-            "items": {
-              "exclusiveMinimum": 0,
-              "type": "integer"
-            },
-            "maxItems": 5,
-            "type": "array"
+            "anyOf": [
+              {
+                "items": {
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                },
+                "maxItems": 5,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "New quantities the user wants (spec change — lanes requote at the new quantity). Same rules as on get_fabrication_quote: pass the real ask, never inflate it. Pass null to REMOVE a previously asked quantity — the quote returns to single-part pricing"
           },
           "quote_id": {
             "type": "string"
@@ -486,6 +1009,33 @@
             },
             "maxItems": 20,
             "type": "array"
+          },
+          "scale": {
+            "additionalProperties": false,
+            "description": "Rescale the DESIGN ITSELF before re-quoting: per-axis stretch factors over the file's current geometry (\"make it 2x bigger\" = {\"x\":2,\"y\":2,\"z\":2}). Mesh designs are genuinely converted — the child quote prices a rescaled file; STEP/IGES designs keep their original file with the dimensions riding as callouts (pass those too). {1,1,1} is a no-op",
+            "properties": {
+              "x": {
+                "maximum": 100,
+                "minimum": 0.01,
+                "type": "number"
+              },
+              "y": {
+                "maximum": 100,
+                "minimum": 0.01,
+                "type": "number"
+              },
+              "z": {
+                "maximum": 100,
+                "minimum": 0.01,
+                "type": "number"
+              }
+            },
+            "required": [
+              "x",
+              "y",
+              "z"
+            ],
+            "type": "object"
           },
           "scenario": {
             "description": "Comparison lane label. A labeled refine sits SIDE BY SIDE with the quote's other offers instead of replacing them: refines with the same label replace that scenario, different labels coexist (max 4 per quote), and a refine WITHOUT a scenario resets the baseline and supersedes every lane. \"How does X compare to Y?\" = one labeled refine per scenario (e.g. scenario \"carbon steel\" + material \"carbon steel\", then scenario \"aluminum\" + material \"aluminum\"). Keep labels short and human, like \"carbon steel\"",
@@ -546,6 +1096,104 @@
           "submersible": {
             "type": "boolean"
           },
+          "tapping": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "not": {}
+                  },
+                  {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "axis": {
+                          "items": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ],
+                          "maxItems": 3,
+                          "minItems": 3,
+                          "type": "array"
+                        },
+                        "depth_mm": {
+                          "exclusiveMinimum": 0,
+                          "type": "number"
+                        },
+                        "drilled_diameter_mm": {
+                          "exclusiveMinimum": 0,
+                          "type": "number"
+                        },
+                        "face_id": {
+                          "type": "integer"
+                        },
+                        "hole": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "located_at_mm": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "x": {
+                              "type": "number"
+                            },
+                            "y": {
+                              "type": "number"
+                            },
+                            "z": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "x",
+                            "y",
+                            "z"
+                          ],
+                          "type": "object"
+                        },
+                        "thread": {
+                          "maxLength": 32,
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "thread"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
+                  }
+                ],
+                "description": "Tapped (threaded) holes for a sheet-metal part — one record per hole the user wants threads cut into. `thread` is the callout in the user's words (\"M6\", \"M4 x 0.7\", \"1/4-20\") and is all that's required; when known, add the hole's center in the part's own mm frame (located_at_mm), its unit axis, the pre-tap drilled diameter, and depth_mm so the shop taps the right hole. Pass these when the user asks for threaded/tapped holes; vendors with a tapping service price them."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "New tapped-hole records for this part — a spec change: sheet lanes requote with exactly these taps (the list REPLACES the previous one, never patches it). Same shape as on get_fabrication_quote: thread callout (\"M6\", \"1/4-20\") required, hole geometry optional. Pass null to REMOVE every tap"
+          },
+          "thickness_in": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0,
+                "maximum": 1,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "New sheet thickness in INCHES (\"make it in 1/8\" → 0.125) — a spec change: sheet lanes requote at the nearest stocked gauge, flagging the substitution when the match isn't close. Pass null to REMOVE a previously asked thickness — back to the material's default gauge"
+          },
           "undo_last_step": {
             "description": "GO BACK EXACTLY ONE STEP (\"undo that\", \"go back\", \"put it back how it was\"): the network restores the previous quote's stored spec and constraints EXACTLY — never reconstructed from conversation — and re-prices where needed. Send it ALONE (no other args besides quote_id); combining it with changes is rejected. The quote's steps[] names what each undo would take back — steps[0] is the newest. Undo resets the baseline like any unlabeled refine, so open comparison scenarios close. Undoing the original quote is rejected with honest wording — relay it",
             "type": "boolean"
@@ -569,6 +1217,623 @@
       "title": "Refine quote"
     },
     {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "INTERNAL client rail — the routing half of refine_quote with NOTHING committed: takes the same arguments as refine_quote and answers how many distinct fabricators (and which process lanes) the network WOULD ask for the refined part, plus the exclusion notes, without creating a child quote, asking any vendor, superseding in-flight work, or logging demand. An expectation, never a promise — lanes can still decline once asked. Never call this to look at prices; it carries none. Use refine_quote to actually re-price.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "bends": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "not": {}
+                  },
+                  {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "angle_deg": {
+                          "exclusiveMaximum": 180,
+                          "exclusiveMinimum": 0,
+                          "type": "number"
+                        },
+                        "direction": {
+                          "enum": [
+                            "up",
+                            "down"
+                          ],
+                          "type": "string"
+                        },
+                        "face_id": {
+                          "type": "integer"
+                        },
+                        "id": {
+                          "maxLength": 32,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "line": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "p1": {
+                              "items": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "number"
+                                }
+                              ],
+                              "maxItems": 3,
+                              "minItems": 3,
+                              "type": "array"
+                            },
+                            "p2": {
+                              "items": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "number"
+                                }
+                              ],
+                              "maxItems": 3,
+                              "minItems": 3,
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "p1",
+                            "p2"
+                          ],
+                          "type": "object"
+                        },
+                        "radius_mm": {
+                          "exclusiveMinimum": 0,
+                          "type": "number"
+                        },
+                        "source": {
+                          "enum": [
+                            "detected",
+                            "user"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "line",
+                        "angle_deg",
+                        "direction"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 50,
+                    "type": "array"
+                  }
+                ],
+                "description": "Sheet-metal bend lines, each as TWO POINTS in the part's own mm frame (flat DXF parts use z=0: a bend from (0,12.7) to (76.2,12.7) is p1 [0,12.7,0], p2 [76.2,12.7,0]). angle_deg is the target bend angle (90 = a right-angle flange), direction \"up\"/\"down\" is the fold direction relative to the flat pattern, radius_mm the requested inside radius (omit it — the shop resolves to its tooling and reports what it used). Pass these when the user articulates WHERE the bends go; a bare \"it has 2 bends\" is bend_count, not this."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "New bend records for this part — a spec change: sheet lanes requote with exactly these bends (the list REPLACES the previous one, never patches it). Same shape as on get_fabrication_quote: each bend is two points in the part's own mm frame (flat DXF parts use z=0) plus angle_deg, direction up|down, and an optional requested radius_mm. Pass null to REMOVE every articulated bend"
+          },
+          "callouts": {
+            "description": "Dimensions you read off the user's drawing that matter (\"hole_diameter 6.5mm ±0.1\"). The tightest tolerance prunes vendors that cannot hold it.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "critical": {
+                  "type": "boolean"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "tolerance_mm": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "unit": {
+                  "enum": [
+                    "mm",
+                    "in"
+                  ],
+                  "type": "string"
+                },
+                "value": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "name",
+                "value",
+                "unit"
+              ],
+              "type": "object"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "clear": {
+            "description": "REMOVE constraints entirely (\"drop the deadline\", \"forget the budget\", \"no more food-safe requirement\"): list the constraints to clear and each is removed from the quote — the one deliberate widening besides undo. Clearing a deadline or budget answers instantly from held offers (near-misses convert back); clearing an attribute/reliability/requirements demand re-prices honestly. Same effect as [\"any\"] on the three filter args, extended to every constraint",
+            "items": {
+              "enum": [
+                "deadline",
+                "budget",
+                "outdoor_rated",
+                "submersible",
+                "high_temp",
+                "food_safe",
+                "reliability",
+                "requirements",
+                "processes",
+                "ships_from",
+                "vendors"
+              ],
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "color": {
+            "description": "New color for this part (spec change — lanes requote). Colour WORDS only ('black', 'green', 'clear'); the network resolves them to each maker's stocked shades, dyes, filaments or coatings — a family word ('blue') brings back EVERY stocked shade of it, and the quote's color_shades_available lists them — never pass a material or a shade you invented. Pass null to REMOVE a previously asked color — back to vendor defaults",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "color_shades": {
+            "anyOf": [
+              {
+                "items": {
+                  "maxLength": 48,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 64,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Narrow the board to these color SHADES exactly as the quote lists them (color_shades_available / \"Colors on this board\") — instant, nothing re-prices, the same quote id comes back with only those shades; pass null to show every shade again. Never invent a shade name."
+          },
+          "deadline": {
+            "description": "Latest acceptable delivery date, ISO YYYY-MM-DD",
+            "type": "string"
+          },
+          "finish": {
+            "description": "New surface finish (\"powder coat\", \"anodized\", \"bead blasted\") — a spec change: finish-capable lanes (sheet metal, CNC, metal print) requote WITH it; 3D-print lanes have no coating step, so they ignore the finish but keep the COLOR. A colored finish ask (\"black powder coat\") should set BOTH finish and color, so every lane lands on the buyer's color. Pass null to REMOVE a previously asked finish",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "food_safe": {
+            "type": "boolean"
+          },
+          "high_temp": {
+            "type": "boolean"
+          },
+          "inserts": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "not": {}
+                  },
+                  {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "axis": {
+                          "items": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ],
+                          "maxItems": 3,
+                          "minItems": 3,
+                          "type": "array"
+                        },
+                        "depth_mm": {
+                          "exclusiveMinimum": 0,
+                          "type": "number"
+                        },
+                        "drilled_diameter_mm": {
+                          "exclusiveMinimum": 0,
+                          "type": "number"
+                        },
+                        "face_id": {
+                          "type": "integer"
+                        },
+                        "hole": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "insert": {
+                          "enum": [
+                            "nut",
+                            "flush_nut",
+                            "standoff",
+                            "blind_standoff",
+                            "stud"
+                          ],
+                          "type": "string"
+                        },
+                        "length_mm": {
+                          "exclusiveMinimum": 0,
+                          "type": "number"
+                        },
+                        "located_at_mm": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "x": {
+                              "type": "number"
+                            },
+                            "y": {
+                              "type": "number"
+                            },
+                            "z": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "x",
+                            "y",
+                            "z"
+                          ],
+                          "type": "object"
+                        },
+                        "points": {
+                          "items": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ],
+                          "maxItems": 3,
+                          "minItems": 3,
+                          "type": "array"
+                        },
+                        "thread": {
+                          "maxLength": 32,
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "insert",
+                        "thread"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
+                  }
+                ],
+                "description": "PEM-style hardware inserts pressed into holes of a sheet-metal part — one record per hole. `insert` is the species (nut | flush_nut | standoff | blind_standoff | stud) and `thread` its size (\"M4\", \"1/4-20\"); both are required. When known, add length_mm (standoff/stud post length), the hole's center (located_at_mm, part's own mm frame), its axis, the drilled diameter, and `points` — the signed unit vector the insert's functional side faces (flip = negate). Pass these when the user asks for press-in nuts/standoffs/studs; vendors with a hardware service price them."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "New hardware-insert records for this part — a spec change: sheet lanes requote with exactly these inserts (the list REPLACES the previous one, never patches it). Same shape as on get_fabrication_quote: species (nut|flush_nut|standoff|blind_standoff|stud) and thread required, hole geometry optional. Pass null to REMOVE every insert"
+          },
+          "material": {
+            "description": "New material for this part (\"I need it in PLA\" → \"pla\"). A spec change: lanes requote with this material through warm vendor sessions; an explicit material here replaces the quote's material fan-out. Free-form — unstocked asks resolve to the closest stocked material with a substitution note. Do NOT pass material changes as requirements terms. Pass null to REMOVE a previously asked material (\"forget the aluminum ask\") — the ask comes off the record and the process-default material fan returns",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "max_budget_usd": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "min_vendor_reviews": {
+            "description": "Only vendors with at least this many verified-purchase reviews",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "min_vendor_stars": {
+            "description": "Only vendors whose displayed review rating is at least this many stars (1-5); vendors with no reviews yet are excluded",
+            "maximum": 5,
+            "minimum": 1,
+            "type": "number"
+          },
+          "outdoor_rated": {
+            "type": "boolean"
+          },
+          "processes": {
+            "description": "Narrow this quote to specific fabrication processes (\"no, I meant in sheet metal\" → [\"sheet metal\"]). A CONSTRAINT, not a new quote: excluded lanes drop while warm vendor sessions survive, and further refines inherit the filter. Friendly terms accepted (\"sheet metal\", \"3d printing\", \"cnc\", \"laser\"); pass [\"any\"] to clear the filter and show every process again. When comparison scenarios are open and the user narrows the process, re-refine EVERY active scenario label with this same arg so all columns prune together",
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 8,
+            "type": "array"
+          },
+          "proven_spec_orders": {
+            "description": "Only vendors with at least N completed orders for this exact process+material — \"a vendor that prints PC reliably\"",
+            "exclusiveMinimum": 0,
+            "type": "integer"
+          },
+          "quantities": {
+            "anyOf": [
+              {
+                "items": {
+                  "exclusiveMinimum": 0,
+                  "type": "integer"
+                },
+                "maxItems": 5,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "New quantities the user wants (spec change — lanes requote at the new quantity). Same rules as on get_fabrication_quote: pass the real ask, never inflate it. Pass null to REMOVE a previously asked quantity — the quote returns to single-part pricing"
+          },
+          "quote_id": {
+            "type": "string"
+          },
+          "remove_requirements": {
+            "description": "Take back INDIVIDUAL requirements terms (\"drop the anodized ask, keep the rest\"): each listed term is removed from the quote's requirements by normalized match, the others stay. Unknown terms are ignored, never an error. Re-stating the requirements list can never drop a term (terms merge as a union) — this is the removal channel",
+            "items": {
+              "maxLength": 120,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "type": "array"
+          },
+          "requirements": {
+            "description": "Verbatim context terms from the user — materials, finishes, certifications, tolerances (\"UV resistant\", \"anodized: red\", \"iso 13485\", \"tolerance: 0.1mm\"). UFP applies what it can and reports what it could not; unresolvable terms are logged for vendor sourcing. Do not interrogate the user to fill this — pass what they said.",
+            "items": {
+              "maxLength": 120,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 20,
+            "type": "array"
+          },
+          "scale": {
+            "additionalProperties": false,
+            "description": "Rescale the DESIGN ITSELF before re-quoting: per-axis stretch factors over the file's current geometry (\"make it 2x bigger\" = {\"x\":2,\"y\":2,\"z\":2}). Mesh designs are genuinely converted — the child quote prices a rescaled file; STEP/IGES designs keep their original file with the dimensions riding as callouts (pass those too). {1,1,1} is a no-op",
+            "properties": {
+              "x": {
+                "maximum": 100,
+                "minimum": 0.01,
+                "type": "number"
+              },
+              "y": {
+                "maximum": 100,
+                "minimum": 0.01,
+                "type": "number"
+              },
+              "z": {
+                "maximum": 100,
+                "minimum": 0.01,
+                "type": "number"
+              }
+            },
+            "required": [
+              "x",
+              "y",
+              "z"
+            ],
+            "type": "object"
+          },
+          "scenario": {
+            "description": "Comparison lane label. A labeled refine sits SIDE BY SIDE with the quote's other offers instead of replacing them: refines with the same label replace that scenario, different labels coexist (max 4 per quote), and a refine WITHOUT a scenario resets the baseline and supersedes every lane. \"How does X compare to Y?\" = one labeled refine per scenario (e.g. scenario \"carbon steel\" + material \"carbon steel\", then scenario \"aluminum\" + material \"aluminum\"). Keep labels short and human, like \"carbon steel\"",
+            "maxLength": 40,
+            "minLength": 1,
+            "type": "string"
+          },
+          "ship_to_zip": {
+            "description": "Destination US ZIP code, exactly as the user stated it — use this when the user provides their ZIP after a quote priced to the assumed central-US destination (routing.ship_to); the refined prices become theirs. NEVER guess or invent a ZIP",
+            "pattern": "^\\d{5}(-\\d{4})?$",
+            "type": "string"
+          },
+          "ships_from": {
+            "description": "Only vendors that ship from these countries/regions (\"only US vendors\", \"just European shops\", \"keep it domestic\") — an INCLUDE list naming where the user DOES want vendors from. A CONSTRAINT like processes: non-matching vendors drop instantly (nothing re-prices), further refines inherit the filter, and [\"any\"] clears it to show vendors everywhere again. Friendly terms accepted (\"US\", \"Europe\", \"Germany\", \"China\", \"UK\"). Vendors whose origin is unknown or whose network is worldwide (a specific origin cannot be guaranteed) are excluded, each with an honest note. For \"nothing from X\" asks, pass the regions the user does want instead",
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 8,
+            "type": "array"
+          },
+          "sort_by": {
+            "description": "\"Organize by\": re-order the quote's offer cards (\"sort by cheapest\" → \"price\"; \"soonest arrival first\" → \"arrival\"; \"best rated\" → \"rating\"; \"total_price\" = part + cheapest shipping; \"recommended\" restores the default price+speed rank). PURE PRESENTATION — answers instantly on the same quote, never re-prices or drops offers, and the ordering sticks across re-reads, streaming, and later refines until changed",
+            "enum": [
+              "recommended",
+              "price",
+              "unit_price",
+              "total_price",
+              "arrival",
+              "rating"
+            ],
+            "type": "string"
+          },
+          "sort_direction": {
+            "description": "Flip a sort_by ordering: \"desc\" reverses the key's natural direction (\"most expensive first\" = sort_by \"price\" + \"desc\"). Only meaningful with sort_by",
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "type": "string"
+          },
+          "sort_label": {
+            "description": "Short human wording for a sort_order, displayed on the board (\"most green first\") — required with sort_order, since only you know what your order means",
+            "maxLength": 60,
+            "minLength": 1,
+            "type": "string"
+          },
+          "sort_order": {
+            "description": "EXPLICIT card order for asks only you can judge (\"sort the most green to the top\"): look at the offers' preview images, decide the order yourself, and pass the offer ids first-on-top. Offers you leave out (including ones that stream in later) land below the listed ones in the default rank. Pass sort_label with it",
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 200,
+            "minItems": 1,
+            "type": "array"
+          },
+          "submersible": {
+            "type": "boolean"
+          },
+          "tapping": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "not": {}
+                  },
+                  {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "axis": {
+                          "items": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ],
+                          "maxItems": 3,
+                          "minItems": 3,
+                          "type": "array"
+                        },
+                        "depth_mm": {
+                          "exclusiveMinimum": 0,
+                          "type": "number"
+                        },
+                        "drilled_diameter_mm": {
+                          "exclusiveMinimum": 0,
+                          "type": "number"
+                        },
+                        "face_id": {
+                          "type": "integer"
+                        },
+                        "hole": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "located_at_mm": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "x": {
+                              "type": "number"
+                            },
+                            "y": {
+                              "type": "number"
+                            },
+                            "z": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "x",
+                            "y",
+                            "z"
+                          ],
+                          "type": "object"
+                        },
+                        "thread": {
+                          "maxLength": 32,
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "thread"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
+                  }
+                ],
+                "description": "Tapped (threaded) holes for a sheet-metal part — one record per hole the user wants threads cut into. `thread` is the callout in the user's words (\"M6\", \"M4 x 0.7\", \"1/4-20\") and is all that's required; when known, add the hole's center in the part's own mm frame (located_at_mm), its unit axis, the pre-tap drilled diameter, and depth_mm so the shop taps the right hole. Pass these when the user asks for threaded/tapped holes; vendors with a tapping service price them."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "New tapped-hole records for this part — a spec change: sheet lanes requote with exactly these taps (the list REPLACES the previous one, never patches it). Same shape as on get_fabrication_quote: thread callout (\"M6\", \"1/4-20\") required, hole geometry optional. Pass null to REMOVE every tap"
+          },
+          "thickness_in": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0,
+                "maximum": 1,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "New sheet thickness in INCHES (\"make it in 1/8\" → 0.125) — a spec change: sheet lanes requote at the nearest stocked gauge, flagging the substitution when the match isn't close. Pass null to REMOVE a previously asked thickness — back to the material's default gauge"
+          },
+          "undo_last_step": {
+            "description": "GO BACK EXACTLY ONE STEP (\"undo that\", \"go back\", \"put it back how it was\"): the network restores the previous quote's stored spec and constraints EXACTLY — never reconstructed from conversation — and re-prices where needed. Send it ALONE (no other args besides quote_id); combining it with changes is rejected. The quote's steps[] names what each undo would take back — steps[0] is the newest. Undo resets the baseline like any unlabeled refine, so open comparison scenarios close. Undoing the original quote is rejected with honest wording — relay it",
+            "type": "boolean"
+          },
+          "vendors": {
+            "description": "Only these specific vendors/makers (\"only show A3D Manufacturing\", \"just Slant 3D and Fictiv\") — an INCLUDE list of vendor names as they appear on offers. A CONSTRAINT like processes: other vendors' offers drop instantly (nothing re-prices), further refines inherit the filter, and [\"any\"] clears it to show every vendor again. Friendly names accepted (\"A3D\", \"slant 3d\"); unmatched names are reported, never an error. This is THE way to answer \"show me everything vendor X offers\" — the filtered quote lists that vendor's complete lineup",
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 16,
+            "type": "array"
+          }
+        },
+        "required": [
+          "quote_id"
+        ],
+        "type": "object"
+      },
+      "name": "preview_quote",
+      "title": "Preview quote routing (soft quote)"
+    },
+    {
       "_meta": {
         "openai/toolInvocation/invoked": "Offers refreshed",
         "openai/toolInvocation/invoking": "Refreshing offers…",
@@ -579,6 +1844,11 @@
             "app"
           ]
         }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
       },
       "description": "INTERNAL — the offer board calls this to refresh itself while vendors finish pricing. Never call this yourself. The board you were given is already final for its turn; do not reach for refine_quote to look at it again either, that paints a duplicate board.",
       "execution": {
@@ -603,13 +1873,18 @@
     },
     {
       "_meta": {
-        "openai/outputTemplate": "ui://widget/quote-compare-v40.html",
+        "openai/outputTemplate": "ui://widget/quote-compare-v41.html",
         "openai/toolInvocation/invoked": "All vendors answered",
         "openai/toolInvocation/invoking": "Waiting for the remaining vendors…",
         "openai/widgetAccessible": true,
         "ui": {
-          "resourceUri": "ui://widget/quote-compare-v40.html"
+          "resourceUri": "ui://widget/quote-compare-v41.html"
         }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
       },
       "description": "ONLY for the case where a quote response came back with an EMPTY board and told you to call this: waits for the vendors to answer (up to ~40s) and returns their offers as a full board. Call with just quote_id, immediately, and say nothing substantive before it. NEVER call it on a response that already listed offers — that board is final, and this would add nothing.",
       "execution": {
@@ -644,6 +1919,11 @@
           ]
         }
       },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
       "description": "Create the order and get a hosted payment link for a chosen offer. Call this as soon as the user picks an offer + shipping speed — do NOT ask for their address first: the secure payment page collects the shipping address and email. Only pass address fields if the user already volunteered them. Returns checkout_url — give it to the user to pay; UFP places the vendor order automatically after payment.",
       "execution": {
         "taskSupport": "forbidden"
@@ -675,6 +1955,10 @@
             "type": "string"
           },
           "city": {
+            "type": "string"
+          },
+          "coupon_code": {
+            "description": "Coupon code, only if the user provided one (early-adopter codes from the AFN team). Case-insensitive. The discount appears on the payment page; a 100%-off code makes the total $0 with no card required. Never invent or guess a code.",
             "type": "string"
           },
           "email": {
@@ -739,6 +2023,11 @@
           ]
         }
       },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
       "description": "Check status, ETA and tracking for a UFP order.",
       "execution": {
         "taskSupport": "forbidden"
@@ -760,6 +2049,11 @@
       "title": "Get order status"
     },
     {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
       "description": "List this agent's recent UFP orders (newest first): order id, what was made, vendor, status, total, ETA, created date. Use it to resolve vague references — \"my sticker order\", \"that order from 6 days ago\" — to a concrete order_id before calling get_order_status or leave_review.",
       "execution": {
         "taskSupport": "forbidden"
@@ -773,6 +2067,11 @@
       "title": "List recent orders"
     },
     {
+      "annotations": {
+        "destructiveHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
       "description": "Send the user's answer to a question the maker (vendor) asked about a UFP order — get_order_status surfaces an open question when one is waiting. Confirm the answer with the user before sending. The network relays it: the maker sees plain text from the network account with the user's contact details and links stripped, so never include emails, phone numbers, or URLs the answer depends on.",
       "execution": {
         "taskSupport": "forbidden"
@@ -802,6 +2101,11 @@
       "title": "Reply to the maker"
     },
     {
+      "annotations": {
+        "destructiveHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
       "description": "Record the user's verified-purchase review of how a UFP order turned out. YOUR JOB IS TO STRUCTURE THE FEEDBACK: turn what the user actually said into stars (1-5 overall) and facet scores — \"the cut was sloppy\" -> quality, \"parts arrived 2 days late\" -> timeliness, \"wrong color\" -> accuracy. Keep the optional comment to a short factual summary of their words; never embellish. ALWAYS draft the review (stars, facets, comment) and confirm it with the user BEFORE calling this tool — e.g. \"I'll rate this 2 stars with timeliness 1 because it arrived 2 days late — send it?\". One review per order: submitting again updates the existing review. Use list_orders first if you need to resolve which order they mean.",
       "execution": {
         "taskSupport": "forbidden"
@@ -898,6 +2202,11 @@
           ]
         }
       },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
       "description": "Honest, cited material intelligence for material-choice / strength / durability / heat / outdoor questions (\"my PLA part broke, what's stronger?\", \"will this survive outdoors?\"). Returns caveats-FIRST facts: published specs (tensile, heat-deflection, UV/outdoor, chemical) each tagged vendor-cited vs general engineering knowledge, \"stronger/tougher/hotter than X\" ladders (PLA→PETG→ABS/ASA→nylon/PC→metals), and finish/coating options. Call it BEFORE answering such a question, then relay the facts. It supplies FACTS ONLY — comparative specs and vendor-admitted caveats, never a fitness-for-purpose or safety guarantee (that stays your judgment boundary); name express vendor claims \"advertised\", not \"certified\".",
       "execution": {
         "taskSupport": "forbidden"
@@ -923,6 +2232,84 @@
       },
       "name": "get_material_guide",
       "title": "Get material guide"
+    },
+    {
+      "_meta": {
+        "openai/toolInvocation/invoked": "Fetched network capabilities",
+        "openai/toolInvocation/invoking": "Reading the network's live catalog…",
+        "openai/widgetAccessible": true,
+        "ui": {
+          "visibility": [
+            "model",
+            "app"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "The LIVE catalog of what the fabrication network can do RIGHT NOW — no quote needed. Returns the services ledger (tapping, inserts, welding, bending, finishes… with each shop's own size/material/thickness windows), the network's sheet gauge ladder, the stocked hardware combinations (species x thread) with stocked lengths and shop counts — the most-stocked length is the steering default for an unspecified length — the finish options with their stocked color menus, and per-process manufacturability rules. This is live state, not a spec sheet: it changes as connectors join, leave, or have capability branches toggled, so call it fresh when the user asks what's possible (materials, gauges, hardware, colors, services) rather than answering from memory.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "process": {
+            "description": "Advisory scope (\"sheetmetal\") — v1 returns the whole catalog either way; filter what you relay",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_network_capabilities",
+      "title": "Network capabilities"
+    },
+    {
+      "_meta": {
+        "openai/toolInvocation/invoked": "Fetched shop gauges",
+        "openai/toolInvocation/invoking": "Reading the shop's stocked gauges…",
+        "openai/widgetAccessible": true,
+        "ui": {
+          "visibility": [
+            "model",
+            "app"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Every sheet thickness (gauge) ONE named shop stocks right now, per material — read live off the shop's declared catalog, no quote needed. Call it when the user asks what thicknesses/gauges a specific maker carries (\"what thicknesses does SendCutSend have in mild steel?\"). For the whole network's ladder use get_network_capabilities instead. Never answer a gauge question from memory.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "material": {
+            "description": "Advisory: narrow the relayed list to one material (\"mild steel\", \"5052\")",
+            "type": "string"
+          },
+          "shop": {
+            "description": "The shop as the user or the offer cards name it (\"SendCutSend\", \"sendcutsend\")",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "shop"
+        ],
+        "type": "object"
+      },
+      "name": "get_shop_gauges",
+      "title": "A shop's stocked sheet gauges"
     }
   ],
   "url": "https://agenticfabricationnetwork.ai/mcp"

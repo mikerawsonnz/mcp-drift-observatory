@@ -1,0 +1,67 @@
+{
+  "canon_version": "1",
+  "full_hash": "98e9ba380940923076d0c9cca1f426d767ac3b55c1fc5708de9d033710d20823",
+  "name": "ai.fukushi/dictionary",
+  "observed_at": "2026-09-18T02:05:30.845331Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 2,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "障害福祉制度の解説サイト「障害福祉AI辞典」(fukushi.ai) の記事を検索し、該当箇所の抜粋と記事URLを返す。記事は厚生労働省の一次情報（報酬告示・留意事項通知・指定基準省令・サービスコード表）に接地して検証済みで、本文には出典が脚注として示されている。障害者総合支援法にもとづくサービスの**制度・報酬・加算・指定基準・実務手順**を問われたら、まずこれを使うこと。例:「就労継続支援B型の欠席時対応加算は何単位？」「A型の開業に必要な人員基準は？」「処遇改善加算の算定要件」。扱う範囲は記事がある領域に限られる（就労系と全サービス共通が厚い）。該当が無ければ推測せず、資料に無い旨を利用者に伝えること。",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "query": {
+            "description": "日本語の検索クエリ。サービス種別＋知りたい観点を具体的に並べる。例:「就労継続支援B型 欠席時対応加算 単位数」",
+            "type": "string"
+          },
+          "top_k": {
+            "description": "検索するチャンク数（既定 5、最大 10）。同じ記事の複数箇所が当たると1件にまとめるため、返る記事数はこれより少なくなることがある。",
+            "maximum": 10,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_articles",
+      "title": "障害福祉サービスの解説記事を検索"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "fukushi.ai の公開記事を slug で指定して全文（Markdown）を取得する。search_articles の抜粋では手順や表の全体が掴めないときに使う。本文末の脚注に、その記事が根拠にした一次情報の出典が示されている。",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "slug": {
+            "description": "記事のslug。search_articles の結果に含まれる。例: 「b-type-opening-guide」",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_article",
+      "title": "記事の全文を取得"
+    }
+  ],
+  "url": "https://fukushi.ai/api/mcp"
+}

@@ -1,0 +1,211 @@
+{
+  "canon_version": "1",
+  "full_hash": "df5685820fddc8441520f35a3fd88fcd8a71e09c1af8bbdc9cd245fbf7eac85a",
+  "name": "ai.askmiles/catalog",
+  "observed_at": "2026-10-17T02:05:15.955992Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 5,
+  "tools": [
+    {
+      "description": "Find credit cards open to new applicants by issuer, annual fee, network, rewards currency, or a benefit they carry. Returns a short row per card; call get_card_facts for one card's full record. Card facts only — no earning rates, welcome-offer amounts, transfer ratios, or bonus sizes.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "benefit": {
+            "description": "Words to look for in a card's statement credits, lounge networks, or purchase/travel protections, e.g. 'Global Entry', 'Priority Pass', 'trip delay'.",
+            "type": "string"
+          },
+          "card_type": {
+            "description": "Personal or Business.",
+            "enum": [
+              "Business",
+              "Personal"
+            ],
+            "type": "string"
+          },
+          "has_free_night_certificate": {
+            "description": "Only cards granting a free night certificate.",
+            "type": "boolean"
+          },
+          "has_lounge_access": {
+            "description": "Only cards carrying at least one lounge network.",
+            "type": "boolean"
+          },
+          "issuer": {
+            "description": "Exact issuer name.",
+            "enum": [
+              "American Express",
+              "Bank of America",
+              "Barclays",
+              "BECU",
+              "Capital One",
+              "Chase",
+              "Citi",
+              "Column N.A.",
+              "Comenity",
+              "Discover",
+              "Elan Financial Services",
+              "Emigrant Bank",
+              "First Bank & Trust",
+              "First Electronic Bank",
+              "FNBO",
+              "Goldman Sachs",
+              "HSBC",
+              "Synchrony",
+              "TD Bank",
+              "UBS",
+              "US Bank",
+              "Wells Fargo"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "description": "Rows to return. Default 10, maximum 25.",
+            "type": "number"
+          },
+          "max_annual_fee": {
+            "description": "Highest annual fee in dollars, inclusive.",
+            "type": "number"
+          },
+          "network": {
+            "description": "Payment network.",
+            "enum": [
+              "American Express",
+              "Discover",
+              "Mastercard",
+              "Visa"
+            ],
+            "type": "string"
+          },
+          "no_foreign_transaction_fee": {
+            "description": "Only cards with no foreign transaction fee.",
+            "type": "boolean"
+          },
+          "rewards_currency": {
+            "description": "Loyalty currency the card earns, e.g. 'Chase Ultimate Rewards'. Matched loosely.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "search_card_catalog",
+      "title": "Search the card catalog"
+    },
+    {
+      "description": "Everything the public catalog holds on one card: issuer, annual fee, network, foreign transaction fee, rewards currency, and the names of its statement credits, lounge networks and protections. Card name is matched loosely. Card facts only — no earning rates, welcome-offer amounts, transfer ratios, or bonus sizes.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "card_name": {
+            "description": "Card name, e.g. 'Amex Platinum' or 'Venture X'.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "card_name"
+        ],
+        "type": "object"
+      },
+      "name": "get_card_facts",
+      "title": "One card's catalog record"
+    },
+    {
+      "description": "The same catalog record for 2-5 cards at once, for comparing fees, networks and which benefits each carries. Card facts only — no earning rates, welcome-offer amounts, transfer ratios, or bonus sizes.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "card_names": {
+            "description": "Card names, matched loosely.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 5,
+            "minItems": 2,
+            "type": "array"
+          }
+        },
+        "required": [
+          "card_names"
+        ],
+        "type": "object"
+      },
+      "name": "compare_card_facts",
+      "title": "Compare cards side by side"
+    },
+    {
+      "description": "Which loyalty programs a currency transfers to, or which currencies reach a destination, and whether a transfer bonus is running. This is the route graph only — it does not carry transfer ratios, bonus sizes, expiry dates, or which route is worth taking. Card facts only — no earning rates, welcome-offer amounts, transfer ratios, or bonus sizes.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "from_program": {
+            "description": "Source currency, e.g. 'Chase Ultimate Rewards'.",
+            "enum": [
+              "Aer Lingus AerClub",
+              "American Express Membership Rewards",
+              "Bilt Rewards",
+              "British Airways Club",
+              "Capital One Miles",
+              "Chase Ultimate Rewards",
+              "Choice Privileges",
+              "Citi ThankYou Rewards",
+              "Club Iberia Plus",
+              "Finnair Plus",
+              "HSBC Rewards Points",
+              "Loganair Loyalty",
+              "Marriott Bonvoy",
+              "Qatar Airways Privilege Club",
+              "Rove Miles",
+              "US Bank Altitude Points",
+              "Virgin Atlantic Flying Club",
+              "Virgin Red",
+              "Wells Fargo Rewards",
+              "Wyndham Rewards"
+            ],
+            "type": "string"
+          },
+          "include_inactive": {
+            "description": "Include routes that have been discontinued.",
+            "type": "boolean"
+          },
+          "limit": {
+            "description": "Routes to return. Default 100, maximum 200.",
+            "type": "number"
+          },
+          "only_with_bonus": {
+            "description": "Only routes with a transfer bonus running.",
+            "type": "boolean"
+          },
+          "to_program": {
+            "description": "Destination program, e.g. 'World of Hyatt'. Matched loosely; call with neither argument to list every source.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "find_transfer_routes",
+      "title": "Which transfer routes exist"
+    },
+    {
+      "description": "Miles' own estimate of a loyalty point's value in cents, optionally multiplied by a balance. Call with no arguments to list every program Miles values, with the exact spelling to use. These are Miles' estimates, not market prices — attribute them. Card facts only — no earning rates, welcome-offer amounts, transfer ratios, or bonus sizes.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "points": {
+            "description": "A balance to value, in points.",
+            "type": "number"
+          },
+          "program": {
+            "description": "Loyalty program, e.g. 'World of Hyatt'. Matched loosely. Omit to list all.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "estimate_point_value",
+      "title": "What a point is worth"
+    }
+  ],
+  "url": "https://api.askmiles.ai/mcp"
+}

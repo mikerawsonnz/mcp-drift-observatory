@@ -1,0 +1,346 @@
+{
+  "canon_version": "1",
+  "full_hash": "4da4510bb171bc0a2a36bb5589063eb0f8c35620f94f872c182087a16496e59b",
+  "name": "ai.coreplex/shopping",
+  "observed_at": "2026-10-20T02:05:45.845765Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 7,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Find products from Shopify brands; results name the seller and flag official stores. Example: {\"query\":\"Owala FreeSip 24oz\",\"limit\":5}",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "default": 8,
+            "description": "Max results",
+            "maximum": 24,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "official_only": {
+            "default": false,
+            "description": "Brand stores only",
+            "type": "boolean"
+          },
+          "query": {
+            "description": "What to find",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_products",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "products": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "products"
+        ],
+        "type": "object"
+      },
+      "title": "Search products"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "One listing: price per option, stock, seller, official-store flag, policy links. Example: {\"product_url\":\"https://owalalife.com/products/freesip\"}",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "product_url": {
+            "description": "Shopify product URL (seller_url)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_url"
+        ],
+        "type": "object"
+      },
+      "name": "get_product",
+      "outputSchema": {
+        "properties": {
+          "options": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "policies": {
+            "type": "object"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "type": "object"
+      },
+      "title": "Get product details"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Seller's return terms (window, condition, opened items, return shipping), each with the policy's exact sentence. Example: {\"product_url\":\"https://owalalife.com/products/freesip\"}",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "product_url": {
+            "description": "Shopify product URL (seller_url)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_url"
+        ],
+        "type": "object"
+      },
+      "name": "get_return_policy",
+      "outputSchema": {
+        "properties": {
+          "policy_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "summary": {
+            "type": "string"
+          },
+          "terms": {
+            "type": [
+              "object",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "summary"
+        ],
+        "type": "object"
+      },
+      "title": "Get return policy terms"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Other sellers of the exact same item (catalog ID or barcode), lowest first; similar listings kept apart. Example: {\"product_url\":\"https://owalalife.com/products/freesip\"}",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "product_url": {
+            "description": "Shopify product URL (seller_url)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_url"
+        ],
+        "type": "object"
+      },
+      "name": "compare_prices",
+      "outputSchema": {
+        "properties": {
+          "coverage": {
+            "type": "string"
+          },
+          "same_item_sellers": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "similar_listings": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "same_item_sellers"
+        ],
+        "type": "object"
+      },
+      "title": "Compare prices across sellers"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Brand's own listing, then every store selling it, marked same, likely same or not, with evidence. Example: {\"product_url\":\"https://owalalife.com/products/freesip\"}",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "product_url": {
+            "description": "Shopify product URL (seller_url)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_url"
+        ],
+        "type": "object"
+      },
+      "name": "get_passport",
+      "outputSchema": {
+        "properties": {
+          "passport_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "product": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Get product passport"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Brands with a confirmed official Shopify store, optionally by category. Example: {\"category\":\"beauty\"}",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "description": "Optional category",
+            "enum": [
+              "baby",
+              "home",
+              "drinkware",
+              "travel",
+              "health",
+              "beauty",
+              "drinks",
+              "tech",
+              "pets",
+              "fitness",
+              "toys"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_brands",
+      "outputSchema": {
+        "properties": {
+          "brands": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "brands"
+        ],
+        "type": "object"
+      },
+      "title": "List brands with official stores"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Health products by seller-stated claim (HSA/FSA, USP, NSF, Informed Sport, GMP, ConsumerLab). Example: {\"filter\":\"hsa_fsa\",\"query\":\"vitamin d\"}",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "filter": {
+            "description": "Claim to match",
+            "enum": [
+              "hsa_fsa",
+              "usp",
+              "nsf",
+              "informed_sport",
+              "gmp",
+              "consumerlab"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "default": 8,
+            "description": "Max results",
+            "maximum": 24,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "description": "Optional product type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "filter"
+        ],
+        "type": "object"
+      },
+      "name": "find_health_products",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "products": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "products"
+        ],
+        "type": "object"
+      },
+      "title": "Find health products by claim"
+    }
+  ],
+  "url": "https://coreplex.ai/api/apps/6a9567482e969b1ab43e0c49/functions/coreplexMcp"
+}

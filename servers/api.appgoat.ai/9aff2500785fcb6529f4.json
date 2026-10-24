@@ -1,0 +1,1665 @@
+{
+  "canon_version": "1",
+  "full_hash": "d0dc644269ea369e40b02f3e3098e48eeeeef5490bab37fcca89b55464d4dd06",
+  "name": "ai.appgoat/mcp",
+  "observed_at": "2026-10-24T02:04:36.400248Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 29,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get App"
+      },
+      "description": "Look up one App Store or Google Play app: title, subtitle, developer, category, price, rating and histogram, installs (Play), version and dates, description, languages, and the same app in the other store. Accepts any id, bundle id, package, store URL or a name. Reads stored data (refreshed from the store only when older than max_age, default 7 days) for one country (default us); add include sections for markets, versions, IAP, privacy, estimates and chart positions. Cost: 1 + 1 per country refreshed from the store (max 10) credits.",
+      "inputSchema": {
+        "properties": {
+          "app": {
+            "description": "Any app identifier: App Store id (`284882215`, `id284882215`), Play package (`com.spotify.music`), Apple bundle id (`com.spotify.client`), store URL (URL-encoded), `apple:<id>` / `play:<id>`, or a name (`spotify`). Example: com.spotify.music",
+            "type": "string"
+          },
+          "country": {
+            "description": "ISO country code(s): `us` (default), a comma list (paid plans), or `all` (Studio). Example: us,de",
+            "type": "string"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "full_text": {
+            "description": "Return long text (description, release notes, review bodies) in full instead of cut short",
+            "type": "boolean"
+          },
+          "include": {
+            "description": "Extra sections: markets (every storefront), iap, versions (history with release notes), privacy (App Store labels), estimates (modelled downloads/revenue), charts (current top-chart positions)",
+            "items": {
+              "enum": [
+                "markets",
+                "iap",
+                "versions",
+                "privacy",
+                "estimates",
+                "charts"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "max_age": {
+            "description": "Refresh from the store when our data is older than this many seconds (0 = always). Default 604800 (7 days).",
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "store": {
+            "description": "Disambiguates `{app}` (a bundle id vs a Play package, or a name).",
+            "enum": [
+              "apple",
+              "play"
+            ],
+            "type": "string"
+          },
+          "wait": {
+            "description": "Block up to ~25 s for a refresh (default). false = answer immediately from cache with a job id.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "app"
+        ],
+        "type": "object"
+      },
+      "name": "get_app",
+      "title": "Get App"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get Reviews"
+      },
+      "description": "Read an app's user reviews, newest first, up to 100 per page: rating, title, text, version, date, developer reply and AI tags (sentiment, intent, severity, topic) where tagged. Filter by stars (rating='1-2' for complaints), version, date range, text (q) or AI tags (intent='bug,crash'; tag filters skip untagged reviews). Page with cursor. Cost: 1 per page + 1 if the US reviews are refreshed credits.",
+      "inputSchema": {
+        "properties": {
+          "app": {
+            "description": "Any app identifier: App Store id (`284882215`, `id284882215`), Play package (`com.spotify.music`), Apple bundle id (`com.spotify.client`), store URL (URL-encoded), `apple:<id>` / `play:<id>`, or a name (`spotify`). Example: com.spotify.music",
+            "type": "string"
+          },
+          "country": {
+            "description": "ISO country code(s): `us` (default), a comma list (paid plans), or `all` (Studio). Example: us,de",
+            "type": "string"
+          },
+          "cursor": {
+            "description": "`meta.next_cursor` from the previous page.",
+            "type": "string"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "full_text": {
+            "description": "Return long text (description, release notes, review bodies) in full instead of cut short",
+            "type": "boolean"
+          },
+          "intent": {
+            "description": "AI intent filter (comma list): bug, crash, feature_request, pricing, ux, praise, spam, other. Example: bug,crash",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max items to return. Default: 50.",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "max_age": {
+            "description": "Refresh the latest US reviews when older than this many seconds. Default 86400 (1 day).",
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "q": {
+            "description": "Case-insensitive text search in the title and body. Example: crash",
+            "type": "string"
+          },
+          "rating": {
+            "description": "Star rating filter, `1`, `1,2` or a range `1-3`. Example: 1-2",
+            "type": "string"
+          },
+          "sentiment": {
+            "description": "AI sentiment filter (comma list): positive, neutral, negative. Example: negative",
+            "type": "string"
+          },
+          "since": {
+            "description": "Only items at or after this ISO date / datetime. Example: 2026-10-01",
+            "type": "string"
+          },
+          "store": {
+            "description": "Disambiguates `{app}` (a bundle id vs a Play package, or a name).",
+            "enum": [
+              "apple",
+              "play"
+            ],
+            "type": "string"
+          },
+          "topic": {
+            "description": "AI topic filter (comma list of topic labels, case-insensitive, or topic ids).",
+            "type": "string"
+          },
+          "until": {
+            "description": "Only reviews created before this ISO date / datetime.",
+            "type": "string"
+          },
+          "version": {
+            "description": "Only reviews written for this app version.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "app"
+        ],
+        "type": "object"
+      },
+      "name": "get_reviews",
+      "title": "Get Reviews"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get App History"
+      },
+      "description": "An app's daily metric history per country: rating, ratings count, reviews count, installs (Play), star histogram and price, one row per day a value changed (default the last 90 days), with the change over the period. Use it to chart growth or spot rating drops after a release. Cost: 1 + 1 per country refreshed (max 10) credits.",
+      "inputSchema": {
+        "properties": {
+          "app": {
+            "description": "Any app identifier: App Store id (`284882215`, `id284882215`), Play package (`com.spotify.music`), Apple bundle id (`com.spotify.client`), store URL (URL-encoded), `apple:<id>` / `play:<id>`, or a name (`spotify`). Example: com.spotify.music",
+            "type": "string"
+          },
+          "country": {
+            "description": "ISO country code(s): `us` (default), a comma list (paid plans), or `all` (Studio). Example: us,de",
+            "type": "string"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "from": {
+            "description": "Start date (ISO), default 90 days before `to`.",
+            "type": "string"
+          },
+          "store": {
+            "description": "Disambiguates `{app}` (a bundle id vs a Play package, or a name).",
+            "enum": [
+              "apple",
+              "play"
+            ],
+            "type": "string"
+          },
+          "to": {
+            "description": "End date (ISO), default today.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "app"
+        ],
+        "type": "object"
+      },
+      "name": "get_app_history",
+      "title": "Get App History"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get App Changes"
+      },
+      "description": "What changed in an app's store listing, newest first, with old and new values: version, release notes, title, subtitle, description, screenshots, icon, price, IAP, privacy, in-app events, badges, featuring, installs, content rating. Use it to monitor competitors (\"what did X change this month?\"). Cost: 1 + 1 if the US listing is refreshed credits.",
+      "inputSchema": {
+        "properties": {
+          "app": {
+            "description": "Any app identifier: App Store id (`284882215`, `id284882215`), Play package (`com.spotify.music`), Apple bundle id (`com.spotify.client`), store URL (URL-encoded), `apple:<id>` / `play:<id>`, or a name (`spotify`). Example: com.spotify.music",
+            "type": "string"
+          },
+          "country": {
+            "description": "Only changes seen in these storefronts (comma list). Default all storefronts.",
+            "type": "string"
+          },
+          "cursor": {
+            "description": "`meta.next_cursor` from the previous page.",
+            "type": "string"
+          },
+          "field": {
+            "description": "Only these fields (comma list), e.g. `version,title,subtitle`.",
+            "type": "string"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max items to return. Default: 50.",
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "since": {
+            "description": "Only items at or after this ISO date / datetime. Example: 2026-10-01",
+            "type": "string"
+          },
+          "store": {
+            "description": "Disambiguates `{app}` (a bundle id vs a Play package, or a name).",
+            "enum": [
+              "apple",
+              "play"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "app"
+        ],
+        "type": "object"
+      },
+      "name": "get_app_changes",
+      "title": "Get App Changes"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get App Keywords"
+      },
+      "description": "The search terms an app ranks for in a country, best rank first, with popularity (5–100) and difficulty (0–100): from the weekly keyword universe plus your tracked keywords. Call it for the app and a competitor to find keyword gaps. Cost: 1 credits.",
+      "inputSchema": {
+        "properties": {
+          "app": {
+            "description": "Any app identifier: App Store id (`284882215`, `id284882215`), Play package (`com.spotify.music`), Apple bundle id (`com.spotify.client`), store URL (URL-encoded), `apple:<id>` / `play:<id>`, or a name (`spotify`). Example: com.spotify.music",
+            "type": "string"
+          },
+          "country": {
+            "description": "Two-letter country code (default 'us').",
+            "type": "string"
+          },
+          "cursor": {
+            "description": "`meta.next_cursor` from the previous page.",
+            "type": "string"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max items to return. Default: 100.",
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "max_rank": {
+            "description": "Only terms where the app ranks at or above this position.",
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "store": {
+            "description": "Disambiguates `{app}` (a bundle id vs a Play package, or a name).",
+            "enum": [
+              "apple",
+              "play"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "app"
+        ],
+        "type": "object"
+      },
+      "name": "get_app_keywords",
+      "title": "Get App Keywords"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get Competitors"
+      },
+      "description": "An app's competitors, best first, scored from search terms both apps rank for (shared keywords) plus the store's similar-apps list. Feed the app ids into get_app or get_app_changes for a competitor digest. Cost: 1 credits.",
+      "inputSchema": {
+        "properties": {
+          "app": {
+            "description": "Any app identifier: App Store id (`284882215`, `id284882215`), Play package (`com.spotify.music`), Apple bundle id (`com.spotify.client`), store URL (URL-encoded), `apple:<id>` / `play:<id>`, or a name (`spotify`). Example: com.spotify.music",
+            "type": "string"
+          },
+          "country": {
+            "description": "Two-letter country code (default 'us').",
+            "type": "string"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max items to return. Default: 20.",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "store": {
+            "description": "Disambiguates `{app}` (a bundle id vs a Play package, or a name).",
+            "enum": [
+              "apple",
+              "play"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "app"
+        ],
+        "type": "object"
+      },
+      "name": "get_competitors",
+      "title": "Get Competitors"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Search Apps"
+      },
+      "description": "Find apps by name or id in AppGoat's catalog of both stores (~5M apps): exact title matches first, then prefix, then substring, most-rated first. Returns store, app_id, title, developer, category, rating, ratings and price; pass the app_id to the other tools. Cost: 1 credits.",
+      "inputSchema": {
+        "properties": {
+          "category": {
+            "description": "Store category name, e.g. `Photo & Video` (App Store) or `PHOTOGRAPHY` (Play).",
+            "type": "string"
+          },
+          "cursor": {
+            "description": "`meta.next_cursor` from the previous page.",
+            "type": "string"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max items to return. Default: 20.",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "q": {
+            "description": "App name (≥ 2 characters) or exact id. Example: photo editor",
+            "type": "string"
+          },
+          "store": {
+            "description": "Limit to one store: 'apple' or 'play'. Omit for both.",
+            "enum": [
+              "apple",
+              "play"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "q"
+        ],
+        "type": "object"
+      },
+      "name": "search_apps",
+      "title": "Search Apps"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get Charts"
+      },
+      "description": "A top free, paid or grossing chart for a store, country and category, today or on a past date: rank, app, developer, rating and the move since the previous capture (new entries marked), plus apps that dropped out. Charts are captured daily for every country and category. Cost: 1 credits.",
+      "inputSchema": {
+        "properties": {
+          "category": {
+            "description": "App Store genre id (`36` or `all` = all apps, `6014` = games, …) or Play category (`GAME_PUZZLE`; `APPLICATION` = all apps).",
+            "type": "string"
+          },
+          "chart": {
+            "description": "'free' (default), 'paid' or 'grossing'.",
+            "enum": [
+              "free",
+              "paid",
+              "grossing"
+            ],
+            "type": "string"
+          },
+          "country": {
+            "description": "Two-letter country code (default 'us').",
+            "type": "string"
+          },
+          "date": {
+            "description": "The chart as of this date (ISO). Default the latest capture.",
+            "type": "string"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "description": "How many ranks to return (default 100, max 200).",
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "store": {
+            "description": "'apple' (default) or 'play'.",
+            "enum": [
+              "apple",
+              "play"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_charts",
+      "title": "Get Charts"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Keyword Research"
+      },
+      "description": "Keyword metrics and research for App Store / Google Play search terms: popularity (5–100), difficulty (0–100), result count and the #1 result's estimated daily downloads. include adds related terms with metrics, the store's autocomplete and the current top 10 apps; app adds that app's rank and metadata relevance per term (the core of an ASO keyword audit). Unmeasured terms are measured live (a few per call) or come back pending. Cost: 1 per keyword; 5 per seed with include=related or suggestions credits.",
+      "inputSchema": {
+        "properties": {
+          "app": {
+            "description": "Any app identifier (as in `{app}`); adds `app.rank` and `app.relevance` per term.",
+            "type": "string"
+          },
+          "country": {
+            "description": "Two-letter ISO country code (storefront), e.g. us, gb, de. Default: us.",
+            "type": "string"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "include": {
+            "description": "related (~10 related terms with metrics), suggestions (store autocomplete), top_apps (current top 10). related/suggestions cost 5 credits per term",
+            "items": {
+              "enum": [
+                "related",
+                "suggestions",
+                "top_apps"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "store": {
+            "description": "Required unless `app` is given.",
+            "enum": [
+              "apple",
+              "play"
+            ],
+            "type": "string"
+          },
+          "terms": {
+            "description": "Search terms, 1–25 (at most 5 with include related or suggestions)",
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 25,
+            "minItems": 1,
+            "type": "array"
+          },
+          "wait": {
+            "description": "Block up to ~25 s for a refresh (default). false = answer immediately from cache with a job id.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "terms"
+        ],
+        "type": "object"
+      },
+      "name": "keyword_research",
+      "title": "Keyword Research"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Track Keywords"
+      },
+      "description": "Deprecated: use watch with kind keyword (also reports rank moves as events). Starts tracking the search ranking of terms in one or both stores and the given countries: ranked apps are captured daily from now on (idempotent; already tracked terms are reported as such). Each term × store × country uses one keyword slot of the plan; a request over the limit tracks nothing (plan_limit). Read history with get_keyword_ranks. Cost: 0 credits.",
+      "inputSchema": {
+        "properties": {
+          "countries": {
+            "description": "Two-letter country codes to track in (default ['us'])",
+            "items": {
+              "pattern": "^[A-Za-z]{2}$",
+              "type": "string"
+            },
+            "maxItems": 50,
+            "minItems": 1,
+            "type": "array"
+          },
+          "depth": {
+            "description": "How many results to keep per ranking (default 100 Apple / 50 Play).",
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "store": {
+            "description": "'apple', 'play' or 'both' (tracks each term in each store)",
+            "enum": [
+              "apple",
+              "play",
+              "both"
+            ],
+            "type": "string"
+          },
+          "tags": {
+            "description": "Free-form labels.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "terms": {
+            "description": "Search terms to track, e.g. ['habit tracker', 'streaks']",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "terms",
+          "store"
+        ],
+        "type": "object"
+      },
+      "name": "track_keywords",
+      "title": "Track Keywords"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Untrack Keywords"
+      },
+      "description": "Deprecated: use unwatch for keyword watches. Stops tracking keywords by id (from list_tracked_keywords or track_keywords): no new rankings are recorded and their plan slots are freed. Cost: 0 credits.",
+      "inputSchema": {
+        "properties": {
+          "ids": {
+            "description": "Tracked keyword ids",
+            "items": {
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991,
+              "type": "integer"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "ids"
+        ],
+        "type": "object"
+      },
+      "name": "untrack_keywords",
+      "title": "Untrack Keywords"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "List Tracked Keywords"
+      },
+      "description": "Deprecated: use list_watches (keyword watches list their slots). Your tracked keywords with id, store, country, popularity, depth, cadence, last ranking and current top 3. Filter by store, country or a term substring. Cost: 0 credits.",
+      "inputSchema": {
+        "properties": {
+          "country": {
+            "description": "Only this two-letter country code.",
+            "type": "string"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "q": {
+            "description": "Only terms containing this text.",
+            "type": "string"
+          },
+          "store": {
+            "description": "'apple' = Apple App Store (iOS), 'play' = Google Play (Android).",
+            "enum": [
+              "apple",
+              "play"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_tracked_keywords",
+      "title": "List Tracked Keywords"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get Keyword Ranks"
+      },
+      "description": "Ranking history of a watched keyword: per capture the top 10 app ids, or with app, that app's rank over time (best, worst, latest). Default the last 90 days. The id is a keyword slot of a keyword watch (list_watches and watch show the slot ids) or a list_tracked_keywords id. Cost: 1 credits.",
+      "inputSchema": {
+        "properties": {
+          "app": {
+            "description": "Store app id; returns `rank` per point instead of the full id list.",
+            "type": "string"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "from": {
+            "description": "Start, ISO date or datetime (default 90 days ago)",
+            "type": "string"
+          },
+          "id": {
+            "description": "Keyword slot id (from a keyword watch, or list_tracked_keywords)",
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "to": {
+            "description": "End date or datetime (ISO), default now.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_keyword_ranks",
+      "title": "Get Keyword Ranks"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Watch"
+      },
+      "description": "Watch an app, a set of competitors or a set of keywords; significant changes become events (get_events, webhooks, daily email). kind app {app}: new versions, metadata and price changes, featuring, rating drops, review and ratings spikes, chart entries. kind competitor_set {competitors, app?}: the same for every competitor. kind keyword {terms, store or app}: the app's rank moves per term and new apps in the top N. Watched apps count against the plan's watch limit, keyword watches use one keyword slot per term × store × country; over a limit nothing changes (plan_limit). With id, changes that watch instead (send only what changes; settings are merged; active=false pauses it). Cost: 0 credits.",
+      "inputSchema": {
+        "properties": {
+          "active": {
+            "description": "false pauses the watch, true resumes it",
+            "type": "boolean"
+          },
+          "app": {
+            "description": "Any app id, bundle id, package, store URL or name. kind app: the app (required); competitor_set: your own app (optional); keyword: the app whose ranks to report (optional)",
+            "type": "string"
+          },
+          "competitors": {
+            "description": "kind competitor_set: the apps to watch (any identifiers), up to 50",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "countries": {
+            "description": "Two-letter country codes to watch in (default ['us'])",
+            "items": {
+              "pattern": "^[A-Za-z]{2}$",
+              "type": "string"
+            },
+            "maxItems": 50,
+            "minItems": 1,
+            "type": "array"
+          },
+          "event_types": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "new_version",
+                    "metadata_change",
+                    "price_change",
+                    "featured",
+                    "in_app_event",
+                    "installs_milestone",
+                    "rating_drop",
+                    "ratings_spike",
+                    "review_spike",
+                    "negative_review_spike",
+                    "chart_enter",
+                    "chart_leave",
+                    "rank_change",
+                    "keyword_entrant"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Only these event types (default: every type of the kind)"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "description": "Watch id to change (from list_watches). Omit to create a watch",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991,
+            "type": "integer"
+          },
+          "kind": {
+            "description": "'app' (one app), 'competitor_set' (several apps) or 'keyword' (search terms). Required when creating",
+            "enum": [
+              "app",
+              "keyword",
+              "competitor_set"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A label for the watch"
+          },
+          "settings": {
+            "description": "Thresholds: significance (0–1, default 0.5, minimum for an event), rank_move (default 5), keyword_top_n (10), chart_top_n (100), rating_drop (stars over 7 days, 0.1), spike_factor (3), email_digest (true), depth and cadence_minutes (keyword watches)",
+            "properties": {
+              "cadence_minutes": {
+                "description": "Keyword watches: minutes between re-ranks (360…10080).",
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "chart_top_n": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "depth": {
+                "description": "Keyword watches: results kept per ranking (Apple ≤ 250, Play ≤ 30).",
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "email_digest": {
+                "description": "Include in the daily email digest. Default: true.",
+                "type": "boolean"
+              },
+              "keyword_top_n": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "rank_move": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "rating_drop": {
+                "description": "Stars over 7 days. Default: 0.1.",
+                "type": "number"
+              },
+              "significance": {
+                "description": "Minimum significance for an event: Jev's probability that an analyst would want the alert (AI on), or a fixed per-type score. Default: 0.5.",
+                "maximum": 1,
+                "minimum": 0,
+                "type": "number"
+              },
+              "spike_factor": {
+                "type": "number"
+              }
+            },
+            "type": "object"
+          },
+          "store": {
+            "description": "'apple', 'play' or 'both' (keyword watches without app; default both). Also disambiguates app inputs",
+            "enum": [
+              "apple",
+              "play",
+              "both"
+            ],
+            "type": "string"
+          },
+          "terms": {
+            "description": "kind keyword: search terms, e.g. ['habit tracker', 'streaks']",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 500,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "name": "watch",
+      "title": "Watch"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Unwatch"
+      },
+      "description": "Stop watches by id (from list_watches or watch): no new events, and their watched apps and keyword slots are freed. Past events are kept. To pause instead, call watch with id and active=false. Cost: 0 credits.",
+      "inputSchema": {
+        "properties": {
+          "ids": {
+            "description": "Watch ids",
+            "items": {
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991,
+              "type": "integer"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "ids"
+        ],
+        "type": "object"
+      },
+      "name": "unwatch",
+      "title": "Unwatch"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "List Watches"
+      },
+      "description": "Your watches (apps, competitor sets, keyword sets), newest first, with id, apps, terms, countries, event types and whether they are paused, plus watched apps and keyword slots used vs the plan's limits. Filter by kind or by an app they include. Cost: 0 credits.",
+      "inputSchema": {
+        "properties": {
+          "app": {
+            "description": "Only watches that include this app (any id, bundle id, package, URL or name).",
+            "type": "string"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "kind": {
+            "description": "Only this kind: 'app', 'competitor_set' or 'keyword'.",
+            "enum": [
+              "app",
+              "keyword",
+              "competitor_set"
+            ],
+            "type": "string"
+          },
+          "store": {
+            "description": "Disambiguates `{app}` (a bundle id vs a Play package, or a name).",
+            "enum": [
+              "apple",
+              "play"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_watches",
+      "title": "List Watches"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get Events"
+      },
+      "description": "Significant changes on your watched apps and keywords, newest first: type, one-line title, AI summary, significance (0–1), app, country and the key payload fields (version, changes old → new, rating drop, rank move, chart rank…). Filter by type, app, watch, since and min_significance. To check for news, pass since = the created_at of the newest event already handled. Cost: 0 credits.",
+      "inputSchema": {
+        "properties": {
+          "app": {
+            "description": "Only events of this app (any id, bundle id, package, URL or name).",
+            "type": "string"
+          },
+          "cursor": {
+            "description": "`meta.next_cursor` from the previous page.",
+            "type": "string"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max items to return. Default: 50.",
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "min_significance": {
+            "description": "Only events at least this significant (0–1).",
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "since": {
+            "description": "Only items at or after this ISO date / datetime. Example: 2026-10-01",
+            "type": "string"
+          },
+          "store": {
+            "description": "Disambiguates `{app}` (a bundle id vs a Play package, or a name).",
+            "enum": [
+              "apple",
+              "play"
+            ],
+            "type": "string"
+          },
+          "type": {
+            "description": "Comma list of event types, e.g. 'new_version,rating_drop'. Types: new_version, metadata_change, price_change, featured, in_app_event, installs_milestone, rating_drop, ratings_spike, review_spike, negative_review_spike, chart_enter, chart_leave, rank_change, keyword_entrant.",
+            "type": "string"
+          },
+          "watch": {
+            "description": "Only events of this watch id.",
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_events",
+      "title": "Get Events"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get Developer"
+      },
+      "description": "A developer's profile: name, website, country, app count, total ratings and installs, all their apps (most-rated first) and the same company in the other store. get_app shows the developer id as dev <store>:<id>. Cost: 1 credits.",
+      "inputSchema": {
+        "properties": {
+          "dev": {
+            "description": "`apple:<artist id>`, `play:<developer id>`, a numeric Apple artist id, a Play developer id (often the name), or the website domain (`spotify.com`). Example: apple:324684583",
+            "type": "string"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "store": {
+            "description": "Disambiguates `{app}` (a bundle id vs a Play package, or a name).",
+            "enum": [
+              "apple",
+              "play"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "dev"
+        ],
+        "type": "object"
+      },
+      "name": "get_developer",
+      "title": "Get Developer"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get Job"
+      },
+      "description": "Poll a background store fetch that another call started (its output said refreshing or still being fetched, with a job id): status, per-country progress. When it is done, repeat the original call. Cost: 0 credits.",
+      "inputSchema": {
+        "properties": {
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "description": "`meta.freshness.job_id`, e.g. `fetch_123`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_job",
+      "title": "Get Job"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "List Connections"
+      },
+      "description": "The user's connected App Store Connect, Play Console and Apple Ads accounts: connection id, provider, mode (actions or read_only), status and the linked apps. Start here before read_connection or propose_action; secrets are never returned. No connections yet: the user adds them at https://dash.appgoat.ai/connections. Cost: 0 credits.",
+      "inputSchema": {
+        "properties": {
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "provider": {
+            "description": "Only this provider: 'asc' (App Store Connect), 'play_console' or 'apple_ads'.",
+            "enum": [
+              "asc",
+              "play_console",
+              "apple_ads"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_connections",
+      "title": "List Connections"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Read Connection"
+      },
+      "description": "Read live data from one of the user's connected accounts. what='reviews' (asc, play_console): the app's own reviews with reply status, unanswered=true for those without a developer reply; their review_id feeds propose_action review.reply (Play only returns reviews from the last 7 days). what='listing' (asc, play_console): the current listing text for one locale with lengths and which fields are editable right now (App Store name, subtitle, description, keywords and what's new need a version in Prepare for Submission). what='ads' (apple_ads): view=campaigns → ad_groups (campaign_id) → keywords (campaign_id, ad_group_id) gives the ids the ads.* actions take, view=negatives lists negative keywords, view=report with level=campaigns|adgroups|keywords|searchterms returns impressions, taps, installs, spend, CPT and CPA for start..end (default the last 7 days). Cost: 1 credits.",
+      "inputSchema": {
+        "properties": {
+          "ad_group_id": {
+            "description": "ads: ad group id (needed for keywords; optional for negatives)",
+            "type": "string"
+          },
+          "app": {
+            "description": "A linked app (App Store id or package name); required for reviews and listing",
+            "type": "string"
+          },
+          "campaign_id": {
+            "description": "ads: campaign id (needed for ad_groups, keywords, negatives and every report level except campaigns)",
+            "type": "string"
+          },
+          "country": {
+            "description": "reviews: App Store territory filter (two-letter code)",
+            "type": "string"
+          },
+          "cursor": {
+            "description": "reviews: next_cursor from the previous page",
+            "type": "string"
+          },
+          "end": {
+            "description": "ads report: end date YYYY-MM-DD (default yesterday, UTC)",
+            "type": "string"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "full_text": {
+            "description": "Return long text (description, release notes, review bodies) in full instead of cut short",
+            "type": "boolean"
+          },
+          "id": {
+            "description": "Connection id (con_…) from list_connections",
+            "type": "string"
+          },
+          "level": {
+            "description": "ads report: 'campaigns' (default), 'adgroups', 'keywords' or 'searchterms'",
+            "enum": [
+              "campaigns",
+              "adgroups",
+              "keywords",
+              "searchterms"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max rows: reviews up to 200 (default 100), ads up to 1000 (default 200)",
+            "maximum": 1000,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "locale": {
+            "description": "listing: locale such as en-US, de-DE (default en-US)",
+            "type": "string"
+          },
+          "rating": {
+            "description": "reviews: star filter, '1', '1,2' or '1-3'",
+            "type": "string"
+          },
+          "start": {
+            "description": "ads report: start date YYYY-MM-DD (default 7 days before end)",
+            "type": "string"
+          },
+          "unanswered": {
+            "description": "reviews: only reviews without a developer reply",
+            "type": "boolean"
+          },
+          "view": {
+            "description": "ads: 'campaigns' (default), 'ad_groups', 'keywords', 'negatives' or 'report'",
+            "enum": [
+              "campaigns",
+              "ad_groups",
+              "keywords",
+              "negatives",
+              "report"
+            ],
+            "type": "string"
+          },
+          "what": {
+            "description": "'reviews', 'listing' or 'ads' (Apple Ads)",
+            "enum": [
+              "reviews",
+              "listing",
+              "ads"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "what"
+        ],
+        "type": "object"
+      },
+      "name": "read_connection",
+      "title": "Read Connection"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Propose Action"
+      },
+      "description": "Prepare a change to the user's connected account as a DRY RUN: nothing is written. AppGoat reads the live account and returns the before → after diff, guardrail results (AI probabilities for store policy, tone and risky claims, plus checks such as character limits and bid jumps) and an action id. ALWAYS show the diff and any guardrail flags to the user and get their go-ahead before calling apply_action. Types and params (app = a linked App Store id or package name, locale like en-US): review.reply {app, review_id, text} (review ids from read_connection what=reviews; Play replies ≤ 350 chars); listing.update {app, locale, fields: {name|title, subtitle, description, promotional_text, whats_new, marketing_url, support_url, privacy_policy_url}} (Play: title, short_description, full_description, video); keywords.set {app, locale, keywords: [..] or 'a,b,c', mode?: replace|add|remove} (App Store, 100 bytes comma-joined); screenshots.upload {app, locale, display_type: APP_IPHONE_67… (asc) or image_type: phoneScreenshots… (play), images: [{url}], replace?}; ads.keyword.bid {campaign_id, ad_group_id, keywords: [{id, bid?, status?: ENABLED|PAUSED}], max_increase?}; ads.keyword.add {campaign_id, ad_group_id, keywords: [{text, match_type?: EXACT|BROAD, bid?}]}; ads.negative.add {campaign_id, ad_group_id?, keywords: [{text, match_type?}]} (Apple Ads ids from read_connection what=ads). Cost: 0 credits.",
+      "inputSchema": {
+        "properties": {
+          "connection": {
+            "description": "Connection id from list_connections; optional when exactly one active connection fits the type and app",
+            "type": "string"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": {},
+            "description": "Params for the type (see the tool description)",
+            "propertyNames": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "playbook": {
+            "description": "The playbook proposing this, e.g. 'reply-to-every-review' (shown to approvers); omit outside a playbook",
+            "maxLength": 80,
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": {
+            "description": "What to change: review.reply, listing.update, keywords.set, screenshots.upload, ads.keyword.bid, ads.keyword.add or ads.negative.add",
+            "enum": [
+              "review.reply",
+              "listing.update",
+              "keywords.set",
+              "screenshots.upload",
+              "ads.keyword.bid",
+              "ads.keyword.add",
+              "ads.negative.add"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "params"
+        ],
+        "type": "object"
+      },
+      "name": "propose_action",
+      "title": "Propose Action"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Apply Action"
+      },
+      "description": "Go ahead with an action from propose_action, after the user has seen its diff and agreed. Outcomes: applied (written to the store / Apple Ads account, 1 credit; when the org has an auto-apply rule the guardrail score clears, or allows agents to approve); pending_approval (a person must approve it in the AppGoat dashboard: give the user the approve link, nothing is written until then); needs a person (it was already pending and agents may not approve: hand over the link, do not retry); changed (the account changed since the dry run: the new diff is shown; show it to the user and call again with force=true only if they accept it, or propose_action again). Cost: 1 credit when applied, else 0 credits.",
+      "inputSchema": {
+        "properties": {
+          "force": {
+            "description": "Apply the recomputed diff even though the account changed since the dry run. Only after the user has seen the new diff",
+            "type": "boolean"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "description": "Action id (act_…) from propose_action",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "apply_action",
+      "title": "Apply Action"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get Action"
+      },
+      "description": "One action from propose_action: its status (draft, pending_approval, approved, applied, failed, rejected), diff, guardrail scores, the provider result or error, the approve link and the audit trail. Use it to check whether a pending action was approved and applied. Cost: 0 credits.",
+      "inputSchema": {
+        "properties": {
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "description": "Action id (act_…)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_action",
+      "title": "Get Action"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Reject Action"
+      },
+      "description": "Discard a draft or pending action the user does not want; nothing is written to the account. Cost: 0 credits.",
+      "inputSchema": {
+        "properties": {
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "description": "Action id (act_…)",
+            "type": "string"
+          },
+          "reason": {
+            "description": "Why (shown in the audit log)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "reject_action",
+      "title": "Reject Action"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Audit App"
+      },
+      "description": "Run an App Audit of one app in one country: a 0–100 score, prioritised ASO actions with evidence, title / subtitle / keyword rewrites within the store character limits, and findings from listing, ratings, reviews, keywords and competitors, plus a shareable report page. Takes 1–3 minutes: waits about 25 s, then returns the audit id to pass to get_audit. An audit of the same app, country and mode from the last 24 h is returned again for free unless fresh=true; failed audits are not charged. The first audit of an organization is free (free_only=true runs only that one). Cost: 100 credits.",
+      "inputSchema": {
+        "properties": {
+          "app": {
+            "description": "Any app identifier: App Store id (`284882215`, `id284882215`), Play package (`com.spotify.music`), Apple bundle id (`com.spotify.client`), store URL (URL-encoded), `apple:<id>` / `play:<id>`, or a name (`spotify`). Example: com.spotify.music",
+            "type": "string"
+          },
+          "country": {
+            "description": "Two-letter country code, one storefront (default 'us').",
+            "type": "string"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "free_only": {
+            "description": "Only run when it is the free first audit (402 free_audit_used otherwise). Default: false.",
+            "type": "boolean"
+          },
+          "fresh": {
+            "description": "Run again even if a recent audit exists. Default: false.",
+            "type": "boolean"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Your label for the audit list, e.g. the client or prospect name."
+          },
+          "mode": {
+            "description": "lite = cached data, fewer reviews and keywords (cheaper and faster for us; same price). Default: full.",
+            "enum": [
+              "full",
+              "lite"
+            ],
+            "type": "string"
+          },
+          "store": {
+            "description": "Disambiguates `{app}` (a bundle id vs a Play package, or a name).",
+            "enum": [
+              "apple",
+              "play"
+            ],
+            "type": "string"
+          },
+          "white_label": {
+            "description": "Studio: the shareable report shows the organization's branding (set in the dashboard under Settings → Report branding) instead of AppGoat's, e.g. for client or prospect reports.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "app"
+        ],
+        "type": "object"
+      },
+      "name": "audit_app",
+      "title": "Audit App"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get Audit"
+      },
+      "description": "Check on an App Audit that audit_app started (by its id, e.g. aud_3fK9aQ2mXc81LpRt): waits up to about 25 s for it to finish, then returns the report (score, actions, metadata rewrites, findings, report page) or its status. Cost: 0 credits.",
+      "inputSchema": {
+        "properties": {
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "description": "Audit id from audit_app, e.g. aud_3fK9aQ2mXc81LpRt",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_audit",
+      "title": "Get Audit"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get Review Insights"
+      },
+      "description": "What an app's users praise and complain about, from the AI tags on its reviews: top issues (topics behind negative, bug, crash, UX and pricing reviews) with last-30-days vs previous-30-days counts and sample reviews, topics, what each recent version changed in rating, sentiment and topics, and weekly sentiment. Use it for \"what do users complain about since v2.3?\" before reading individual reviews with get_reviews. Cost: 25 credits.",
+      "inputSchema": {
+        "properties": {
+          "app": {
+            "description": "Any app identifier: App Store id (`284882215`, `id284882215`), Play package (`com.spotify.music`), Apple bundle id (`com.spotify.client`), store URL (URL-encoded), `apple:<id>` / `play:<id>`, or a name (`spotify`). Example: com.spotify.music",
+            "type": "string"
+          },
+          "country": {
+            "description": "One storefront; omit for every storefront we hold reviews for.",
+            "type": "string"
+          },
+          "format": {
+            "description": "'markdown' (default): compact tables for reading. 'json': the API's raw { data, meta }",
+            "enum": [
+              "markdown",
+              "json"
+            ],
+            "type": "string"
+          },
+          "since_days": {
+            "description": "How many days of reviews to analyse, 7–730 (default 180).",
+            "maximum": 730,
+            "minimum": 7,
+            "type": "integer"
+          },
+          "store": {
+            "description": "Disambiguates `{app}` (a bundle id vs a Play package, or a name).",
+            "enum": [
+              "apple",
+              "play"
+            ],
+            "type": "string"
+          },
+          "versions": {
+            "description": "How many of the latest versions to break down. Default: 6.",
+            "maximum": 20,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "app"
+        ],
+        "type": "object"
+      },
+      "name": "get_insights",
+      "title": "Get Review Insights"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List Playbooks"
+      },
+      "description": "AppGoat playbooks: step-by-step recipes (which tools to call, credit budget, decision rules, output format) for app audits, app idea research, ASO metadata rewrites, weekly competitor digests, turning reviews into GitHub issues, and, on connected accounts, replying to every review, optimizing Apple Ads and pushing localized listings. Without name, lists them; with name, returns the full playbook to follow. Also offered as MCP prompts. Free.",
+      "inputSchema": {
+        "properties": {
+          "name": {
+            "description": "A playbook name from the list, e.g. 'app-audit-lite'",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_playbooks",
+      "title": "List Playbooks"
+    }
+  ],
+  "url": "https://api.appgoat.ai/mcp"
+}

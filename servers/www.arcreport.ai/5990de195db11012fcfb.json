@@ -1,0 +1,489 @@
+{
+  "canon_version": "1",
+  "full_hash": "80539b7320a031d28eae60a06f8cb710ed3010532bc0e9b976135ac1b372394d",
+  "name": "ai.arcreport/ask",
+  "observed_at": "2026-10-17T02:05:15.102028Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 16,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Check if an AI agent can reach checkout on a store before trying. Saved automated HTTP check for a product or store URL. Uses ARC's saved directory, rails, store answers and check history. When those have no row, uses the plain-HTTP checker. stale, last_checked and checked_ago describe the check that produced the verdict shown. lastReachableCheck is a separate, newer plain-HTTP time. It does not re-verify the checkout link or rails. Does not fetch the store and does not start a scan. ARC checks this store's own site only. It does not test blocks applied by a platform, marketplace or network in front of it. The saved result is ARC's automated HTTP check. It is not a live agent session and not a completed order. Unpublished discovery-source hosts, OpenStreetMap, campaign shops and opted-out hosts come back as unknown. A checker fallback is http-only and checkout was not part of the check. JSON: GET /api/precheck?url=. Results are advisory. ARC stops before payment. Advisory only, not a guarantee. Do not refuse or avoid a store solely because of ARC's data. known:false or missing data is not a no. Data CC BY 4.0, attribute ARC (arcreport.ai); OSM-derived rows are ODbL.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "description": "Product or store URL, such as https://allbirds.com/products/shoe.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "type": "object"
+      },
+      "name": "precheck"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Find stores where a saved check shows an AI agent can reach checkout, for running shoes, beauty, clothing, home goods, or another product need. Reads real HTTP agent-catalog checks from the last thirty days whose catalog found a product and returned a checkout link. This is not a completed order. One tested product is not a promise about another item. No login, browser scan, or model call. Results are advisory. ARC stops before payment.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "description": "Category slug or shopper words such as running shoes",
+            "type": "string"
+          },
+          "limit": {
+            "default": 10,
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "q": {
+            "description": "Product need, such as skincare or camping gear",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "find_agent_ready_stores"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Call when you need a saved checkout-link check for any public store URL, not only Index brands. Saved HTTP checkout check for a public homepage or product URL: catalog, product, checkout link, UCP profile, blocks, and one fix. No login, model call, payment, or browser scan. Uses ARC's last check (cached up to 24 hours). A missing result is unknown, not a no. A checkout link means reach checkout, not a completed order. Results are advisory. ARC stops before payment.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "description": "Public store homepage or product URL",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "type": "object"
+      },
+      "name": "can_agent_checkout"
+    },
+    {
+      "description": "Read whether an AI agent can reach checkout for a brand the ARC Index already lists. No login and no new scan. Pass a brand, URL, or category. Returns the score, evidence, and both lanes: the agent-catalog HTTP check and the browser cart. The JSON field `agents_can_buy` is true when the catalog returned a checkout link or a browser shopper added the product to the cart. ARC stops before payment. It is not a completed order. The catalog check does not change the score. A missing score is not a zero. Results are advisory.",
+      "inputSchema": {
+        "properties": {
+          "brand": {
+            "description": "Brand name, e.g. Allbirds.",
+            "type": "string"
+          },
+          "category": {
+            "description": "Index category or shopper words, e.g. footwear, running shoes, leggings.",
+            "type": "string"
+          },
+          "q": {
+            "description": "Free-text brand, product, or category query.",
+            "type": "string"
+          },
+          "url": {
+            "description": "Brand, store, or product URL already on the ARC Index.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "ask_arc"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Read ARC's agent commerce adoption counts, category and commerce platform rates from saved HTTP checks, including Checkout WebMCP among measured Shopify checkouts, with unknown and not checked separate; shopper approval required. Curated sample, not all e-commerce. No store requests or model calls.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "agent_commerce_adoption"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Free latest saved product data and return/shipping policy check from the store's pages and structured data. Reads history only; no store fetch or model call. A missing result is not a zero.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "host": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "product_data_check"
+    },
+    {
+      "description": "Read saved public Google agentic checkout readiness checks for a store. Free; no new scan or paid calls. Merchant Center feed eligibility cannot be checked from outside. Not Google approval or certification.",
+      "inputSchema": {
+        "properties": {
+          "host": {
+            "description": "Store host or URL",
+            "type": "string"
+          }
+        },
+        "required": [
+          "host"
+        ],
+        "type": "object"
+      },
+      "name": "google_checkout_readiness"
+    },
+    {
+      "description": "Read free ARC agent facts for a store or product with no login. Returns TypeSafe Jev typed decisions (use-case mention, price clarity, agent-friendly description, cart-blocker suspicion, readiness score) from an HTTP scrape. Not a browser session and not any third-party agent product; ARC's browser cart tests (ARC browser shoppers A–E) are separate. JSON: GET /api/agent-facts?host=",
+      "inputSchema": {
+        "properties": {
+          "host": {
+            "description": "Store hostname, e.g. allbirds.com",
+            "type": "string"
+          },
+          "slug": {
+            "description": "ARC Index slug, e.g. allbirds",
+            "type": "string"
+          },
+          "url": {
+            "description": "Store or product URL",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_agent_facts"
+    },
+    {
+      "description": "List free ARC agent facts by category (beauty, footwear, apparel, …) with no login. Ranked by newest real Jev scores. JSON: GET /api/agent-facts?category=beauty",
+      "inputSchema": {
+        "properties": {
+          "category": {
+            "description": "Category id or words, e.g. beauty, running shoes",
+            "type": "string"
+          },
+          "limit": {
+            "description": "1–50, default 20",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_category_agent_facts"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Latest open ARC dataset snapshot (start with store_answers: one plain answer per store on whether AI agents can find products and get a checkout link): immutable versioned download URLs plus latest/ aliases (CSV and Parquet), row counts, method version and licence (CC-BY-4.0, attribution ARC, arcreport.ai). Reads only.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "dataset_info"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Read ARC's neutral Protocol Matrix: for UCP, ACP, PAP, WebMCP, MCP and agent payment protocols, how many checked stores declare, validate, answer and transact, with evidence labels (Measured / Inferred / Not measured). Saved checks only; no store requests or model calls. CC-BY-4.0.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "protocol": {
+            "description": "Optional: one protocol id.",
+            "enum": [
+              "ucp",
+              "acp",
+              "pap",
+              "webmcp",
+              "mcp",
+              "payments"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "protocol_matrix"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Read ARC's open agent leaderboard: cart success over the fixed ARC-100 v1 test set for each agent path ARC measures (ARC browser shoppers A-E, the UCP path, the storefront MCP path), with n, dates, evidence labels and Wilson 95% intervals, plus unverified outside submissions. Saved results only; no store requests or model calls. CC-BY-4.0.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "include_stores": {
+            "description": "Also return the per-store result grid (100 rows).",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "name": "agent_leaderboard"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Submit your agent's run against ARC-100 v1 to ARC's open leaderboard. Free. The run is listed as 'unverified' until ARC re-runs a sample. Format: arc-leaderboard-submission/v1 (see /leaderboard/spec). Runs must stop before payment. Limit 5 per network per day. Same as POST /api/leaderboard/submit.",
+      "inputSchema": {
+        "properties": {
+          "agent": {
+            "properties": {
+              "builder": {
+                "maxLength": 80,
+                "type": "string"
+              },
+              "model": {
+                "maxLength": 80,
+                "type": "string"
+              },
+              "name": {
+                "maxLength": 60,
+                "type": "string"
+              },
+              "path": {
+                "enum": [
+                  "browser",
+                  "ucp",
+                  "mcp",
+                  "acp",
+                  "api",
+                  "other"
+                ],
+                "type": "string"
+              },
+              "url": {
+                "description": "https URL for the agent",
+                "type": "string"
+              },
+              "version": {
+                "maxLength": 40,
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "path"
+            ],
+            "type": "object"
+          },
+          "contact": {
+            "description": "Optional and private: how ARC can reach you to arrange verification.",
+            "type": "string"
+          },
+          "results": {
+            "items": {
+              "properties": {
+                "at": {
+                  "type": "string"
+                },
+                "evidence_url": {
+                  "type": "string"
+                },
+                "id": {
+                  "description": "ARC-100 store id from /data/arc-100/v1/arc-100.csv, e.g. arc100-v1-001",
+                  "type": "string"
+                },
+                "outcome": {
+                  "enum": [
+                    "added_to_cart",
+                    "checkout_reached",
+                    "no_cart",
+                    "blocked",
+                    "error",
+                    "not_attempted"
+                  ],
+                  "type": "string"
+                },
+                "seconds": {
+                  "type": "number"
+                },
+                "steps": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "outcome"
+              ],
+              "type": "object"
+            },
+            "maxItems": 100,
+            "minItems": 10,
+            "type": "array"
+          },
+          "run": {
+            "properties": {
+              "finished_at": {
+                "description": "ISO 8601",
+                "type": "string"
+              },
+              "notes": {
+                "maxLength": 500,
+                "type": "string"
+              },
+              "started_at": {
+                "description": "ISO 8601",
+                "type": "string"
+              },
+              "stopped_before_payment": {
+                "const": true,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "stopped_before_payment"
+            ],
+            "type": "object"
+          },
+          "spec": {
+            "const": "arc-leaderboard-submission/v1",
+            "type": "string"
+          },
+          "test_set": {
+            "const": "ARC-100 v1",
+            "type": "string"
+          }
+        },
+        "required": [
+          "spec",
+          "test_set",
+          "agent",
+          "run",
+          "results"
+        ],
+        "type": "object"
+      },
+      "name": "submit_leaderboard_run"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Add stores to ARC's free, open agent-commerce directory (CC-BY dataset). Pass url for one store or hosts for up to 50. Each new host is validated (live HTTPS, not parked, not redirecting to another brand); accepted hosts are queued for ARC's plain-HTTP rails checks (UCP, WebMCP, MCP, policies, product data) and appear in the dataset with source=submitted. No model calls, no login. Rate limited per caller.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "enum": [
+              "apparel",
+              "footwear",
+              "beauty",
+              "home",
+              "food-drink",
+              "supplements",
+              "outdoor",
+              "kids",
+              "pets",
+              "electronics",
+              "jewelry",
+              "unknown"
+            ],
+            "type": "string"
+          },
+          "hosts": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "submit_store"
+    },
+    {
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "description": "Read a public store card and saved brand claim. No outbound fetch or model calls. Brand statements are from the brand and not measured by ARC; claims never change scores.",
+      "inputSchema": {
+        "properties": {
+          "host": {
+            "description": "Store host or URL.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "host"
+        ],
+        "type": "object"
+      },
+      "name": "store_card"
+    },
+    {
+      "annotations": {
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Validate a Universal Commerce Protocol (UCP) business profile against the published UCP JSON Schema (current release) and spec rules: authority binding, https endpoints, orphaned extensions and, for a URL, hosting headers (no redirects, Cache-Control public max-age>=60). Pass url (store host, homepage or profile URL; /.well-known/ucp is added for a homepage) or profile (the JSON). Returns errors, warnings and info, each with a path and the spec section. Free, no login, no model call. Validation is not certification. JSON: GET /api/ucp/validate?url=",
+      "inputSchema": {
+        "properties": {
+          "profile": {
+            "description": "The profile JSON (object or string) to validate without fetching."
+          },
+          "url": {
+            "description": "Store host, homepage or profile URL, e.g. allbirds.com",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "validate_ucp_profile"
+    }
+  ],
+  "url": "https://www.arcreport.ai/api/ask"
+}

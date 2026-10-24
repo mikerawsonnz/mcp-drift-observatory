@@ -1,0 +1,567 @@
+{
+  "canon_version": "1",
+  "full_hash": "342340c7fdbdb7b9e6a5fdd3f2a0630d490ad1ce122370ad9aa1289dc138e765",
+  "name": "ai.contractorsnearme/contractors-near-me",
+  "observed_at": "2026-09-02T02:06:37.596598Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 14,
+  "tools": [
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Search active contractors by trade, location, company name, and geo radius.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "accountType": {
+            "enum": [
+              "gc",
+              "supplier",
+              "subcontractor",
+              "customer"
+            ],
+            "type": "string"
+          },
+          "city": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "contractorCategory": {
+            "enum": [
+              "gc",
+              "supplier",
+              "subcontractor"
+            ],
+            "type": "string"
+          },
+          "customerOnly": {
+            "type": "boolean"
+          },
+          "lat": {
+            "maximum": 90,
+            "minimum": -90,
+            "type": "number"
+          },
+          "limit": {
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991,
+            "type": "integer"
+          },
+          "lng": {
+            "maximum": 180,
+            "minimum": -180,
+            "type": "number"
+          },
+          "q": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "radius_miles": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "state": {
+            "maxLength": 2,
+            "minLength": 2,
+            "type": "string"
+          },
+          "trade": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "search_contractors",
+      "title": "Search Contractors"
+    },
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Get detailed contractor profile by slug. Returns full profile including about text, contact info, and trade details.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "slug": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_contractor",
+      "title": "Get Contractor Profile"
+    },
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Get reviews for a contractor by slug. Returns review text, rating, reviewer name, and dates. Limited to 50 per request.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "contractor_slug": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "limit": {
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "contractor_slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_reviews",
+      "title": "Get Contractor Reviews"
+    },
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Get a list of all available trades/professions. Returns filtered list of contractor trades from the directory.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_trades",
+      "title": "List Trades"
+    },
+    {
+      "annotations": {
+        "idempotentHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Submit a lead to ContractorsNearMe. Requires API key authentication.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "contractor_slug": {
+            "type": "string"
+          },
+          "email": {
+            "format": "email",
+            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+            "type": "string"
+          },
+          "message": {
+            "minLength": 10,
+            "type": "string"
+          },
+          "name": {
+            "minLength": 2,
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "trade_slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "message"
+        ],
+        "type": "object"
+      },
+      "name": "submit_lead",
+      "title": "Submit Lead"
+    },
+    {
+      "annotations": {
+        "idempotentHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Submit a review for a contractor. Requires API key authentication. Reviews are held for moderation before publishing.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "contractor_slug": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "description": {
+            "minLength": 20,
+            "type": "string"
+          },
+          "rating": {
+            "maximum": 5,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "rating_cleanliness": {
+            "maximum": 5,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "rating_communication": {
+            "maximum": 5,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "rating_quality": {
+            "maximum": 5,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "rating_timeliness": {
+            "maximum": 5,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "rating_value": {
+            "maximum": 5,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "reviewer_name": {
+            "minLength": 2,
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "contractor_slug",
+          "rating",
+          "description",
+          "reviewer_name"
+        ],
+        "type": "object"
+      },
+      "name": "submit_review",
+      "title": "Submit Review"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get My Leads"
+      },
+      "description": "Get leads submitted to the authenticated contractor's directory profile. Requires API key authentication. Returns lead name, email, phone, message, status, source, and created date.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "limit": {
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_my_leads",
+      "title": "Get My Leads"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Respond to Lead"
+      },
+      "description": "Update the status of a lead owned by the authenticated contractor's directory profile, optionally adding a note. Requires API key authentication. Allowed statuses: new, contacted, qualified, converted, lost.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "lead_id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "note": {
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "new",
+              "contacted",
+              "qualified",
+              "converted",
+              "lost"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "lead_id"
+        ],
+        "type": "object"
+      },
+      "name": "respond_to_lead",
+      "title": "Respond to Lead"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Update My Profile"
+      },
+      "description": "Update the authenticated contractor's own directory profile. Requires API key authentication. Only the profile owned by the key's contractor can be updated.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "about_text": {
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "company_name": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "company_size": {
+            "maxLength": 100,
+            "type": "string"
+          },
+          "dba": {
+            "maxLength": 200,
+            "type": "string"
+          },
+          "email": {
+            "format": "email",
+            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+            "type": "string"
+          },
+          "license_number": {
+            "maxLength": 100,
+            "type": "string"
+          },
+          "phone": {
+            "maxLength": 40,
+            "type": "string"
+          },
+          "quote": {
+            "maxLength": 300,
+            "type": "string"
+          },
+          "website": {
+            "maxLength": 500,
+            "type": "string"
+          },
+          "year_established": {
+            "maximum": 2100,
+            "minimum": 1800,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "update_my_profile",
+      "title": "Update My Profile"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Search ITBs"
+      },
+      "description": "Search public invitations to bid (ITBs) on the projects board. Returns open project title, description, budget range, location, and created date. Public read, no API key required.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "city": {
+            "maxLength": 100,
+            "type": "string"
+          },
+          "limit": {
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "state_code": {
+            "maxLength": 2,
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "search_itbs",
+      "title": "Search ITBs"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get ITB"
+      },
+      "description": "Get a single public invitation to bid (ITB) by its UUID. Returns full project detail including description, budget range, job site address, and dates. Public read, no API key required.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "itb_id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "itb_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_itb",
+      "title": "Get ITB"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Availability"
+      },
+      "description": "Get a contractor's published availability calendar by slug. Returns days, start/end times, timezone, and note. Public read, no API key required.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "slug": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_availability",
+      "title": "Get Availability"
+    },
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "readOnlyHint": true
+      },
+      "description": "List public marketplace requests with canonical request status, bounded budget visibility, urgency, payment summary, and proposal/application summary fields.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "limit": {
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991,
+            "type": "integer"
+          },
+          "q": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_marketplace_requests",
+      "title": "List Marketplace Requests"
+    },
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Get a single public marketplace request by UUID or slug, with canonical request status, bounded budget visibility, payment summary, and proposal/application summary fields.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "city_slug": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "id_or_slug": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "state_code": {
+            "maxLength": 2,
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id_or_slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_marketplace_request",
+      "title": "Get Marketplace Request"
+    }
+  ],
+  "url": "https://contractorsnearme.ai/api/mcp"
+}

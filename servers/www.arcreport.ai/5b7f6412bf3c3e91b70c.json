@@ -1,0 +1,514 @@
+{
+  "canon_version": "1",
+  "full_hash": "a6a91ad8df915cb9378d4ebcf9bff3410b8ae3cfcfb07a8a12e68880423fb70c",
+  "name": "ai.arcreport/mcp",
+  "observed_at": "2026-10-17T02:05:15.268686Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 19,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Check if an AI agent can reach checkout on a store before trying. Call this with a store domain, such as allbirds.com. Returns the saved checkout evidence, or not checked yet when ARC has no saved check. Free, no login, no new scan, and no fetch of the store. A missing field says \"not recorded\" and is not a zero. Results are advisory. ARC stops before payment.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "description": "Store domain, such as allbirds.com.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "type": "object"
+      },
+      "name": "check_store"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Find stores where a saved check shows an AI agent can reach checkout. Filter by platform, protocol, or category. With no filters, returns the most recently checked of those stores and labels the result default: no filters given. A missing result is not counted against a store. No login and no new scan. Results are advisory. ARC stops before payment.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "description": "Category or shopper words, such as footwear or running shoes.",
+            "type": "string"
+          },
+          "limit": {
+            "description": "How many stores to return. Default 10. Maximum 25.",
+            "maximum": 25,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "platform": {
+            "description": "Commerce platform id, such as shopify or woocommerce.",
+            "type": "string"
+          },
+          "protocol": {
+            "description": "ucp, webmcp, or mcp. ACP, PAP, and payments are not recorded per store.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "find_stores"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Report how far one agent got at one store. Free, no login. Omit contributor_key and ARC issues one. Emails, phones, street addresses, card numbers, IP addresses, and private hosts are rejected. The report stays private until 3 independent contributors with a day-old key, or enough reputation, agree within 14 days. A blocked outcome also waits for ARC's free HTTP recheck. Same as POST /api/outcomes.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_family": {
+            "description": "Agent family, such as browser or a model family. No personal name.",
+            "type": "string"
+          },
+          "agent_name": {
+            "description": "Name of the agent that tried the checkout. No personal name.",
+            "type": "string"
+          },
+          "blocker": {
+            "description": "What stopped the agent, or none.",
+            "enum": [
+              "captcha",
+              "login_wall",
+              "bot_block",
+              "3ds",
+              "payment_declined",
+              "none"
+            ],
+            "type": "string"
+          },
+          "contributor_key": {
+            "description": "Optional. Omit it and ARC returns a free key. Send that key on later reports.",
+            "type": "string"
+          },
+          "furthest_step": {
+            "description": "Furthest step the agent reached.",
+            "enum": [
+              "product",
+              "cart",
+              "checkout",
+              "payment",
+              "placed"
+            ],
+            "type": "string"
+          },
+          "store_domain": {
+            "description": "Store hostname, such as allbirds.com.",
+            "type": "string"
+          },
+          "store_error_text": {
+            "description": "Optional store error text. Personal data is stripped.",
+            "type": "string"
+          },
+          "timestamp": {
+            "description": "ISO 8601 time of the attempt, within the last 14 days.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "store_domain",
+          "agent_family",
+          "agent_name",
+          "timestamp",
+          "furthest_step",
+          "blocker"
+        ],
+        "type": "object"
+      },
+      "name": "report_checkout"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "requiresSignIn": true
+      },
+      "description": "[Requires sign-in] Look up a free ARC store card by host. Includes saved measurements and brand_claim ownership metadata. Brand statements are not measured by ARC; claims never change measured scores.",
+      "inputSchema": {
+        "properties": {
+          "host": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "host"
+        ],
+        "type": "object"
+      },
+      "name": "get_store_hub"
+    },
+    {
+      "annotations": {
+        "requiresSignIn": true
+      },
+      "description": "[Requires sign-in] Read saved public Google agentic checkout readiness checks for a store. Free; no new scan or paid calls. Merchant Center feed eligibility cannot be checked from outside. Not Google approval or certification.",
+      "inputSchema": {
+        "properties": {
+          "host": {
+            "description": "Store host or URL",
+            "type": "string"
+          }
+        },
+        "required": [
+          "host"
+        ],
+        "type": "object"
+      },
+      "name": "google_checkout_readiness"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Free latest saved product data and return/shipping policy check from the store's pages and structured data. Reads history only; no store fetch or model call. A missing result is not a zero.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "host": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "product_data_check"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "requiresSignIn": true
+      },
+      "description": "[Requires sign-in] Call when you need a saved checkout-link check for any public store URL, not only Index brands. Saved HTTP checkout check for a public homepage or product URL: catalog, product, checkout link, UCP profile, blocks, and one fix. No model call, payment, or browser scan. Uses ARC's last check (cached up to 24 hours). A missing result is unknown, not a no. A checkout link means reach checkout, not a completed order. Results are advisory. ARC stops before payment.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "description": "Public store homepage or product URL",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "type": "object"
+      },
+      "name": "can_agent_checkout"
+    },
+    {
+      "annotations": {
+        "requiresSignIn": true
+      },
+      "description": "[Requires sign-in] Check whether personal AI agents can reach a product URL, understand it, and reach checkout. Runs ARC's readiness check: crawler access, whether an agent can answer a shopper's questions from the page, and personal shopping agents trying to add to cart or reach checkout. Returns a check id — poll get_readiness_result (about 30–60 seconds). This does not ask what agents think of the brand; use ask_agents_about_brand for that.",
+      "inputSchema": {
+        "properties": {
+          "task": {
+            "description": "Optional goal, e.g. 'add to cart' (default) or 'reach checkout'.",
+            "type": "string"
+          },
+          "url": {
+            "description": "The product or store URL to test, e.g. https://store.com/products/best-seller",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "type": "object"
+      },
+      "name": "check_agent_readiness"
+    },
+    {
+      "annotations": {
+        "requiresSignIn": true
+      },
+      "description": "[Requires sign-in] Get a readiness check by id. While running, reports progress. When complete, reports whether personal agents could reach the page, understand it, and reach checkout, plus the wall, concrete next steps, a directional score, a per-agent breakdown, and screenshots. Calling this again with the same id redisplays the result and does not start a new check. Never re-run check_agent_readiness just to see the screenshots again.",
+      "inputSchema": {
+        "properties": {
+          "id": {
+            "description": "The check id returned by check_agent_readiness.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_readiness_result"
+    },
+    {
+      "annotations": {
+        "requiresSignIn": true
+      },
+      "description": "[Requires sign-in] List this workspace's recent readiness checks (newest first) — each store, its score, status, and id. Use an id with get_readiness_result to reopen a check.",
+      "inputSchema": {
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "list_readiness_checks"
+    },
+    {
+      "annotations": {
+        "requiresSignIn": true
+      },
+      "description": "[Requires sign-in] Ask benchmark personal-agent personas what they think of a brand and whether they would recommend it for a category. Personas: Muse-style, Instinct-style, Grok Bot-style, OpenAI dots-style, and OpenClaw-style. This tool uses benchmark personas, including the Grok Bot-style persona; these are not live consumer-product sessions. It is not the real Grok read-back on a scan and it is not the agent-rails HTTP check. What Grok tells shoppers on a scan is a real model call via API, checked against the store's pages, not the consumer Grok app. All five cart attempts, Grok included, are ARC browser cart tests. Returns, per persona: mentioned, recommended, which competitors were recommended instead, sentiment, and short quotes, plus next steps. Limited to 8 runs per workspace per day and 12 per network. Free workspaces also share a site-wide daily cap so unpaid runs cannot drain the model budget.",
+      "inputSchema": {
+        "properties": {
+          "brand": {
+            "description": "Brand name, e.g. Allbirds.",
+            "type": "string"
+          },
+          "category": {
+            "description": "Product category a shopper would ask about, e.g. running shoes.",
+            "type": "string"
+          },
+          "competitors": {
+            "description": "Optional competitor brand names to watch for in the answers.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "store_url": {
+            "description": "Public store URL, e.g. https://www.allbirds.com",
+            "type": "string"
+          }
+        },
+        "required": [
+          "brand",
+          "store_url",
+          "category"
+        ],
+        "type": "object"
+      },
+      "name": "ask_agents_about_brand"
+    },
+    {
+      "annotations": {
+        "requiresSignIn": true
+      },
+      "description": "[Requires sign-in] Concrete next steps to get recommended by personal agents and to become reachable, understandable, and buyable. Pass a readiness check id and/or the brand, category, store URL, and competitors that were recommended instead. Uses the check's evidence when an id is given. Does not start a new check.",
+      "inputSchema": {
+        "properties": {
+          "brand": {
+            "description": "Brand name, if you want recommendation steps.",
+            "type": "string"
+          },
+          "category": {
+            "description": "Product category, e.g. running shoes.",
+            "type": "string"
+          },
+          "competitors_recommended": {
+            "description": "Competitors personal agents recommended instead.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "mentioned": {
+            "description": "Whether any benchmark persona mentioned the brand.",
+            "type": "boolean"
+          },
+          "recommended": {
+            "description": "Whether any benchmark persona recommended the brand for the category.",
+            "type": "boolean"
+          },
+          "scan_id": {
+            "description": "Optional readiness check id from check_agent_readiness.",
+            "type": "string"
+          },
+          "store_url": {
+            "description": "Store URL.",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "get_fixes"
+    },
+    {
+      "annotations": {
+        "requiresSignIn": true
+      },
+      "description": "[Requires sign-in] Set up scheduled monitoring for one or more store URLs (the 'set up monitoring' flow). Validates each URL and rejects invalid/private/internal ones. GUIDED FLOW: first ask the user for the URLs (paste a list or a CSV), then the frequency (daily/weekly/monthly, default weekly). Every plan runs the core panel of personal shopping agents — no picking needed. Call once without confirmed=true to preview the exact setup and scan-credit estimate, read that summary to the user, and only after the user explicitly says yes call again with confirmed=true to create the monitors. Each scheduled run uses one scan credit. Every run emails who reached the cart, who stopped or started, the stuck step, and the fix. Weekly is what the plans include; daily only fits when the plan's scan allowance covers it.",
+      "inputSchema": {
+        "properties": {
+          "confirmed": {
+            "description": "Must be true only after the user has confirmed the summarized setup. If missing or false, ARC returns a preview and creates nothing.",
+            "type": "boolean"
+          },
+          "depth": {
+            "description": "How far each scan goes. Default: cart.",
+            "enum": [
+              "cart",
+              "checkout"
+            ],
+            "type": "string"
+          },
+          "frequency": {
+            "description": "How often to re-test. Default: weekly.",
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly"
+            ],
+            "type": "string"
+          },
+          "urls": {
+            "description": "Store/product URLs to monitor (a list or pasted CSV lines).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "urls"
+        ],
+        "type": "object"
+      },
+      "name": "bulk_create_monitors"
+    },
+    {
+      "annotations": {
+        "requiresSignIn": true
+      },
+      "description": "[Requires sign-in] List the workspace's monitors — each store re-checked on a schedule for whether personal agents can still reach it and its checkout. Includes cadence, status, last score, next run, and the monitor id.",
+      "inputSchema": {
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "list_monitors"
+    },
+    {
+      "annotations": {
+        "requiresSignIn": true
+      },
+      "description": "[Requires sign-in] Overview of whether monitored stores are still buyable by personal agents: latest score, trend, status, next run, and recent regression alerts.",
+      "inputSchema": {
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "monitor_summary"
+    },
+    {
+      "annotations": {
+        "requiresSignIn": true
+      },
+      "description": "[Requires sign-in] Change a monitor's cadence (daily/weekly/monthly) or label. Use the monitor id from list_monitors.",
+      "inputSchema": {
+        "properties": {
+          "frequency": {
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "description": "Monitor id from list_monitors.",
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "update_monitor"
+    },
+    {
+      "annotations": {
+        "requiresSignIn": true
+      },
+      "description": "[Requires sign-in] Pause a monitor so it stops running on schedule (its history is kept). Use the monitor id from list_monitors.",
+      "inputSchema": {
+        "properties": {
+          "id": {
+            "description": "Monitor id from list_monitors.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "pause_monitor"
+    },
+    {
+      "annotations": {
+        "requiresSignIn": true
+      },
+      "description": "[Requires sign-in] Resume a paused monitor.",
+      "inputSchema": {
+        "properties": {
+          "id": {
+            "description": "Monitor id from list_monitors.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "resume_monitor"
+    },
+    {
+      "annotations": {
+        "requiresSignIn": true
+      },
+      "description": "[Requires sign-in] Run a monitor's scan immediately (off-schedule) to establish or refresh its baseline. Consumes one scan credit — only call when the user explicitly asks to run now. Use the monitor id from list_monitors.",
+      "inputSchema": {
+        "properties": {
+          "id": {
+            "description": "Monitor id from list_monitors.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "run_monitor_now"
+    }
+  ],
+  "url": "https://www.arcreport.ai/api/mcp"
+}

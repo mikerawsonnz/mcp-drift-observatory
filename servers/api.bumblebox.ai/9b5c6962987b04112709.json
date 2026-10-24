@@ -1,0 +1,844 @@
+{
+  "canon_version": "1",
+  "full_hash": "989b0c1c12aa0e3a79f9e24e42fa45f2124c88e8c257b3dbf598a5e87ce1c1cc",
+  "name": "ai.bumblebox/mail",
+  "observed_at": "2026-10-23T02:04:35.723590Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 17,
+  "tools": [
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Search emails"
+      },
+      "description": "Searches every connected mailbox (sender, subject, preview), newest first. Operators: from:, subject:, before:YYYY-MM-DD, after:YYYY-MM-DD; the rest is free text. Deleted emails are not returned.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_emails",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "results": {
+            "items": {
+              "additionalProperties": {},
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "results"
+        ],
+        "type": "object"
+      },
+      "title": "Search emails"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Read an email"
+      },
+      "description": "One email in full: sender, recipients, date, subject, plain-text body, attachment names, folder and BumbleBox classification.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Email id, as returned by search_emails or list_to_answer.",
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_email",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "email": {
+            "additionalProperties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "type": "object"
+      },
+      "title": "Read an email"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Emails waiting for a reply"
+      },
+      "description": "Received emails BumbleBox classified as needing a reply and still in the inbox, newest first.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_to_answer",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "emails": {
+            "items": {
+              "additionalProperties": {},
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "emails"
+        ],
+        "type": "object"
+      },
+      "title": "Emails waiting for a reply"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Search contacts"
+      },
+      "description": "Contacts BumbleBox knows from the mail history (name, address, organization domain, exchange counts, last exchanges, VIP mark, note), matched on name, address or domain.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "maxLength": 200,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "search_contacts",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "contacts": {
+            "items": {
+              "additionalProperties": {},
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "contacts"
+        ],
+        "type": "object"
+      },
+      "title": "Search contacts"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List mail folders"
+      },
+      "description": "The folders of each connected mailbox, as last synced. Trash, spam, sent and drafts are left out.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_folders",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "mailboxes": {
+            "items": {
+              "additionalProperties": {},
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "mailboxes"
+        ],
+        "type": "object"
+      },
+      "title": "List mail folders"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List calendar events"
+      },
+      "description": "Events of the connected Google calendars between two dates (default: the next 7 days, at most 62 days).",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "from": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "to": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_calendar_events",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "events": {
+            "items": {
+              "additionalProperties": {},
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "events"
+        ],
+        "type": "object"
+      },
+      "title": "List calendar events"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Prepare a reply (not sent)"
+      },
+      "description": "Saves the text as the reply draft of a received email, from the mailbox that received it. Nothing is sent: the draft waits in BumbleBox (Pilotage › prepared replies) until the user reviews it and clicks Send. Saving again replaces the previous draft of the same email.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "description": "Plain-text reply body.",
+            "maxLength": 20000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "email_id": {
+            "description": "Email id, as returned by search_emails or list_to_answer.",
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          },
+          "subject": {
+            "description": "Defaults to \"Re: <original subject>\".",
+            "maxLength": 300,
+            "type": "string"
+          }
+        },
+        "required": [
+          "email_id",
+          "body"
+        ],
+        "type": "object"
+      },
+      "name": "draft_reply",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "draft": {
+            "additionalProperties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "draft"
+        ],
+        "type": "object"
+      },
+      "title": "Prepare a reply (not sent)"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Reply to the sender"
+      },
+      "description": "Replies to the sender of one received email, and only to them (no Cc, no Bcc, no attachment), from the mailbox that received it. What happens next is the level the user set in BumbleBox for this kind of reply: a draft, a reply waiting for one tap (the default), or a reply that leaves after a delay the user can cancel. Anything that commits the user (amounts, bank details, acceptance, contracts, dates, links) always waits for the user. The result says which one applied.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "description": "Plain-text reply body.",
+            "maxLength": 20000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "email_id": {
+            "description": "Email id, as returned by search_emails or list_to_answer.",
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "email_id",
+          "body"
+        ],
+        "type": "object"
+      },
+      "name": "send_reply",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "reply": {
+            "additionalProperties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "reply"
+        ],
+        "type": "object"
+      },
+      "title": "Reply to the sender"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Archive an email"
+      },
+      "description": "Moves one inbox email to its mailbox's archive folder, on the mail server too. Undone by restore_to_inbox. Nothing is deleted.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "email_id": {
+            "description": "Email id, as returned by search_emails or list_to_answer.",
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "email_id"
+        ],
+        "type": "object"
+      },
+      "name": "archive_email",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "moved": {
+            "additionalProperties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "moved"
+        ],
+        "type": "object"
+      },
+      "title": "Archive an email"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Move an email to a folder"
+      },
+      "description": "Moves one inbox email to an existing folder of the same mailbox (see list_folders), on the mail server too. No folder is created. Undone by restore_to_inbox.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "email_id": {
+            "description": "Email id, as returned by search_emails or list_to_answer.",
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          },
+          "folder": {
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "email_id",
+          "folder"
+        ],
+        "type": "object"
+      },
+      "name": "move_email",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "moved": {
+            "additionalProperties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "moved"
+        ],
+        "type": "object"
+      },
+      "title": "Move an email to a folder"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Put an email in the trash"
+      },
+      "description": "Moves one inbox email to its mailbox's trash when BumbleBox certifies it as noise (spam, newsletter, promotion, with a unanimous safety vote and no known contact or action word). Any other email is not moved: it becomes a proposal the user confirms in one tap in BumbleBox. Never a permanent deletion; undone by restore_to_inbox.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "email_id": {
+            "description": "Email id, as returned by search_emails or list_to_answer.",
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          },
+          "reason": {
+            "description": "Why, shown to the user with a proposal.",
+            "maxLength": 300,
+            "type": "string"
+          }
+        },
+        "required": [
+          "email_id"
+        ],
+        "type": "object"
+      },
+      "name": "trash_email",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "result": {
+            "additionalProperties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "title": "Put an email in the trash"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Put an email back in the inbox"
+      },
+      "description": "Moves an archived, filed or trashed email back to the inbox, on the mail server too.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "email_id": {
+            "description": "Email id, as returned by search_emails or list_to_answer.",
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "email_id"
+        ],
+        "type": "object"
+      },
+      "name": "restore_to_inbox",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "restored": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "restored"
+        ],
+        "type": "object"
+      },
+      "title": "Put an email back in the inbox"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List campaigns"
+      },
+      "description": "The user's prospection campaigns (missions), most recently active first, with the number of drafts waiting, emails sent and prospects who replied.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_missions",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "missions": {
+            "items": {
+              "additionalProperties": {},
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "missions"
+        ],
+        "type": "object"
+      },
+      "title": "List campaigns"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List the drafts of a campaign"
+      },
+      "description": "The drafts of one campaign that wait for the user to validate them in BumbleBox (recipient, subject, plain-text body, sender), newest first, with the true totals.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "mission_id": {
+            "description": "Campaign id, as returned by list_missions.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "mission_id"
+        ],
+        "type": "object"
+      },
+      "name": "list_campaign_drafts",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "counts": {
+            "additionalProperties": {},
+            "type": "object"
+          },
+          "drafts": {
+            "items": {
+              "additionalProperties": {},
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "counts",
+          "drafts"
+        ],
+        "type": "object"
+      },
+      "title": "List the drafts of a campaign"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Campaign replies waiting for the user"
+      },
+      "description": "Replies received on campaigns that still need the user: prepared reply drafts waiting for validation, and replies with no answer yet (with the stored AI triage: kind, summary, whether a human is needed).",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_replies_to_validate",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "drafts": {
+            "items": {
+              "additionalProperties": {},
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "pending": {
+            "$ref": "#/properties/drafts"
+          }
+        },
+        "required": [
+          "drafts",
+          "pending"
+        ],
+        "type": "object"
+      },
+      "title": "Campaign replies waiting for the user"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Write a campaign draft (not sent)"
+      },
+      "description": "Writes one draft inside an existing campaign, to one recipient (added to the campaign list if new), from the campaign's sender. Nothing is sent: the draft waits for the user to validate the campaign send in BumbleBox.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "description": "Plain-text body.",
+            "maxLength": 20000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "mission_id": {
+            "description": "Campaign id, as returned by list_missions.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "description": "Recipient name, for a new prospect.",
+            "maxLength": 200,
+            "type": "string"
+          },
+          "subject": {
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          },
+          "to": {
+            "maxLength": 320,
+            "minLength": 3,
+            "type": "string"
+          }
+        },
+        "required": [
+          "mission_id",
+          "to",
+          "subject",
+          "body"
+        ],
+        "type": "object"
+      },
+      "name": "create_campaign_draft",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "draft": {
+            "additionalProperties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "draft"
+        ],
+        "type": "object"
+      },
+      "title": "Write a campaign draft (not sent)"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Edit a campaign draft (not sent)"
+      },
+      "description": "Changes the subject, body or recipient of a draft that is still a draft. Nothing is sent, and a draft the user already validated cannot be changed.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "maxLength": 20000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "draft_id": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "mission_id": {
+            "description": "Campaign id, as returned by list_missions.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "subject": {
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          },
+          "to": {
+            "maxLength": 320,
+            "minLength": 3,
+            "type": "string"
+          }
+        },
+        "required": [
+          "mission_id",
+          "draft_id"
+        ],
+        "type": "object"
+      },
+      "name": "update_campaign_draft",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": true,
+        "properties": {
+          "draft": {
+            "additionalProperties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "draft"
+        ],
+        "type": "object"
+      },
+      "title": "Edit a campaign draft (not sent)"
+    }
+  ],
+  "url": "https://api.bumblebox.ai/api/mcp"
+}

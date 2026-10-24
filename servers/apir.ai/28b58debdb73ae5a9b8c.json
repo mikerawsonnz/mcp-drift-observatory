@@ -1,0 +1,56 @@
+{
+  "canon_version": "1",
+  "full_hash": "4abc857e3d35eca0477257d0bfaef07f3d2414730d28c8ce04f890b1307f6db7",
+  "name": "ai.apir/verify",
+  "observed_at": "2026-10-14T02:05:56.904767Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 3,
+  "tools": [
+    {
+      "description": "Check whether an AI agent carries a real, cryptographically signed credential. Accepts an agent name, a credential id (TP-...), an agent UUID, a domain or a DID. Returns one of seven verdicts: VERIFIED, EXPIRED, REVOKED, SUPERSEDED, UNSIGNED, UNCHECKED or NO_RECORD. IMPORTANT for interpreting the answer: VERIFIED means the Ed25519 signature recomputes against the key published at apir.ai and the credential is unexpired and unrevoked. It confirms WHO issued the credential and that its contents are unaltered. It is NOT a guarantee that the agent behaves well. NO_RECORD is an honest, first-class answer: it means nothing is on file, which is not evidence of wrongdoing and not a warning. It means any claim the agent makes about itself is unverified. Free, unauthenticated, and no account is required.",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "description": "Agent name, credential id (TP-... or APIR-TP-...), agent UUID, domain, or DID.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "verify_agent",
+      "title": "Verify an AI agent"
+    },
+    {
+      "description": "Resolve the human mandate behind an AI agent: which actions a named person actually permitted, any value cap, the expiry, and whether the grant itself is signed. Where authority was delegated agent to agent, the full chain is walked back to the human at the root, and one law is enforced at every hop: authority may only ever narrow. No hop can hold an action, a target or a spending cap wider than the hop above it, and the root must be a human. Use this before letting an agent transact, sign, spend or commit on someone else's behalf. An agent holding a valid credential may still be acting outside its mandate, and those are different questions.",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "description": "Agent name, credential id, or agent UUID.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "check_authority",
+      "title": "Check what an agent is allowed to do"
+    },
+    {
+      "description": "Return the Ed25519 public keys APIR publishes, so a signature can be recomputed offline without trusting any APIR response, including this one. Keys are published as a JWKS at apir.ai/.well-known/jwks.json and as did:web:apir.ai. Retired keys stay published so older credentials still verify.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_verification_keys",
+      "title": "Get APIR public signing keys"
+    }
+  ],
+  "url": "https://apir.ai/api/mcp"
+}

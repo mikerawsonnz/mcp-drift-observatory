@@ -1,0 +1,334 @@
+{
+  "canon_version": "1",
+  "full_hash": "c208fb14df9299afbe4e5010b06dc80cc42848f6184601c73c97e61ee1dacb46",
+  "name": "ai.cleanvector/cleanvector",
+  "observed_at": "2026-09-22T02:07:52.440715Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 11,
+  "tools": [
+    {
+      "description": "Generate professional, editable SVG artwork from a text prompt: illustrations, icons, stickers and mascot scenes. The result is real vector paths with a transparent background, not an embedded bitmap. Returns a task that processes asynchronously, so call wait_for_task with the returned id to get the result. Pass mascot_id (from list_mascots) to keep a consistent character across scenes. Costs 4 credits.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "aspect_ratio": {
+            "default": "auto",
+            "enum": [
+              "auto",
+              "square",
+              "landscape",
+              "portrait"
+            ],
+            "type": "string"
+          },
+          "mascot_id": {
+            "description": "Optional mascot id; the character appears consistently in the scene",
+            "type": "string"
+          },
+          "no_background": {
+            "default": true,
+            "description": "Return only the subject on a transparent background",
+            "type": "boolean"
+          },
+          "prompt": {
+            "description": "What to draw, in plain language",
+            "maxLength": 2000,
+            "minLength": 3,
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "type": "object"
+      },
+      "name": "generate_illustration",
+      "title": "Generate SVG artwork"
+    },
+    {
+      "description": "Generate a professional vector logo as editable SVG, delivered as a brand kit: the original mark, black and white variants, transparent PNG exports and a color palette measured from the finished artwork. An optional reference can refine an existing identity or provide loose inspiration. Runs asynchronously, so call wait_for_task with the returned id, then download_logo_kit. Costs 8 credits.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "brand_name": {
+            "description": "Exact optional brand name; omit for symbol-only",
+            "maxLength": 80,
+            "type": "string"
+          },
+          "prompt": {
+            "description": "Creative brief for the logo",
+            "maxLength": 2000,
+            "minLength": 3,
+            "type": "string"
+          },
+          "reference_image_base64": {
+            "type": "string"
+          },
+          "reference_image_url": {
+            "format": "uri",
+            "type": "string"
+          },
+          "reference_role": {
+            "enum": [
+              "refine",
+              "inspiration"
+            ],
+            "type": "string"
+          },
+          "request_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "type": "object"
+      },
+      "name": "generate_logo",
+      "title": "Generate vector logo and brand kit"
+    },
+    {
+      "description": "Convert a raster image (PNG/JPG/WebP, max 5 MB) into a clean, editable SVG. Provide image_url or image_base64. no_background defaults to true and isolates the subject (4 credits). Set no_background false with mode 'direct' to trace as-is (1 credit); mode 'enhance' redraws with AI first (4 credits). Runs async, so poll with wait_for_task.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "image_base64": {
+            "description": "Base64 image data (raw or data URL)",
+            "type": "string"
+          },
+          "image_url": {
+            "description": "Public URL of the image",
+            "format": "uri",
+            "type": "string"
+          },
+          "mode": {
+            "default": "direct",
+            "enum": [
+              "direct",
+              "enhance"
+            ],
+            "type": "string"
+          },
+          "no_background": {
+            "default": true,
+            "description": "Isolate the subject on a transparent background",
+            "type": "boolean"
+          },
+          "prompt": {
+            "description": "Optional guidance for enhance mode",
+            "maxLength": 2000,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "vectorize_image",
+      "title": "Vectorize image"
+    },
+    {
+      "description": "Fetch the current status of a task. Status is one of queued, processing, succeeded, failed. A succeeded task includes the result with download URLs.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "task_id": {
+            "description": "Task id from generate_illustration or vectorize_image",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_task",
+      "title": "Get task status"
+    },
+    {
+      "description": "Block until a task settles (succeeded/failed) or the timeout passes. Preferred over polling get_task in a loop. Generation typically takes 10-60 seconds.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "task_id": {
+            "type": "string"
+          },
+          "timeout_seconds": {
+            "default": 45,
+            "maximum": 50,
+            "minimum": 5,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "task_id"
+        ],
+        "type": "object"
+      },
+      "name": "wait_for_task",
+      "title": "Wait for task to finish"
+    },
+    {
+      "description": "List the user's most recent tasks, newest first.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "default": 10,
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_tasks",
+      "title": "List recent tasks"
+    },
+    {
+      "description": "List the user's ready-to-use mascots (consistent characters). Pass a mascot id to generate_illustration to place that character in a new scene. Mascots are created in the CleanVector dashboard.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_mascots",
+      "title": "List mascots"
+    },
+    {
+      "description": "Return the finished artwork as a PNG image (free on all plans). Use after a task succeeded. For larger exports up to 8192px, use the png_url from the task result with the same Bearer key.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "task_id": {
+            "type": "string"
+          },
+          "variant": {
+            "description": "Logo only: original/black/white. Artwork tasks have one SVG.",
+            "enum": [
+              "original",
+              "black",
+              "white"
+            ],
+            "type": "string"
+          },
+          "width": {
+            "default": 1024,
+            "description": "Output width in px (height keeps aspect)",
+            "maximum": 2048,
+            "minimum": 16,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "task_id"
+        ],
+        "type": "object"
+      },
+      "name": "download_png",
+      "title": "Download result as PNG"
+    },
+    {
+      "description": "Return the finished artwork as SVG markup. Use after a task succeeded.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "task_id": {
+            "type": "string"
+          },
+          "variant": {
+            "enum": [
+              "original",
+              "black",
+              "white"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id"
+        ],
+        "type": "object"
+      },
+      "name": "download_svg",
+      "title": "Download result as SVG"
+    },
+    {
+      "description": "Return a completed logo kit as an embedded ZIP resource. Includes three SVGs, three PNGs and palette.json. MCP output is capped at 2048px; use zip_url from the task result for larger files.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "task_id": {
+            "type": "string"
+          },
+          "width": {
+            "default": 2048,
+            "maximum": 2048,
+            "minimum": 16,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "task_id"
+        ],
+        "type": "object"
+      },
+      "name": "download_logo_kit",
+      "title": "Download logo brand kit"
+    },
+    {
+      "description": "Current plan and credit balance. Costs: vectorize 1, generate/enhance 4, logo 8 credits. PNG and SVG downloads are free on every plan.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_account",
+      "title": "Get account info"
+    }
+  ],
+  "url": "https://cleanvector.ai/api/mcp"
+}

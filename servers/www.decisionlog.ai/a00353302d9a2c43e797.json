@@ -1,0 +1,2854 @@
+{
+  "canon_version": "1",
+  "full_hash": "7759f508e68bc41e064e56c36d5401d440a79f89ed2a6a3b843eaa777d19b1f4",
+  "name": "ai.decisionlog/mcp",
+  "observed_at": "2026-08-28T02:07:45.202111Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 30,
+  "tools": [
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create an immutable Decision when permitted, otherwise create a reviewable DecisionCandidate.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "decisionText": {
+            "description": "The immutable meaning of the decision.",
+            "type": "string"
+          },
+          "decisionType": {
+            "enum": [
+              "policy",
+              "technical",
+              "product",
+              "vendor",
+              "security",
+              "financial",
+              "legal",
+              "operational",
+              "architecture",
+              "process",
+              "personnel",
+              "other"
+            ],
+            "type": "string"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "rationale": {
+            "description": "Why the decision was made.",
+            "type": "string"
+          },
+          "sourceIds": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "summary": {
+            "description": "Optional summary.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Concise direct-action title without speaker wrappers or ellipses.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "decisionText",
+          "rationale",
+          "decisionType"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_create_decision",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {}
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Record a decision"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Search decisions in the authenticated workspace.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "currentOnly": {
+            "type": "boolean"
+          },
+          "decisionKey": {
+            "description": "Optional stable Decision key filter.",
+            "type": "string"
+          },
+          "decisionType": {
+            "description": "Optional Decision type filter.",
+            "type": "string"
+          },
+          "domain": {
+            "description": "Optional Domain slug filter.",
+            "type": "string"
+          },
+          "includeSuperseded": {
+            "default": false,
+            "type": "boolean"
+          },
+          "limit": {
+            "default": 25,
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "projectId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional Project identifier filter."
+          },
+          "query": {
+            "description": "Search text.",
+            "type": "string"
+          },
+          "sort": {
+            "default": "newest",
+            "enum": [
+              "newest",
+              "oldest",
+              "title"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "description": "Optional Decision status filter.",
+            "type": "string"
+          },
+          "tag": {
+            "description": "Optional Tag slug filter.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "decision_log_search_decisions",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {
+            "additionalProperties": false,
+            "properties": {
+              "hasNext": {
+                "description": "Whether another page exists after this page.",
+                "type": "boolean"
+              },
+              "limit": {
+                "maximum": 100,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "offset": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "results": {
+                "description": "Decisions matched by the current page and filters.",
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "totalCount": {
+                "description": "Exact number of matching Decisions across all pages.",
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "results",
+              "totalCount",
+              "limit",
+              "offset",
+              "hasNext"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Search decisions"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Retrieve one decision by ID.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "decisionId": {
+            "description": "Decision identifier.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "decisionId"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_get_decision",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {}
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Get a decision"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create a replacement Decision and supersession relationship for an existing Decision.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "decisionId": {
+            "description": "Decision being superseded.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "decisionText": {
+            "description": "The immutable meaning of the decision.",
+            "type": "string"
+          },
+          "decisionType": {
+            "enum": [
+              "policy",
+              "technical",
+              "product",
+              "vendor",
+              "security",
+              "financial",
+              "legal",
+              "operational",
+              "architecture",
+              "process",
+              "personnel",
+              "other"
+            ],
+            "type": "string"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "rationale": {
+            "description": "Why the decision was made.",
+            "type": "string"
+          },
+          "reason": {
+            "description": "Reason for supersession.",
+            "type": "string"
+          },
+          "sourceIds": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "summary": {
+            "description": "Optional summary.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Concise direct-action title without speaker wrappers or ellipses.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "decisionId",
+          "title",
+          "decisionText",
+          "rationale",
+          "decisionType",
+          "reason"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_supersede_decision",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {}
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Supersede a decision"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Irreversibly prevent a current Decision from ever being superseded; may create an approval request.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "decisionId": {
+            "description": "Decision to lock.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "rationale": {
+            "description": "Why permanent finality is required.",
+            "type": "string"
+          },
+          "sourceIds": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "decisionId",
+          "rationale"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_lock_decision",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {}
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Permanently lock a decision"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Record one immutable approval or rejection attestation.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "approvalGroupId": {
+            "description": "Approval group identifier.",
+            "type": "string"
+          },
+          "approvalRequestId": {
+            "description": "Approval request identifier.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "comment": {
+            "description": "Optional approval comment.",
+            "type": "string"
+          },
+          "decision": {
+            "enum": [
+              "approve",
+              "reject"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "approvalRequestId",
+          "approvalGroupId",
+          "decision"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_approve_decision_action",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {}
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Sign off on a decision action"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Retrieve lock, authority snapshot, and approval state for a Decision.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "decisionId": {
+            "description": "Decision identifier.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "decisionId"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_get_decision_governance",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {}
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Get decision governance"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List the most recent decisions in the authenticated workspace.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "default": 10,
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "decision_log_list_recent_decisions",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {}
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "List recent decisions"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Submit source content for ingestion and later provenance links.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "contentBlobUrl": {
+            "format": "uri",
+            "type": "string"
+          },
+          "contentText": {
+            "description": "Inline source text.",
+            "type": "string"
+          },
+          "externalId": {
+            "description": "External provider identifier.",
+            "type": "string"
+          },
+          "externalUrl": {
+            "format": "uri",
+            "type": "string"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "sourceType": {
+            "description": "Source type; defaults to mcp.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Optional source title.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "decision_log_submit_source",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {}
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Submit a source"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List visible SourceContent using bounded excerpts and canonical retention redaction.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "default": 25,
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "query": {
+            "description": "Optional title, content, or external identifier search.",
+            "type": "string"
+          },
+          "retentionState": {
+            "description": "Optional exact retention lifecycle state.",
+            "type": "string"
+          },
+          "sort": {
+            "default": "newest",
+            "enum": [
+              "newest",
+              "oldest",
+              "title"
+            ],
+            "type": "string"
+          },
+          "sourceType": {
+            "description": "Optional exact source type.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "decision_log_list_sources",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {
+            "description": "Visible SourceContent summaries with bounded excerpts and retention redaction applied.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "contentExcerpt": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Bounded source excerpt, or null when unavailable or hidden."
+                },
+                "createdAt": {
+                  "description": "Source creation timestamp.",
+                  "type": "string"
+                },
+                "externalId": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Provider source identifier."
+                },
+                "externalUrl": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Provider source URL."
+                },
+                "id": {
+                  "description": "SourceContent identifier.",
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "integrationId": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Integration identifier."
+                },
+                "retentionState": {
+                  "description": "Source retention lifecycle state.",
+                  "type": "string"
+                },
+                "sourceType": {
+                  "description": "Source type.",
+                  "type": "string"
+                },
+                "submittedByActorId": {
+                  "description": "Submitting Actor identifier.",
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "title": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Source title, or null when retention policy hides it."
+                }
+              },
+              "required": [
+                "id",
+                "sourceType",
+                "title",
+                "contentExcerpt",
+                "retentionState",
+                "createdAt",
+                "submittedByActorId",
+                "externalId",
+                "externalUrl",
+                "integrationId"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "List sources"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Retrieve one visible SourceContent detail projection. Redacted, purged, and unknown retention states never return stored title, content, blob URL, or metadata.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "sourceId": {
+            "description": "SourceContent identifier.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sourceId"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_get_source",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {
+            "additionalProperties": false,
+            "properties": {
+              "archivedAt": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Source archive timestamp."
+              },
+              "contentBlobUrl": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Retained source blob URL, or null when absent or retention-hidden."
+              },
+              "contentText": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Retained source text, or null when absent or retention-hidden."
+              },
+              "createdAt": {
+                "description": "Source creation timestamp.",
+                "type": "string"
+              },
+              "externalCreatedAt": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Provider creation timestamp."
+              },
+              "externalId": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Provider source identifier."
+              },
+              "externalUpdatedAt": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Provider update timestamp."
+              },
+              "externalUrl": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Provider source URL."
+              },
+              "id": {
+                "description": "SourceContent identifier.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "integrationId": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Integration identifier."
+              },
+              "metadata": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Retained source metadata, or null when absent or retention-hidden."
+              },
+              "organizationId": {
+                "description": "Owning Organization identifier.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "retentionState": {
+                "description": "Source retention lifecycle state.",
+                "type": "string"
+              },
+              "sourceType": {
+                "description": "Source type.",
+                "type": "string"
+              },
+              "submittedByActorId": {
+                "description": "Submitting Actor identifier.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "title": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Source title, or null when retention policy hides it."
+              },
+              "updatedAt": {
+                "description": "Source update timestamp.",
+                "type": "string"
+              },
+              "workspaceId": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Owning Workspace identifier."
+              }
+            },
+            "required": [
+              "id",
+              "organizationId",
+              "workspaceId",
+              "sourceType",
+              "title",
+              "contentText",
+              "contentBlobUrl",
+              "externalId",
+              "externalUrl",
+              "externalCreatedAt",
+              "externalUpdatedAt",
+              "submittedByActorId",
+              "integrationId",
+              "retentionState",
+              "metadata",
+              "createdAt",
+              "updatedAt",
+              "archivedAt"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Get a source"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Retrieve visible DecisionSource links for one SourceContent record with each linked Decision's lifecycle, authoritative current-state, and supersession identity.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "sourceId": {
+            "description": "SourceContent identifier.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sourceId"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_get_source_decisions",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {
+            "description": "Visible DecisionSource links for one SourceContent record, paired with the minimal Decision lifecycle projection.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "decision": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "archivedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Decision archive timestamp, or null when not archived."
+                    },
+                    "decidedAt": {
+                      "description": "Timestamp when the Decision was decided.",
+                      "type": "string"
+                    },
+                    "decisionKey": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Stable Decision key, or null when no key was recorded."
+                    },
+                    "decisionType": {
+                      "description": "Decision type.",
+                      "type": "string"
+                    },
+                    "effectiveAt": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Decision effective timestamp, or null when unspecified."
+                    },
+                    "id": {
+                      "description": "Decision identifier.",
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "isCurrent": {
+                      "description": "Whether this is the authoritative current Decision after lifecycle and supersession evaluation.",
+                      "type": "boolean"
+                    },
+                    "recordedAt": {
+                      "description": "Timestamp when the Decision was recorded.",
+                      "type": "string"
+                    },
+                    "retractedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Decision retraction timestamp, or null when not retracted."
+                    },
+                    "status": {
+                      "description": "Decision lifecycle status. Use isCurrent for the authoritative current-state signal.",
+                      "type": "string"
+                    },
+                    "supersededByDecisionId": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Replacement Decision identifier, or null when this Decision has no recorded replacement."
+                    },
+                    "title": {
+                      "description": "Decision title.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "decisionKey",
+                    "title",
+                    "decisionType",
+                    "status",
+                    "isCurrent",
+                    "effectiveAt",
+                    "decidedAt",
+                    "recordedAt",
+                    "supersededByDecisionId",
+                    "archivedAt",
+                    "retractedAt"
+                  ],
+                  "type": "object"
+                },
+                "link": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "createdAt": {
+                      "description": "Timestamp when the source was linked.",
+                      "type": "string"
+                    },
+                    "decisionId": {
+                      "description": "Linked Decision identifier.",
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "id": {
+                      "description": "DecisionSource identifier.",
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "relationshipType": {
+                      "description": "Provenance relationship type.",
+                      "type": "string"
+                    },
+                    "sourceContentId": {
+                      "description": "Linked SourceContent identifier.",
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "decisionId",
+                    "sourceContentId",
+                    "relationshipType",
+                    "createdAt"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "link",
+                "decision"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Get decisions for a source"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List reviewable DecisionCandidates visible in the current Organization and Workspace before taking a resolution action.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "decisionType": {
+            "description": "Optional exact decision type.",
+            "type": "string"
+          },
+          "limit": {
+            "default": 25,
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "query": {
+            "description": "Optional title, summary, decision text, or rationale search.",
+            "type": "string"
+          },
+          "sort": {
+            "default": "newest",
+            "enum": [
+              "newest",
+              "oldest",
+              "confidence"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "description": "Optional exact candidate review status.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "decision_log_list_candidates",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {
+            "description": "Visible DecisionCandidates in the current Organization and Workspace.",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "List decision candidates"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Get the complete visible review context for one DecisionCandidate before approving, rejecting, or converting it.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "candidateId": {
+            "description": "DecisionCandidate identifier.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidateId"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_get_candidate",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {
+            "additionalProperties": true,
+            "description": "The complete visible DecisionCandidate review model, including classification, alternatives, criteria, and source identifiers.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Get a decision candidate"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create a reviewable DecisionCandidate.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence": {
+            "maximum": 100,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "decisionText": {
+            "description": "The immutable meaning of the decision.",
+            "type": "string"
+          },
+          "decisionType": {
+            "enum": [
+              "policy",
+              "technical",
+              "product",
+              "vendor",
+              "security",
+              "financial",
+              "legal",
+              "operational",
+              "architecture",
+              "process",
+              "personnel",
+              "other"
+            ],
+            "type": "string"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "rationale": {
+            "description": "Why the decision was made.",
+            "type": "string"
+          },
+          "sourceIds": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "summary": {
+            "description": "Optional summary.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Concise direct-action title without speaker wrappers or ellipses.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "decisionText",
+          "rationale",
+          "decisionType"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_create_candidate",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {}
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Create a decision candidate"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Approve or reject a pending DecisionCandidate.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "candidateId": {
+            "description": "Candidate identifier.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "decisionText": {
+            "description": "The immutable meaning of the decision.",
+            "type": "string"
+          },
+          "decisionType": {
+            "enum": [
+              "policy",
+              "technical",
+              "product",
+              "vendor",
+              "security",
+              "financial",
+              "legal",
+              "operational",
+              "architecture",
+              "process",
+              "personnel",
+              "other"
+            ],
+            "type": "string"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "rationale": {
+            "description": "Why the decision was made.",
+            "type": "string"
+          },
+          "reason": {
+            "description": "Optional rejection reason.",
+            "type": "string"
+          },
+          "resolution": {
+            "enum": [
+              "approve",
+              "reject"
+            ],
+            "type": "string"
+          },
+          "sourceIds": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "summary": {
+            "description": "Optional summary.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Concise direct-action title without speaker wrappers or ellipses.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidateId",
+          "resolution"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_resolve_candidate",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {}
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Resolve a decision candidate"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Approve a pending DecisionCandidate as the immutable replacement for one current Decision, preserving provenance and supersession history.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "candidateId": {
+            "description": "Pending DecisionCandidate identifier.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "reason": {
+            "description": "Optional reason for the supersession.",
+            "type": "string"
+          },
+          "replacesDecisionId": {
+            "description": "Current Decision identifier that the candidate replaces.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidateId",
+          "replacesDecisionId"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_convert_candidate_to_supersession",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {}
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Convert a candidate to a supersession"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Get the newest active decision in a domain.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "description": "Domain slug.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_get_current_decision",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {}
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Get the current decision"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Retrieve the complete visible Decision supersession chain in oldest-to-newest order. Malformed chains fail closed and never claim a current Decision.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "decisionId": {
+            "description": "Decision identifier from any point in the chain.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "decisionId"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_get_supersession_history",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {
+            "additionalProperties": false,
+            "properties": {
+              "ambiguous": {
+                "type": "boolean"
+              },
+              "chain": {
+                "description": "Visible Decisions ordered oldest to newest.",
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "currentDecision": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Canonical current Decision when status is resolved; otherwise null."
+              },
+              "cycleDetected": {
+                "type": "boolean"
+              },
+              "depthExceeded": {
+                "type": "boolean"
+              },
+              "maxDepth": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "relationships": {
+                "description": "Visible DecisionSupersession relationships in chain order.",
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "requestedDecisionId": {
+                "description": "Decision identifier used to start traversal.",
+                "format": "uuid",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "resolved",
+                  "not_found",
+                  "cycle_detected",
+                  "depth_exceeded",
+                  "ambiguous",
+                  "broken_chain"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "requestedDecisionId",
+              "status",
+              "chain",
+              "relationships",
+              "currentDecision",
+              "cycleDetected",
+              "depthExceeded",
+              "ambiguous",
+              "maxDepth"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Get supersession history"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Retrieve retention-safe provenance links for one visible Decision, including relationship, source lifecycle, and submitter metadata.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "decisionId": {
+            "description": "Decision identifier.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "decisionId"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_get_decision_sources",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "link": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "createdAt": {
+                      "description": "Timestamp when the source was linked.",
+                      "type": "string"
+                    },
+                    "decisionId": {
+                      "description": "Linked Decision identifier.",
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "id": {
+                      "description": "DecisionSource identifier.",
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "relationshipType": {
+                      "description": "Provenance relationship type.",
+                      "type": "string"
+                    },
+                    "sourceContentId": {
+                      "description": "Linked SourceContent identifier.",
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "decisionId",
+                    "sourceContentId",
+                    "relationshipType",
+                    "createdAt"
+                  ],
+                  "type": "object"
+                },
+                "source": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "contentExcerpt": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Bounded source excerpt, or null when unavailable or hidden."
+                    },
+                    "createdAt": {
+                      "description": "Source creation timestamp.",
+                      "type": "string"
+                    },
+                    "externalId": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Provider source identifier."
+                    },
+                    "externalUrl": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Provider source URL."
+                    },
+                    "id": {
+                      "description": "SourceContent identifier.",
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "integrationId": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Integration identifier."
+                    },
+                    "retentionState": {
+                      "description": "Source retention lifecycle state.",
+                      "type": "string"
+                    },
+                    "sourceType": {
+                      "description": "Source type.",
+                      "type": "string"
+                    },
+                    "submittedByActorId": {
+                      "description": "Submitting Actor identifier.",
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "title": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Source title, or null when retention policy hides it."
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "sourceType",
+                    "title",
+                    "contentExcerpt",
+                    "retentionState",
+                    "createdAt",
+                    "submittedByActorId",
+                    "externalId",
+                    "externalUrl",
+                    "integrationId"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "link",
+                "source"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Get decision sources"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List the visible append-only audit events for the current Organization using the canonical permission-aware, attribution-safe projection.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "description": "Optional exact AuditEvent action.",
+            "type": "string"
+          },
+          "actorType": {
+            "description": "Optional exact actor type.",
+            "type": "string"
+          },
+          "limit": {
+            "default": 50,
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "query": {
+            "description": "Optional actor, action, resource, or identifier search.",
+            "type": "string"
+          },
+          "resourceType": {
+            "description": "Optional exact resource type.",
+            "type": "string"
+          },
+          "sort": {
+            "default": "newest",
+            "enum": [
+              "newest",
+              "oldest"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "decision_log_list_audit_events",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "List audit events"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List decisions related to an exact tag slug.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "tag": {
+            "description": "Tag slug.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tag"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_list_decisions_by_tag",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {}
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "List decisions by tag"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List decisions related to an exact domain slug.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "description": "Domain slug.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_list_decisions_by_domain",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "result": {}
+        },
+        "required": [
+          "result"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "List decisions by domain"
+    },
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://decision-log/decision-card-v5.html",
+        "openai/toolInvocation/invoked": "Decision card ready",
+        "openai/toolInvocation/invoking": "Loading decision card…",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ],
+        "ui": {
+          "resourceUri": "ui://decision-log/decision-card-v5.html",
+          "visibility": [
+            "model",
+            "app"
+          ]
+        },
+        "ui/resourceUri": "ui://decision-log/decision-card-v5.html"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Use this when the user wants to inspect one known Decision in a visual card. Call a data retrieval tool first when the Decision ID is unknown.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "decisionId": {
+            "description": "Decision identifier returned by a retrieval tool.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "decisionId"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_render_decision",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "decision": {}
+        },
+        "required": [
+          "decision"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Show a decision card"
+    },
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://decision-log/workflow-surfaces-v1.html",
+        "openai/toolInvocation/invoked": "Workspace brief ready",
+        "openai/toolInvocation/invoking": "Preparing workspace brief…",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ],
+        "ui": {
+          "resourceUri": "ui://decision-log/workflow-surfaces-v1.html",
+          "visibility": [
+            "model",
+            "app"
+          ]
+        },
+        "ui/resourceUri": "ui://decision-log/workflow-surfaces-v1.html"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Use this when the user wants a visual briefing of recent decisions, pending candidates, and source activity.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "decision_log_render_workspace_brief",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "actors": {},
+          "candidates": {},
+          "decisions": {},
+          "sources": {},
+          "surface": {
+            "description": "Workflow surface.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "surface",
+          "decisions",
+          "candidates",
+          "sources"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Show workspace brief"
+    },
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://decision-log/workflow-surfaces-v1.html",
+        "openai/toolInvocation/invoked": "Decision explorer ready",
+        "openai/toolInvocation/invoking": "Loading recent decisions…",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ],
+        "ui": {
+          "resourceUri": "ui://decision-log/workflow-surfaces-v1.html",
+          "visibility": [
+            "model",
+            "app"
+          ]
+        },
+        "ui/resourceUri": "ui://decision-log/workflow-surfaces-v1.html"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Use this when the user wants to browse the five most recent Decisions and optionally inspect one in detail.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "decisionId": {
+            "description": "Optional Decision identifier to open immediately.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "decision_log_render_decision_explorer",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "actors": {},
+          "decisions": {},
+          "selected": {},
+          "surface": {
+            "description": "Workflow surface.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "surface",
+          "decisions"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Show decision explorer"
+    },
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://decision-log/workflow-surfaces-v1.html",
+        "openai/toolInvocation/invoked": "Candidate ready for review",
+        "openai/toolInvocation/invoking": "Loading candidate…",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ],
+        "ui": {
+          "resourceUri": "ui://decision-log/workflow-surfaces-v1.html",
+          "visibility": [
+            "model",
+            "app"
+          ]
+        },
+        "ui/resourceUri": "ui://decision-log/workflow-surfaces-v1.html"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Use this when the user wants to inspect and disposition one known DecisionCandidate in a visual review workbench.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "candidateId": {
+            "description": "DecisionCandidate identifier.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidateId"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_render_candidate_review",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "actors": {},
+          "candidate": {},
+          "surface": {
+            "description": "Workflow surface.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "surface",
+          "candidate"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Show candidate review"
+    },
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://decision-log/workflow-surfaces-v1.html",
+        "openai/toolInvocation/invoked": "Supersession review ready",
+        "openai/toolInvocation/invoking": "Preparing supersession review…",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ],
+        "ui": {
+          "resourceUri": "ui://decision-log/workflow-surfaces-v1.html",
+          "visibility": [
+            "model",
+            "app"
+          ]
+        },
+        "ui/resourceUri": "ui://decision-log/workflow-surfaces-v1.html"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Use this when the user has a known active Decision and complete replacement meaning to review before supersession.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "decisionId": {
+            "description": "Decision being superseded.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "decisionText": {
+            "description": "The immutable meaning of the decision.",
+            "type": "string"
+          },
+          "decisionType": {
+            "enum": [
+              "policy",
+              "technical",
+              "product",
+              "vendor",
+              "security",
+              "financial",
+              "legal",
+              "operational",
+              "architecture",
+              "process",
+              "personnel",
+              "other"
+            ],
+            "type": "string"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "rationale": {
+            "description": "Why the decision was made.",
+            "type": "string"
+          },
+          "reason": {
+            "description": "Reason for supersession.",
+            "type": "string"
+          },
+          "sourceIds": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "summary": {
+            "description": "Optional summary.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Concise direct-action title without speaker wrappers or ellipses.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "decisionId",
+          "title",
+          "decisionText",
+          "rationale",
+          "decisionType",
+          "reason"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_render_supersession_composer",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "actors": {},
+          "current": {},
+          "reason": {
+            "description": "Reason for supersession.",
+            "type": "string"
+          },
+          "replacement": {},
+          "surface": {
+            "description": "Workflow surface.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "surface",
+          "current",
+          "replacement",
+          "reason"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Show supersession composer"
+    },
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://decision-log/workflow-surfaces-v1.html",
+        "openai/toolInvocation/invoked": "Source pipeline ready",
+        "openai/toolInvocation/invoking": "Loading source pipeline…",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ],
+        "ui": {
+          "resourceUri": "ui://decision-log/workflow-surfaces-v1.html",
+          "visibility": [
+            "model",
+            "app"
+          ]
+        },
+        "ui/resourceUri": "ui://decision-log/workflow-surfaces-v1.html"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Use this when the user wants to inspect one known source, its provenance lifecycle, and extracted candidates.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "sourceId": {
+            "description": "DecisionSource identifier.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sourceId"
+        ],
+        "type": "object"
+      },
+      "name": "decision_log_render_source_pipeline",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "actors": {},
+          "candidates": {},
+          "source": {},
+          "surface": {
+            "description": "Workflow surface.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "surface",
+          "source",
+          "candidates"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Show source pipeline"
+    },
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://decision-log/workflow-surfaces-v1.html",
+        "openai/toolInvocation/invoked": "Audit explorer ready",
+        "openai/toolInvocation/invoking": "Loading audit events…",
+        "securitySchemes": [
+          {
+            "scopes": [
+              "decision_log.api"
+            ],
+            "type": "oauth2"
+          }
+        ],
+        "ui": {
+          "resourceUri": "ui://decision-log/workflow-surfaces-v1.html",
+          "visibility": [
+            "model",
+            "app"
+          ]
+        },
+        "ui/resourceUri": "ui://decision-log/workflow-surfaces-v1.html"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Use this when the user wants to visually inspect attributable, append-only audit events with filtering and pagination.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "default": 25,
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "description": "Optional audit event filter.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "decision_log_render_audit_explorer",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "actors": {},
+          "events": {},
+          "surface": {
+            "description": "Workflow surface.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "surface",
+          "events"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [
+            "decision_log.api"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Show audit explorer"
+    }
+  ],
+  "url": "https://www.decisionlog.ai/api/mcp"
+}

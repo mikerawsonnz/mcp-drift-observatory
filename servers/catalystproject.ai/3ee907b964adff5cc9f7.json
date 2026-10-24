@@ -1,0 +1,342 @@
+{
+  "canon_version": "1",
+  "full_hash": "18246fb390c6fedce3c2d98a3e6d678e34a06420387d0182a743ac4c2025464b",
+  "name": "ai.catalystproject/evidence-graph",
+  "observed_at": "2026-10-05T02:05:27.326237Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 7,
+  "tools": [
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://catalyst/evidence-card.html",
+        "ui": {
+          "resourceUri": "ui://catalyst/evidence-card.html"
+        },
+        "ui/resourceUri": "ui://catalyst/evidence-card.html"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Find the evidence on a substance or a question"
+      },
+      "description": "Use this when someone asks what a supplement, nutrient, drug, food compound or plant does in the body, or whether it affects something specific (for example \"does magnesium help sleep?\", \"what is creatine shown to do?\", \"omega-3 and triglycerides\"). Pass the substance (or an outcome such as \"sleep\") as query, and the specific effect, if there is one, as about. One call resolves the name to the node that has findings and returns them, each with its evidence strength in words, the study design, the quote, the paper, a permalink and a citation to quote as it stands. Without about, summary lists everything the node has findings about. If nothing matches, it says so: tell the person Catalyst has no findings on it rather than answering from memory as though from Catalyst. An evidence strength says how well the evidence supports a finding; it is not a recommendation.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": {},
+        "properties": {
+          "about": {
+            "description": "Optional: the specific effect or outcome asked about (e.g. \"sleep\", \"blood pressure\"), or a node id.",
+            "maxLength": 80,
+            "minLength": 2,
+            "type": "string"
+          },
+          "detail": {
+            "default": "brief",
+            "description": "brief (default): each finding with its claim, evidence strength, design, population, dose, quote, paper, permalink and a ready-to-quote citation. full: every recorded field.",
+            "enum": [
+              "brief",
+              "full"
+            ],
+            "type": "string"
+          },
+          "evidence_strength": {
+            "description": "Optional floor: only findings with at least this evidence strength.",
+            "enum": [
+              "strong",
+              "moderate",
+              "limited",
+              "very_limited",
+              "insufficient"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "default": 10,
+            "description": "Findings to return, strongest evidence first.",
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "description": "The substance or outcome the person asked about, in their words (e.g. \"magnesium\", \"vitamin D\", \"sleep\"), or a node id.",
+            "maxLength": 80,
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "find_evidence",
+      "title": "Find the evidence on a substance or a question"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Find a compound, outcome or protein"
+      },
+      "description": "Search the Catalyst evidence graph by name or synonym (for example \"magnesium\", \"vitamin D\", \"sleep\", \"creatine\"). Returns node ids to pass to get_findings or get_relations. Each hit says how many findings it has, and hits with findings come first, so the first hit with findings above 0 is usually the one to use. It finds things; it does not say anything about them.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": {},
+        "properties": {
+          "query": {
+            "description": "A name, synonym or phrase.",
+            "maxLength": 80,
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_nodes",
+      "title": "Find a compound, outcome or protein"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Findings about a node, with their evidence strength"
+      },
+      "description": "The curated study findings for one node: for a compound, organism or material, what it has been shown to affect; for an outcome, which compounds have been studied against it. summary lists everything the node has findings about, one row each, across ALL its findings and not only the rows returned. Use it to see what is covered, then pass about (an id from summary, or words such as \"sleep\") to get the findings on one thing. Each finding carries its evidence strength, one of five named levels from strong to insufficient (strong, moderate, limited, very_limited, insufficient), the verbatim sentence it was drawn from, the paper, the population and dose, and a permalink. An evidence strength says how well the evidence supports the finding; it is not a recommendation. Always give the evidence strength with the claim, and link the permalink. An empty list means nothing has been curated yet, not that the compound does nothing.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": {},
+        "properties": {
+          "about": {
+            "description": "Optional: only findings about this, as an id from summary (e.g. CAT:outcome/sleep-onset-latency) or words in its name (e.g. \"sleep\").",
+            "maxLength": 80,
+            "minLength": 2,
+            "type": "string"
+          },
+          "detail": {
+            "default": "brief",
+            "description": "brief (default): each finding with its claim, evidence strength, design, population, dose, quote, paper, permalink and a ready-to-quote citation. full: every recorded field.",
+            "enum": [
+              "brief",
+              "full"
+            ],
+            "type": "string"
+          },
+          "evidence_strength": {
+            "description": "Optional floor: return only findings with at least this evidence strength.",
+            "enum": [
+              "strong",
+              "moderate",
+              "limited",
+              "very_limited",
+              "insufficient"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "description": "Findings to return, strongest evidence first.",
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "node_id": {
+            "description": "A node id from search_nodes, e.g. CHEBI:16919 (creatine).",
+            "maxLength": 120,
+            "minLength": 3,
+            "pattern": "^[A-Za-z_]+:[A-Za-z0-9_./+-]+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "node_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_findings",
+      "title": "Findings about a node, with their evidence strength"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "One finding, with its evidence strength explained"
+      },
+      "description": "One finding by its id (the last part of a permalink, /e/{id}): the claim, its evidence strength and what that level means, the verbatim quote, the study design and the paper, and evidence_strength_reasons: each rule that set the level, in order, and what the assessment does not weigh. Use it to explain why the evidence behind a finding is as strong as it is, from evidence_strength_reasons rather than by guessing.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": {},
+        "properties": {
+          "finding_id": {
+            "description": "A 26-character finding id, from a permalink or get_findings.",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "finding_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_finding",
+      "title": "One finding, with its evidence strength explained"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Reference-database relations (hypotheses)"
+      },
+      "description": "What public reference databases (Reactome, UniProt, Rhea, ChEBI and others) record about a node: transporters, enzymes, pathways, expression. Every row is assertion_class 'inferred': a hypothesis about how a compound could act, not a result anyone measured in people. Present these as possible mechanisms and never as effects. For effects, use get_findings.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": {},
+        "properties": {
+          "limit": {
+            "default": 25,
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "node_id": {
+            "description": "A node id from search_nodes, e.g. CHEBI:16919 (creatine).",
+            "maxLength": 120,
+            "minLength": 3,
+            "pattern": "^[A-Za-z_]+:[A-Za-z0-9_./+-]+$",
+            "type": "string"
+          },
+          "offset": {
+            "default": 0,
+            "maximum": 10000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "predicate": {
+            "description": "Limit to one relation type, e.g. transports.",
+            "maxLength": 40,
+            "pattern": "^[a-z_]+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "node_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_relations",
+      "title": "Reference-database relations (hypotheses)"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Reactions a compound or protein takes part in (inferred)"
+      },
+      "description": "Biochemical reactions from Rhea and Human-GEM that a compound is a substrate or product of, or that a protein catalyses or transports. Every row is assertion_class 'inferred': a reaction two public databases record, not a result anyone measured in a person. Present these as known biochemistry, never as an effect a compound has, and never as a recommendation. For effects, use get_findings. A compound flagged is_hub (water, ATP, protons and the like) returns its reaction count only, because it participates in nearly everything and a row list would not be biology anyone reads. Coverage: the whole of one Rhea release and one Human-GEM release, each reaction counted once; a participant that is not a node in this graph is listed but not linked, and only human enzymes that are nodes are listed at all. An empty result means no reaction in those releases names this node, not that the body has none.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": {},
+        "properties": {
+          "limit": {
+            "default": 25,
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "node_id": {
+            "description": "A node id from search_nodes, e.g. CHEBI:16919 (creatine).",
+            "maxLength": 120,
+            "minLength": 3,
+            "pattern": "^[A-Za-z_]+:[A-Za-z0-9_./+-]+$",
+            "type": "string"
+          },
+          "offset": {
+            "default": 0,
+            "maximum": 10000,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "node_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_reactions",
+      "title": "Reactions a compound or protein takes part in (inferred)"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "What a compound can become, and through what (inferred, a hypothesis)"
+      },
+      "description": "Breadth-first reachability through the reactions two public databases (Rhea, Human-GEM) record: what a compound could become, and through which reactions and enzymes, within up to 3 steps. Every route is assertion_class 'inferred': a hypothesis drawn from reference databases, never a measured or reported effect. Present it as known biochemical connectivity — never as an effect, a recommendation, or a claim that the body actually does this. For measured effects, use get_findings. Common cofactors and currency species (water, ATP, protons and the like) are excluded as intermediate steps, so a route never reads 'reaches everything through ATP'. A currency species is also never materialised as from_id or to_id itself — asking about one returns reachable: null with a coverage note explaining that, not a checked \"0 routes\". Give to_id to check one target compound; omit it to list everything from_id reaches. A route not being found can mean three different things, and the result's coverage field says which: reachability may not have been BUILT for this scope yet (nothing has been checked); it may have been checked and found NOT REACHABLE through the reactions loaded — never read that as \"the body cannot make it\"; or the compound asked about may be a currency species, structurally excluded rather than searched.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": {},
+        "properties": {
+          "depth": {
+            "default": 3,
+            "description": "Longest route to consider, in reaction steps (1-3).",
+            "maximum": 3,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "from_id": {
+            "description": "The compound to start from.",
+            "maxLength": 120,
+            "minLength": 3,
+            "pattern": "^[A-Za-z_]+:[A-Za-z0-9_./+-]+$",
+            "type": "string"
+          },
+          "limit": {
+            "default": 25,
+            "description": "Rows to return when to_id is omitted.",
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "maximum": 10000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "to_id": {
+            "description": "A target compound. Omit to list everything from_id reaches.",
+            "maxLength": 120,
+            "minLength": 3,
+            "pattern": "^[A-Za-z_]+:[A-Za-z0-9_./+-]+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "from_id"
+        ],
+        "type": "object"
+      },
+      "name": "reach",
+      "title": "What a compound can become, and through what (inferred, a hypothesis)"
+    }
+  ],
+  "url": "https://catalystproject.ai/mcp"
+}
