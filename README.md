@@ -5,27 +5,25 @@ servers: what tools each one **declared**, byte-exactly, and when that declarati
 
 One commit per crawl cycle. A change to a server's tool surface appears as a diff.
 
-## Latest crawl: 2026-10-24 02:04 UTC
+## Latest crawl: 2026-10-25 02:04 UTC
 
-15 of 238 observable servers changed their declared tools. Attempted 351: 238 observable, 104 auth-walled, 4 unreachable, 5 blocked.
+13 of 243 observable servers changed their declared tools. Attempted 343: 243 observable, 93 auth-walled, 2 unreachable, 5 blocked.
 
-- [ae.beachclubs/mcp](deltas/2026-10-24/342c8a5bf0901ef67c50.json): annotation changed, count changed, description changed, schema changed, tool added; 1 tool(s) added; 233 field(s) changed; signals: length_more_than_doubled, url_introduced
-- [ae.waggle/fenlight](deltas/2026-10-24/080eb55643f26382f415.json): description changed; 2 field(s) changed
-- [ae.waggle/vera](deltas/2026-10-24/d06c15457e98ec8c8b45.json): description changed, schema changed; 5 field(s) changed
-- [ai.1court.state/court-directory](deltas/2026-10-24/c36a3ccafbf96b7eca38.json): count changed, tool added; 2 tool(s) added
-- [ai.agentsindex/mcp](deltas/2026-10-24/ae90c62287403cba0474.json): description changed; 2 field(s) changed
-- [ai.airshelf/catalog](deltas/2026-10-24/bcd6b8dd84c17aeab22b.json): description changed, schema changed; 2 field(s) changed
-- [ai.analyticslegends/sap-analytics](deltas/2026-10-24/44700875edd0c1c1f674.json): schema changed; 11 field(s) changed
-- [ai.athenahq/mcp](deltas/2026-10-24/d1c9dc97b241abc09e4e.json): description changed, schema changed; 4 field(s) changed; signals: length_more_than_doubled
-- [ai.bankrolled/agent-hub](deltas/2026-10-24/5cc2518d652f586b7ba6.json): count changed, tool added; 1 tool(s) added
-- [ai.betslipdoctor/mcp](deltas/2026-10-24/f29327f2a9147dd897c0.json): description changed, schema changed; 736 field(s) changed
-- [ai.capitalcompany/capital-company](deltas/2026-10-24/62d6b0cca4647fe5fa82.json): description changed; 9 field(s) changed
-- [ai.capxule/capxule](deltas/2026-10-24/6aef8eb99de229777343.json): description changed; 1 field(s) changed
-- [ai.cerebrium/docs](deltas/2026-10-24/4f7d9ea5115fd6450d8e.json): annotation changed, field changed; 4 field(s) changed
-- [ai.ciphyr.agentmart/agentmart](deltas/2026-10-24/3d7c628fac1dcd1441e2.json): annotation changed, description changed, schema changed; 365 field(s) changed; signals: length_more_than_doubled, url_introduced
-- [ai.coingraph/coingraph](deltas/2026-10-24/8e38f137a38da246adbf.json): description changed; 1 field(s) changed
+- [ai.1court.state/court-directory](deltas/2026-10-25/c36a3ccafbf96b7eca38.json): description changed, schema changed; 11 field(s) changed
+- [ai.agentsindex/mcp](deltas/2026-10-25/ae90c62287403cba0474.json): description changed; 1 field(s) changed
+- [ai.alphaquantlabs/propertycheck](deltas/2026-10-25/c307148b3e77d7c2db4d.json): description changed, schema changed; 4 field(s) changed
+- [ai.analyticslegends/sap-analytics](deltas/2026-10-25/44700875edd0c1c1f674.json): schema changed; 4 field(s) changed
+- [ai.artemisgtm/gtm-engineer](deltas/2026-10-25/05201622ddbc4614d3f7.json): tool added, tool removed; 5 tool(s) added; 5 tool(s) removed
+- [ai.athenahq/mcp](deltas/2026-10-25/d1c9dc97b241abc09e4e.json): schema changed; 1206 field(s) changed
+- [ai.atmy/air-quality](deltas/2026-10-25/5f23f4a4f55342a166a0.json): count changed, description changed, schema changed, tool added; 1 tool(s) added; 9 field(s) changed; signals: length_more_than_doubled
+- [ai.aviado/health](deltas/2026-10-25/112d81952274218832ad.json): description changed; 2 field(s) changed
+- [ai.betslipdoctor/mcp](deltas/2026-10-25/f29327f2a9147dd897c0.json): description changed; 1 field(s) changed
+- [ai.bowmark/bowmark](deltas/2026-10-25/e742a173e323c903336e.json): description changed; 1 field(s) changed
+- [ai.bowmark/bowmark](deltas/2026-10-25/5f2d24be930573ed8878.json): description changed; 1 field(s) changed
+- [ai.bumblebox/mail](deltas/2026-10-25/9b5c6962987b04112709.json): schema changed; 2 field(s) changed
+- [ai.capxule/capxule](deltas/2026-10-25/6aef8eb99de229777343.json): description changed; 1 field(s) changed
 
-Changes per day: [2026-10-18](deltas/2026-10-18/) 6, [2026-10-19](deltas/2026-10-19/) 6, [2026-10-20](deltas/2026-10-20/) 15, [2026-10-21](deltas/2026-10-21/) 2, [2026-10-22](deltas/2026-10-22/) 11, [2026-10-23](deltas/2026-10-23/) 7, [2026-10-24](deltas/2026-10-24/) 15
+Changes per day: [2026-10-19](deltas/2026-10-19/) 6, [2026-10-20](deltas/2026-10-20/) 15, [2026-10-21](deltas/2026-10-21/) 2, [2026-10-22](deltas/2026-10-22/) 11, [2026-10-23](deltas/2026-10-23/) 7, [2026-10-24](deltas/2026-10-24/) 15, [2026-10-25](deltas/2026-10-25/) 13
 
 ## What this is
 
