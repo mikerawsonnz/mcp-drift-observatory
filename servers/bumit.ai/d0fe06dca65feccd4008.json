@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "fbae9273bac5b27d3a2b1426544d7fa66f7568a51feb0fd9829a2eee3af33ebe",
+  "full_hash": "29b68f26b4764d69b3d6221d957430f774ed7ccbe34a1ec5954f5ca0e1a7ce85",
   "name": "ai.bumit/verify-business",
-  "observed_at": "2026-10-23T02:04:37.890602Z",
+  "observed_at": "2026-10-26T02:04:20.348169Z",
   "sources": [
     "official"
   ],
@@ -15,30 +15,36 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Verify a Swiss business (current scope: Switzerland only) by uid, name and/or address, using evidence from official/public Swiss sources: Zefix (commercial-register index), plus SECO sanctions and FINMA authorisation datasets ingested by the operator. Each check names its source (checks[].sources), data basis, provenance and freshness (observed_at, retrieved_at, source timestamps); explain to the user which source supplied the evidence and when BUMIT observed or retrieved it. A timestamp that is null is unknown — do not infer one. Returns the BUMIT business-verification result (contract 1.1.0); result.outcome is one of VERIFIED, NOT_VERIFIED, REVIEW_REQUIRED, UNAVAILABLE, NOT_FOUND, AMBIGUOUS, UNSUPPORTED — all are business results, not errors. You may call with only a company name; no UID is needed. An exact unique legal-name match is resolved and verified in one call. Otherwise result.outcome is AMBIGUOUS and resolution.candidates lists commercial-register companies (uid, legal_name, seat, canton): BUMIT never selects a partial/similar or duplicate-name candidate. Choose the intended company from your context (or ask the user), then call verify_business again with {\"uid\": \"<candidate uid>\"}. NOT_FOUND means the register search returned no candidate. REVIEW_REQUIRED: additional review of the blocking checks is required before acting. UNAVAILABLE: evidence could not currently support a conclusion; it is NOT NOT_VERIFIED. Checks marked UNSUPPORTED have no source and must stay unsupported.",
+      "description": "Verify a Swiss company using official commercial-register data (Zefix), SECO sanctions data, and FINMA authorisation data. Search by UID or company name (optionally narrowed by address); a UID is not required. Returns structured verification outcomes, source provenance, and data freshness. If a name matches multiple companies, returns candidates for the agent or user to disambiguate; never assume a partial match is the intended company. Unavailable evidence must not be interpreted as a failed verification.",
       "inputSchema": {
         "additionalProperties": false,
+        "description": "Identify a Swiss company by uid or name; supply at least one of them. A uid is not required when a name is given. address is optional and only assists; address alone is not supported (result outcome UNSUPPORTED). If uid is given, it identifies the company and a supplied name is checked against the registered name. Only uid, name and address are accepted.",
         "minProperties": 1,
         "properties": {
           "address": {
             "additionalProperties": false,
+            "description": "Optional Swiss postal address; all four fields are required when address is supplied. It is checked against the official building-address directory (this never proves the company is at that address). With name, locality may narrow several exact legal-name matches by registered seat; it never turns a non-exact match into an identity. Address alone cannot identify a company.",
             "properties": {
               "house_number": {
+                "description": "House number.",
                 "maxLength": 20,
                 "minLength": 1,
                 "type": "string"
               },
               "locality": {
+                "description": "Locality (town). Also compared with the registered seat when narrowing exact name matches.",
                 "maxLength": 100,
                 "minLength": 1,
                 "type": "string"
               },
               "postcode": {
+                "description": "Postcode.",
                 "maxLength": 10,
                 "minLength": 1,
                 "type": "string"
               },
               "street": {
+                "description": "Street name, without house number.",
                 "maxLength": 200,
                 "minLength": 1,
                 "type": "string"
@@ -53,13 +59,13 @@
             "type": "object"
           },
           "name": {
-            "description": "Exact legal name. Name-only resolution needs at least 3 characters. Exact normalized equality only; never fuzzy.",
+            "description": "Optional company legal name; use it when no UID is known. Name-only resolution needs at least 3 characters. A company is resolved only on a unique exact normalized legal-name match — never fuzzy. Otherwise candidates are returned for explicit selection: do not guess; resubmit with the chosen candidate's uid. With uid, the name is compared against the registered name instead.",
             "maxLength": 300,
             "minLength": 1,
             "type": "string"
           },
           "uid": {
-            "description": "Swiss UID, canonical (CHE-123.456.789) or compact (CHE123456789). Check digit validated server-side.",
+            "description": "Optional Swiss UID, canonical (CHE-123.456.789) or compact (CHE123456789). When present it identifies the company directly. Check digit validated server-side; an invalid UID is rejected before any source lookup.",
             "maxLength": 64,
             "pattern": "^[\\s._/-]*[Cc][\\s._/-]*[Hh][\\s._/-]*[Ee](?:[\\s._/-]*[0-9]){9}[\\s._/-]*$",
             "type": "string"

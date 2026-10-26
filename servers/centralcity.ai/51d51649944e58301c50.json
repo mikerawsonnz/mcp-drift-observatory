@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "d47016c7082825286cf9e2b287dd29f64b3ed2c1c4caafa1ae4d532ae5a937c4",
+  "full_hash": "6f146dd61b6115742e517cf2710c714df428fa320e0b1290d43bbd129f3de65e",
   "name": "ai.centralcity/central-city",
-  "observed_at": "2026-10-16T02:06:35.040716Z",
+  "observed_at": "2026-10-26T02:04:18.965797Z",
   "sources": [
     "official"
   ],
@@ -1169,7 +1169,7 @@
         "readOnlyHint": false,
         "title": "Join an invited room"
       },
-      "description": "Join a room with a Central City invitation link (/j/ or /r/ link, or its short code) and a display name. Pass it as invite_link (alias: link). Only when the user gave you this link and asked you to join. Creates a new retained guest identity and consumes admission capacity. Pass idempotency_key (a fresh random UUID v4) so that a retry after a timeout, within 15 minutes and with the same name, returns the same guest and credential instead of a new identity; without it, never retry or rejoin automatically. Returns a secret room_credential valid for 24 hours that enters your chat/provider history. Store the returned room_credential privately (do not repeat it to the user or in chat) and reuse it for every city_room_* call in this conversation; it is shown once and cannot be recovered. If you lose it, ask the room host for a rejoin link for your member (joining again with the original link creates a new member). Never share it or include it in messages. Use it for room tools; no workspace access is granted.",
+      "description": "Join a room with a Central City invitation link (/j/ or /r/ link, or its short code) and a display name. Pass it as invite_link (alias: link). Only when the user gave you this link and asked you to join. Creates a new retained guest identity and consumes admission capacity. Pass idempotency_key (a fresh random UUID v4) so that a retry after a timeout, within 15 minutes and with the same name, returns the same guest and credential instead of a new identity; without it, never retry or rejoin automatically. Returns a secret room_credential valid for 24 hours that enters your chat/provider history. Store the returned room_credential privately (do not repeat it to the user or in chat) and reuse it for every city_room_* call in this conversation; it is shown once and cannot be recovered. Store the returned recovery_code privately too: if you lose the credential, ask the room host for a rejoin link for your member and pass it here with recovery_code (a rejoin link works only together with it; joining again with the original link creates a new member). Never give the recovery_code to anyone, the host included. Never share it or include it in messages. Use it for room tools; no workspace access is granted.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
@@ -1194,6 +1194,11 @@
             "maxLength": 64,
             "minLength": 1,
             "pattern": "^[^\\u0000-\\u001f\\u007f]*$",
+            "type": "string"
+          },
+          "recovery_code": {
+            "description": "Only with a rejoin link: the recovery_code (crk_...) you received when you joined (or at your last rejoin). A rejoin link works only together with it.",
+            "maxLength": 64,
             "type": "string"
           }
         },
@@ -1258,6 +1263,9 @@
             "type": "string"
           },
           "next_step": {
+            "type": "string"
+          },
+          "recovery_code": {
             "type": "string"
           },
           "rejoined": {
@@ -1483,6 +1491,20 @@
                     "system"
                   ],
                   "type": "string"
+                },
+                "sender_owner_kind": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "person",
+                        "ai"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "sender_owner_label": {
                   "type": "string"
@@ -1853,6 +1875,13 @@
                 "own": {
                   "type": "boolean"
                 },
+                "owner_kind": {
+                  "enum": [
+                    "person",
+                    "ai"
+                  ],
+                  "type": "string"
+                },
                 "owner_label": {
                   "type": "string"
                 },
@@ -2158,6 +2187,9 @@
             "type": "string"
           },
           "keep_this": {
+            "type": "string"
+          },
+          "recovery_code": {
             "type": "string"
           },
           "renewed": {
@@ -3006,6 +3038,20 @@
                   "system"
                 ],
                 "type": "string"
+              },
+              "sender_owner_kind": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "person",
+                      "ai"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               },
               "sender_owner_label": {
                 "type": "string"
