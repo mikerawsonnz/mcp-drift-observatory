@@ -1,0 +1,640 @@
+{
+  "canon_version": "1",
+  "full_hash": "d2bb1c509e05459da91a45987043b236febbb5bf325f89807aed7024d13cb539",
+  "name": "ai.bugtape/bugtape-demo",
+  "observed_at": "2026-10-27T02:05:52.615460Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 14,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List bugs for the organization (flat, one row per deduplicated report). Supports filtering by status, severity, project, platform, deliveryFeed (all | urgent_critical | ui_ux), and text search. Each row includes affected_user_count, repeat_user_count, and user_spread (user_specific vs widespread). Diagnostic-class signals are excluded by default. Prefer list_bug_groups for grouped triage.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "deliveryFeed": {
+            "description": "Delivery feed: all, urgent_critical (severity Score ≥ high and confidence ≥ 0.80), or ui_ux (is_ui_ux Noul ≥ 0.70). Defaults to the PAT or project setting.",
+            "enum": [
+              "all",
+              "urgent_critical",
+              "ui_ux"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "description": "Number of results (default 20)",
+            "maximum": 200,
+            "minimum": 1,
+            "type": "number"
+          },
+          "offset": {
+            "default": 0,
+            "description": "Pagination offset",
+            "minimum": 0,
+            "type": "number"
+          },
+          "platform": {
+            "description": "Only bugs with an occurrence captured on this platform",
+            "enum": [
+              "web",
+              "ios",
+              "android",
+              "react-native",
+              "flutter",
+              "server",
+              "other"
+            ],
+            "type": "string"
+          },
+          "projectId": {
+            "description": "Filter by project ID",
+            "format": "uuid",
+            "type": "string"
+          },
+          "search": {
+            "description": "Search text in title and description",
+            "type": "string"
+          },
+          "severity": {
+            "description": "Filter by severity",
+            "enum": [
+              "critical",
+              "high",
+              "medium",
+              "low"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "description": "Filter by bug status",
+            "enum": [
+              "new",
+              "known",
+              "working",
+              "resolved",
+              "silenced",
+              "awaiting_verification",
+              "verified_fixed"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_bugs",
+      "title": "List Bugs"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Get full details of a bug including title, description, severity, status, reporters, AI summary, environment info, report count, affected_user_count, repeat_user_count, and user_spread (user_specific vs widespread). Use get_bug_users for the per-user roster.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "bugId": {
+            "description": "The bug ID",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "bugId"
+        ],
+        "type": "object"
+      },
+      "name": "get_bug",
+      "title": "Read an issue"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Get session events for a bug (DOM, network, console, clicks, errors). Prefer passing occurrenceId so events are not mixed across captures.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "bugId": {
+            "description": "The bug ID",
+            "format": "uuid",
+            "type": "string"
+          },
+          "limit": {
+            "default": 100,
+            "description": "Max events to return",
+            "maximum": 1000,
+            "minimum": 1,
+            "type": "number"
+          },
+          "occurrenceId": {
+            "description": "Pin events to one occurrence (recommended)",
+            "format": "uuid",
+            "type": "string"
+          },
+          "offset": {
+            "default": 0,
+            "description": "Continue from the previous response nextOffset",
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "type": {
+            "description": "Filter by event type (e.g., \"click\", \"console-error\", \"network\")",
+            "type": "string"
+          }
+        },
+        "required": [
+          "bugId"
+        ],
+        "type": "object"
+      },
+      "name": "get_bug_events",
+      "title": "Read captured events"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Build an agent-consumable reproduction pack: evidence (timeline, status, env) separate from inference (AI summary). Prefer occurrenceId so sessions are not interleaved. Not raw rrweb. Same pack as resources/read bugtape://bugs/{bugId}/repro.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "bugId": {
+            "description": "The bug ID",
+            "format": "uuid",
+            "type": "string"
+          },
+          "eventLimit": {
+            "default": 200,
+            "description": "Max raw events to scan before summarizing",
+            "maximum": 500,
+            "minimum": 20,
+            "type": "number"
+          },
+          "occurrenceId": {
+            "description": "Pin to one occurrence. If omitted, uses the latest occurrence when available.",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "bugId"
+        ],
+        "type": "object"
+      },
+      "name": "get_repro_context",
+      "title": "Read issue evidence"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List all projects in the organization with their bug counts.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_projects",
+      "title": "List projects"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Get aggregate statistics for a project (server-computed over bugs in the elected delivery feed, not a sample): counts by status and severity, daily timeline, top unresolved bugs by report count, MTTR, health score, and previous-period comparison.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "days": {
+            "default": 30,
+            "description": "Timeline window in days (default 30)",
+            "maximum": 365,
+            "minimum": 1,
+            "type": "number"
+          },
+          "deliveryFeed": {
+            "description": "Delivery feed: all, urgent_critical, or ui_ux. Defaults to the PAT or project setting.",
+            "enum": [
+              "all",
+              "urgent_critical",
+              "ui_ux"
+            ],
+            "type": "string"
+          },
+          "projectId": {
+            "description": "Project ID",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "type": "object"
+      },
+      "name": "get_project_stats",
+      "title": "Get Project Stats"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List the individual occurrences grouped under a bug. Use this to see which users, sessions, releases, or environments were affected.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "bugId": {
+            "description": "The grouped bug ID",
+            "format": "uuid",
+            "type": "string"
+          },
+          "limit": {
+            "default": 50,
+            "description": "Max occurrences to return",
+            "maximum": 200,
+            "minimum": 1,
+            "type": "number"
+          },
+          "offset": {
+            "default": 0,
+            "description": "Pagination offset",
+            "minimum": 0,
+            "type": "number"
+          }
+        },
+        "required": [
+          "bugId"
+        ],
+        "type": "object"
+      },
+      "name": "get_bug_occurrences",
+      "title": "Get Bug Occurrences"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Who hit this bug: one row per affected end user (the app's identify() userId, else reporter email, else an anonymous IP-hash key) with firstSeen, lastSeen, occurrenceCount, platforms (web/ios/…), lastRelease and lastOccurrenceId. Pass a row's userKey to get_user_timeline to see everything that user experienced across bugs, or to get_repro_context via occurrenceId=lastOccurrenceId.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "bugId": {
+            "description": "The grouped bug ID",
+            "format": "uuid",
+            "type": "string"
+          },
+          "limit": {
+            "default": 50,
+            "description": "Max users to return (newest last-seen first)",
+            "maximum": 200,
+            "minimum": 1,
+            "type": "number"
+          },
+          "offset": {
+            "default": 0,
+            "description": "Pagination offset",
+            "minimum": 0,
+            "type": "number"
+          }
+        },
+        "required": [
+          "bugId"
+        ],
+        "type": "object"
+      },
+      "name": "get_bug_users",
+      "title": "Get Bug Users"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Get the most recent occurrences across the organization. Useful for live monitoring and tester workflows. Honors deliveryFeed (tool arg, else PAT / project).",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "deliveryFeed": {
+            "description": "Delivery feed: all, urgent_critical, or ui_ux. Defaults to the PAT or project setting.",
+            "enum": [
+              "all",
+              "urgent_critical",
+              "ui_ux"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "default": 50,
+            "description": "Max live occurrences to return",
+            "maximum": 200,
+            "minimum": 1,
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_live_occurrences",
+      "title": "Get Live Occurrences"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Return the credential workspace. Agent PATs resolve only their own workspace; human sessions use BUGTAPE_ORG_ID.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_current_org",
+      "title": "Current workspace"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Get the full audit trail of status/severity changes and assignments on a bug, including who changed what and when.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "bugId": {
+            "description": "The bug ID",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "bugId"
+        ],
+        "type": "object"
+      },
+      "name": "get_bug_history",
+      "title": "Get Bug History"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Find other bugs similar to the given bug, ranked by similarity score (0-100, fingerprint + title overlap). Returns up to 5 matches. Useful before merging or triaging.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "bugId": {
+            "description": "The bug ID to find similar bugs for",
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "bugId"
+        ],
+        "type": "object"
+      },
+      "name": "get_similar_bugs",
+      "title": "Get Similar Bugs"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Grouped triage view: bugs collapsed across pages by error signature (one group per distinct error within a project, even when dedup created many bug rows). Each group includes projectId + groupKey (the stable group identity), a representative sampleBugId/sampleTitle, instanceCount, occurrenceCount, sessionCount, userCount, maxSeverity, topStatus, signalReason (why the classifier flagged it), browsers/oses, platforms (web/ios/android/react-native/flutter/server — one issue can span several), and anyRegression. Pass both projectId and groupKey as one groupRefs entry to bulk_update_bugs. Legacy groupKeys are accepted only when unique across the organization and are rejected when ambiguous. Prefer this over list_bugs for triage.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "assignee": {
+            "description": "'unassigned', or a user id from list_team — narrows to bugs assigned to that person (or none)",
+            "type": "string"
+          },
+          "deliveryFeed": {
+            "description": "Delivery feed: all, urgent_critical, or ui_ux. Defaults to the PAT or project setting.",
+            "enum": [
+              "all",
+              "urgent_critical",
+              "ui_ux"
+            ],
+            "type": "string"
+          },
+          "direction": {
+            "default": "desc",
+            "description": "Sort direction for the chosen key (default desc; ties break on last_seen desc)",
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "description": "Number of groups (default 20)",
+            "maximum": 200,
+            "minimum": 1,
+            "type": "number"
+          },
+          "offset": {
+            "default": 0,
+            "description": "Pagination offset",
+            "minimum": 0,
+            "type": "number"
+          },
+          "platform": {
+            "description": "Only groups with an occurrence captured on this platform",
+            "enum": [
+              "web",
+              "ios",
+              "android",
+              "react-native",
+              "flutter",
+              "server",
+              "other"
+            ],
+            "type": "string"
+          },
+          "projectId": {
+            "description": "Filter by project ID",
+            "format": "uuid",
+            "type": "string"
+          },
+          "search": {
+            "description": "Search text in title and description",
+            "type": "string"
+          },
+          "severity": {
+            "description": "Filter by per-bug severity",
+            "enum": [
+              "critical",
+              "high",
+              "medium",
+              "low"
+            ],
+            "type": "string"
+          },
+          "sort": {
+            "default": "last_seen",
+            "description": "Sort key: last_seen (default), first_seen, count (occurrences), severity, title, signal (regressions first), assignee (display name, unassigned last)",
+            "enum": [
+              "last_seen",
+              "first_seen",
+              "count",
+              "severity",
+              "title",
+              "signal",
+              "assignee"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "description": "Filter by per-bug status (groups also expose aggregated topStatus)",
+            "enum": [
+              "new",
+              "known",
+              "working",
+              "resolved",
+              "silenced",
+              "awaiting_verification",
+              "verified_fixed"
+            ],
+            "type": "string"
+          },
+          "unresolved": {
+            "default": false,
+            "description": "true = only groups whose aggregated topStatus is not resolved/silenced",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_bug_groups",
+      "title": "List Bug Groups"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Start here. Returns `sentToYou` first: bugs a person sent you with \"Send to agent\" (fix these first), then the prefiltered agent inbox: one row per signature group, new unique issues scored critical/high (or regressions). `id` is the best qualifying member. `member_id_sample` is at most 8 member ids; `instance_count` is the full count and `instances_path` lists the rest. Use this instead of list_bugs for what to work on. Diagnostic, silenced, and agent-acked rows are excluded.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "type": "number"
+          },
+          "projectId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "since": {
+            "description": "ISO timestamp; only rows recommended after this",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_recommended_critical",
+      "title": "Find urgent issues"
+    }
+  ],
+  "url": "https://app.bugtape.ai/demo/mcp"
+}
