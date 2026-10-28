@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "67eebfaee81f4e37c1dae07ae8e894accdb2454759ce8952c39457c01a220864",
+  "full_hash": "22e188a4b2f68562a6932f243ca6c7313e3635487db0dffaa7d35176a42e1222",
   "name": "ai.azquo/azquo",
-  "observed_at": "2026-10-27T02:05:47.929117Z",
+  "observed_at": "2026-10-28T02:04:17.750159Z",
   "sources": [
     "official"
   ],
-  "tool_count": 40,
+  "tool_count": 41,
   "tools": [
     {
       "annotations": {
@@ -660,7 +660,7 @@
         "readOnlyHint": false,
         "title": "Run report"
       },
-      "description": "Fetch the full data for a report, including all regions and current choice values.\n\nReports in Azquo are Excel-based templates with named data regions. Each region contains\nrow/column headings and a 2D array of values. Reports also support 'choices' — named\nparameters that filter the data (e.g. selecting a business unit, time period, etc).\n\nUse it to see what a report shows a user - the figures as laid out in the report. For an ad-hoc\nquestion that no report answers, use query_aql; to see a report's formulas and layout rather than its\ndata, use read_workbook. Find reports with list_reports (or list_database_sheets for one database).\n\nPass reportId as either a numeric ID or the report name.\nThe database parameter is required. Any additional choices can be passed as key/value pairs.\nChoices are SAVED as this user's selections, as when they are picked in the report in a browser, so\nthey also apply to the next run of any report using the same choice. A choice passed as \"\" clears\nthe saved selection; leave a choice out to keep it as it is.\n\nExample choices: { \"Month\": \"Jan-24\", \"Department\": \"Sales\" }\n\nErrors report_not_found when the report does not exist or is not one this user may run, and\nreport_render_failed when the report cannot be calculated.",
+      "description": "Fetch the full data for a report, including all regions and current choice values.\n\nReports in Azquo are Excel-based templates with named data regions. Each region contains\nrow/column headings and a 2D array of values. Reports also support 'choices' — named\nparameters that filter the data (e.g. selecting a business unit, time period, etc).\n\nUse it to see what a report shows a user - the figures as laid out in the report. For an ad-hoc\nquestion that no report answers, use query_aql; to see a report's formulas and layout rather than its\ndata, use read_workbook. Find reports with list_reports (or list_database_sheets for one database).\n\nPass reportId as either a numeric ID or the report name.\nThe database parameter is required. Any additional choices can be passed as key/value pairs.\nChoices are SAVED as this user's selections, as when they are picked in the report in a browser, so\nthey also apply to the next run of any report using the same choice. A choice passed as \"\" clears\nthe saved selection; leave a choice out to keep it as it is.\n\nExample choices: { \"Month\": \"Jan-24\", \"Department\": \"Sales\" }\n\nThe result includes openUrl: the address that opens this report in a browser as a person uses it - Save\nbutton, choosers, input cells - showing the choices just made. Give it to the person when they should\nsee the report or type into it (they sign in there if they have not).\n\nErrors report_not_found when the report does not exist or is not one this user may run, and\nreport_render_failed when the report cannot be calculated.",
       "inputSchema": {
         "properties": {
           "business": {
@@ -1106,7 +1106,7 @@
         "readOnlyHint": true,
         "title": "List reports"
       },
-      "description": "List the online reports (Excel reports users run in Azquo) the current user can see, across every\ndatabase in the business. Read-only, no parameters. Use it to find a report's id or name before\nget_report_data, read_workbook or delete_report. For the reports, setup sheets and import templates of\none database use list_database_sheets instead.\n\nWho sees what: an administrator sees every report in the business; a developer sees the reports on\ndatabases they own; other users see the reports on their menus.\n\nReturns an array of reports: id, reportName (with \" uploaded by <user>\" appended), database (the one it\nruns against; empty for reports usable with any database, \"No database\" when unlinked), filename,\ncategory, explanation, dateCreated, author. A report linked to several databases appears once for each.\nWith none visible, a single placeholder with id 0 and reportName \"No reports found\" is returned.\nNot paginated.",
+      "description": "List the online reports (Excel reports users run in Azquo) the current user can see, across every\ndatabase in the business. Read-only, no parameters. Use it to find a report's id or name before\nget_report_data, read_workbook or delete_report. For the reports, setup sheets and import templates of\none database use list_database_sheets instead.\n\nWho sees what: an administrator sees every report in the business; a developer sees the reports on\ndatabases they own; other users see the reports on their menus.\n\nReturns an array of reports: id, reportName (with \" uploaded by <user>\" appended), database (the one it\nruns against; empty for reports usable with any database, \"No database\" when unlinked), filename,\ncategory, explanation, dateCreated, author, and openUrl - the address that opens the report in a browser\nas a person uses it, with its Save button, choosers and input cells; give it to the person to show them\nthe report rather than only describe it (they sign in there if they have not). A report linked to several\ndatabases appears once for each.\nWith none visible, a single placeholder with id 0 and reportName \"No reports found\" is returned.\nNot paginated.",
       "inputSchema": {
         "properties": {
           "business": {
@@ -1178,6 +1178,53 @@
       },
       "name": "name_history",
       "title": "Show name history"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Open report in browser"
+      },
+      "description": "A link that opens a report in the person's own web browser, ALREADY SIGNED IN as them - the live report\nwith its Save button, choosers and input cells, where they can look and type figures in. Use it when the\nperson should see or work in the report rather than read figures in the chat (get_report_data gives the\nfigures to you). The link works ONCE and only for 10 minutes: give it to\nthe person straight away and do not reuse it - call again for a fresh one. Anyone holding an unused link\nis signed in as this person, so do not put it anywhere but your reply to them.\n\nreportId and database as for get_report_data; choices (optional) are set first, as there.\nReturns url, expiresInMinutes, and reportName. Errors report_not_found as get_report_data.",
+      "inputSchema": {
+        "properties": {
+          "business": {
+            "description": "Optional. The business this call is for, by name, e.g. \"azquo\" - it then runs there whatever business the session is in. Worth giving on writes when you work in more than one business: a new MCP session starts in the login's own business. list_businesses shows the names.",
+            "type": "string"
+          },
+          "choices": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Optional choices to set before opening, e.g. { Branch: 'North', Year: '2026' }",
+            "type": "object"
+          },
+          "database": {
+            "description": "Database name to open the report against - usually the one list_reports shows for it",
+            "type": "string"
+          },
+          "reportId": {
+            "description": "Report ID (number) or exact report name (string), from list_reports",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              }
+            ]
+          }
+        },
+        "required": [
+          "reportId",
+          "database"
+        ],
+        "type": "object"
+      },
+      "name": "open_in_browser",
+      "title": "Open report in browser"
     },
     {
       "annotations": {

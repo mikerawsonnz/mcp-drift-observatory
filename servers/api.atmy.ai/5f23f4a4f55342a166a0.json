@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "b9167b7d0fa0c70ffdecbab97c7fcf6505e04d5ff45042ac2e4dd26511442294",
+  "full_hash": "b808f1af8b373dd459466efa260a6ce2c9573e22986fabdc06c317741ce75895",
   "name": "ai.atmy/air-quality",
-  "observed_at": "2026-10-25T02:04:39.419907Z",
+  "observed_at": "2026-10-28T02:04:17.106984Z",
   "sources": [
     "official"
   ],
-  "tool_count": 6,
+  "tool_count": 11,
   "tools": [
     {
       "annotations": {
@@ -448,6 +448,221 @@
       },
       "name": "get_country_ranking",
       "title": "Country ranking"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Sensor networks"
+      },
+      "description": "The sensor networks in Atmy (Sensor.Community, AirGradient, Atmy) with their number of sensors, how many pass the quality check, and their license.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_sensor_networks",
+      "title": "Sensor networks"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Find sensors"
+      },
+      "description": "Single sensors with their latest reading (PM1, PM2.5, PM10, temperature, humidity, pressure), network and quality check: status, rating 0–10 of the last checked day, the mean rating of the last 7 days and the reasons. Filter by city, country, or a point with a radius; sort=rating puts the most reliable sensors first.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "city": {
+            "description": "City slug like \"serbia/belgrade\" or the Atmy city id (find it with search_cities).",
+            "type": "string"
+          },
+          "country": {
+            "description": "Country slug, the first part of a city slug, e.g. \"serbia\".",
+            "type": "string"
+          },
+          "lat": {
+            "description": "With lon: sensors within radius_km of this point.",
+            "maximum": 90,
+            "minimum": -90,
+            "type": "number"
+          },
+          "limit": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "lon": {
+            "maximum": 180,
+            "minimum": -180,
+            "type": "number"
+          },
+          "min_rating": {
+            "description": "Only sensors with at least this rating on their last checked day.",
+            "maximum": 10,
+            "minimum": 0,
+            "type": "number"
+          },
+          "network": {
+            "enum": [
+              "sensor_community",
+              "airgradient",
+              "atmy"
+            ],
+            "type": "string"
+          },
+          "page": {
+            "default": 1,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "quality": {
+            "default": "all",
+            "description": "passed: only sensors that pass the quality check.",
+            "enum": [
+              "all",
+              "passed"
+            ],
+            "type": "string"
+          },
+          "radius_km": {
+            "default": 5,
+            "exclusiveMinimum": 0,
+            "maximum": 50,
+            "type": "number"
+          },
+          "sort": {
+            "default": "id",
+            "enum": [
+              "id",
+              "rating"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "find_sensors",
+      "title": "Find sensors"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "One sensor"
+      },
+      "description": "One sensor by its id: location, network, license, quality check with rating and reasons, and the latest reading.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Sensor id from find_sensors.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_sensor",
+      "title": "One sensor"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Sensor readings"
+      },
+      "description": "Readings of one sensor: raw (the last 31 days, at most 7 days a call), 5-minute means (the same windows), hourly means (the last 366 days, at most 92 days a call) or daily means (UTC days of the last 366 days, with the quality check of each day). Default: the last 24 hours, or 30 days by day. Times are UTC.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "from": {
+            "description": "ISO 8601 date or time, UTC.",
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "interval": {
+            "default": "raw",
+            "enum": [
+              "raw",
+              "5min",
+              "hour",
+              "day"
+            ],
+            "type": "string"
+          },
+          "to": {
+            "description": "ISO 8601 date or time, UTC; default now.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_sensor_readings",
+      "title": "Sensor readings"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Mean of a group of sensors"
+      },
+      "description": "The mean of up to 100 sensors per 5 minutes, hour or UTC day, each sensor counted once per bucket, with the number of sensors in each bucket. Windows as in get_sensor_readings; by day at most 92 days a call.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "from": {
+            "description": "ISO 8601 date or time, UTC.",
+            "type": "string"
+          },
+          "ids": {
+            "items": {
+              "type": "integer"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "type": "array"
+          },
+          "interval": {
+            "default": "hour",
+            "enum": [
+              "5min",
+              "hour",
+              "day"
+            ],
+            "type": "string"
+          },
+          "to": {
+            "description": "ISO 8601 date or time, UTC; default now.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ids"
+        ],
+        "type": "object"
+      },
+      "name": "get_sensors_average",
+      "title": "Mean of a group of sensors"
     }
   ],
   "url": "https://api.atmy.ai/mcp"

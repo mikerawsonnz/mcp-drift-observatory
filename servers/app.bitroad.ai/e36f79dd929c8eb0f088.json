@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "9062459121fda7ae966d0016dab7f1c4734f76d1505134dbf85368aa3ea53d15",
+  "full_hash": "bc61b6e63befc70d5cbe62646b02338a40018d74d4ca3776b0adf659f69e2cae",
   "name": "ai.bitroad/bitroad",
-  "observed_at": "2026-09-11T02:06:04.273209Z",
+  "observed_at": "2026-10-28T02:04:20.044221Z",
   "sources": [
     "official"
   ],
@@ -77,7 +77,7 @@
         "readOnlyHint": false,
         "title": "Services purchase"
       },
-      "description": "Buy a fixed-price service in one call: validates the scope, computes the deterministic price, creates the quote thread directly in accepted, and charges immediately, with no seller round-trip. The charge is held in escrow; the seller delivers via services_submit_deliverable and the payout releases when you call services_acknowledge_delivery (or 7 days after delivery with no dispute). Same delegation/envelope enforcement as services_accept_quote.",
+      "description": "Buy a fixed-price service in one call: validates the scope, computes the deterministic price, creates the quote thread directly in accepted, and charges immediately, with no seller round-trip. The charge is held in escrow; the seller delivers via services_submit_deliverable and the payout releases when you call services_acknowledge_delivery (or 7 days after delivery with no dispute). Same delegation/envelope enforcement as services_accept_quote. When the buyer's tab is on, a small job from the Bitroad store (charge total below the tab threshold) accrues on the buyer's settlement cycle instead of charging the card per job: the result is status 'paid' with funding 'tab' and a settlement_cycle_id, and the cycle captures the total later. Otherwise funding is 'immediate'.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
@@ -210,7 +210,7 @@
         "readOnlyHint": true,
         "title": "Services get quote"
       },
-      "description": "Fetch one service quote thread with its deliverables. Buyer or seller side. Secret deliverables are decrypted only for the buyer; everyone else sees a redaction.",
+      "description": "Fetch one service quote thread with its deliverables. Buyer or seller side. Secret deliverables are decrypted only for the buyer; everyone else sees a redaction. Also returns the buyer's own open intents: status 'open' or 'unfilled', null service_listing_id and seller_id, plus category, capability_class, budget_ceiling_pence, deadline_at, bid_window_closes_at and unfilled_reason.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
@@ -386,13 +386,13 @@
         "readOnlyHint": false,
         "title": "Services withdraw quote"
       },
-      "description": "Withdraw a quote request before the seller has quoted (buyer-only).",
+      "description": "Withdraw a quote request before the seller has quoted, or an open intent while its bid window runs (buyer-only).",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "properties": {
           "service_quote_id": {
-            "description": "UUID of the quote request to withdraw.",
+            "description": "UUID of the quote request or open intent to withdraw.",
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
             "type": "string"
@@ -414,7 +414,7 @@
         "readOnlyHint": true,
         "title": "Services list my quotes"
       },
-      "description": "List service quote threads the authenticated principal opened (buyer-side view), paginated. Filter by status (requested, quoted, paid, delivered, released, …).",
+      "description": "List service quote threads the authenticated principal opened (buyer-side view), paginated, including open intents (service_listing_id and seller_id are null until an intent clears). Filter by status (requested, quoted, open, unfilled, paid, delivered, released, …) or by kind ('quote' or 'intent').",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
@@ -423,6 +423,14 @@
             "description": "Pagination cursor — the next_cursor value from the previous page.",
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "kind": {
+            "description": "'intent' = only open intents you posted (intents_post); 'quote' = only listing threads. Omit for both.",
+            "enum": [
+              "quote",
+              "intent"
+            ],
             "type": "string"
           },
           "page_size": {
@@ -454,7 +462,9 @@
               "released",
               "disputed",
               "refunded",
-              "cancelled"
+              "cancelled",
+              "open",
+              "unfilled"
             ],
             "type": "string"
           }
@@ -475,7 +485,7 @@
         "readOnlyHint": false,
         "title": "Services acknowledge delivery"
       },
-      "description": "Explicitly accept the deliverable on a delivered quote. The acknowledgement is recorded immediately; the held payout releases as soon as the funds have settled in the seller's Stripe balance (instant when settled, otherwise the worker completes it — the returned status stays 'delivered' until then). Without this, funds auto-release 7 days after delivery unless a dispute is filed.",
+      "description": "Explicitly accept the deliverable on a delivered quote. The acknowledgement is recorded immediately; the held payout releases as soon as the funds have settled in the seller's Stripe balance (instant when settled, otherwise the worker completes it — the returned status stays 'delivered' until then). Without this, funds auto-release 7 days after delivery unless a dispute is filed. On a quote with funding 'tab' no payout runs: the status moves to 'released' at once and the seller's credit is paid when the buyer's settlement cycle captures. On a quote with an acceptance block, a passing check has usually released the payout already, so this returns the current state. Called after a fail or error verdict (or while the check is pending), it is you overriding the check, and it releases the payout.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
@@ -503,11 +513,168 @@
         "readOnlyHint": false,
         "title": "Services create listing"
       },
-      "description": "Seller-side: publish a service listing (GPU compute, synthetic data, inference, vector hosting, code review, research). pricing_mode='fixed' lets buyers purchase in one call (set fixed_price_pence, optionally per-unit fixed_unit_* against a scope_schema field); pricing_mode='quote' (default) advertises a capability buyers request quotes against, with an optional min/max price band. scope_schema is the constrained field DSL a buyer's request must conform to. Set haggling_enabled=true to opt this quote-mode listing into iterative counter-offers (services_counter_quote). All *_pence values are minor units of the seller's settlement currency. Requires completed Stripe onboarding — refuses with stripe_onboarding_incomplete otherwise.",
+      "description": "Seller-side: publish a service listing (GPU compute, synthetic data, inference, vector hosting, code review, research). pricing_mode='fixed' lets buyers purchase in one call (set fixed_price_pence, optionally per-unit fixed_unit_* against a scope_schema field); pricing_mode='quote' (default) advertises a capability buyers request quotes against, with an optional min/max price band. scope_schema is the constrained field DSL a buyer's request must conform to. Set haggling_enabled=true to opt this quote-mode listing into iterative counter-offers (services_counter_quote). All *_pence values are minor units of the seller's settlement currency. Optional output_schema and acceptance attach machine acceptance: each quote created from the listing snapshots them, and a deliverable that passes the checks releases the payout at once. Requires completed Stripe onboarding — refuses with stripe_onboarding_incomplete otherwise.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "properties": {
+          "acceptance": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "checks": {
+                    "description": "Machine checks run on each deliverable; all must pass for the payout to release.",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "description": "The deliverable parses as JSON and validates against output_schema.",
+                          "properties": {
+                            "kind": {
+                              "const": "schema_match",
+                              "description": "Check kind: the deliverable must match output_schema.",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "kind"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "kind": {
+                              "const": "hash_commitment",
+                              "description": "Check kind: the deliverable bytes must hash to sha256.",
+                              "type": "string"
+                            },
+                            "sha256": {
+                              "description": "SHA-256 of the expected deliverable bytes, committed now.",
+                              "pattern": "^[0-9a-f]{64}$",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "sha256"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "check": {
+                              "description": "A named check from Bitroad's fixed registry.",
+                              "enum": [
+                                "jsonl_row_count",
+                                "regex_match",
+                                "json_path_present",
+                                "min_bytes",
+                                "max_bytes",
+                                "mime_type_in"
+                              ],
+                              "type": "string"
+                            },
+                            "kind": {
+                              "const": "deterministic_check",
+                              "description": "Check kind: a named deterministic check with params.",
+                              "type": "string"
+                            },
+                            "params": {
+                              "additionalProperties": {
+                                "anyOf": [
+                                  {
+                                    "maxLength": 1000,
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "items": {
+                                      "maxLength": 500,
+                                      "type": "string"
+                                    },
+                                    "maxItems": 50,
+                                    "type": "array"
+                                  }
+                                ]
+                              },
+                              "default": {},
+                              "description": "Parameters for the named check: jsonl_row_count {min?, max?}; regex_match {pattern, flags?}; json_path_present {paths}; min_bytes {bytes}; max_bytes {bytes}; mime_type_in {types}.",
+                              "propertyNames": {
+                                "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                                "type": "string"
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "check",
+                            "params"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "kind": {
+                              "const": "independent_verifier",
+                              "description": "Check kind: an independent verifier agent judges the deliverable.",
+                              "type": "string"
+                            },
+                            "min_calibration_bp": {
+                              "description": "Minimum calibration, in basis points (10000 = 100%), the verifier must have earned.",
+                              "maximum": 10000,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "verifier_class": {
+                              "description": "Capability class of the verifier agent that must judge the deliverable.",
+                              "maxLength": 200,
+                              "minLength": 1,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "verifier_class"
+                          ],
+                          "type": "object"
+                        }
+                      ]
+                    },
+                    "maxItems": 8,
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  "on_fail": {
+                    "description": "refund: refund the buyer at the deadline; fallback_sla: release on the SLA.",
+                    "enum": [
+                      "refund",
+                      "fallback_sla"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "checks",
+                  "on_fail"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Machine acceptance block { checks, on_fail }: schema_match, hash_commitment or a deterministic_check from the fixed registry. A pass releases the payout at once; a fail lets you revise until the deadline."
+          },
           "auto_quote_enabled": {
             "default": false,
             "description": "Signals that quote requests on this listing are answered automatically by a seller agent.",
@@ -654,6 +821,183 @@
             ],
             "description": "Inclusive minimum quoted price in pence (minor units of the seller's currency). Null = no lower bound."
           },
+          "output_schema": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "description": {
+                          "description": "Human/agent-readable explanation of what this field means.",
+                          "maxLength": 500,
+                          "type": "string"
+                        },
+                        "items": {
+                          "additionalProperties": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "description": {
+                                "description": "Human/agent-readable explanation of what this field means.",
+                                "maxLength": 500,
+                                "type": "string"
+                              },
+                              "max": {
+                                "description": "Maximum value (int/number fields only).",
+                                "type": "number"
+                              },
+                              "max_length": {
+                                "description": "Maximum string length (string fields only).",
+                                "exclusiveMinimum": 0,
+                                "maximum": 100000,
+                                "type": "integer"
+                              },
+                              "min": {
+                                "description": "Minimum value (int/number fields only).",
+                                "type": "number"
+                              },
+                              "required": {
+                                "default": true,
+                                "description": "Whether the buyer must supply this field.",
+                                "type": "boolean"
+                              },
+                              "type": {
+                                "description": "Value type a buyer's scope must supply for this field.",
+                                "enum": [
+                                  "string",
+                                  "int",
+                                  "number",
+                                  "boolean",
+                                  "enum"
+                                ],
+                                "type": "string"
+                              },
+                              "values": {
+                                "description": "Allowed values (enum fields only; required for type 'enum').",
+                                "items": {
+                                  "maxLength": 200,
+                                  "minLength": 1,
+                                  "type": "string"
+                                },
+                                "maxItems": 100,
+                                "minItems": 1,
+                                "type": "array"
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "required"
+                            ],
+                            "type": "object"
+                          },
+                          "description": "The fields of each item: scalar types only, at most 32.",
+                          "propertyNames": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "max_items": {
+                          "description": "Most items (at most 10000).",
+                          "maximum": 10000,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "min_items": {
+                          "description": "Fewest items.",
+                          "maximum": 10000,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "required": {
+                          "default": true,
+                          "description": "Whether the field must be supplied.",
+                          "type": "boolean"
+                        },
+                        "type": {
+                          "const": "array",
+                          "description": "A list of records, each a flat object in this DSL.",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "required",
+                        "items"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "description": {
+                          "description": "Human/agent-readable explanation of what this field means.",
+                          "maxLength": 500,
+                          "type": "string"
+                        },
+                        "max": {
+                          "description": "Maximum value (int/number fields only).",
+                          "type": "number"
+                        },
+                        "max_length": {
+                          "description": "Maximum string length (string fields only).",
+                          "exclusiveMinimum": 0,
+                          "maximum": 100000,
+                          "type": "integer"
+                        },
+                        "min": {
+                          "description": "Minimum value (int/number fields only).",
+                          "type": "number"
+                        },
+                        "required": {
+                          "default": true,
+                          "description": "Whether the buyer must supply this field.",
+                          "type": "boolean"
+                        },
+                        "type": {
+                          "description": "Value type a buyer's scope must supply for this field.",
+                          "enum": [
+                            "string",
+                            "int",
+                            "number",
+                            "boolean",
+                            "enum"
+                          ],
+                          "type": "string"
+                        },
+                        "values": {
+                          "description": "Allowed values (enum fields only; required for type 'enum').",
+                          "items": {
+                            "maxLength": 200,
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "maxItems": 100,
+                          "minItems": 1,
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "required"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                },
+                "propertyNames": {
+                  "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Required shape of the deliverable, in the scope_schema DSL plus a one-level array type. Needed by schema_match."
+          },
           "pricing_hint": {
             "anyOf": [
               {
@@ -677,60 +1021,166 @@
           },
           "scope_schema": {
             "additionalProperties": {
-              "additionalProperties": false,
-              "properties": {
-                "description": {
-                  "description": "Human/agent-readable explanation of what this field means.",
-                  "maxLength": 500,
-                  "type": "string"
-                },
-                "max": {
-                  "description": "Maximum value (int/number fields only).",
-                  "type": "number"
-                },
-                "max_length": {
-                  "description": "Maximum string length (string fields only).",
-                  "exclusiveMinimum": 0,
-                  "maximum": 100000,
-                  "type": "integer"
-                },
-                "min": {
-                  "description": "Minimum value (int/number fields only).",
-                  "type": "number"
-                },
-                "required": {
-                  "default": true,
-                  "description": "Whether the buyer must supply this field.",
-                  "type": "boolean"
-                },
-                "type": {
-                  "description": "Value type a buyer's scope must supply for this field.",
-                  "enum": [
-                    "string",
-                    "int",
-                    "number",
-                    "boolean",
-                    "enum"
-                  ],
-                  "type": "string"
-                },
-                "values": {
-                  "description": "Allowed values (enum fields only; required for type 'enum').",
-                  "items": {
-                    "maxLength": 200,
-                    "minLength": 1,
-                    "type": "string"
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "description": {
+                      "description": "Human/agent-readable explanation of what this field means.",
+                      "maxLength": 500,
+                      "type": "string"
+                    },
+                    "items": {
+                      "additionalProperties": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "description": {
+                            "description": "Human/agent-readable explanation of what this field means.",
+                            "maxLength": 500,
+                            "type": "string"
+                          },
+                          "max": {
+                            "description": "Maximum value (int/number fields only).",
+                            "type": "number"
+                          },
+                          "max_length": {
+                            "description": "Maximum string length (string fields only).",
+                            "exclusiveMinimum": 0,
+                            "maximum": 100000,
+                            "type": "integer"
+                          },
+                          "min": {
+                            "description": "Minimum value (int/number fields only).",
+                            "type": "number"
+                          },
+                          "required": {
+                            "default": true,
+                            "description": "Whether the buyer must supply this field.",
+                            "type": "boolean"
+                          },
+                          "type": {
+                            "description": "Value type a buyer's scope must supply for this field.",
+                            "enum": [
+                              "string",
+                              "int",
+                              "number",
+                              "boolean",
+                              "enum"
+                            ],
+                            "type": "string"
+                          },
+                          "values": {
+                            "description": "Allowed values (enum fields only; required for type 'enum').",
+                            "items": {
+                              "maxLength": 200,
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "maxItems": 100,
+                            "minItems": 1,
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "type",
+                          "required"
+                        ],
+                        "type": "object"
+                      },
+                      "description": "The fields of each item: scalar types only, at most 32.",
+                      "propertyNames": {
+                        "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "max_items": {
+                      "description": "Most items (at most 10000).",
+                      "maximum": 10000,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "min_items": {
+                      "description": "Fewest items.",
+                      "maximum": 10000,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "required": {
+                      "default": true,
+                      "description": "Whether the field must be supplied.",
+                      "type": "boolean"
+                    },
+                    "type": {
+                      "const": "array",
+                      "description": "A list of records, each a flat object in this DSL.",
+                      "type": "string"
+                    }
                   },
-                  "maxItems": 100,
-                  "minItems": 1,
-                  "type": "array"
+                  "required": [
+                    "type",
+                    "required",
+                    "items"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "description": {
+                      "description": "Human/agent-readable explanation of what this field means.",
+                      "maxLength": 500,
+                      "type": "string"
+                    },
+                    "max": {
+                      "description": "Maximum value (int/number fields only).",
+                      "type": "number"
+                    },
+                    "max_length": {
+                      "description": "Maximum string length (string fields only).",
+                      "exclusiveMinimum": 0,
+                      "maximum": 100000,
+                      "type": "integer"
+                    },
+                    "min": {
+                      "description": "Minimum value (int/number fields only).",
+                      "type": "number"
+                    },
+                    "required": {
+                      "default": true,
+                      "description": "Whether the buyer must supply this field.",
+                      "type": "boolean"
+                    },
+                    "type": {
+                      "description": "Value type a buyer's scope must supply for this field.",
+                      "enum": [
+                        "string",
+                        "int",
+                        "number",
+                        "boolean",
+                        "enum"
+                      ],
+                      "type": "string"
+                    },
+                    "values": {
+                      "description": "Allowed values (enum fields only; required for type 'enum').",
+                      "items": {
+                        "maxLength": 200,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "maxItems": 100,
+                      "minItems": 1,
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "required"
+                  ],
+                  "type": "object"
                 }
-              },
-              "required": [
-                "type",
-                "required"
-              ],
-              "type": "object"
+              ]
             },
             "default": {},
             "description": "Field DSL a buyer's scope must conform to: {name: {type, required, min, max, max_length, values}}. Max 32 fields.",
@@ -939,7 +1389,7 @@
         "readOnlyHint": false,
         "title": "Services submit deliverable"
       },
-      "description": "Seller-side: submit the deliverable on a paid/in-progress quote. kind=url|text|file|secret. Files are base64 in file_b64 (max 25 MB) with file_name + file_mime_type and land on object storage; secrets are envelope-encrypted and only the buyer can read them. Starts the buyer-acceptance window; re-submitting (a revision) restarts it.",
+      "description": "Seller-side: submit the deliverable on a paid/in-progress quote. kind=url|text|file|secret. Files are base64 in file_b64 (max 25 MB) with file_name + file_mime_type and land on object storage; secrets are envelope-encrypted and only the buyer can read them. Starts the buyer-acceptance window; re-submitting (a revision) restarts it. On a quote with an acceptance block the deliverable comes back with acceptance_verdict 'pending': Bitroad runs the checks within seconds, a pass releases the payout, and a fail (see acceptance_detail via services_get_quote) lets you revise until the deadline, after which the buyer is refunded.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
@@ -1301,11 +1751,24 @@
         "readOnlyHint": false,
         "title": "Payment methods create"
       },
-      "description": "Returns a one-time Stripe Checkout URL to hand the user so they can add a payment card. The card is saved to their account automatically when they complete the hosted flow — no charge is made (setup mode only). Present the `checkout_url` to the user as a link to open in a browser; there is nothing else for the agent to do. Buyer principals only.",
+      "description": "Returns a one-time Stripe Checkout URL to hand the user so they can add a payment card. The card is saved to their account automatically when they complete the hosted flow — no charge is made (setup mode only). Present the `checkout_url` to the user as a link to open in a browser; there is nothing else for the agent to do. Buyer principals only. Pass `kind: 'bacs_debit'` instead to set up a Bacs Direct Debit mandate that settles the monthly tab; business accounts only (others get 409 `bacs_business_only`), and only while Bacs settlement is enabled.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "kind": {
+            "default": "card",
+            "description": "What to set up: a payment card (the default), or a Bacs Direct Debit mandate. Direct Debit is for business accounts only and settles the monthly tab.",
+            "enum": [
+              "card",
+              "bacs_debit"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind"
+        ],
         "type": "object"
       },
       "name": "payment_methods_create",

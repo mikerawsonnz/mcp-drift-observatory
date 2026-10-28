@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "1e2a590483683b568f03f713910f8fc85f5e2f4e6d3805695d7851236a2c6a07",
+  "full_hash": "33e82c56ad95618253cc0ede3acb0190beb8bdc7fb584ece21f6f25b9559b4da",
   "name": "ai.beatra/beatra",
-  "observed_at": "2026-10-26T02:04:14.342379Z",
+  "observed_at": "2026-10-28T02:04:18.490152Z",
   "sources": [
     "official"
   ],
-  "tool_count": 31,
+  "tool_count": 32,
   "tools": [
     {
       "annotations": {
@@ -9556,7 +9556,7 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Synthesize speech using a Beatra voice ID. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry.",
+      "description": "Synthesize speech using a Beatra voice ID. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry. The input accepts speech markup. Read the vocabulary and limits from the model card returned by beatra.models.list. beatra.speech.validate checks the input before you submit and does not charge credits.",
       "inputSchema": {
         "properties": {
           "client_request_id": {
@@ -9575,7 +9575,8 @@
                   "fearful",
                   "disgusted",
                   "surprised",
-                  "calm"
+                  "calm",
+                  "fluent"
                 ],
                 "type": "string"
               },
@@ -10022,6 +10023,501 @@
         "type": "object"
       },
       "title": "Synthesize Speech"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Check a speech request before paying for it: parse the markup, list warnings, count weighted characters, and return the credit price. This call does not create a task, charge credits, or call the speech engine. The markup vocabulary is on the model card from beatra.models.list.",
+      "inputSchema": {
+        "properties": {
+          "emotion": {
+            "anyOf": [
+              {
+                "enum": [
+                  "happy",
+                  "sad",
+                  "angry",
+                  "fearful",
+                  "disgusted",
+                  "surprised",
+                  "calm",
+                  "fluent"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Emotion preset for the whole request",
+            "title": "Emotion"
+          },
+          "format": {
+            "default": "mp3",
+            "description": "Audio format the create call would use",
+            "enum": [
+              "mp3",
+              "wav",
+              "flac",
+              "opus",
+              "pcm"
+            ],
+            "title": "Format",
+            "type": "string"
+          },
+          "input": {
+            "description": "Text to check",
+            "maxLength": 50000,
+            "minLength": 1,
+            "title": "Input",
+            "type": "string"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "maxLength": 32,
+                "minLength": 2,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "BCP-47 language hint",
+            "title": "Language"
+          },
+          "model": {
+            "default": "auto",
+            "description": "Model to check against (default auto)",
+            "enum": [
+              "auto",
+              "minimax-speech-2.8-hd",
+              "minimax-speech-2.8-turbo"
+            ],
+            "title": "Model",
+            "type": "string"
+          },
+          "model_options": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Expert provider options, same as the create call",
+            "title": "Model Options"
+          },
+          "pitch": {
+            "default": 0.0,
+            "description": "Normalized pitch (-1.0 to 1.0)",
+            "maximum": 1.0,
+            "minimum": -1.0,
+            "title": "Pitch",
+            "type": "number"
+          },
+          "sample_rate": {
+            "anyOf": [
+              {
+                "enum": [
+                  8000,
+                  16000,
+                  22050,
+                  24000,
+                  32000,
+                  44100
+                ],
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Sample rate in Hz for the chosen format",
+            "title": "Sample Rate"
+          },
+          "speed": {
+            "default": 1.0,
+            "description": "Speaking rate (0.5 to 2.0)",
+            "maximum": 2.0,
+            "minimum": 0.5,
+            "title": "Speed",
+            "type": "number"
+          },
+          "subtitle_enable": {
+            "default": false,
+            "description": "Whether the create call would request subtitles",
+            "title": "Subtitle Enable",
+            "type": "boolean"
+          },
+          "voice": {
+            "description": "Opaque beatra voice_id (preset or cloned)",
+            "title": "Voice",
+            "type": "string"
+          },
+          "volume": {
+            "default": 1.0,
+            "description": "Volume (0 to 10)",
+            "exclusiveMinimum": 0,
+            "maximum": 10,
+            "title": "Volume",
+            "type": "number"
+          }
+        },
+        "required": [
+          "voice",
+          "input"
+        ],
+        "title": "McpSpeechValidateInput",
+        "type": "object"
+      },
+      "name": "beatra.speech.validate",
+      "outputSchema": {
+        "$defs": {
+          "SpeechMarkupPause": {
+            "additionalProperties": false,
+            "properties": {
+              "note": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Note"
+              },
+              "range": {
+                "items": {
+                  "type": "number"
+                },
+                "title": "Range",
+                "type": "array"
+              },
+              "syntax": {
+                "title": "Syntax",
+                "type": "string"
+              }
+            },
+            "required": [
+              "syntax",
+              "range"
+            ],
+            "title": "SpeechMarkupPause",
+            "type": "object"
+          },
+          "SpeechMarkupPronunciation": {
+            "additionalProperties": false,
+            "properties": {
+              "readings": {
+                "title": "Readings",
+                "type": "string"
+              },
+              "syntax": {
+                "title": "Syntax",
+                "type": "string"
+              }
+            },
+            "required": [
+              "syntax",
+              "readings"
+            ],
+            "title": "SpeechMarkupPronunciation",
+            "type": "object"
+          },
+          "SpeechMarkupTag": {
+            "additionalProperties": false,
+            "properties": {
+              "meaning": {
+                "title": "Meaning",
+                "type": "string"
+              },
+              "token": {
+                "title": "Token",
+                "type": "string"
+              }
+            },
+            "required": [
+              "token",
+              "meaning"
+            ],
+            "title": "SpeechMarkupTag",
+            "type": "object"
+          },
+          "SpeechScriptMarkup": {
+            "additionalProperties": false,
+            "properties": {
+              "escape": {
+                "title": "Escape",
+                "type": "string"
+              },
+              "pause": {
+                "$ref": "#/$defs/SpeechMarkupPause"
+              },
+              "pronunciation": {
+                "$ref": "#/$defs/SpeechMarkupPronunciation"
+              },
+              "tags": {
+                "items": {
+                  "$ref": "#/$defs/SpeechMarkupTag"
+                },
+                "title": "Tags",
+                "type": "array"
+              }
+            },
+            "required": [
+              "pause",
+              "tags",
+              "pronunciation",
+              "escape"
+            ],
+            "title": "SpeechScriptMarkup",
+            "type": "object"
+          },
+          "SpeechValidationExecution": {
+            "properties": {
+              "mode": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Execution path the create call would take (sync or async)",
+                "title": "Mode"
+              }
+            },
+            "title": "SpeechValidationExecution",
+            "type": "object"
+          },
+          "TaskWarning": {
+            "properties": {
+              "code": {
+                "description": "e.g. option_clamped / auto_routed",
+                "title": "Code",
+                "type": "string"
+              },
+              "field": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Field"
+              },
+              "message": {
+                "title": "Message",
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "title": "TaskWarning",
+            "type": "object"
+          },
+          "ToolError": {
+            "additionalProperties": true,
+            "description": "Stable MCP tool-error envelope embedded in structuredContent.\n\nSame branching vocabulary as the REST error envelope: `code` is a registry\nerror code (plus the OAuth-standard `insufficient_scope`), `retryable`\ntells the agent whether an identical retry can succeed, `param` is a JSON\nPointer to the offending argument, and `details` carries correction facts.",
+            "properties": {
+              "code": {
+                "title": "Code",
+                "type": "string"
+              },
+              "details": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Details"
+              },
+              "jsonrpc_code": {
+                "title": "Jsonrpc Code",
+                "type": "integer"
+              },
+              "message": {
+                "title": "Message",
+                "type": "string"
+              },
+              "param": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Param"
+              },
+              "retryable": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Retryable"
+              },
+              "type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Type"
+              }
+            },
+            "required": [
+              "code",
+              "jsonrpc_code",
+              "message"
+            ],
+            "title": "ToolError",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ToolError"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "execution": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/SpeechValidationExecution"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "limitations": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Limitations"
+          },
+          "price_credits": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Price Credits"
+          },
+          "script_markup": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/SpeechScriptMarkup"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "valid": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Valid"
+          },
+          "warnings": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/$defs/TaskWarning"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Warnings"
+          },
+          "weighted_characters": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Weighted Characters"
+          }
+        },
+        "title": "McpSpeechValidateOutput",
+        "type": "object"
+      },
+      "title": "Validate Speech"
     },
     {
       "annotations": {
@@ -10551,6 +11047,19 @@
       "description": "List preset and tenant-owned voices available for speech synthesis.",
       "inputSchema": {
         "properties": {
+          "age_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "child, youth, adult, or senior",
+            "title": "Age Group"
+          },
           "category": {
             "anyOf": [
               {
@@ -10566,6 +11075,20 @@
             ],
             "default": null,
             "title": "Category"
+          },
+          "cursor": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "voice_id of the last voice on the previous page",
+            "title": "Cursor"
           },
           "gender": {
             "anyOf": [
@@ -10597,6 +11120,27 @@
             "default": null,
             "title": "Language"
           },
+          "limit": {
+            "default": 50,
+            "description": "Page size",
+            "maximum": 500,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Compatible model id",
+            "title": "Model"
+          },
           "query": {
             "anyOf": [
               {
@@ -10609,6 +11153,20 @@
             ],
             "default": null,
             "title": "Query"
+          },
+          "voice_id": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Exact voice_id",
+            "title": "Voice Id"
           }
         },
         "title": "VoiceListInput",
@@ -10705,14 +11263,9 @@
                 "default": null,
                 "title": "Accent"
               },
-              "age": {
+              "age_group": {
                 "anyOf": [
                   {
-                    "enum": [
-                      "adult",
-                      "child",
-                      "elder"
-                    ],
                     "type": "string"
                   },
                   {
@@ -10720,7 +11273,8 @@
                   }
                 ],
                 "default": null,
-                "title": "Age"
+                "description": "Age group: child, youth, adult, or senior",
+                "title": "Age Group"
               },
               "category": {
                 "enum": [
@@ -10791,6 +11345,19 @@
                 "title": "Languages Supported",
                 "type": "array"
               },
+              "persona": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Short description of how the voice sounds and where it fits",
+                "title": "Persona"
+              },
               "preview_url": {
                 "anyOf": [
                   {
@@ -10802,6 +11369,19 @@
                 ],
                 "default": null,
                 "title": "Preview Url"
+              },
+              "preview_url_scene": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Scene sample URL. Null until a sample has been published",
+                "title": "Preview Url Scene"
               },
               "status": {
                 "default": "ready",
@@ -10859,6 +11439,23 @@
               }
             ],
             "default": null
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Next Cursor"
+          },
+          "total_count": {
+            "default": 0,
+            "title": "Total Count",
+            "type": "integer"
           },
           "voices": {
             "items": {
@@ -13361,6 +13958,13 @@
                 "title": "Language Auto",
                 "type": "boolean"
               },
+              "limitations": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Limitations",
+                "type": "array"
+              },
               "minimum_billable_characters": {
                 "const": 0,
                 "default": 0,
@@ -13395,6 +13999,17 @@
                 "title": "Sample Rates By Format",
                 "type": "object"
               },
+              "script_markup": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/SpeechScriptMarkup"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "speed": {
                 "$ref": "#/$defs/AudioNumberRange"
               },
@@ -13419,6 +14034,108 @@
               "emotions"
             ],
             "title": "SpeechConstraintsCard",
+            "type": "object"
+          },
+          "SpeechMarkupPause": {
+            "additionalProperties": false,
+            "properties": {
+              "note": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Note"
+              },
+              "range": {
+                "items": {
+                  "type": "number"
+                },
+                "title": "Range",
+                "type": "array"
+              },
+              "syntax": {
+                "title": "Syntax",
+                "type": "string"
+              }
+            },
+            "required": [
+              "syntax",
+              "range"
+            ],
+            "title": "SpeechMarkupPause",
+            "type": "object"
+          },
+          "SpeechMarkupPronunciation": {
+            "additionalProperties": false,
+            "properties": {
+              "readings": {
+                "title": "Readings",
+                "type": "string"
+              },
+              "syntax": {
+                "title": "Syntax",
+                "type": "string"
+              }
+            },
+            "required": [
+              "syntax",
+              "readings"
+            ],
+            "title": "SpeechMarkupPronunciation",
+            "type": "object"
+          },
+          "SpeechMarkupTag": {
+            "additionalProperties": false,
+            "properties": {
+              "meaning": {
+                "title": "Meaning",
+                "type": "string"
+              },
+              "token": {
+                "title": "Token",
+                "type": "string"
+              }
+            },
+            "required": [
+              "token",
+              "meaning"
+            ],
+            "title": "SpeechMarkupTag",
+            "type": "object"
+          },
+          "SpeechScriptMarkup": {
+            "additionalProperties": false,
+            "properties": {
+              "escape": {
+                "title": "Escape",
+                "type": "string"
+              },
+              "pause": {
+                "$ref": "#/$defs/SpeechMarkupPause"
+              },
+              "pronunciation": {
+                "$ref": "#/$defs/SpeechMarkupPronunciation"
+              },
+              "tags": {
+                "items": {
+                  "$ref": "#/$defs/SpeechMarkupTag"
+                },
+                "title": "Tags",
+                "type": "array"
+              }
+            },
+            "required": [
+              "pause",
+              "tags",
+              "pronunciation",
+              "escape"
+            ],
+            "title": "SpeechScriptMarkup",
             "type": "object"
           },
           "ToolError": {
