@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "3145bf3fecdc069d716ae3c6111e24152bc62b07dec6138dd20e399c713cf2db",
+  "full_hash": "9913e54d6a507ba50f9fefd1dc4f49aa8ff7d6f3b2799d7004c9848fc1a8574e",
   "name": "ai.athenahq/mcp",
-  "observed_at": "2026-10-28T02:04:17.151225Z",
+  "observed_at": "2026-10-29T02:04:57.714186Z",
   "sources": [
     "official"
   ],
-  "tool_count": 111,
+  "tool_count": 113,
   "tools": [
     {
       "_meta": {
@@ -11175,6 +11175,130 @@
         "destructiveHint": false,
         "openWorldHint": false,
         "readOnlyHint": false,
+        "title": "Add competitors"
+      },
+      "description": "Start tracking competitors on a website, 1 to 25 per call, under the same rules as the Competitors page. Each competitor needs a name and its website url, or no_website: true for a brand with no website of its own; identifiers and additional_urls are optional. Returns one result per competitor, in order: added, already_tracked (the website already tracks that url; nothing changes), or rejected with the reason (a url on the website's own domains, an invalid url, or the limit of 500 competitors per website). New AI responses count mentions of an added competitor right away. Past responses are reanalyzed only when someone runs the backfill on the Competitors page, which costs credits; this tool never starts it and costs no credits.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "competitors": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "additional_urls": {
+                  "description": "Other domains the competitor owns, e.g. acme.co.uk.",
+                  "items": {
+                    "maxLength": 2048,
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "identifiers": {
+                  "description": "Other names and aliases to count as a mention, beyond the name and domain.",
+                  "items": {
+                    "maxLength": 500,
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "name": {
+                  "maxLength": 255,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "no_website": {
+                  "const": true,
+                  "description": "Pass true only for a brand that has no website of its own. Mentions still match on the name and identifiers.",
+                  "type": "boolean"
+                },
+                "url": {
+                  "description": "The competitor's website, e.g. acme.com. Required unless no_website is true.",
+                  "maxLength": 2048,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "website_id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "website_id",
+          "competitors"
+        ],
+        "type": "object"
+      },
+      "name": "add_competitors",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "results": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "competitor_id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "added",
+                    "already_tracked",
+                    "rejected"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "status"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [],
+          "type": "oauth2"
+        }
+      ]
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
         "title": "Add content"
       },
       "description": "Add an article that is already written (for example, one drafted in this conversation) to the website's Content Hub as an editable draft. Same as pasting it into the Content Hub's blank editor: no AI model runs and no content credits are spent. Use create_content instead when Athena should research and write the piece. body is the full article in Markdown and is stored as given, except that link and image destinations with an unsafe scheme (javascript:, data:) become #. The item is created with type manual at stage generated, and the body is recorded as version 1, so get_content_draft, edit_content, revise_content and get_content_versions work on it right away. Pass title, or it is taken from the body's first heading (else its first line). sheet_id must be a tab from get_content_hub_sheets: a sheet-type tab keeps the item, a view-type tab or no sheet_id puts it in the shared pool. The item is not published. Once it is live on the site, call publish_content with its URL to start citation tracking.",
@@ -16390,6 +16514,92 @@
           },
           "url": {
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [],
+          "type": "oauth2"
+        }
+      ]
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Remove competitors"
+      },
+      "description": "Stop tracking competitors on a website, 1 to 25 per call, by id from get_competitors, as the Competitors page's delete does. Returns one result per id, in order: removed, no_change (already removed), or not_found (not a competitor of this website). Past mentions and citations are kept, and a removed competitor can be restored on the Competitors page. Reanalyzing past responses happens only when someone runs the backfill on the Competitors page, which costs credits; this tool never starts it and costs no credits.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "competitor_ids": {
+            "description": "The competitors to stop tracking, by id from get_competitors.",
+            "items": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "website_id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "website_id",
+          "competitor_ids"
+        ],
+        "type": "object"
+      },
+      "name": "remove_competitors",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "results": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "competitor_id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "removed",
+                    "no_change",
+                    "not_found"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "competitor_id",
+                "status"
+              ],
+              "type": "object"
+            },
+            "type": "array"
           }
         },
         "type": "object"

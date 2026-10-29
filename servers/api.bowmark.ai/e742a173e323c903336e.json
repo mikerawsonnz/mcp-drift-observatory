@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "5f687556402f61a7630cbafa4274f9a76cdfc23fe50277965d1e82ee05e5352f",
+  "full_hash": "fa2f22487997557141dcde34e52f6b9e1f9dbb1cba25059083d197a6b3b55421",
   "name": "ai.bowmark/bowmark",
-  "observed_at": "2026-10-27T02:05:51.366091Z",
+  "observed_at": "2026-10-29T02:05:02.294738Z",
   "sources": [
     "official"
   ],
-  "tool_count": 16,
+  "tool_count": 23,
   "tools": [
     {
       "_meta": {
@@ -272,6 +272,296 @@
       },
       "name": "run_view",
       "title": "Run view"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ],
+        "ui": {
+          "resourceUri": "ui://bowmark/jig-v1"
+        },
+        "ui/resourceUri": "ui://bowmark/jig-v1"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Make the user a \"jig\": their own copy of a website, running through Bowmark, that you curate for them as they talk to you. Asked for \"a jig of YouTube\" or \"Amazon, but with no promotions and the best products first\", you build a page that LOOKS like that site — its layout, its views, its controls — with Bowmark's name and logo wherever the site's logo would be, and every list on it filled by Bowmark library functions as this user. Then you stay in the loop: the user keeps talking to you in this chat, and you change what the page shows (`jig_update` state) or how it looks (`jig_update` html) while their tab updates live.\n\nGive the user the link that comes back and tell them to open it; that tab is the app. Start from a built-in (`template`) when one fits; otherwise write the page yourself (`html`). A user's jigs are kept: before building one they say they already have, find it with `jig_list` and reopen it with `jig_open({ jigId })`. Before you curate (\"clear the slop\", \"why is this here\"), call `jig_look` to see what the page is showing them right now and what they just did on it.\n\nInside the page there is one global, `window.bowmark`:\n- `await bowmark.call(\"providers.youtube.search\", { query: \"…\" })` — any library function, by the path `get_library` shows, without the `bowmark.` prefix. It is a real run for this user: their logins, their account, metered like `run`. Look the site up in `get_library` first so the page only calls functions that exist.\n- `await bowmark.batch([{ fn, args }, …])` — up to 8 calls in ONE run, in parallel; resolves to `[{ ok, value } | { ok: false, error }]`.\n- `bowmark.state` and `bowmark.onState(fn)` — the state you pass here and change with `jig_update`. Put every curation choice in state (filters, hidden items, ranking words, your picks with a reason) so you can change it from the chat without rewriting the page.\n- `await bowmark.setState(patch)` — the page saves the user's click (hide this, mute that) into that same state.\n- `bowmark.show({ view, items: [...] })` — call it after every render with what is on screen (a few fields per item: id, title, seller or channel, price). That is what `jig_look` shows you.\n- `bowmark.tellModel(text)` — note what the user just did (watched X, opened Y); you see it in `jig_look`. `bowmark.say(text)` posts into this chat as the user and only works when the page is open inside the chat.\n- `bowmark.open(url)`; `bowmark.theme` is \"light\" or \"dark\" (`bowmark.onTheme(fn)`), also set as `data-theme` on <html>.\nThe page has no `fetch` and loads no external script, stylesheet or font. At its link, images and embedded players load from any site; inside a chat panel only YouTube's do.\nA call that needs a sign-in pauses behind a \"Sign in\" banner the page draws for you, and resumes once the user has signed in.\nThere is no chat box in the page: the user talks to you here, and the page follows.\n\nBOWMARK'S LOOK, THE SITE'S LAYOUT. The user judges Bowmark by this page. Arrange the page the way the site is arranged (its header, search, navigation, grid or list, detail view), but build it from the kit's premade Bowmark components, in Bowmark's colors and type, never the site's. The name and logo are always Bowmark's: put `<a class=\"bm-brand\"></a>` where the site's logo goes and leave it empty; it draws the Bowmark mark and the word Bowmark itself. Never title the page with a name you made up.\n- Frame: `.bm-app` > `header.bm-topbar` (`.bm-iconbtn` menu, `.bm-brand`, `form.bm-search` with an input and a button, `.bm-topbar-end` holding `<span class=\"bm-live\">Curated by Claude</span>`) + `.bm-body` > `nav.bm-sidenav` (`.bm-navitem` with an svg icon, `.is-active`; `.bm-navlabel`; `.bm-sep`) + `main.bm-main`.\n- Content: `.bm-chipbar` of `.bm-chip` (`.is-active`); `.bm-heading` (`<h2>`, `.bm-sub`, `.bm-end`); `.bm-media-grid` of `.bm-media` (`.bm-thumb` with `.bm-duration`, `.bm-badge` for your pick; `.bm-media-body` with `.bm-avatar`, `.bm-media-title`, `.bm-media-meta`, `.bm-why`; `.bm-more` + `.bm-menu`); `.bm-product-grid` of `.bm-product` (`.bm-product-img`, `.bm-product-title`, `.bm-stars`, `.bm-price` + `.bm-was`, `.bm-why`); `.bm-list` of `.bm-row` (`.is-large` for search results; `.bm-thumb` + `.bm-row-body`); a detail view: `.bm-watch` (`.bm-player` holding an iframe, `.bm-detail-title`, `.bm-actions` of `.bm-pill`, `.is-primary` for the one main action, `.bm-box`).\n- Your curation, visible: `.bm-rules` of `.bm-rule` (`.bm-kind`, `.is-off`; `.bm-text`; an × button that removes it), `.bm-note`. State: `.bm-skel` while a call runs, `.bm-empty` when there is nothing, `.bm-toast` (with an Undo button) after a click.\n- Tokens if you need more: `--bg --surface --surface-2 --surface-3 --fg --fg-2 --fg-3 --line --line-2 --accent --accent-ink --accent-soft --mark --star --cta`, radii `--r-sm --r --r-lg --r-full`, `--font`, `--shadow-1 --shadow-2`; dark mode is already handled. Never hard-code a color in a rule.\nRules: Bowmark's font only, no monospace outside code; never truncate your own reasoning; mark what you picked and say why; works from a phone up to a full desktop window; real images over drawn ones; every control does something visible when clicked.\n\nBuilt-in jigs:\n- `youtube-feed` — A full YouTube-style app over the user's own account: their home feed (plus searches you add) re-ranked and filtered by rules you write from the conversation, your hand-picked videos first with your reason, search, a watch page with Up next, and their Subscriptions, History, Watch later and Liked videos. 'Not interested' clicks and rule removals come back into state.\n  State it reads: `heading`, `note` (one line: what you are curating for), `topics` (chips across the top of Home; defaults to `prefer`), `prefer` (words that rank a video up), `avoid` (words that hide it), `mutedChannels`, `hidden` (videoIds), `maxMinutes`, `minMinutes`, `hideShorts` (default true), `home` (default true: include the home feed), `searches` (up to 6 extra YouTube searches), `limit` (home feed size, default 30), `picks` ([{ videoId, reason, title, channel, length }] shown first — fetch them yourself with `run`, copy the title, channel and length from what came back, and say WHY in `reason`, one or two plain sentences).",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "html": {
+            "description": "Your own page: a whole HTML document with inline <style> and <script>. It gets a `bowmark` global (see the tool description) and nothing else — no fetch, no CDN.",
+            "type": "string"
+          },
+          "jigId": {
+            "description": "Reopen a jig the user already has (from `jig_list`), with its page and state as they left them. Pass nothing else with it.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "state": {
+            "additionalProperties": {},
+            "description": "The page's starting state — what you steer it with later via `jig_update`.",
+            "type": "object"
+          },
+          "template": {
+            "description": "Start from a built-in jig instead of writing `html`.",
+            "enum": [
+              "youtube-feed"
+            ],
+            "type": "string"
+          },
+          "title": {
+            "description": "Shown above the page.",
+            "maxLength": 120,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "jig_open",
+      "title": "Open a page for the user (jig)"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "The jigs this user has made, newest change first: id, title, the built-in it started from, and when it last changed. Call it when the user mentions a page they made before (\"my YouTube feed\", \"that dashboard\"), then reopen it with `jig_open({ jigId })` instead of building a new one.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "jig_list",
+      "title": "List the user's pages (jigs)"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Change a page you opened with `jig_open`: merge `state` into its state (a key set to null is removed), or replace its `html` or `title`. The open page updates itself within a few seconds — do not call `jig_open` again. Use this whenever the user asks, in chat, for the page to show something different.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "html": {
+            "type": "string"
+          },
+          "jigId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "replaceState": {
+            "description": "Start from {} instead of merging.",
+            "type": "boolean"
+          },
+          "state": {
+            "additionalProperties": {},
+            "type": "object"
+          },
+          "title": {
+            "maxLength": 120,
+            "type": "string"
+          }
+        },
+        "required": [
+          "jigId"
+        ],
+        "type": "object"
+      },
+      "name": "jig_update",
+      "title": "Steer an open page (jig)"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://bowmark/jig-v1",
+          "visibility": [
+            "app"
+          ]
+        },
+        "ui/resourceUri": "ui://bowmark/jig-v1"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Used by an open jig to pick up its latest state. You do not need to call this.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "jigId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "since": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "jigId"
+        ],
+        "type": "object"
+      },
+      "name": "jig_view",
+      "title": "Jig view"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://bowmark/jig-v1",
+          "visibility": [
+            "app"
+          ]
+        },
+        "ui/resourceUri": "ui://bowmark/jig-v1"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Used by an open jig to report what it shows. You do not need to call this.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "event": {
+            "type": "string"
+          },
+          "jigId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "snapshot": {}
+        },
+        "required": [
+          "jigId"
+        ],
+        "type": "object"
+      },
+      "name": "jig_seen",
+      "title": "Jig seen"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "See what an open jig is showing the user right now — the items on screen, which view they are on — plus what they just did on it (watched, hid, searched) and its current state. Call it before you curate: when the user says \"clear the slop\" or \"why is this here\", look first, then change the page with `jig_update`.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "jigId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "jigId"
+        ],
+        "type": "object"
+      },
+      "name": "jig_look",
+      "title": "Look at a page (jig)"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://bowmark/jig-v1",
+          "visibility": [
+            "app"
+          ]
+        },
+        "ui/resourceUri": "ui://bowmark/jig-v1"
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Used by an open jig to call the library. You do not need to call this — use `run`.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "calls": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "args": {},
+                "fn": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "fn"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "jigId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "runId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "jigId"
+        ],
+        "type": "object"
+      },
+      "name": "jig_call",
+      "title": "Jig call"
     },
     {
       "_meta": {

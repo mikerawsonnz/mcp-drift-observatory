@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "33e82c56ad95618253cc0ede3acb0190beb8bdc7fb584ece21f6f25b9559b4da",
+  "full_hash": "193e34c617f08bf6e624bf35368d88656def87439b5474b7eb246ddcc5eb496f",
   "name": "ai.beatra/beatra",
-  "observed_at": "2026-10-28T02:04:18.490152Z",
+  "observed_at": "2026-10-29T02:04:58.980027Z",
   "sources": [
     "official"
   ],
@@ -9601,7 +9601,7 @@
             "type": "string"
           },
           "input": {
-            "description": "Text to synthesize",
+            "description": "Text to synthesize. It may contain speech markup such as {pause 0.5}, {laugh}, {pron 行 hang2} or {sub W3C 万维网联盟}; read the vocabulary and limits from the model card (beatra.models.list).",
             "maxLength": 50000,
             "minLength": 1,
             "title": "Input",
@@ -10071,7 +10071,7 @@
             "type": "string"
           },
           "input": {
-            "description": "Text to check",
+            "description": "Text to synthesize. It may contain speech markup such as {pause 0.5}, {laugh}, {pron 行 hang2} or {sub W3C 万维网联盟}; read the vocabulary and limits from the model card (beatra.models.list).",
             "maxLength": 50000,
             "minLength": 1,
             "title": "Input",
@@ -10184,6 +10184,25 @@
       "name": "beatra.speech.validate",
       "outputSchema": {
         "$defs": {
+          "SpeechMarkupAlias": {
+            "additionalProperties": false,
+            "properties": {
+              "note": {
+                "title": "Note",
+                "type": "string"
+              },
+              "syntax": {
+                "title": "Syntax",
+                "type": "string"
+              }
+            },
+            "required": [
+              "syntax",
+              "note"
+            ],
+            "title": "SpeechMarkupAlias",
+            "type": "object"
+          },
           "SpeechMarkupPause": {
             "additionalProperties": false,
             "properties": {
@@ -10259,6 +10278,17 @@
           "SpeechScriptMarkup": {
             "additionalProperties": false,
             "properties": {
+              "alias": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/SpeechMarkupAlias"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "escape": {
                 "title": "Escape",
                 "type": "string"
@@ -11153,6 +11183,50 @@
             ],
             "default": null,
             "title": "Query"
+          },
+          "search": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Case-insensitive text found in the display name or the persona",
+            "title": "Search"
+          },
+          "use_case": {
+            "anyOf": [
+              {
+                "enum": [
+                  "audiobook",
+                  "narration",
+                  "news",
+                  "ads",
+                  "conversational",
+                  "business",
+                  "character",
+                  "ivr",
+                  "course",
+                  "podcast",
+                  "gaming",
+                  "shorts",
+                  "education",
+                  "support",
+                  "social"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Voices tagged with this use case",
+            "title": "Use Case"
           },
           "voice_id": {
             "anyOf": [
@@ -14036,6 +14110,25 @@
             "title": "SpeechConstraintsCard",
             "type": "object"
           },
+          "SpeechMarkupAlias": {
+            "additionalProperties": false,
+            "properties": {
+              "note": {
+                "title": "Note",
+                "type": "string"
+              },
+              "syntax": {
+                "title": "Syntax",
+                "type": "string"
+              }
+            },
+            "required": [
+              "syntax",
+              "note"
+            ],
+            "title": "SpeechMarkupAlias",
+            "type": "object"
+          },
           "SpeechMarkupPause": {
             "additionalProperties": false,
             "properties": {
@@ -14111,6 +14204,17 @@
           "SpeechScriptMarkup": {
             "additionalProperties": false,
             "properties": {
+              "alias": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/SpeechMarkupAlias"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "escape": {
                 "title": "Escape",
                 "type": "string"
@@ -15643,7 +15747,7 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
-      "description": "Read the current Beatra credit balance for this account, including the next expiring batch. Also returns how many unfinished creations this account can keep at a time. This call is read-only and does not charge. It does not top up, change the wallet, or estimate a generation; use beatra.models.list for prices. On insufficient_balance, relay that error's message instead of calling this tool as a substitute.",
+      "description": "Read the current Beatra credit balance for this account, including the next expiring batch. Also returns how many unfinished creations this account can keep at a time. This call is read-only and does not charge. It does not top up, change the wallet, or estimate a generation; use beatra.models.list for prices. On insufficient_balance, relay that error's message instead of calling this tool as a substitute. After the user says they have topped up, call this tool once before retrying: the balance_credits in an earlier refusal is the balance at that moment, not the current one.",
       "inputSchema": {
         "properties": {},
         "title": "WalletGetInput",

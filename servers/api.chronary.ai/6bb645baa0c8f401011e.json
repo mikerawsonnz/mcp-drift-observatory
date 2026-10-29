@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "984c6598575ad827966a253137f629b4390f592ca8efc272c49ed45c3e02df5f",
+  "full_hash": "bb2f54da8df571d864f730f29ffb4130881d64cee86e5014abc9b80ac96823f5",
   "name": "ai.chronary/mcp",
-  "observed_at": "2026-10-20T02:05:41.424216Z",
+  "observed_at": "2026-10-29T02:05:06.653228Z",
   "sources": [
     "official"
   ],
-  "tool_count": 54,
+  "tool_count": 58,
   "tools": [
     {
       "description": "Register your agent (AI assistant, human participant, or resource) with Chronary so it can own calendars, events, and webhooks.",
@@ -1094,7 +1094,7 @@
       "name": "resolve_proposal"
     },
     {
-      "description": "Cancel an open proposal. Fires a proposal.cancelled webhook with reason=\"organizer_cancelled\". Requires an org-level API key. Pro plan only.",
+      "description": "Cancel an open proposal. Fires a proposal.cancelled webhook with reason=\"organizer_cancelled\". Requires an org-level API key. Works on every plan, so an org that dropped to Free can still cancel proposals it made on Pro.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -1436,7 +1436,8 @@
                 "proposal.confirmed",
                 "proposal.expired",
                 "proposal.cancelled",
-                "webhook.deactivated"
+                "webhook.deactivated",
+                "org.plan_changed"
               ],
               "type": "string"
             },
@@ -1537,7 +1538,8 @@
                 "proposal.confirmed",
                 "proposal.expired",
                 "proposal.cancelled",
-                "webhook.deactivated"
+                "webhook.deactivated",
+                "org.plan_changed"
               ],
               "type": "string"
             },
@@ -2196,6 +2198,118 @@
         "type": "object"
       },
       "name": "cancel_connection_link"
+    },
+    {
+      "description": "Get the org's plan, subscription status, renewal or cancellation date, Pro pricing, and any pending upgrade request. Works even when the org is at its usage limit. Requires an org-level API key (chr_sk_*).",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_billing"
+    },
+    {
+      "description": "Ask your human to upgrade this Chronary account to Pro. Returns approval_url — give it to your human; only a human can pay. If reused=true a request is already pending — do not call again; poll get_upgrade_request at most once a minute.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "feature": {
+            "description": "Pro feature you need, from a plan_required error",
+            "enum": [
+              "temporal_hold",
+              "scheduling",
+              "cross_calendar_availability",
+              "scoped_keys",
+              "temporal_holds"
+            ],
+            "type": "string"
+          },
+          "interval": {
+            "default": "month",
+            "description": "Billing interval to propose: month ($29) or year ($290)",
+            "enum": [
+              "month",
+              "year"
+            ],
+            "type": "string"
+          },
+          "metric": {
+            "description": "Usage limit you hit, from a quota error",
+            "enum": [
+              "agents",
+              "calendars",
+              "events",
+              "api_calls",
+              "webhook_deliveries",
+              "availability_queries",
+              "ical_subscriptions",
+              "proposals",
+              "webhook_endpoints",
+              "scoped_keys",
+              "recurring_events",
+              "booking_pages"
+            ],
+            "type": "string"
+          },
+          "reason": {
+            "description": "Short note for your human, shown on the approval page (not emailed)",
+            "maxLength": 500,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "request_upgrade"
+    },
+    {
+      "description": "Check an upgrade request (pending, completed, declined, canceled, expired). Poll at most once a minute; after completed, wait ~15 seconds before retrying the call that hit the plan limit.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "id": {
+            "description": "Upgrade request id from request_upgrade",
+            "format": "starts_with",
+            "pattern": "^upr_.*",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "get_upgrade_request"
+    },
+    {
+      "description": "Withdraw a pending upgrade request (for example, if you no longer need Pro).",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "id": {
+            "description": "Upgrade request id from request_upgrade",
+            "format": "starts_with",
+            "pattern": "^upr_.*",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "cancel_upgrade_request"
     }
   ],
   "url": "https://api.chronary.ai/mcp"
