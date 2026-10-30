@@ -1,0 +1,288 @@
+{
+  "canon_version": "1",
+  "full_hash": "fe8f3536565faacec184e01c961add19410e5040097eb9053985618b4fd75b14",
+  "name": "ai.bareun/bareun",
+  "observed_at": "2026-10-30T02:04:30.628639Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 6,
+  "tools": [
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "형태소 분석"
+      },
+      "description": "한국어 문장의 형태소 분석을 수행합니다. 문장을 어절·형태소로 나누고 품사를 부착합니다. format=compact 면 '표층형/품사' 요약 문자열을, full 이면 전체 구조 JSON 을 돌려줍니다. with_sense=true 를 주면 동형이의어(같은 표기, 다른 뜻: 배[腹]/배[船]/배[梨])의 의미까지 구분해 어깨번호·뜻풀이를 함께 돌려줍니다(베타).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "auto_jointing": {
+            "description": "true면 자동 붙여쓰기를 적용한다. 기본값 false",
+            "type": "boolean"
+          },
+          "auto_spacing": {
+            "description": "true면 분석 전 자동 띄어쓰기를 적용한다. 기본값 false",
+            "type": "boolean"
+          },
+          "auto_split_sentence": {
+            "description": "true면 문장을 자동으로 분리한다. 기본값 false",
+            "type": "boolean"
+          },
+          "custom_dict_names": {
+            "description": "적용할 사용자 사전 이름 목록(선택)",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "encoding": {
+            "description": "오프셋 계산 인코딩. utf8(바이트·Go/C++)/utf16(JS·Java)/utf32(코드포인트·Python) 중 하나. 기본값 utf32",
+            "type": "string"
+          },
+          "format": {
+            "description": "결과 형식. full(전체 구조, 기본) 또는 compact(표층형/품사 요약 문자열)",
+            "type": "string"
+          },
+          "text": {
+            "description": "분석할 한국어 텍스트(필수)",
+            "type": "string"
+          },
+          "with_sense": {
+            "description": "true면 동형이의어 의미 구분(WSD, 베타) 결과를 형태소마다 함께 돌려준다. 어깨번호·뜻풀이·우리말샘 번호·선택 확률이 sense 에 실린다. 기본값 false",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "type": "object"
+      },
+      "name": "analyze_syntax",
+      "title": "형태소 분석"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "형태소 분석(후처리 없음)"
+      },
+      "description": "후처리 없는 순수 형태소 분석을 수행합니다. 분절·품사 태깅 모델의 추론 결과를 그대로 반환하며 복합명사·복합동사 분해, 자동 띄어쓰기·붙여쓰기, 사용자 사전을 적용하지 않습니다. 모델 성능 평가나 말뭉치 재태깅처럼 후처리가 섞이지 않은 출력이 필요할 때만 쓰고, 일반적인 분석에는 analyze_syntax 를 쓰세요. with_sense=true 면 동형이의어 의미 구분(WSD, 베타) 결과도 후처리 없이 함께 돌려줍니다.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "auto_split_sentence": {
+            "description": "true면 문장을 자동으로 분리한다. 기본값 false",
+            "type": "boolean"
+          },
+          "encoding": {
+            "description": "오프셋 계산 인코딩. utf8(바이트·Go/C++)/utf16(JS·Java)/utf32(코드포인트·Python) 중 하나. 기본값 utf32",
+            "type": "string"
+          },
+          "format": {
+            "description": "결과 형식. full(전체 구조, 기본) 또는 compact(표층형/품사 요약 문자열)",
+            "type": "string"
+          },
+          "text": {
+            "description": "분석할 한국어 텍스트(필수)",
+            "type": "string"
+          },
+          "with_sense": {
+            "description": "true면 동형이의어 의미 구분(WSD, 베타) 결과를 형태소마다 함께 돌려준다. 기본값 false",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "type": "object"
+      },
+      "name": "analyze_syntax_raw",
+      "title": "형태소 분석(후처리 없음)"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "맞춤법·띄어쓰기 교정"
+      },
+      "description": "한국어 문장의 맞춤법·띄어쓰기를 교정합니다. 교정된 문장과 교정 블록(원문/교정문) 목록을 돌려줍니다. 원문을 다시 쓰지 않고 어긋난 자리만 고치므로 글의 문체·말투가 그대로 남습니다. 고친 자리마다 근거가 되는 한글맞춤법 조항(예: 제1장 총칙 제2항)과 설명·예시가 함께 실려 오므로, 교열 근거를 대야 하는 일에 적합합니다. 띄어쓰기가 전혀 없는 음성 인식 결과·자동 자막 원고도 복원하고 문장 경계를 찾아 문장 부호를 넣습니다.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "custom_dict_names": {
+            "description": "적용할 사용자 사전 이름 목록(선택)",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "disable_caret_spacing": {
+            "description": "복합명사 분리 사전 적용 비활성화. 기본 false",
+            "type": "boolean"
+          },
+          "disable_confusion": {
+            "description": "혼동모델 비활성화. 기본 false",
+            "type": "boolean"
+          },
+          "disable_split_sentence": {
+            "description": "문장 단위 분할 비활성화. 기본 false",
+            "type": "boolean"
+          },
+          "disable_typo_correction": {
+            "description": "오타(오탈자) 교정 비활성화. 기본 false",
+            "type": "boolean"
+          },
+          "disable_vx_spacing": {
+            "description": "보조 용언 띄어쓰기 비활성화. 기본 false",
+            "type": "boolean"
+          },
+          "enable_cleanup_whitespace": {
+            "description": "불필요한 공백 정리 활성화. 기본 false",
+            "type": "boolean"
+          },
+          "enable_limited_punctuation": {
+            "description": "제약된 구두점 사용 기능 활성화. 기본 false",
+            "type": "boolean"
+          },
+          "enable_sentence_check": {
+            "description": "문장 단위 점검 활성화. 기본 false",
+            "type": "boolean"
+          },
+          "encoding": {
+            "description": "오프셋 계산 인코딩. utf8/utf16/utf32 중 하나. 기본값 utf32",
+            "type": "string"
+          },
+          "text": {
+            "description": "맞춤법/띄어쓰기를 교정할 한국어 텍스트(필수)",
+            "type": "string"
+          },
+          "treat_as_title": {
+            "description": "입력 문장을 기사 등의 제목으로 취급. 기본 false",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "type": "object"
+      },
+      "name": "correct_grammar",
+      "title": "맞춤법·띄어쓰기 교정"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "품사 태그표"
+      },
+      "description": "바른 형태소 분석이 사용하는 47개 품사 태그 목록(코드·이름·대분류·소분류·enum)을 JSON 으로 돌려줍니다. analyze_syntax 결과의 품사 코드(NNG, JKS 등)를 해석할 때 참고하세요.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "name": "list_pos_tags",
+      "title": "품사 태그표"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "우리말샘 음소 검색"
+      },
+      "description": "우리말샘 사전을 자소(음소) 단위 슬롯 패턴으로 검색합니다. 완성형으로 표현할 수 없는 조건 — 초성·중성·종성 각각에 대한 조건('받침이 ㅎ인 용언', '중성이 ㅚ이고 받침 없는 1음절 어간') — 을 걸 수 있고, anchor=suffix 로 '-아지'·'-둥이'처럼 끝소리 검색도 됩니다. 각운(라임) 찾기, 초성 퀴즈·끝말잇기, 불규칙 활용 후보 수집처럼 글자를 자소로 쪼개야 풀리는 일에 씁니다. 색인 없이 사전 전체(약 100만 항목)를 훑으므로 넓은 패턴은 count_only 로 규모부터 확인하세요.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "anchor": {
+            "description": "패턴 위치. word(표제어 전체, 기본)/prefix(앞)/suffix(뒤 — '-아지'로 끝나는 말 등)/contains(포함) 중 하나",
+            "type": "string"
+          },
+          "count_only": {
+            "description": "true면 항목 없이 개수만 돌려준다(넓은 패턴의 규모 확인용). 기본 false",
+            "type": "boolean"
+          },
+          "limit": {
+            "description": "돌려줄 표제어 최대 개수. 기본 100, 상한 1000",
+            "maximum": 2147483647,
+            "minimum": -2147483648,
+            "type": "integer"
+          },
+          "offset": {
+            "description": "건너뛸 표제어 개수(페이지 넘기기). 기본 0",
+            "maximum": 2147483647,
+            "minimum": -2147483648,
+            "type": "integer"
+          },
+          "pattern": {
+            "description": "자소 슬롯 패턴(필수). 음절 리터럴('다'), {초/중/종} 슬롯({ㅅ//ㄴ}=초성ㅅ·종성ㄴ, {/ㅚ/-}=중성ㅚ·받침없음, {//ㅎ}=받침ㅎ), '*'(음절 0개 이상), '?'(음절 1개)를 조합한다. 슬롯 필드에는 자모(ㄱ), 겹받침·이중모음의 두 자모 이어쓰기(ㄹㄱ→ㄺ, ㅗㅏ→ㅘ), 선택(ㄱ|ㅋ), 문자 클래스([ㄱㄴㄷ]·[^ㄱ]·[ㄱ-ㄷ]), 종성 전용 '-'(받침 없음)/'+'(받침 있음)를 쓸 수 있다. 예: '{ㅅ//ㄴ}다' → 신다, '*{//ㅎ}다' → 낳다·넣다·내놓다",
+            "type": "string"
+          },
+          "pos": {
+            "description": "품사 필터(비우면 전체, OR). 우리말샘 표기('동사'·'명사'·'보조 동사') 또는 별칭('용언'·'동사류'·'형용사류'·'체언'·'부사류'·'수식언'·'관계언')",
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "std_only": {
+            "description": "true면 비표준어·방언·북한어 항목을 제외한다. 기본 false",
+            "type": "boolean"
+          },
+          "with_definition": {
+            "description": "true면 표제어마다 뜻풀이·용례까지 돌려준다. 응답이 커지므로 필요한 때만. 기본 false",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "pattern"
+        ],
+        "type": "object"
+      },
+      "name": "search_dict",
+      "title": "우리말샘 음소 검색"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "어절 분리"
+      },
+      "description": "한국어 문장을 어절(토큰) 단위로 분리합니다. 품사 정보 없이 어절 경계만 필요할 때 쓰고, 형태소·품사가 필요하면 analyze_syntax 를 쓰세요. auto_spacing=true 를 주면 띄어쓰기가 어긋난 문장도 바로잡아 나눕니다.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "auto_spacing": {
+            "description": "true면 자동 띄어쓰기를 적용한다. 기본값 false",
+            "type": "boolean"
+          },
+          "encoding": {
+            "description": "오프셋 계산 인코딩. utf8/utf16/utf32 중 하나. 기본값 utf32",
+            "type": "string"
+          },
+          "text": {
+            "description": "토큰화할 한국어 텍스트(필수)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "type": "object"
+      },
+      "name": "tokenize",
+      "title": "어절 분리"
+    }
+  ],
+  "url": "https://api.bareun.ai/mcp"
+}

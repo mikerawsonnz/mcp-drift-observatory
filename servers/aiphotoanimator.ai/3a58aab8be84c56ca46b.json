@@ -1,0 +1,369 @@
+{
+  "canon_version": "1",
+  "full_hash": "33b0ff4a6695172d1987db39480f921008dae86c9120cb93eb7eead22e19d91b",
+  "name": "ai.aiphotoanimator/photo-animator",
+  "observed_at": "2026-10-30T02:04:23.080709Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 10,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List video effects"
+      },
+      "description": "List video effect templates (dance, sports, meme scenes, etc.). Use the returned `effect` id with animate_photo. `photos` is how many photos the effect needs.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_effects",
+      "title": "List video effects"
+    },
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://widget/media-v1.html",
+        "openai/toolInvocation/invoked": "Animation started",
+        "openai/toolInvocation/invoking": "Starting the animation…"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Animate a photo"
+      },
+      "description": "Turn photo(s) into a short video. With `effect` (from list_effects) the effect decides the motion; without it the photo is animated following `prompt`. Costs credits. Returns a task_id; poll get_video for the result (usually 1–5 minutes).",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "effect": {
+            "description": "Effect id from list_effects. Omit for a free-form animation.",
+            "type": "string"
+          },
+          "image_urls": {
+            "description": "Public https image URLs (or data:image/...;base64 URLs), in the order the effect asks for. Usually one photo.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 4,
+            "minItems": 1,
+            "type": "array"
+          },
+          "prompt": {
+            "description": "Motion description for free-form animation, or extra instructions for an effect.",
+            "maxLength": 1000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "image_urls"
+        ],
+        "type": "object"
+      },
+      "name": "animate_photo",
+      "title": "Animate a photo"
+    },
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://widget/media-v1.html",
+        "openai/toolInvocation/invoked": "Video started",
+        "openai/toolInvocation/invoking": "Starting the video…"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Create a video from text"
+      },
+      "description": "Generate a short video (5 seconds, 720p, with sound) from a text description only, no photo needed. Costs credits. Returns a task_id; poll get_video.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "aspect_ratio": {
+            "description": "9:16 for TikTok / Reels / Shorts (default), 16:9 for landscape, 1:1 square.",
+            "enum": [
+              "9:16",
+              "16:9",
+              "1:1"
+            ],
+            "type": "string"
+          },
+          "prompt": {
+            "description": "What happens in the video: subject, action, setting, camera, mood.",
+            "maxLength": 1000,
+            "minLength": 3,
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "type": "object"
+      },
+      "name": "create_video",
+      "title": "Create a video from text"
+    },
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://widget/media-v1.html",
+        "openai/toolInvocation/invoked": "Edit started",
+        "openai/toolInvocation/invoking": "Starting the edit…"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Edit a video"
+      },
+      "description": "Edit an existing video clip (MP4, up to 15 seconds, 50 MB) following instructions: put the person from a photo into the clip, change outfit, style, background or scene, while keeping the motion and timing. Costs credits (based on clip length). Returns a task_id; poll get_video.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "image_urls": {
+            "description": "Optional reference photos, referred to as image 1, image 2… in the prompt.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 4,
+            "type": "array"
+          },
+          "prompt": {
+            "description": "What to change, e.g. \"Replace the dancer with the person in image 1, keep the moves\".",
+            "maxLength": 1000,
+            "minLength": 3,
+            "type": "string"
+          },
+          "video_url": {
+            "description": "Public https URL of the MP4 clip to edit.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "video_url",
+          "prompt"
+        ],
+        "type": "object"
+      },
+      "name": "edit_video",
+      "title": "Edit a video"
+    },
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://widget/media-v1.html",
+        "openai/toolInvocation/invoked": "Image ready",
+        "openai/toolInvocation/invoking": "Creating the image…"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Create or edit an image"
+      },
+      "description": "Generate a new image from text, or edit photo(s) following instructions (change background, outfit, style, lighting, combine several photos). Uses Nano Banana 2 at 1K. Costs credits. Usually returns the image directly; if status is pending, call get_image later.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "aspect_ratio": {
+            "description": "auto (default) keeps the input photo's shape.",
+            "enum": [
+              "auto",
+              "1:1",
+              "3:4",
+              "4:3",
+              "2:3",
+              "3:2",
+              "4:5",
+              "5:4",
+              "9:16",
+              "16:9",
+              "21:9"
+            ],
+            "type": "string"
+          },
+          "image_urls": {
+            "description": "Photos to edit or combine. Omit to generate from text only.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "type": "array"
+          },
+          "prompt": {
+            "description": "The image to create, or the edit to make to the photo(s).",
+            "maxLength": 4000,
+            "minLength": 3,
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "type": "object"
+      },
+      "name": "create_image",
+      "title": "Create or edit an image"
+    },
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://widget/media-v1.html",
+        "openai/toolInvocation/invoked": "Photo restored",
+        "openai/toolInvocation/invoking": "Restoring the photo…"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Restore an old photo"
+      },
+      "description": "Repair an old or damaged photo: remove scratches, dust, creases and fading, recover sharp faces, keep everyone exactly as they are. Optionally colorize a black-and-white photo. Costs credits. Returns the restored image (or pending → get_image). Tip: animate the result with animate_photo afterwards.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "colorize": {
+            "description": "Also colorize a black-and-white or sepia photo. Default false.",
+            "type": "boolean"
+          },
+          "image_url": {
+            "description": "Public https URL of the old photo (a scan or phone photo of a print is fine).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "image_url"
+        ],
+        "type": "object"
+      },
+      "name": "restore_photo",
+      "title": "Restore an old photo"
+    },
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://widget/media-v1.html",
+        "openai/toolInvocation/invoked": "Image status",
+        "openai/toolInvocation/invoking": "Checking the image…"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get image status"
+      },
+      "description": "Check an image task from create_image or restore_photo. status is pending, success (image_url ready) or failed (credits refunded).",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "task_id": {
+            "description": "task_id returned by create_image or restore_photo",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_image",
+      "title": "Get image status"
+    },
+    {
+      "_meta": {
+        "openai/outputTemplate": "ui://widget/media-v1.html",
+        "openai/toolInvocation/invoked": "Video status",
+        "openai/toolInvocation/invoking": "Checking the video…"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get video status"
+      },
+      "description": "Check a generation task. status is pending, success (video_url ready) or failed (credits refunded).",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "task_id": {
+            "description": "task_id returned by animate_photo, create_video or edit_video",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_video",
+      "title": "Get video status"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List my videos"
+      },
+      "description": "The user's most recent video generations, newest first.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "limit": {
+            "maximum": 30,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_my_videos",
+      "title": "List my videos"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get credits"
+      },
+      "description": "Remaining credits and plan of the connected account.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_credits",
+      "title": "Get credits"
+    }
+  ],
+  "url": "https://aiphotoanimator.ai/api/mcp"
+}

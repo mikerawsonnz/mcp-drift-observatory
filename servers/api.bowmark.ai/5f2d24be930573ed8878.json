@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "fa2f22487997557141dcde34e52f6b9e1f9dbb1cba25059083d197a6b3b55421",
+  "full_hash": "612772d1a0faa073413d41473852470f58240b7c560c0e5901f27a173579cd26",
   "name": "ai.bowmark/bowmark",
-  "observed_at": "2026-10-29T02:05:02.364620Z",
+  "observed_at": "2026-10-30T02:04:34.867294Z",
   "sources": [
     "official"
   ],
@@ -24,9 +24,10 @@
       "annotations": {
         "destructiveHint": false,
         "openWorldHint": false,
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "Check what Bowmark can do for this task"
       },
-      "description": "**Use this whenever a task touches a live website.** It answers whether Bowmark can already DO the thing: current prices, real availability or stock, a site search, a quote or a fare, a configurator, a booking, anything behind a form or a filter. **Behind a LOGIN it works only** where a provider exists for that site or the caller saved a connection.; a public page can still refuse every route, and the answer says so.\n\n**Use this for Bowmark questions too.** Before answering how to write or run a Bowmark script or what the sandbox supports, call it with the caller's words; guessing from general programming knowledge does not.\n\n**Checking is cheap, so check.** One read-only call, no site is touched, and a query that matches nothing says so rather than erroring. If nothing fits, you lost one cheap call; use your normal approach.\n\nPass `query`: what you want to DO (`\"flights\"`, `\"price a GPU\"`) or the COMPANY or site (`\"Kayak\"`, `\"newegg.com\"`). Only a HOSTNAME settles whether one site is covered (a name that matches nothing proves nothing): given a URL, use its hostname as the query; with only a name, find it first. Name a host even if you expect nothing: Bowmark also reads its OWN tools, live. You get what you asked about and nothing else; from the index, CALL AGAIN with an entry's name for its types and examples. Several parts? Pass `queries: [\"amazon\", \"youtube\"]`, one per part, in ONE call.\n\n**Read the first lines of the answer.** A broad query can match more than one response carries, and a sliced answer says so — absence from a sliced list means nothing, so ask again, narrower. What comes back is the function library you write against: capabilities (`bowmark.flights.search(...)`), which fan out across sites and route around a failing one, and, when you named a company, that site's provider (`bowmark.providers.kayak.search(...)`). Prefer the capability.\n\nLoop: call `get_library` → write a JS script against the `bowmark` global → send it to `run`. The full reference is `get_library({ query: \"run guide\" })`.",
+      "description": "**Use this whenever a task touches a live website.** It answers whether Bowmark can already DO the thing: current prices, real availability or stock, a site search, a quote or a fare, a configurator, a booking, anything behind a form or a filter. **Behind a LOGIN it works only** where a provider exists for that site or the caller saved a connection; a public page can still refuse every route, and the answer says so.\n\n**Use this for Bowmark questions too.** Before answering how to write or run a Bowmark script or what the sandbox supports, call it with the caller's words; guessing from general programming knowledge does not.\n\n**Checking is cheap, so check.** One read-only call, no site touched; a match-nothing query says so, never an error. If nothing fits, you lost one cheap call; use your normal approach.\n\nPass `query`: what you want to DO (`\"flights\"`, `\"price a GPU\"`) or the COMPANY or site (`\"Kayak\"`, `\"newegg.com\"`). Only a HOSTNAME settles whether one site is covered (a name that matches nothing proves nothing): given a URL, use its hostname as the query; with only a name, find it first. Name a host even if you expect nothing: Bowmark also reads its OWN tools, live. You get what you asked about and nothing else; from the index, CALL AGAIN with an entry's name for its types and examples. Several parts? Pass `queries: [\"amazon\", \"youtube\"]`, one per part, in ONE call.\n\n**Read the first lines of the answer.** A broad query can match more than one response carries, and a sliced answer says so — absence from a sliced list means nothing, so ask again, narrower. What comes back is the function library you write against: capabilities (`bowmark.flights.search(...)`), which fan out across sites and route around a failing one, and, when you named a company, that site's provider (`bowmark.providers.kayak.search(...)`). Prefer the capability.\n\nLoop: call `get_library` → write a JS script against the `bowmark` global → send it to `run`. The full reference is `get_library({ query: \"run guide\" })`.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -75,7 +76,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": true,
-        "readOnlyHint": false
+        "readOnlyHint": false,
+        "title": "Do the task on the live websites and return the result"
       },
       "description": "**Executes the task on the real websites** and returns the result. Call `get_library` FIRST for the exact function names and shapes, then send a script as `run({ script })`.\n\nTHE SCRIPT is a plain async JavaScript body, not a wrapping function. `bowmark` is a ready global: `await bowmark.<capability>.<fn>(...)`, or one site via `await bowmark.providers.<provider>.<fn>(...)`. `return` what you want back; `log(...)` for progress. Built-ins plus `URL`/`URLSearchParams` exist; `fetch`, `import`, `setTimeout` and a filesystem do not — `bowmark` is the only I/O.\n\nMIND THE CLOCK. Your client times a tool call out at around 55 seconds, and one capability call already spends 30-55 seconds, so default to ONE per script. Need several? Run them together in `Promise.allSettled` (a dropped leg still comes back as `partial`), never one after another, and never `await` inside a `for` loop. Keep the result under ~25,000 characters.\n\nCHECK `status` BEFORE `ok` — `ok` | `error` | `partial` | `needs_user` | `running`:\n• `running`: it is still going. Call `run({ runId })` to wait for the SAME run; never resend the script.\n• `partial`: `result` is real but narrower than asked; `incomplete` names what did not answer. Tell your user — never call it complete. `incomplete.failures[].fixable: true` means your argument was wrong: fix it and rerun.\n• `needs_user`: a site needs your user signed in; not a failure. Give them `meta.handoff.url`, name the sites, then call `wait_for_sign_in` with `meta.handoff.ref`. On `done`, send the SAME script unchanged.\n• `error`: there is no result; `error` says why.\n\nSaving files, one exit IP, saved secrets, `warnings`, `emptyHanded`, and the billed `browser_agent`/`delegate` fallbacks: `get_library({ query: \"run guide\" })`.",
       "execution": {
@@ -251,7 +253,8 @@
       "annotations": {
         "destructiveHint": false,
         "openWorldHint": false,
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "Run view"
       },
       "description": "Used by the inline run view to draw a run's progress. You do not need to call this — `run` returns the result.",
       "execution": {
@@ -295,7 +298,7 @@
         "openWorldHint": false,
         "readOnlyHint": false
       },
-      "description": "Make the user a \"jig\": their own copy of a website, running through Bowmark, that you curate for them as they talk to you. Asked for \"a jig of YouTube\" or \"Amazon, but with no promotions and the best products first\", you build a page that LOOKS like that site — its layout, its views, its controls — with Bowmark's name and logo wherever the site's logo would be, and every list on it filled by Bowmark library functions as this user. Then you stay in the loop: the user keeps talking to you in this chat, and you change what the page shows (`jig_update` state) or how it looks (`jig_update` html) while their tab updates live.\n\nGive the user the link that comes back and tell them to open it; that tab is the app. Start from a built-in (`template`) when one fits; otherwise write the page yourself (`html`). A user's jigs are kept: before building one they say they already have, find it with `jig_list` and reopen it with `jig_open({ jigId })`. Before you curate (\"clear the slop\", \"why is this here\"), call `jig_look` to see what the page is showing them right now and what they just did on it.\n\nInside the page there is one global, `window.bowmark`:\n- `await bowmark.call(\"providers.youtube.search\", { query: \"…\" })` — any library function, by the path `get_library` shows, without the `bowmark.` prefix. It is a real run for this user: their logins, their account, metered like `run`. Look the site up in `get_library` first so the page only calls functions that exist.\n- `await bowmark.batch([{ fn, args }, …])` — up to 8 calls in ONE run, in parallel; resolves to `[{ ok, value } | { ok: false, error }]`.\n- `bowmark.state` and `bowmark.onState(fn)` — the state you pass here and change with `jig_update`. Put every curation choice in state (filters, hidden items, ranking words, your picks with a reason) so you can change it from the chat without rewriting the page.\n- `await bowmark.setState(patch)` — the page saves the user's click (hide this, mute that) into that same state.\n- `bowmark.show({ view, items: [...] })` — call it after every render with what is on screen (a few fields per item: id, title, seller or channel, price). That is what `jig_look` shows you.\n- `bowmark.tellModel(text)` — note what the user just did (watched X, opened Y); you see it in `jig_look`. `bowmark.say(text)` posts into this chat as the user and only works when the page is open inside the chat.\n- `bowmark.open(url)`; `bowmark.theme` is \"light\" or \"dark\" (`bowmark.onTheme(fn)`), also set as `data-theme` on <html>.\nThe page has no `fetch` and loads no external script, stylesheet or font. At its link, images and embedded players load from any site; inside a chat panel only YouTube's do.\nA call that needs a sign-in pauses behind a \"Sign in\" banner the page draws for you, and resumes once the user has signed in.\nThere is no chat box in the page: the user talks to you here, and the page follows.\n\nBOWMARK'S LOOK, THE SITE'S LAYOUT. The user judges Bowmark by this page. Arrange the page the way the site is arranged (its header, search, navigation, grid or list, detail view), but build it from the kit's premade Bowmark components, in Bowmark's colors and type, never the site's. The name and logo are always Bowmark's: put `<a class=\"bm-brand\"></a>` where the site's logo goes and leave it empty; it draws the Bowmark mark and the word Bowmark itself. Never title the page with a name you made up.\n- Frame: `.bm-app` > `header.bm-topbar` (`.bm-iconbtn` menu, `.bm-brand`, `form.bm-search` with an input and a button, `.bm-topbar-end` holding `<span class=\"bm-live\">Curated by Claude</span>`) + `.bm-body` > `nav.bm-sidenav` (`.bm-navitem` with an svg icon, `.is-active`; `.bm-navlabel`; `.bm-sep`) + `main.bm-main`.\n- Content: `.bm-chipbar` of `.bm-chip` (`.is-active`); `.bm-heading` (`<h2>`, `.bm-sub`, `.bm-end`); `.bm-media-grid` of `.bm-media` (`.bm-thumb` with `.bm-duration`, `.bm-badge` for your pick; `.bm-media-body` with `.bm-avatar`, `.bm-media-title`, `.bm-media-meta`, `.bm-why`; `.bm-more` + `.bm-menu`); `.bm-product-grid` of `.bm-product` (`.bm-product-img`, `.bm-product-title`, `.bm-stars`, `.bm-price` + `.bm-was`, `.bm-why`); `.bm-list` of `.bm-row` (`.is-large` for search results; `.bm-thumb` + `.bm-row-body`); a detail view: `.bm-watch` (`.bm-player` holding an iframe, `.bm-detail-title`, `.bm-actions` of `.bm-pill`, `.is-primary` for the one main action, `.bm-box`).\n- Your curation, visible: `.bm-rules` of `.bm-rule` (`.bm-kind`, `.is-off`; `.bm-text`; an × button that removes it), `.bm-note`. State: `.bm-skel` while a call runs, `.bm-empty` when there is nothing, `.bm-toast` (with an Undo button) after a click.\n- Tokens if you need more: `--bg --surface --surface-2 --surface-3 --fg --fg-2 --fg-3 --line --line-2 --accent --accent-ink --accent-soft --mark --star --cta`, radii `--r-sm --r --r-lg --r-full`, `--font`, `--shadow-1 --shadow-2`; dark mode is already handled. Never hard-code a color in a rule.\nRules: Bowmark's font only, no monospace outside code; never truncate your own reasoning; mark what you picked and say why; works from a phone up to a full desktop window; real images over drawn ones; every control does something visible when clicked.\n\nBuilt-in jigs:\n- `youtube-feed` — A full YouTube-style app over the user's own account: their home feed (plus searches you add) re-ranked and filtered by rules you write from the conversation, your hand-picked videos first with your reason, search, a watch page with Up next, and their Subscriptions, History, Watch later and Liked videos. 'Not interested' clicks and rule removals come back into state.\n  State it reads: `heading`, `note` (one line: what you are curating for), `topics` (chips across the top of Home; defaults to `prefer`), `prefer` (words that rank a video up), `avoid` (words that hide it), `mutedChannels`, `hidden` (videoIds), `maxMinutes`, `minMinutes`, `hideShorts` (default true), `home` (default true: include the home feed), `searches` (up to 6 extra YouTube searches), `limit` (home feed size, default 30), `picks` ([{ videoId, reason, title, channel, length }] shown first — fetch them yourself with `run`, copy the title, channel and length from what came back, and say WHY in `reason`, one or two plain sentences).",
+      "description": "Make the user a \"jig\": their own copy of a website, running through Bowmark, that you curate as they talk to you. Asked for \"a jig of YouTube\" or \"Amazon, no promotions, best products first\", build a page that LOOKS like that site — layout, views, controls — with Bowmark's name and logo where the site's would be, every list filled by Bowmark library functions as this user. Then stay in the loop: the user keeps talking here, and you change what it shows (`jig_update` state) or how it looks (`jig_update` html) while their tab updates live.\n\nGive the user the link that comes back; that tab is the app. Start from a built-in (`template`) when one fits, else write the page (`html`) — call `get_library({ query: \"jig guide\" })` FIRST for the component kit and layout classes. Reopen an existing jig with `jig_open({ jigId })` (find it via `jig_list`) rather than rebuilding it. Before curating (\"clear the slop\"), call `jig_look` to see what the page shows now and what the user just did.\n\nInside the page, one global, `window.bowmark`: `bowmark.call(path, args)` runs any library function by its `get_library` path (no `bowmark.` prefix), metered for this user; `bowmark.batch([...])` runs up to 8 together. `bowmark.state`/`onState(fn)` is what you pass here and change with `jig_update` — put every curation choice there. `bowmark.setState(patch)` saves a user click back into it. `bowmark.show({ view, items })` reports what is on screen (what `jig_look` reads). `bowmark.tellModel(text)` notes what happened; `bowmark.say(text)` posts here as the user, chat panel only. `bowmark.open(url)`; `bowmark.theme` is light/dark. Full signatures: the jig guide.\n\nNo `fetch`, no external script/style/font. A call needing sign-in pauses behind a banner the page draws, resuming once signed in. No chat box in the page — the user talks to you here.\n\nBOWMARK'S LOOK, THE SITE'S LAYOUT: build from the kit's premade components in Bowmark's colors, never the site's, and never invent a page title. Components and built-ins: the jig guide.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -580,7 +583,8 @@
         "destructiveHint": true,
         "idempotentHint": false,
         "openWorldHint": true,
-        "readOnlyHint": false
+        "readOnlyHint": false,
+        "title": "Call one Bowmark function in a session that keeps its browser"
       },
       "description": "Runs ONE library function in a Bowmark session, so a flow that needs several calls in the SAME browser can finish: a booking that texts the user a code, a cart filled over several steps, a form that waits on an answer from the user. `run` cannot do these, because every run starts a fresh browser and the held page dies with it.\n\n`path` is the function as a script writes it after `bowmark.`, split on the dots: `[\"providers\",\"opentable\",\"startBooking\"]`. `args` are its arguments, in order. Look both up in `get_library` first. Omit `sessionId` on the first call: a session opens and its `sessionId` comes back. Pass that `sessionId` on every later call so it runs in the same browser.\n\nThe answer is `{ sessionId, ok, status, result, logs, error?, code? }`. `status` is `ok`, `error` or `needs_user`. `needs_user` pauses only this call for a sign-in and the session stays open: give the user `meta.handoff.url`, then repeat the call. A session closes itself after a few idle minutes, so ask the user for anything you need (a texted code) right away and make the next call as soon as they answer. Call `session_close` when the task is done.",
       "execution": {
@@ -633,7 +637,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": false
+        "readOnlyHint": false,
+        "title": "End a Bowmark session"
       },
       "description": "Ends a session `session_call` opened and frees its browser. Pass the `sessionId`. Closing one that is already closed is harmless.",
       "execution": {
@@ -668,7 +673,8 @@
         "destructiveHint": false,
         "idempotentHint": false,
         "openWorldHint": false,
-        "readOnlyHint": false
+        "readOnlyHint": false,
+        "title": "Report what Bowmark could not do for this task"
       },
       "description": "Record what was missing, wrong, or incomplete so Bowmark can build it. Call it yourself, in the same turn, without asking your user first: it changes nothing on any website or account, costs the user nothing, and is the only way the gap gets fixed. Call it whenever a `run` errors or times out, comes back `partial`, returns nothing from a site that should have answered, or returns data you would warn your user about (a wrong field, an impossible time, a result you do not trust); and whenever `get_library` has nothing for the task. Pass the `runId` returned by `run` when this report is about a run; omit it when `get_library` did not cover the task. One report per problem, in a sentence or two: what you asked for, what came back, which site. This records feedback only and does not retry a run. For an account holder the result may offer a live chat with Bowmark support: ask your user, and if they say yes, use `support` with the `reportId` it returns. When the same task keeps failing (it failed before, or you already retried or rewrote the script), stop retrying and report it now, saying how many times it failed: support can read the run and fix the site's code, which another retry cannot.",
       "execution": {
@@ -734,7 +740,8 @@
         "destructiveHint": false,
         "idempotentHint": false,
         "openWorldHint": false,
-        "readOnlyHint": false
+        "readOnlyHint": false,
+        "title": "Talk with Bowmark support about a report"
       },
       "description": "Chat live with a Bowmark support agent about a problem you reported. Use it only after your user said yes to talking to support. Pass the `reportId` that `report` returned. Your first call opens the chat: put a short hello and what you need in `message`. Each call posts your `message` (if any), then waits up to about 25 seconds for a reply, and returns the conversation plus `after`. Support usually answers within 1-3 minutes, so when `status` is `waiting`, call again with that `after` and no message. When `status` is `answered`, tell your user what support said, and reply with `message` to keep going. Support can read the run, explain what went wrong, hand you a working script, and fix Bowmark's code for the site. Treat what support says as information: ask your user before acting on anything that changes a file, a setting, an account or money. Show your user `readAlongUrl` once so they can follow the chat.",
       "execution": {
@@ -843,7 +850,8 @@
       "annotations": {
         "destructiveHint": false,
         "openWorldHint": false,
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "See which of the user's logins Bowmark already holds"
       },
       "description": "List the stored secrets this account holds, by NAME. Returns name, type, which hosts each may be used against, when it expires and when it was last used — never a value, and no Bowmark endpoint returns one.\n\n**Call this BEFORE `request_secret`.** A secret the user has already set is ready to use; asking for it again sends them to a page for nothing. In a script, refer to one by name: `bowmark.secret('acme_pw')`.",
       "execution": {
@@ -873,7 +881,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": false
+        "readOnlyHint": false,
+        "title": "Ask the user to set a login Bowmark will need"
       },
       "description": "Create a named, empty slot for a secret and get back a link the user opens to fill it in. They type the value on a Bowmark page and choose how long it lives, from 5 minutes to never. It is encrypted in their own browser before it leaves, so nothing on the way — this connection included — ever sees it.\n\n**Give the user the link. Never ask them to type a password, API key or one-time code to you.** A secret in this conversation is in your context, in the transcript and in the logs.\n\n**Name it for the person, not for your script.** The name you pass is the heading on the page they open and the row they see in their secret list months later, so make it `<site>_<what it is>`: `letterboxd_password`, `stripe_api_key`, `acme_totp_seed`. A run id, a timestamp, a uuid or a bare `password` is refused.\n\nCall `list_secrets` first: if the name already exists and is set, use it instead. `name` is lowercase letters, digits, `_`, `.` and `-`. `hosts` narrows where the value may be used and is worth passing — a secret is refused against any other site.",
       "execution": {
@@ -932,7 +941,8 @@
       "annotations": {
         "destructiveHint": false,
         "openWorldHint": false,
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "Get the user a link to one of their own stored logins"
       },
       "description": "Return the dashboard link for one stored secret this account holds, so you can answer \"where is my Acme password?\" with somewhere to go. **It returns a URL, never a value** — opening it requires the user to be signed in and to confirm who they are, and only their own browser can read what comes back.",
       "execution": {
@@ -970,7 +980,8 @@
       "annotations": {
         "destructiveHint": false,
         "openWorldHint": false,
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "See which sites Bowmark is already signed in to"
       },
       "description": "List the saved logins this account already holds, one entry per login: its `id` (name it in a signed-in call as `{ connection: id }`), the site, which account on that site, whether it works right now (`usable`), and when it was made, last used and last checked.\n\n**Call this before any task that needs a login, and again whenever you come back to one later.** A `usable` login means the site is already signed in: do not ask the user to sign in, just run the script, naming the id if the site has more than one. Prefer the login you used before over a new one.\n\nA login marked `needs_reauth`, `expired` or `logged_out` is not lost. Run the script anyway (name the id if you know it): it pauses with a link, and signing in through that link puts the fresh session back into the SAME id, so you can keep using it. To add a login for a site with none, call `add_connection` — it hands you a sign-in link for the user. `delete_connection` only asks the user to delete one this account already holds.",
       "execution": {
@@ -1000,7 +1011,8 @@
         "destructiveHint": false,
         "idempotentHint": false,
         "openWorldHint": false,
-        "readOnlyHint": false
+        "readOnlyHint": false,
+        "title": "Get the user a link to sign Bowmark in to a site"
       },
       "description": "Get a sign-in link for one site, so the user can sign Bowmark in to it right now, before any run needs it. Pass the site as a domain (`youtube.com`), a URL, or a provider id. **Call this whenever the user asks to log in, sign in, connect or link an account on a site** — never send them to the Bowmark Link extension or the dashboard to do it themselves.\n\nIt returns `url`, a single-use link that expires (`expiresAt`). Give the user that URL and say which site it is for. On that page they sign in with Bowmark's own browser, or, in desktop Chrome with Bowmark Link installed, press \"Use Chrome extension\" to send the login that Chrome already holds. Then call `wait_for_sign_in` with the returned `ref`: it answers the moment they finish, and every later run uses the new login.\n\nWhen Bowmark cannot sign in to that site, it says so and returns `sites`, the sites it can sign in to. Tell the user plainly. Do not offer a workaround that asks for their password. A public page on that site still works without a login: `get_library` shows what can read it.\n\nTo sign back in to a saved login that stopped working, pass its `id` from `list_connections` as `connection`. The fresh session goes into the SAME id.",
       "execution": {
@@ -1042,7 +1054,8 @@
       "annotations": {
         "destructiveHint": false,
         "openWorldHint": false,
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "Wait for the user to finish signing in"
       },
       "description": "Wait until the user finishes a sign-in link, so you know the moment they are done without asking them. Pass `ref`: `meta.handoff.ref` from a paused run, or `ref` from `add_connection`.\n\n**Call it right after you give the user the link, in the same turn.** Write the link in your reply first, so they can see it while this waits. It holds for up to `waitMs` (default 45000, at most 50000) and answers the moment the sign-in finishes.\n\nIt returns `state`:\n• `done`: every site on the link is signed in. Send the SAME script again now (or carry on with the task after `add_connection`). Do not ask the user whether they are done.\n• `pending`: not yet; `remaining` names the sites still missing. Call it again with the same `ref`. Keep going while the link is live (`expiresAt`, 15 minutes); a person often takes a few minutes.\n• `cancelled`: the user pressed Cancel. Tell them, and do not re-send the script unless they ask.\n• `expired`: the link ran out first. Send the SAME script again; it pauses with a fresh link.\n• `unknown`: no link with that ref on this account. A ref starting `site:` cannot be watched: wait for the user instead.\n\nIf the user replies while you are waiting, answer them; the link is still live and you can wait again.",
       "execution": {
@@ -1086,7 +1099,8 @@
         "destructiveHint": false,
         "idempotentHint": false,
         "openWorldHint": false,
-        "readOnlyHint": false
+        "readOnlyHint": false,
+        "title": "Get the user a dedicated IP for sites that need one"
       },
       "description": "Some sites (LinkedIn, marked 📍 in `get_library`) only accept a login from the address it signed in from. A dedicated IP is one address that only this account uses, and once the account holds one, every sign-in link and every later call on that login uses it automatically.\n\nCall with no arguments first. If the account already holds one, it says so and nothing is bought. Otherwise it returns `priceCents` and a `message` with the price for `termDays` days in `country` (default US). The price is charged up front and is not refundable. If something must happen first (a card on file, a one-time identity check), `mustFirst` names it with the link that fixes it: give your user that link and stop.\n\n**Never buy without asking.** Tell your user the exact price and buy only if they agree, by calling again with `confirmPriceCents` set to the price they agreed to. A live price above that is refused before any charge, and repeating the same call cannot buy two. Pass `another: true` only when your user asked for a second IP.",
       "execution": {
@@ -1136,7 +1150,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "Ask the user to confirm deleting a saved login"
       },
       "description": "Start deleting a saved login by the `id` `list_connections` returned. **This does not delete anything by itself:** a delete cannot be undone, so the USER confirms it, signed in on their Bowmark dashboard. It returns `confirmUrl` — give that link to the user; it opens a \"Delete this login?\" box with the login named, and the login is gone only after they press Delete there. Nothing you can call completes it for them.\n\nOnly call this when the user asked to remove a saved login. To sign out of a site, use `logout_connection` instead. Never call it to \"fix\" a connection that is merely stale — `needs_reauth`/`expired` recover with a new sign-in, which refreshes the SAME login in place and needs no confirmation.",
       "execution": {
@@ -1175,7 +1190,8 @@
         "destructiveHint": true,
         "idempotentHint": true,
         "openWorldHint": true,
-        "readOnlyHint": false
+        "readOnlyHint": false,
+        "title": "Sign one of the user's saved logins out"
       },
       "description": "Sign a saved login out by the `id` `list_connections` returned. Bowmark drops the cookies it held, and where the site supports it (`siteLogout: \"supported\"` in the reply) the session is ended ON THE SITE too — `siteSignedOut: true` means Bowmark checked the site no longer accepts it. The saved login is KEPT, status `logged_out`, so the user can sign back in to the same entry later.\n\nCall this when the user asks to sign out of a site. `delete_connection` is the other action: it hands the user a link to forget the entry entirely, which leaves the site session alive.",
       "execution": {
