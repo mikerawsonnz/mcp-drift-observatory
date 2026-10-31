@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "193e34c617f08bf6e624bf35368d88656def87439b5474b7eb246ddcc5eb496f",
+  "full_hash": "73b9b7e485d25dd31b0d8c75fa0cd628df79ce53985de16e190ef0d18599f2b7",
   "name": "ai.beatra/beatra",
-  "observed_at": "2026-10-29T02:04:58.980027Z",
+  "observed_at": "2026-10-31T02:06:02.310291Z",
   "sources": [
     "official"
   ],
-  "tool_count": 32,
+  "tool_count": 33,
   "tools": [
     {
       "annotations": {
@@ -9565,6 +9565,19 @@
             "title": "Client Request Id",
             "type": "string"
           },
+          "direction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional natural-language performance direction for the whole request, for example '像在耳边说悄悄话一样，轻声地说' or 'read it like breaking news'. Models and voices that follow it list direction under controls on their model card (with direction_max_characters); anywhere else it is ignored with an option_ignored warning. Effects vary with the voice and the text and are not a guarantee of intensity.",
+            "title": "Direction"
+          },
           "emotion": {
             "anyOf": [
               {
@@ -9628,7 +9641,8 @@
             "enum": [
               "auto",
               "minimax-speech-2.8-hd",
-              "minimax-speech-2.8-turbo"
+              "minimax-speech-2.8-turbo",
+              "doubao-seed-tts-2.0"
             ],
             "title": "Model",
             "type": "string"
@@ -9654,6 +9668,19 @@
             "minimum": -1.0,
             "title": "Pitch",
             "type": "number"
+          },
+          "previous_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional text that comes right before this clip, for example the previous line of a dialogue or the previous paragraph, so separate calls keep a continuous tone. It is never spoken and never billed; any length is accepted and only its end is used (previous_text_tail_characters on the model card). Models and voices that do not use it ignore it with an option_ignored warning.",
+            "title": "Previous Text"
           },
           "sample_rate": {
             "anyOf": [
@@ -10034,6 +10061,19 @@
       "description": "Check a speech request before paying for it: parse the markup, list warnings, count weighted characters, and return the credit price. This call does not create a task, charge credits, or call the speech engine. The markup vocabulary is on the model card from beatra.models.list.",
       "inputSchema": {
         "properties": {
+          "direction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional natural-language performance direction for the whole request, for example '像在耳边说悄悄话一样，轻声地说' or 'read it like breaking news'. Models and voices that follow it list direction under controls on their model card (with direction_max_characters); anywhere else it is ignored with an option_ignored warning. Effects vary with the voice and the text and are not a guarantee of intensity.",
+            "title": "Direction"
+          },
           "emotion": {
             "anyOf": [
               {
@@ -10098,7 +10138,8 @@
             "enum": [
               "auto",
               "minimax-speech-2.8-hd",
-              "minimax-speech-2.8-turbo"
+              "minimax-speech-2.8-turbo",
+              "doubao-seed-tts-2.0"
             ],
             "title": "Model",
             "type": "string"
@@ -10124,6 +10165,19 @@
             "minimum": -1.0,
             "title": "Pitch",
             "type": "number"
+          },
+          "previous_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional text that comes right before this clip, for example the previous line of a dialogue or the previous paragraph, so separate calls keep a continuous tone. It is never spoken and never billed; any length is accepted and only its end is used (previous_text_tail_characters on the model card). Models and voices that do not use it ignore it with an option_ignored warning.",
+            "title": "Previous Text"
           },
           "sample_rate": {
             "anyOf": [
@@ -10556,7 +10610,7 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Clone and permanently activate a voice from a clean single-speaker sample. Call only after the user explicitly confirms they have the rights to clone it, and set consent_attested=true. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry.",
+      "description": "Clone a voice from a clean single-speaker sample. With the default engine (omit model or use 'auto') the cloned voice is ready for speech as soon as the task succeeds. A few explicitly selected models need a separate paid activation before the voice can be used; the result explains the next step. Call only after the user explicitly confirms they have the rights to clone it, and set consent_attested=true. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry.",
       "inputSchema": {
         "$defs": {
           "MediaInputArtifact": {
@@ -10699,13 +10753,28 @@
           },
           "model": {
             "default": "auto",
-            "description": "Clone engine; 'auto' lets the platform choose",
+            "description": "Clone engine. Omit unless the user explicitly asks for a specific clone engine; 'auto' (the default) lets the platform choose.",
             "enum": [
               "auto",
-              "minimax-voice-clone"
+              "minimax-voice-clone",
+              "doubao-voice-clone-2.0"
             ],
             "title": "Model",
             "type": "string"
+          },
+          "model_options": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Only for model doubao-voice-clone-2.0: {\"doubao\": {...}} with the model_options.doubao keys its clone card lists in controls. Ignored for every other model.",
+            "title": "Model Options"
           },
           "prompt": {
             "anyOf": [
@@ -11071,10 +11140,792 @@
       "annotations": {
         "destructiveHint": false,
         "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Activate a cloned voice whose clone result says activation is required (status pending_activation). Voices that are already ready, including every MiniMax clone and every preset voice, never need this; calling it on them charges nothing and changes nothing. The clone result already carries the quote (activation.quote: price, terms, preview, confirmation_token). Only after the user explicitly agrees to the price and terms, call once with voice_id, confirmation_token and confirm_credits; this consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get; reuse the same client_request_id only for an identical retry. Called without confirmation_token (the token is gone or older than 24 hours), it returns a new quote and charges nothing.",
+      "inputSchema": {
+        "description": "Activate a cloned voice that waits for activation: one call with the clone result's quote, after the user agrees.",
+        "properties": {
+          "client_request_id": {
+            "description": "Stable retry identity for this billable operation. Reuse only for the exact same generation arguments.",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Client Request Id",
+            "type": "string"
+          },
+          "confirm_credits": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The quoted price_credits, repeated to confirm the user agreed to exactly that price.",
+            "title": "Confirm Credits"
+          },
+          "confirmation_token": {
+            "anyOf": [
+              {
+                "maxLength": 1024,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The confirmation_token from the clone result's activation.quote (or a later quote); valid for 24 hours. Omit it to get a new quote; nothing is charged.",
+            "title": "Confirmation Token"
+          },
+          "voice_id": {
+            "description": "The voice_id from the clone result.",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Voice Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "voice_id",
+          "client_request_id"
+        ],
+        "title": "McpVoiceActivateInput",
+        "type": "object"
+      },
+      "name": "beatra.voices.activate",
+      "outputSchema": {
+        "$defs": {
+          "ArtifactLink": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Artifact Id"
+              },
+              "media_type": {
+                "title": "Media Type",
+                "type": "string"
+              },
+              "mime_type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Mime Type"
+              },
+              "path": {
+                "title": "Path",
+                "type": "string"
+              },
+              "url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Url"
+              }
+            },
+            "required": [
+              "media_type",
+              "path"
+            ],
+            "title": "ArtifactLink",
+            "type": "object"
+          },
+          "TaskError": {
+            "properties": {
+              "code": {
+                "description": "Stable machine-readable public error code.",
+                "title": "Code",
+                "type": "string"
+              },
+              "details": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Provider-neutral expected, received, supported, or candidate failure facts.",
+                "title": "Details"
+              },
+              "message": {
+                "description": "Human-readable safe failure reason.",
+                "title": "Message",
+                "type": "string"
+              },
+              "param": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "JSON Pointer to the relevant request or output field.",
+                "title": "Param"
+              },
+              "request_id": {
+                "description": "Request trace identifier for support and correlation.",
+                "title": "Request Id",
+                "type": "string"
+              },
+              "retryable": {
+                "description": "Whether the same logical request may succeed when retried unchanged.",
+                "title": "Retryable",
+                "type": "boolean"
+              },
+              "type": {
+                "description": "Stable public error family.",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "type",
+              "message",
+              "retryable",
+              "request_id"
+            ],
+            "title": "TaskError",
+            "type": "object"
+          },
+          "ToolError": {
+            "additionalProperties": true,
+            "description": "Stable MCP tool-error envelope embedded in structuredContent.\n\nSame branching vocabulary as the REST error envelope: `code` is a registry\nerror code (plus the OAuth-standard `insufficient_scope`), `retryable`\ntells the agent whether an identical retry can succeed, `param` is a JSON\nPointer to the offending argument, and `details` carries correction facts.",
+            "properties": {
+              "code": {
+                "title": "Code",
+                "type": "string"
+              },
+              "details": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Details"
+              },
+              "jsonrpc_code": {
+                "title": "Jsonrpc Code",
+                "type": "integer"
+              },
+              "message": {
+                "title": "Message",
+                "type": "string"
+              },
+              "param": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Param"
+              },
+              "retryable": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Retryable"
+              },
+              "type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Type"
+              }
+            },
+            "required": [
+              "code",
+              "jsonrpc_code",
+              "message"
+            ],
+            "title": "ToolError",
+            "type": "object"
+          },
+          "Voice": {
+            "properties": {
+              "accent": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Accent"
+              },
+              "activation": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/VoiceActivation"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "age_group": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Age group: child, youth, adult, or senior",
+                "title": "Age Group"
+              },
+              "category": {
+                "enum": [
+                  "preset",
+                  "cloned"
+                ],
+                "title": "Category",
+                "type": "string"
+              },
+              "clone_model": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Clone Model"
+              },
+              "compatible_models": {
+                "description": "Models this voice currently resolves on (informational; 'auto' always works)",
+                "items": {
+                  "type": "string"
+                },
+                "title": "Compatible Models",
+                "type": "array"
+              },
+              "created_at": {
+                "anyOf": [
+                  {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Created At"
+              },
+              "display_name": {
+                "title": "Display Name",
+                "type": "string"
+              },
+              "expires_at": {
+                "anyOf": [
+                  {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Expires At"
+              },
+              "gender": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "male",
+                      "female",
+                      "neutral"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Gender"
+              },
+              "language": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Language"
+              },
+              "languages_supported": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Languages Supported",
+                "type": "array"
+              },
+              "persona": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Short description of how the voice sounds and where it fits",
+                "title": "Persona"
+              },
+              "preview": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/VoicePreview"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "preview_url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Preview Url"
+              },
+              "preview_url_scene": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Scene sample URL. Null until a sample has been published",
+                "title": "Preview Url Scene"
+              },
+              "status": {
+                "default": "ready",
+                "enum": [
+                  "processing",
+                  "ready",
+                  "failed",
+                  "pending_activation",
+                  "expired"
+                ],
+                "title": "Status",
+                "type": "string"
+              },
+              "use_case": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Use Case",
+                "type": "array"
+              },
+              "voice_id": {
+                "description": "Opaque beatra voice handle",
+                "title": "Voice Id",
+                "type": "string"
+              }
+            },
+            "required": [
+              "voice_id",
+              "display_name",
+              "category"
+            ],
+            "title": "Voice",
+            "type": "object"
+          },
+          "VoiceActivation": {
+            "description": "What it costs to make a preview voice usable for speech.",
+            "properties": {
+              "price_credits": {
+                "title": "Price Credits",
+                "type": "integer"
+              },
+              "quote": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/VoiceActivationQuote"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The activation quote, on the clone task's result. Show the price and terms to the user and, with their consent, call activate once with quote.confirmation_token and confirm_credits = price_credits (valid for 24 hours; without a token, activate returns a new quote)."
+              },
+              "required": {
+                "title": "Required",
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "required",
+              "price_credits"
+            ],
+            "title": "VoiceActivation",
+            "type": "object"
+          },
+          "VoiceActivationQuote": {
+            "description": "The price of activating one preview voice. Nothing is charged until it is confirmed.",
+            "properties": {
+              "balance_credits": {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "title": "Balance Credits",
+                "type": "string"
+              },
+              "confirmation_token": {
+                "title": "Confirmation Token",
+                "type": "string"
+              },
+              "message": {
+                "title": "Message",
+                "type": "string"
+              },
+              "preview": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/VoicePreview"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "price_credits": {
+                "title": "Price Credits",
+                "type": "integer"
+              },
+              "sufficient_balance": {
+                "title": "Sufficient Balance",
+                "type": "boolean"
+              },
+              "terms": {
+                "additionalProperties": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "description": "The activation terms in zh, en and ja",
+                "title": "Terms",
+                "type": "object"
+              },
+              "terms_version": {
+                "title": "Terms Version",
+                "type": "string"
+              },
+              "token_expires_at": {
+                "format": "date-time",
+                "title": "Token Expires At",
+                "type": "string"
+              },
+              "voice_id": {
+                "title": "Voice Id",
+                "type": "string"
+              }
+            },
+            "required": [
+              "voice_id",
+              "price_credits",
+              "balance_credits",
+              "sufficient_balance",
+              "confirmation_token",
+              "token_expires_at",
+              "terms_version",
+              "terms",
+              "message"
+            ],
+            "title": "VoiceActivationQuote",
+            "type": "object"
+          },
+          "VoicePreview": {
+            "description": "The stored preview of a cloned voice that is not yet activated.",
+            "properties": {
+              "language": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Language"
+              },
+              "text": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Text"
+              },
+              "url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Url"
+              },
+              "version": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Version"
+              }
+            },
+            "title": "VoicePreview",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "description": "TaskToolOutput's fields plus the voice, the credits charged and the quote.",
+        "properties": {
+          "artifacts": {
+            "items": {
+              "$ref": "#/$defs/ArtifactLink"
+            },
+            "title": "Artifacts",
+            "type": "array"
+          },
+          "billing": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Billing"
+          },
+          "charged_credits": {
+            "default": "0",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Charged Credits",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ToolError"
+              },
+              {
+                "$ref": "#/$defs/TaskError"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Error"
+          },
+          "quote": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Quote"
+          },
+          "resolved_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Resolved Model"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "task": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Task"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Task Id"
+          },
+          "terminal": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Terminal"
+          },
+          "usage": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Usage"
+          },
+          "voice": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Voice"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "title": "VoiceActivateOutput",
+        "type": "object"
+      },
+      "title": "Activate Voice"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": true
       },
-      "description": "List preset and tenant-owned voices available for speech synthesis.",
+      "description": "List preset and tenant-owned voices available for speech synthesis. By default only voices ready for speech are listed; pass status to include cloned voices that are waiting for activation.",
       "inputSchema": {
         "properties": {
           "age_group": {
@@ -11197,6 +12048,18 @@
             "default": null,
             "description": "Case-insensitive text found in the display name or the persona",
             "title": "Search"
+          },
+          "status": {
+            "default": "ready",
+            "description": "Which voices to list: ready (default, usable for speech), pending_activation (cloned previews that need activation), expired, or any.",
+            "enum": [
+              "ready",
+              "pending_activation",
+              "expired",
+              "any"
+            ],
+            "title": "Status",
+            "type": "string"
           },
           "use_case": {
             "anyOf": [
@@ -11337,6 +12200,17 @@
                 "default": null,
                 "title": "Accent"
               },
+              "activation": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/VoiceActivation"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "age_group": {
                 "anyOf": [
                   {
@@ -11357,6 +12231,18 @@
                 ],
                 "title": "Category",
                 "type": "string"
+              },
+              "clone_model": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Clone Model"
               },
               "compatible_models": {
                 "description": "Models this voice currently resolves on (informational; 'auto' always works)",
@@ -11382,6 +12268,19 @@
               "display_name": {
                 "title": "Display Name",
                 "type": "string"
+              },
+              "expires_at": {
+                "anyOf": [
+                  {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Expires At"
               },
               "gender": {
                 "anyOf": [
@@ -11432,6 +12331,17 @@
                 "description": "Short description of how the voice sounds and where it fits",
                 "title": "Persona"
               },
+              "preview": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/VoicePreview"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "preview_url": {
                 "anyOf": [
                   {
@@ -11462,7 +12372,9 @@
                 "enum": [
                   "processing",
                   "ready",
-                  "failed"
+                  "failed",
+                  "pending_activation",
+                  "expired"
                 ],
                 "title": "Status",
                 "type": "string"
@@ -11486,6 +12398,166 @@
               "category"
             ],
             "title": "Voice",
+            "type": "object"
+          },
+          "VoiceActivation": {
+            "description": "What it costs to make a preview voice usable for speech.",
+            "properties": {
+              "price_credits": {
+                "title": "Price Credits",
+                "type": "integer"
+              },
+              "quote": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/VoiceActivationQuote"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The activation quote, on the clone task's result. Show the price and terms to the user and, with their consent, call activate once with quote.confirmation_token and confirm_credits = price_credits (valid for 24 hours; without a token, activate returns a new quote)."
+              },
+              "required": {
+                "title": "Required",
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "required",
+              "price_credits"
+            ],
+            "title": "VoiceActivation",
+            "type": "object"
+          },
+          "VoiceActivationQuote": {
+            "description": "The price of activating one preview voice. Nothing is charged until it is confirmed.",
+            "properties": {
+              "balance_credits": {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "title": "Balance Credits",
+                "type": "string"
+              },
+              "confirmation_token": {
+                "title": "Confirmation Token",
+                "type": "string"
+              },
+              "message": {
+                "title": "Message",
+                "type": "string"
+              },
+              "preview": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/VoicePreview"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "price_credits": {
+                "title": "Price Credits",
+                "type": "integer"
+              },
+              "sufficient_balance": {
+                "title": "Sufficient Balance",
+                "type": "boolean"
+              },
+              "terms": {
+                "additionalProperties": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "description": "The activation terms in zh, en and ja",
+                "title": "Terms",
+                "type": "object"
+              },
+              "terms_version": {
+                "title": "Terms Version",
+                "type": "string"
+              },
+              "token_expires_at": {
+                "format": "date-time",
+                "title": "Token Expires At",
+                "type": "string"
+              },
+              "voice_id": {
+                "title": "Voice Id",
+                "type": "string"
+              }
+            },
+            "required": [
+              "voice_id",
+              "price_credits",
+              "balance_credits",
+              "sufficient_balance",
+              "confirmation_token",
+              "token_expires_at",
+              "terms_version",
+              "terms",
+              "message"
+            ],
+            "title": "VoiceActivationQuote",
+            "type": "object"
+          },
+          "VoicePreview": {
+            "description": "The stored preview of a cloned voice that is not yet activated.",
+            "properties": {
+              "language": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Language"
+              },
+              "text": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Text"
+              },
+              "url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Url"
+              },
+              "version": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Version"
+              }
+            },
+            "title": "VoicePreview",
             "type": "object"
           }
         },
@@ -12354,6 +13426,12 @@
             ],
             "title": "Capability",
             "type": "string"
+          },
+          "include_activation_required": {
+            "default": false,
+            "description": "Also list voice clone models whose voices need a separate paid activation before use. Omit to get the default list.",
+            "title": "Include Activation Required",
+            "type": "boolean"
           }
         },
         "required": [
@@ -14000,6 +15078,19 @@
               "billing_character_weights": {
                 "$ref": "#/$defs/SpeechCharacterWeights"
               },
+              "direction_max_characters": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Longest direction this model follows; a longer one is ignored with an option_ignored warning. Null when the model ignores direction.",
+                "title": "Direction Max Characters"
+              },
               "emotions": {
                 "items": {
                   "type": "string"
@@ -14047,6 +15138,19 @@
               },
               "pitch": {
                 "$ref": "#/$defs/AudioNumberRange"
+              },
+              "previous_text_tail_characters": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "How many trailing characters of previous_text this model uses (any length is accepted). Null when the model ignores previous_text.",
+                "title": "Previous Text Tail Characters"
               },
               "sample_rates": {
                 "items": {
@@ -15531,7 +16635,6 @@
                 "type": "array"
               },
               "automatic_formal_activation": {
-                "const": true,
                 "default": true,
                 "title": "Automatic Formal Activation",
                 "type": "boolean"
@@ -15542,34 +16645,128 @@
                 "title": "Consent Attestation Required",
                 "type": "boolean"
               },
+              "language_required": {
+                "default": false,
+                "title": "Language Required",
+                "type": "boolean"
+              },
+              "limitations": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Limitations",
+                "type": "array"
+              },
+              "pending_retention_days": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Pending Retention Days"
+              },
+              "preview_available": {
+                "default": false,
+                "title": "Preview Available",
+                "type": "boolean"
+              },
               "prompt_accepted": {
                 "default": false,
                 "title": "Prompt Accepted",
                 "type": "boolean"
               },
               "prompt_max_characters": {
-                "const": 2000,
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
                 "default": 2000,
-                "title": "Prompt Max Characters",
-                "type": "integer"
+                "title": "Prompt Max Characters"
+              },
+              "sample_formats": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Sample Formats"
               },
               "sample_max_bytes": {
-                "const": 20971520,
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
                 "default": 20971520,
-                "title": "Sample Max Bytes",
-                "type": "integer"
+                "title": "Sample Max Bytes"
               },
               "sample_max_seconds": {
-                "const": 300,
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
                 "default": 300,
-                "title": "Sample Max Seconds",
-                "type": "integer"
+                "title": "Sample Max Seconds"
               },
               "sample_min_seconds": {
-                "const": 10,
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
                 "default": 10,
-                "title": "Sample Min Seconds",
-                "type": "integer"
+                "title": "Sample Min Seconds"
+              },
+              "sample_recommended_seconds": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/AudioNumberRange"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "supported_languages": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Supported Languages"
               }
             },
             "required": [

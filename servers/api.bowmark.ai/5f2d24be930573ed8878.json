@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "612772d1a0faa073413d41473852470f58240b7c560c0e5901f27a173579cd26",
+  "full_hash": "bdfd2c73af3ea30356cb7078e8a351a232128c571a19c5c97c7b15e5c7a4a91c",
   "name": "ai.bowmark/bowmark",
-  "observed_at": "2026-10-30T02:04:34.867294Z",
+  "observed_at": "2026-10-31T02:06:05.012828Z",
   "sources": [
     "official"
   ],
@@ -86,6 +86,14 @@
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
+          "egress": {
+            "description": "Optional. `\"link\"` sends every request of this run through the user's own Chrome (Bowmark Link) and fails with \"Link not connected\" when it is not open; `\"default\"` or leaving it out uses Bowmark's own route. The result echoes it as `egress`.",
+            "enum": [
+              "default",
+              "link"
+            ],
+            "type": "string"
+          },
           "runId": {
             "description": "Only to collect a run an earlier call answered `status: \"running\"` for: pass its `runId` and no `script`, and this call waits for that same run's result.",
             "format": "uuid",
@@ -102,6 +110,13 @@
       "outputSchema": {
         "additionalProperties": false,
         "properties": {
+          "egress": {
+            "enum": [
+              "default",
+              "link"
+            ],
+            "type": "string"
+          },
           "emptyHanded": {},
           "error": {
             "type": [
@@ -296,7 +311,8 @@
       "annotations": {
         "destructiveHint": false,
         "openWorldHint": false,
-        "readOnlyHint": false
+        "readOnlyHint": false,
+        "title": "Open a page for the user (jig)"
       },
       "description": "Make the user a \"jig\": their own copy of a website, running through Bowmark, that you curate as they talk to you. Asked for \"a jig of YouTube\" or \"Amazon, no promotions, best products first\", build a page that LOOKS like that site — layout, views, controls — with Bowmark's name and logo where the site's would be, every list filled by Bowmark library functions as this user. Then stay in the loop: the user keeps talking here, and you change what it shows (`jig_update` state) or how it looks (`jig_update` html) while their tab updates live.\n\nGive the user the link that comes back; that tab is the app. Start from a built-in (`template`) when one fits, else write the page (`html`) — call `get_library({ query: \"jig guide\" })` FIRST for the component kit and layout classes. Reopen an existing jig with `jig_open({ jigId })` (find it via `jig_list`) rather than rebuilding it. Before curating (\"clear the slop\"), call `jig_look` to see what the page shows now and what the user just did.\n\nInside the page, one global, `window.bowmark`: `bowmark.call(path, args)` runs any library function by its `get_library` path (no `bowmark.` prefix), metered for this user; `bowmark.batch([...])` runs up to 8 together. `bowmark.state`/`onState(fn)` is what you pass here and change with `jig_update` — put every curation choice there. `bowmark.setState(patch)` saves a user click back into it. `bowmark.show({ view, items })` reports what is on screen (what `jig_look` reads). `bowmark.tellModel(text)` notes what happened; `bowmark.say(text)` posts here as the user, chat panel only. `bowmark.open(url)`; `bowmark.theme` is light/dark. Full signatures: the jig guide.\n\nNo `fetch`, no external script/style/font. A call needing sign-in pauses behind a banner the page draws, resuming once signed in. No chat box in the page — the user talks to you here.\n\nBOWMARK'S LOOK, THE SITE'S LAYOUT: build from the kit's premade components in Bowmark's colors, never the site's, and never invent a page title. Components and built-ins: the jig guide.",
       "execution": {
@@ -353,7 +369,8 @@
       "annotations": {
         "destructiveHint": false,
         "openWorldHint": false,
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "List the user's pages (jigs)"
       },
       "description": "The jigs this user has made, newest change first: id, title, the built-in it started from, and when it last changed. Call it when the user mentions a page they made before (\"my YouTube feed\", \"that dashboard\"), then reopen it with `jig_open({ jigId })` instead of building a new one.",
       "execution": {
@@ -371,7 +388,8 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": false
+        "readOnlyHint": false,
+        "title": "Steer an open page (jig)"
       },
       "description": "Change a page you opened with `jig_open`: merge `state` into its state (a key set to null is removed), or replace its `html` or `title`. The open page updates itself within a few seconds — do not call `jig_open` again. Use this whenever the user asks, in chat, for the page to show something different.",
       "execution": {
@@ -421,7 +439,8 @@
       "annotations": {
         "destructiveHint": false,
         "openWorldHint": false,
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "Jig view"
       },
       "description": "Used by an open jig to pick up its latest state. You do not need to call this.",
       "execution": {
@@ -459,7 +478,8 @@
       "annotations": {
         "destructiveHint": false,
         "openWorldHint": false,
-        "readOnlyHint": false
+        "readOnlyHint": false,
+        "title": "Jig seen"
       },
       "description": "Used by an open jig to report what it shows. You do not need to call this.",
       "execution": {
@@ -489,7 +509,8 @@
       "annotations": {
         "destructiveHint": false,
         "openWorldHint": false,
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "Look at a page (jig)"
       },
       "description": "See what an open jig is showing the user right now — the items on screen, which view they are on — plus what they just did on it (watched, hid, searched) and its current state. Call it before you curate: when the user says \"clear the slop\" or \"why is this here\", look first, then change the page with `jig_update`.",
       "execution": {
@@ -524,7 +545,8 @@
       "annotations": {
         "destructiveHint": true,
         "openWorldHint": true,
-        "readOnlyHint": false
+        "readOnlyHint": false,
+        "title": "Jig call"
       },
       "description": "Used by an open jig to call the library. You do not need to call this — use `run`.",
       "execution": {

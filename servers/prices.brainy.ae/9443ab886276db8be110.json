@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "92252611fc9c2ed688125089a765046f73cd4a3f75643afeca41aa5a457957e5",
+  "full_hash": "3e0711c5af2b7d57c2525103c08ffc73339b5b218f75ff133da67e91925e4e3b",
   "name": "ae.brainy/grocery-prices",
-  "observed_at": "2026-10-22T02:05:55.578341Z",
+  "observed_at": "2026-10-31T02:05:52.817847Z",
   "sources": [
     "official"
   ],
@@ -167,7 +167,6 @@
             "type": "object"
           }
         },
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -629,8 +628,31 @@
       },
       "name": "costs_by_area",
       "outputSchema": {
-        "$defs": {},
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$defs": {
+          "HousingFeePause": {
+            "additionalProperties": false,
+            "properties": {
+              "notice": {
+                "type": "string"
+              },
+              "since": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "const": "paused"
+              }
+            },
+            "required": [
+              "status",
+              "since",
+              "notice"
+            ],
+            "type": "object"
+          }
+        },
         "anyOf": [
           {
             "additionalProperties": false,
@@ -678,11 +700,26 @@
                     "contracts": {
                       "type": "integer"
                     },
+                    "dewa_consumption_charge_aed": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "fuel_surcharge": {
+                      "$ref": "#/$defs/HousingFeePause"
+                    },
+                    "housing_fee": {
+                      "$ref": "#/$defs/HousingFeePause"
+                    },
                     "housing_fee_monthly_aed": {
                       "type": [
                         "number",
                         "null"
                       ]
+                    },
+                    "meter_service_charge": {
+                      "$ref": "#/$defs/HousingFeePause"
                     },
                     "name": {
                       "type": "string"
@@ -738,6 +775,18 @@
                         "null"
                       ]
                     },
+                    "status": {
+                      "const": "partial"
+                    },
+                    "subtotal_aed": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "subtotal_label": {
+                      "type": "string"
+                    },
                     "total_monthly_aed": {
                       "type": [
                         "number",
@@ -754,21 +803,6 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "zone_id",
-                    "name",
-                    "communities",
-                    "rent_monthly_aed",
-                    "rent_p25_monthly_aed",
-                    "rent_p75_monthly_aed",
-                    "housing_fee_monthly_aed",
-                    "total_monthly_aed",
-                    "contracts",
-                    "cheapest_school_monthly_aed",
-                    "total_with_school_monthly_aed",
-                    "open_in_browser",
-                    "provenance"
-                  ],
                   "type": "object"
                 },
                 "type": "array"
@@ -917,7 +951,6 @@
             "required": [
               "consumption",
               "hubs",
-              "paused_tolls",
               "notes"
             ],
             "type": "object"
@@ -948,11 +981,6 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "code",
-                        "name",
-                        "km"
-                      ],
                       "type": [
                         "object",
                         "null"
@@ -979,15 +1007,15 @@
                       "type": "object"
                     }
                   },
-                  "required": [
-                    "area_id",
-                    "name",
-                    "point",
-                    "nearest_airport"
-                  ],
                   "type": "object"
                 },
                 "type": "array"
+              },
+              "dewa_consumption_charge_aed": {
+                "type": [
+                  "number",
+                  "null"
+                ]
               },
               "emirate_id": {
                 "enum": [
@@ -1000,53 +1028,56 @@
                   "fujairah"
                 ]
               },
+              "fuel_surcharge": {
+                "$ref": "#/$defs/HousingFeePause"
+              },
               "housing_fee": {
-                "additionalProperties": false,
-                "properties": {
-                  "how": {
-                    "type": [
-                      "string",
-                      "null"
-                    ]
-                  },
-                  "min_aed": {
-                    "type": [
-                      "number",
-                      "null"
-                    ]
-                  },
-                  "percent_of_annual_rent": {
-                    "type": [
-                      "number",
-                      "null"
-                    ]
-                  },
-                  "source_url": {
-                    "anyOf": [
-                      {
-                        "type": "string"
+                "anyOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "how": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
-                      {
-                        "type": "null"
+                      "min_aed": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "percent_of_annual_rent": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "source_url": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "status": {
+                        "enum": [
+                          "ok",
+                          "partial",
+                          "no_official_data_found"
+                        ]
                       }
-                    ]
+                    },
+                    "type": "object"
                   },
-                  "status": {
-                    "enum": [
-                      "ok",
-                      "partial",
-                      "no_official_data_found"
-                    ]
+                  {
+                    "$ref": "#/$defs/HousingFeePause"
                   }
-                },
-                "required": [
-                  "status",
-                  "percent_of_annual_rent",
-                  "min_aed",
-                  "how",
-                  "source_url"
-                ],
-                "type": "object"
+                ]
               },
               "intercity_buses": {
                 "items": {
@@ -1090,18 +1121,12 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "route",
-                    "from",
-                    "to_dubai_station",
-                    "fare_one_way_aed",
-                    "minutes",
-                    "frequency",
-                    "source_url"
-                  ],
                   "type": "object"
                 },
                 "type": "array"
+              },
+              "meter_service_charge": {
+                "$ref": "#/$defs/HousingFeePause"
               },
               "name": {
                 "type": "string"
@@ -1171,16 +1196,6 @@
                           ]
                         }
                       },
-                      "required": [
-                        "area",
-                        "property_type",
-                        "bedrooms",
-                        "median_monthly_aed",
-                        "median_annual_aed",
-                        "p25_annual_aed",
-                        "p75_annual_aed",
-                        "contracts"
-                      ],
                       "type": "object"
                     },
                     "type": "array"
@@ -1231,18 +1246,11 @@
                     "enum": [
                       "ok",
                       "no_comparable_open_data",
-                      "no_official_data_found"
+                      "no_official_data_found",
+                      "not_published"
                     ]
                   }
                 },
-                "required": [
-                  "status",
-                  "note",
-                  "period",
-                  "attribution",
-                  "medians",
-                  "source_urls"
-                ],
                 "type": "object"
               },
               "schools": {
@@ -1261,85 +1269,95 @@
                     ]
                   }
                 },
-                "required": [
-                  "status",
-                  "note"
-                ],
                 "type": "object"
               },
+              "status": {
+                "const": "partial"
+              },
+              "subtotal_label": {
+                "type": "string"
+              },
               "utilities": {
-                "additionalProperties": false,
-                "properties": {
-                  "basis": {
-                    "type": "string"
-                  },
-                  "calculated": {
-                    "type": "boolean"
-                  },
-                  "electricity_aed": {
-                    "type": [
-                      "number",
-                      "null"
-                    ]
-                  },
-                  "missing": {
-                    "items": {
-                      "type": "string"
+                "anyOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "basis": {
+                        "type": "string"
+                      },
+                      "calculated": {
+                        "type": "boolean"
+                      },
+                      "electricity_aed": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "missing": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "monthly_aed": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "provider": {
+                        "type": "string"
+                      },
+                      "source_urls": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "vat_note": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "water_aed": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      }
                     },
-                    "type": "array"
+                    "type": "object"
                   },
-                  "monthly_aed": {
-                    "type": [
-                      "number",
-                      "null"
-                    ]
-                  },
-                  "provider": {
-                    "type": "string"
-                  },
-                  "source_urls": {
-                    "items": {
-                      "type": "string"
-                    },
-                    "type": "array"
-                  },
-                  "vat_note": {
-                    "type": [
-                      "string",
-                      "null"
-                    ]
-                  },
-                  "water_aed": {
-                    "type": [
-                      "number",
-                      "null"
-                    ]
+                  {
+                    "$ref": "#/$defs/HousingFeePause"
                   }
-                },
-                "required": [
-                  "provider",
-                  "monthly_aed",
-                  "electricity_aed",
-                  "water_aed",
-                  "basis",
-                  "vat_note",
-                  "calculated",
-                  "missing",
-                  "source_urls"
-                ],
-                "type": "object"
+                ]
+              }
+            },
+            "type": "object"
+          },
+          "HousingFeePause": {
+            "additionalProperties": false,
+            "properties": {
+              "notice": {
+                "type": "string"
+              },
+              "since": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "const": "paused"
               }
             },
             "required": [
-              "emirate_id",
-              "name",
-              "rent",
-              "utilities",
-              "housing_fee",
-              "schools",
-              "intercity_buses",
-              "areas",
-              "provenance"
+              "status",
+              "since",
+              "notice"
             ],
             "type": "object"
           },
@@ -1388,7 +1406,6 @@
             "type": "object"
           }
         },
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -1628,7 +1645,6 @@
             "type": "object"
           }
         },
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -1770,33 +1786,51 @@
           "DewaTariff": {
             "additionalProperties": false,
             "properties": {
+              "dewa_consumption_charge_aed": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
               "electricity": {
                 "additionalProperties": false,
                 "properties": {
+                  "fuel_surcharge": {
+                    "$ref": "#/$defs/HousingFeePause"
+                  },
                   "fuel_surcharge_aed_per_kwh": {
                     "type": [
                       "number",
                       "null"
                     ]
                   },
+                  "meter_service_charge": {
+                    "$ref": "#/$defs/HousingFeePause"
+                  },
                   "meter_service_charges": {
-                    "items": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "amount_aed": {
-                          "type": "number"
+                    "anyOf": [
+                      {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "amount_aed": {
+                              "type": "number"
+                            },
+                            "meter_type": {
+                              "type": [
+                                "integer",
+                                "null"
+                              ]
+                            }
+                          },
+                          "type": "object"
                         },
-                        "meter_type": {
-                          "type": "integer"
-                        }
+                        "type": "array"
                       },
-                      "required": [
-                        "meter_type",
-                        "amount_aed"
-                      ],
-                      "type": "object"
-                    },
-                    "type": "array"
+                      {
+                        "$ref": "#/$defs/HousingFeePause"
+                      }
+                    ]
                   },
                   "slabs": {
                     "items": {
@@ -1815,11 +1849,6 @@
                           ]
                         }
                       },
-                      "required": [
-                        "from",
-                        "to",
-                        "aed_per_unit"
-                      ],
                       "type": "object"
                     },
                     "type": "array"
@@ -1828,13 +1857,13 @@
                     "const": "kWh per month"
                   }
                 },
-                "required": [
-                  "unit",
-                  "slabs",
-                  "fuel_surcharge_aed_per_kwh",
-                  "meter_service_charges"
-                ],
                 "type": "object"
+              },
+              "fuel_surcharge": {
+                "$ref": "#/$defs/HousingFeePause"
+              },
+              "housing_fee": {
+                "$ref": "#/$defs/HousingFeePause"
               },
               "housing_fee_rate_of_annual_rent": {
                 "type": [
@@ -1845,6 +1874,9 @@
               "imperial_gallons_per_m3": {
                 "type": "number"
               },
+              "meter_service_charge": {
+                "$ref": "#/$defs/HousingFeePause"
+              },
               "not_included": {
                 "type": [
                   "string",
@@ -1853,6 +1885,18 @@
               },
               "provenance": {
                 "$ref": "#/$defs/Provenance"
+              },
+              "status": {
+                "const": "partial"
+              },
+              "subtotal_aed": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "subtotal_label": {
+                "type": "string"
               },
               "surcharge_month": {
                 "anyOf": [
@@ -1886,14 +1930,20 @@
                         "medium",
                         "heavy"
                       ]
+                    },
+                    "status": {
+                      "const": "not-available"
+                    },
+                    "subtotal_aed": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "subtotal_label": {
+                      "type": "string"
                     }
                   },
-                  "required": [
-                    "profile_id",
-                    "kwh",
-                    "m3",
-                    "monthly_aed"
-                  ],
                   "type": "object"
                 },
                 "type": "array"
@@ -1907,30 +1957,42 @@
               "water": {
                 "additionalProperties": false,
                 "properties": {
+                  "fuel_surcharge": {
+                    "$ref": "#/$defs/HousingFeePause"
+                  },
                   "fuel_surcharge_aed_per_m3": {
                     "type": [
                       "number",
                       "null"
                     ]
                   },
+                  "meter_service_charge": {
+                    "$ref": "#/$defs/HousingFeePause"
+                  },
                   "meter_service_charges": {
-                    "items": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "amount_aed": {
-                          "type": "number"
+                    "anyOf": [
+                      {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "amount_aed": {
+                              "type": "number"
+                            },
+                            "meter_type": {
+                              "type": [
+                                "integer",
+                                "null"
+                              ]
+                            }
+                          },
+                          "type": "object"
                         },
-                        "meter_type": {
-                          "type": "integer"
-                        }
+                        "type": "array"
                       },
-                      "required": [
-                        "meter_type",
-                        "amount_aed"
-                      ],
-                      "type": "object"
-                    },
-                    "type": "array"
+                      {
+                        "$ref": "#/$defs/HousingFeePause"
+                      }
+                    ]
                   },
                   "slabs": {
                     "items": {
@@ -1949,11 +2011,6 @@
                           ]
                         }
                       },
-                      "required": [
-                        "from",
-                        "to",
-                        "aed_per_unit"
-                      ],
                       "type": "object"
                     },
                     "type": "array"
@@ -1962,24 +2019,31 @@
                     "const": "m³ per month"
                   }
                 },
-                "required": [
-                  "unit",
-                  "slabs",
-                  "fuel_surcharge_aed_per_m3",
-                  "meter_service_charges"
-                ],
                 "type": "object"
               }
             },
+            "type": "object"
+          },
+          "HousingFeePause": {
+            "additionalProperties": false,
+            "properties": {
+              "notice": {
+                "type": "string"
+              },
+              "since": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "const": "paused"
+              }
+            },
             "required": [
-              "surcharge_month",
-              "vat_percent",
-              "electricity",
-              "water",
-              "housing_fee_rate_of_annual_rent",
-              "typical",
-              "not_included",
-              "provenance"
+              "status",
+              "since",
+              "notice"
             ],
             "type": "object"
           },
@@ -2046,7 +2110,6 @@
             "type": "object"
           }
         },
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -2089,6 +2152,12 @@
                           "null"
                         ]
                       },
+                      "dewa_consumption_charge_aed": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
                       "electricity_aed": {
                         "type": [
                           "number",
@@ -2100,6 +2169,12 @@
                           "number",
                           "null"
                         ]
+                      },
+                      "fuel_surcharge": {
+                        "$ref": "#/$defs/HousingFeePause"
+                      },
+                      "housing_fee": {
+                        "$ref": "#/$defs/HousingFeePause"
                       },
                       "housing_fee_aed": {
                         "type": [
@@ -2125,6 +2200,9 @@
                           "null"
                         ]
                       },
+                      "meter_service_charge": {
+                        "$ref": "#/$defs/HousingFeePause"
+                      },
                       "months_per_year": {
                         "type": "integer"
                       },
@@ -2137,11 +2215,17 @@
                       "provenance": {
                         "$ref": "#/$defs/Provenance"
                       },
+                      "status": {
+                        "const": "partial"
+                      },
                       "subtotal_aed": {
                         "type": [
                           "number",
                           "null"
                         ]
+                      },
+                      "subtotal_label": {
+                        "type": "string"
                       },
                       "surcharge_month": {
                         "anyOf": [
@@ -2163,6 +2247,12 @@
                         ]
                       },
                       "vat_aed": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "vat_percent": {
                         "type": [
                           "number",
                           "null"
@@ -2193,22 +2283,6 @@
                         ]
                       }
                     },
-                    "required": [
-                      "surcharge_month",
-                      "electricity_fuel_surcharge_aed_per_kwh",
-                      "water_fuel_surcharge_aed_per_m3",
-                      "kwh",
-                      "water_m3",
-                      "electricity_aed",
-                      "water_aed",
-                      "meter_service_aed",
-                      "subtotal_aed",
-                      "vat_aed",
-                      "housing_fee_aed",
-                      "total_aed",
-                      "not_included",
-                      "provenance"
-                    ],
                     "type": "object"
                   },
                   {
@@ -2460,6 +2534,29 @@
               "null"
             ]
           },
+          "HousingFeePause": {
+            "additionalProperties": false,
+            "properties": {
+              "notice": {
+                "type": "string"
+              },
+              "since": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "const": "paused"
+              }
+            },
+            "required": [
+              "status",
+              "since",
+              "notice"
+            ],
+            "type": "object"
+          },
           "TransportOption": {
             "additionalProperties": false,
             "properties": {
@@ -2568,7 +2665,6 @@
             "type": "object"
           }
         },
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -2589,11 +2685,23 @@
                     "covers": {
                       "type": "string"
                     },
+                    "dewa_consumption_charge_aed": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
                     "fixed_monthly_costs_aed": {
                       "type": [
                         "number",
                         "null"
                       ]
+                    },
+                    "fuel_surcharge": {
+                      "$ref": "#/$defs/HousingFeePause"
+                    },
+                    "housing_fee": {
+                      "$ref": "#/$defs/HousingFeePause"
                     },
                     "label": {
                       "type": "string"
@@ -2662,6 +2770,9 @@
                             },
                             "type": "array"
                           },
+                          "fuel_surcharge": {
+                            "$ref": "#/$defs/HousingFeePause"
+                          },
                           "group_coverage": {
                             "items": {
                               "additionalProperties": true,
@@ -2690,6 +2801,9 @@
                               "groceries",
                               "health_insurance"
                             ]
+                          },
+                          "meter_service_charge": {
+                            "$ref": "#/$defs/HousingFeePause"
                           },
                           "method": {
                             "const": "fao_supply_x_basket_prices"
@@ -2731,6 +2845,9 @@
                               "no_car"
                             ],
                             "type": "object"
+                          },
+                          "pause": {
+                            "$ref": "#/$defs/HousingFeePause"
                           },
                           "per_dependent_monthly_aed": {
                             "$ref": "#/$defs/HouseholdMonthlyRange"
@@ -2824,6 +2941,9 @@
                       },
                       "type": "array"
                     },
+                    "meter_service_charge": {
+                      "$ref": "#/$defs/HousingFeePause"
+                    },
                     "profile_id": {
                       "enum": [
                         "single",
@@ -2849,6 +2969,18 @@
                       ],
                       "type": "object"
                     },
+                    "status": {
+                      "const": "partial"
+                    },
+                    "subtotal_aed": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "subtotal_label": {
+                      "type": "string"
+                    },
                     "with_estimates_aed": {
                       "additionalProperties": false,
                       "properties": {
@@ -2870,14 +3002,6 @@
                       "type": "object"
                     }
                   },
-                  "required": [
-                    "profile_id",
-                    "label",
-                    "covers",
-                    "fixed_monthly_costs_aed",
-                    "lines",
-                    "provenance"
-                  ],
                   "type": "object"
                 },
                 "type": "array"
@@ -3034,7 +3158,6 @@
       "name": "free_zone_companies",
       "outputSchema": {
         "$defs": {},
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -3435,7 +3558,6 @@
             "type": "object"
           }
         },
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -3745,7 +3867,6 @@
       "name": "fx_rates",
       "outputSchema": {
         "$defs": {},
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -4281,7 +4402,6 @@
             "type": "object"
           }
         },
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -5036,7 +5156,6 @@
             "type": "object"
           }
         },
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -5619,7 +5738,6 @@
             "type": "object"
           }
         },
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -5752,7 +5870,6 @@
       "name": "health_insurance",
       "outputSchema": {
         "$defs": {},
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -6291,7 +6408,6 @@
             "type": "object"
           }
         },
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -6710,7 +6826,6 @@
       "name": "housing_sales",
       "outputSchema": {
         "$defs": {},
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -7065,7 +7180,6 @@
       "name": "ministry_shop_prices",
       "outputSchema": {
         "$defs": {},
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -7590,7 +7704,6 @@
             "type": "object"
           }
         },
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -8105,6 +8218,29 @@
               "null"
             ]
           },
+          "HousingFeePause": {
+            "additionalProperties": false,
+            "properties": {
+              "notice": {
+                "type": "string"
+              },
+              "since": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "const": "paused"
+              }
+            },
+            "required": [
+              "status",
+              "since",
+              "notice"
+            ],
+            "type": "object"
+          },
           "Links": {
             "additionalProperties": false,
             "properties": {
@@ -8275,7 +8411,6 @@
             "type": "object"
           }
         },
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -8332,15 +8467,6 @@
                             ]
                           }
                         },
-                        "required": [
-                          "iso2",
-                          "name",
-                          "currency",
-                          "tax_year",
-                          "tax_year_period",
-                          "variant",
-                          "variant_label"
-                        ],
                         "type": "object"
                       },
                       "country_notes": {
@@ -8348,6 +8474,12 @@
                           "type": "string"
                         },
                         "type": "array"
+                      },
+                      "dewa_consumption_charge_aed": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
                       },
                       "disclaimer": {
                         "type": "string"
@@ -8368,12 +8500,6 @@
                             "type": "number"
                           }
                         },
-                        "required": [
-                          "gross_annual_aed",
-                          "net_annual_aed",
-                          "net_monthly_aed",
-                          "income_tax_aed"
-                        ],
                         "type": "object"
                       },
                       "dubai_monthly_costs_aed": {
@@ -8416,18 +8542,13 @@
                             ]
                           }
                         },
-                        "required": [
-                          "rent",
-                          "school",
-                          "groceries",
-                          "utilities",
-                          "transport",
-                          "health"
-                        ],
                         "type": "object"
                       },
                       "estimate": {
                         "const": true
+                      },
+                      "fuel_surcharge": {
+                        "$ref": "#/$defs/HousingFeePause"
                       },
                       "fx": {
                         "additionalProperties": false,
@@ -8455,11 +8576,6 @@
                             ]
                           }
                         },
-                        "required": [
-                          "aed_per_unit",
-                          "rates_on",
-                          "source"
-                        ],
                         "type": "object"
                       },
                       "groceries_basket": {
@@ -8534,11 +8650,6 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "amount",
-                          "currency",
-                          "aed"
-                        ],
                         "type": "object"
                       },
                       "health_insurance": {
@@ -8564,12 +8675,6 @@
                                   "type": "string"
                                 }
                               },
-                              "required": [
-                                "component_id",
-                                "label",
-                                "kind",
-                                "amount"
-                              ],
                               "type": "object"
                             },
                             "type": "array"
@@ -8602,16 +8707,6 @@
                             "type": "number"
                           }
                         },
-                        "required": [
-                          "currency",
-                          "net_annual",
-                          "net_monthly",
-                          "income_tax",
-                          "social_contributions",
-                          "effective_rate",
-                          "breakdown",
-                          "net_annual_aed"
-                        ],
                         "type": "object"
                       },
                       "household": {
@@ -8627,14 +8722,13 @@
                             ]
                           }
                         },
-                        "required": [
-                          "status",
-                          "children"
-                        ],
                         "type": "object"
                       },
                       "household_type": {
                         "const": "business_owner"
+                      },
+                      "housing_fee": {
+                        "$ref": "#/$defs/HousingFeePause"
                       },
                       "left_over_after_fixed_costs_aed": {
                         "type": "number"
@@ -8658,6 +8752,9 @@
                           "high"
                         ],
                         "type": "object"
+                      },
+                      "meter_service_charge": {
+                        "$ref": "#/$defs/HousingFeePause"
                       },
                       "not_modelled": {
                         "items": {
@@ -8763,11 +8860,6 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "amount",
-                          "currency",
-                          "aed"
-                        ],
                         "type": "object"
                       },
                       "provenance": {
@@ -8861,27 +8953,25 @@
                           "withheld_reason": {
                             "enum": [
                               "rent_unknown",
-                              null
+                              null,
+                              "housing_fee_pending",
+                              "dewa_pending"
                             ]
                           }
                         },
-                        "required": [
-                          "home_monthly_net",
-                          "dubai_monthly_net",
-                          "net_gain_monthly",
-                          "net_gain_annual",
-                          "dubai_monthly_costs",
-                          "missing_costs",
-                          "costs_complete",
-                          "dubai_monthly_savings",
-                          "dubai_annual_savings",
-                          "home_monthly_savings",
-                          "home_annual_savings",
-                          "savings_difference_monthly",
-                          "savings_difference_annual",
-                          "withheld_reason"
-                        ],
                         "type": "object"
+                      },
+                      "status": {
+                        "const": "partial"
+                      },
+                      "subtotal_aed": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "subtotal_label": {
+                        "type": "string"
                       },
                       "transport_budget": {
                         "$ref": "#/$defs/HouseholdEstimateLine"
@@ -8908,38 +8998,12 @@
                             "type": "integer"
                           }
                         },
-                        "required": [
-                          "car_monthly_aed",
-                          "km_per_day",
-                          "salik_per_day",
-                          "public_transport_min_aed",
-                          "public_transport_max_aed",
-                          "fuel_month"
-                        ],
                         "type": [
                           "object",
                           "null"
                         ]
                       }
                     },
-                    "required": [
-                      "estimate",
-                      "disclaimer",
-                      "country",
-                      "household",
-                      "gross_annual",
-                      "home",
-                      "dubai",
-                      "fx",
-                      "dubai_monthly_costs_aed",
-                      "savings",
-                      "transport_reference",
-                      "notices",
-                      "country_notes",
-                      "not_modelled",
-                      "assumptions",
-                      "provenance"
-                    ],
                     "type": "object"
                   },
                   {
@@ -9552,7 +9616,6 @@
             "type": "object"
           }
         },
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -10008,7 +10071,6 @@
             "type": "object"
           }
         },
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -10501,7 +10563,6 @@
       "name": "shopper_price_reports",
       "outputSchema": {
         "$defs": {},
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -10679,7 +10740,6 @@
       "name": "start_here",
       "outputSchema": {
         "$defs": {},
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -10972,7 +11032,6 @@
             "type": "object"
           }
         },
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,
@@ -11798,7 +11857,6 @@
             "type": "object"
           }
         },
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
         "anyOf": [
           {
             "additionalProperties": false,

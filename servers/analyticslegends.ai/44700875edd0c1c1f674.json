@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "69d16105d4cecccffa3e535749f610108416d4dd4da3095213b31a39d2afd101",
+  "full_hash": "34749e79b64b38354966dffb63d94dd6cb85e35a53c2b292b8c07d19f7641375",
   "name": "ai.analyticslegends/sap-analytics",
-  "observed_at": "2026-10-28T02:04:15.401532Z",
+  "observed_at": "2026-10-31T02:05:59.047426Z",
   "sources": [
     "official"
   ],
@@ -1503,6 +1503,13 @@
                     "null"
                   ]
                 },
+                "daily_rate_max_usd": {
+                  "description": "DEPRECATED — read daily_rate_max + currency.",
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
                 "daily_rate_max_zar": {
                   "description": "DEPRECATED — read daily_rate_max + currency.",
                   "type": [
@@ -1644,6 +1651,13 @@
                   ]
                 },
                 "daily_rate_min_sgd": {
+                  "description": "DEPRECATED — read daily_rate_min + currency.",
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "daily_rate_min_usd": {
                   "description": "DEPRECATED — read daily_rate_min + currency.",
                   "type": [
                     "number",
@@ -2404,12 +2418,21 @@
         "readOnlyHint": true,
         "title": "Read an Academy module (Consultant tier)"
       },
-      "description": "Read one Academy training module in full — body, learning objectives and summary, EN, FR and DE — the written course corpus the Consultant web plan sells. On THIS endpoint the paid tranche is opened by the MCP Pass (€29.90/month, analyticslegends.ai/mcp-server/) or the Firm Pass; the Consultant and Legend web plans do not include MCP access. Requires an API key of an MCP Pass or Firm account (Authorization: Bearer alk_…); without one this tool refuses and `find_academy_modules` keeps serving the catalogue. Takes the module id (`M001`) or its slug (`datasphere-foundations`), both matched case-insensitively — `find_academy_modules` returns both on every row, and `query_knowledge_graph` returns the same ids as `module:M001` node ids, so a graph walk now ENDS somewhere. Unlike `get_study`, the whole module is served in one call: the longest body measured is 17 865 characters, two orders of magnitude under the response ceiling, so sectioning it would cost the caller context without protecting anything.",
+      "description": "Read one Academy training module in full — body, learning objectives and summary, EN, FR and DE — the written course corpus the Consultant web plan sells. On THIS endpoint the paid tranche is opened by the MCP Pass (€29.90/month, analyticslegends.ai/mcp-server/) or the Firm Pass; the Consultant and Legend web plans do not include MCP access. Requires an API key of an MCP Pass or Firm account (Authorization: Bearer alk_…); without one this tool refuses and `find_academy_modules` keeps serving the catalogue. Takes the module id (`M001`) or its slug (`datasphere-foundations`), both matched case-insensitively — `find_academy_modules` returns both on every row, and `query_knowledge_graph` returns the same ids as `module:M001` node ids, so a graph walk now ENDS somewhere. The module is served in one call. `lang` (en · fr · de) returns that language only; without it the three languages come back together — EXCEPT when the three would exceed the response ceiling (the Datasphere foundations course M001, rewritten as a full training on 2026-10-28, weighs 423 KB in three languages): the English text is then served alone and `filters.lang` says so — call again with lang=fr or lang=de for the other two.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
           "id": {
             "description": "Module id (`M001`) or slug (`datasphere-foundations`), verbatim from find_academy_modules.rows[].id / .slug.",
+            "type": "string"
+          },
+          "lang": {
+            "description": "Serve this language only. Omit it to get all three, unless they would exceed the response ceiling — then English alone is served and filters.lang says so.",
+            "enum": [
+              "en",
+              "fr",
+              "de"
+            ],
             "type": "string"
           }
         },
