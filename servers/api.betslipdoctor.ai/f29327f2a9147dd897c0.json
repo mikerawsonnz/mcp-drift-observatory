@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "799f55fabcfeb7d0a70a42e42bdc0f9b6151b2760e084086fc245137865399c7",
+  "full_hash": "c02353f405f29c65440dac693c8c6d446d9728f38aba994d3ff44d98ee7b9d66",
   "name": "ai.betslipdoctor/mcp",
-  "observed_at": "2026-10-31T02:06:02.706936Z",
+  "observed_at": "2026-11-01T02:04:04.770112Z",
   "sources": [
     "official"
   ],
-  "tool_count": 81,
+  "tool_count": 92,
   "tools": [
     {
       "_meta": {
@@ -41,6 +41,11 @@
           },
           "search": {
             "maxLength": 128,
+            "type": "string"
+          },
+          "ticketId": {
+            "description": "One saved ticket (GET tickets/:id) instead of the list.",
+            "format": "uuid",
             "type": "string"
           },
           "view": {
@@ -547,7 +552,7 @@
         "readOnlyHint": true,
         "title": "Today's board (live odds)"
       },
-      "description": "The app Live board (GET live/board): upcoming and in-play games with their main-market prices, optional league or sport, limit 1-20 and cursor. sport reads a sport chip's board across its leagues (SPRT_tennis, SPRT_soccer, SPRT_golf; tennis and golf games have no league). A league outside the app's chips is built on its first read, so that first answer can be 503 provider_unavailable with retryAfterSeconds: read again in about 60 s. mode: live with includeStatus: true lists only the games in play now, each with its status; with includeStatus: true, eventSeries gives each game its playoff series line (round, game, summary; MLB now) or null; stale: true means some games could not be confirmed yet, so read again shortly. Use category: event_catalog for original event market identities, event_prices for an exact source-bound group at one book, or board_snapshot for one prewarmed page; those require request. Decision support; never a wager.",
+      "description": "The app Live board (GET live/board): upcoming and in-play games, each with mainLines: its DraftKings game lines (slot, line, odds), optional league or sport, limit 1-20 and cursor. sport reads a sport chip's board across its leagues (SPRT_tennis, SPRT_soccer, SPRT_golf; tennis and golf games have no league). A league outside the app's chips is built on its first read, so that first answer can be 503 provider_unavailable with retryAfterSeconds: read again in about 60 s. Only leagues in season with a DraftKings price right now are listed: a league or sport without one answers no games (it is not in get_league_order either) and comes back by itself once its games are priced. mode: live with includeStatus: true lists only the games in play now, each with its status (a game in a league with no scoreboard feed, such as tennis or UFC, is listed while DraftKings prices it in play: its status is in_progress with the score, period and clock a public scoreboard has for it, or none; tennis: score = sets won, period = the set in play, displayClock = that set's games home-away; UFC: period = round); with includeStatus: true, eventSeries gives each game its playoff series line (round, game, summary; MLB now) or null; stale: true means some games could not be confirmed yet, so read again shortly. Use category: event_catalog for original event market identities, event_prices for an exact source-bound group at one book, or board_snapshot for one prewarmed page; those require request. pickem is the app's Pick'Em board for one game: request {eventId} returns the catalogue page and pickem.markets (full-game player Over/Under); request {eventId, marketId} returns that market's lines with DraftKings' price on each (pickem.prices). Never a wager.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -557,7 +562,8 @@
               "games",
               "event_catalog",
               "event_prices",
-              "board_snapshot"
+              "board_snapshot",
+              "pickem"
             ],
             "type": "string"
           },
@@ -1025,6 +1031,26 @@
                   "bookId"
                 ],
                 "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "cursor": {
+                    "type": "string"
+                  },
+                  "eventId": {
+                    "pattern": "^EVNT_",
+                    "type": "string"
+                  },
+                  "marketId": {
+                    "pattern": "^MKT_",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "eventId"
+                ],
+                "type": "object"
               }
             ],
             "description": "Required for event_catalog, event_prices or board_snapshot. Pass the exact original source-bound request; never relabel source IDs or periods."
@@ -1164,6 +1190,48 @@
               "currency": {
                 "pattern": "^[A-Z]{3}$",
                 "type": "string"
+              },
+              "groups": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "label": {
+                      "anyOf": [
+                        {
+                          "maxLength": 120,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "legIndexes": {
+                      "items": {
+                        "maximum": 24,
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "maxItems": 25,
+                      "minItems": 2,
+                      "type": "array"
+                    },
+                    "oddsAmerican": {
+                      "maximum": 1000000,
+                      "minimum": -1000000,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "legIndexes",
+                    "oddsAmerican"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 12,
+                "minItems": 1,
+                "type": "array"
               },
               "intent": {
                 "enum": [
@@ -2150,13 +2218,41 @@
               "advice",
               "context",
               "placement_context",
-              "units_summary"
+              "units_summary",
+              "chart",
+              "record",
+              "record_doctor_decisions",
+              "earlier_reports",
+              "earlier_report",
+              "recall",
+              "recall_week",
+              "recall_record",
+              "grade_comparison",
+              "doctor_overview",
+              "links",
+              "imports"
             ],
             "type": "string"
           },
           "currency": {
             "description": "ISO 4217 code.",
             "type": "string"
+          },
+          "id": {
+            "description": "earlier_report: the saved report; links: the import.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            "description": "The app query for chart, record_doctor_decisions, earlier_reports, recall (filters as JSON text), recall_week, grade_comparison, doctor_overview and imports.",
+            "type": "object"
           },
           "range": {
             "description": "1y is a rolling calendar year; ytd is year to date.",
@@ -2171,7 +2267,7 @@
             "type": "string"
           },
           "recordId": {
-            "description": "Original owned History record ID; advice or context category only.",
+            "description": "Original owned History record ID (advice, context, record, recall_record, record_doctor_decisions).",
             "format": "uuid",
             "type": "string"
           },
@@ -2591,58 +2687,33 @@
         ]
       },
       "annotations": {
-        "destructiveHint": true,
-        "idempotentHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
         "openWorldHint": true,
-        "readOnlyHint": false,
+        "readOnlyHint": true,
         "title": "Price-shop a slip"
       },
-      "description": "Compare posted prices across books for each leg of a slip (main markets). Reports every book's quote, the best price for the bettor, and how much the user's own line gives up. Only describes books with real posted data; never places a wager. Uses plan usage (odds refresh) under the app rules; retries deduplicate only within the existing 60-second usage bucket.",
+      "description": "Compare books on a saved slip, exactly the app's Compare books (POST tickets/compare-books): each leg's current price at up to 5 books (books: book ids; default the slip's own book, DraftKings and FanDuel), the best price for the bettor and how much the slip's own price gives up (lineShop). comparison is the app answer unchanged. Save the slip first (track_slip, ticket_actions save_live, scan_slip). Needs Pro or Elite, as the app (other plans: 402 comparison_plan_required). Never places a wager.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
-          "bookKey": {
-            "type": "string"
-          },
-          "intent": {
-            "enum": [
-              "singles",
-              "parlay"
-            ],
-            "type": "string"
-          },
-          "jurisdiction": {
-            "type": "string"
-          },
-          "legs": {
+          "books": {
             "items": {
-              "additionalProperties": false,
-              "properties": {
-                "book": {
-                  "description": "The book the user is on (e.g. 'draftkings'), if known.",
-                  "type": "string"
-                },
-                "odds": {
-                  "description": "The american odds the user is on (e.g. -120), if known.",
-                  "type": "number"
-                },
-                "query": {
-                  "description": "Leg description, e.g. 'Yankees moneyline' or 'Brewers -1.5'.",
-                  "type": "string"
-                }
-              },
-              "required": [
-                "query"
-              ],
-              "type": "object"
+              "pattern": "^BOOK_[A-Za-z0-9_-]{1,80}$",
+              "type": "string"
             },
-            "maxItems": 12,
+            "maxItems": 5,
             "minItems": 1,
             "type": "array"
+          },
+          "ticketId": {
+            "description": "The saved slip to compare.",
+            "format": "uuid",
+            "type": "string"
           }
         },
         "required": [
-          "legs"
+          "ticketId"
         ],
         "type": "object"
       },
@@ -2876,7 +2947,7 @@
         "readOnlyHint": true,
         "title": "Read Tail"
       },
-      "description": "Combined form of the Tail read tools: get_doctor_picks, get_doctor_parlays, get_league_order, get_tail_feed, tail_hot, tail_my_posts and get_tail_post (same fields, same answers): version bsd-agent-tail-v1 and one action.",
+      "description": "Combined form of the Tail read tools: get_doctor_picks, get_doctor_parlays, get_league_order, get_tail_feed, tail_hot, tail_my_posts and get_tail_post (same fields, same answers): version bsd-agent-tail-v1 and one action. Also every other Tail read the app has, on its own routes: timeline: GET tail/timeline params {limit, cursor}; timeline_post: GET tail/timeline/posts/{postId}; own_profile: GET tail/profile; profiles: GET tail/profiles params {prefix, limit, cursor}; profile: GET tail/profiles/{profileId}; profile_record: GET tail/profiles/{profileId}/record; profile_record_v2: GET tail/profiles/{profileId}/record-v2; profile_connections: GET tail/profiles/{profileId}/connections params {direction followers|following, limit, cursor}; relations: GET tail/relations params {kind follow|mute|block, limit, cursor}; search: POST tail/search params {query, category people|posts, limit, cursor}; lists: GET tail/lists params {limit, cursor}; list: GET tail/lists/{listId}; list_members: GET tail/lists/{listId}/members params {limit, cursor}; replies: GET tail/posts/{postId}/replies params {limit, cursor}; reply: GET tail/replies/{replyId}; moments: GET tail/moments params as the app; top: GET tail/top params as the app; top_v2: GET tail/top-v2 params {limit 1-50}; repost_state: GET tail/posts/{postId}/repost; post_grade: GET tail/posts/{postId}/grade; post_analysis: GET tail/posts/{postId}/analysis.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -2887,7 +2958,28 @@
               "doctor_picks",
               "doctor_parlays",
               "hot",
-              "my_posts"
+              "my_posts",
+              "timeline",
+              "timeline_post",
+              "own_profile",
+              "profiles",
+              "profile",
+              "profile_record",
+              "profile_record_v2",
+              "profile_connections",
+              "relations",
+              "search",
+              "lists",
+              "list",
+              "list_members",
+              "replies",
+              "reply",
+              "moments",
+              "top",
+              "top_v2",
+              "repost_state",
+              "post_grade",
+              "post_analysis"
             ],
             "type": "string"
           },
@@ -2942,11 +3034,26 @@
             "format": "uuid",
             "type": "string"
           },
+          "params": {
+            "additionalProperties": {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            "description": "The app query (or tail/search body) for timeline, profiles, profile_connections, relations, search, lists, list_members, replies, moments, top, top_v2.",
+            "type": "object"
+          },
           "postId": {
             "format": "uuid",
             "type": "string"
           },
           "profileId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "replyId": {
             "format": "uuid",
             "type": "string"
           },
@@ -3004,7 +3111,7 @@
         "readOnlyHint": false,
         "title": "Preview or publish to Tail"
       },
-      "description": "Combined form of the Tail write tools: preview_tail_post, publish_tail_post, share_graded_ticket_to_tail, tail_react, set_show_my_record, set_synced_record_consent and add_doctor_parlay_to_slip (same fields, same answers): version bsd-agent-tail-v1 and one action. Publish only after showing the exact preview and getting the customer's yes; publishing never places a wager.",
+      "description": "Combined form of the Tail write tools: preview_tail_post, publish_tail_post, share_graded_ticket_to_tail, tail_react, save_tail_post, set_show_my_record, set_synced_record_consent and add_doctor_parlay_to_slip (same fields, same answers): version bsd-agent-tail-v1 and one action. Publish only after showing the exact preview and getting the customer's yes; publishing never places a wager.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -3015,13 +3122,14 @@
               "record_settings",
               "synced_record_consent",
               "react",
+              "save",
               "share_report",
               "doctor_parlay_slip"
             ],
             "type": "string"
           },
           "active": {
-            "description": "react only: true adds fire, false removes it.",
+            "description": "react: true adds fire, false removes it. save: true saves the post, false removes it.",
             "type": "boolean"
           },
           "commandKey": {
@@ -3116,7 +3224,7 @@
             "type": "string"
           },
           "postId": {
-            "description": "react only: the Tail post.",
+            "description": "react and save only: the Tail post.",
             "format": "uuid",
             "type": "string"
           },
@@ -3554,6 +3662,48 @@
               "currency": {
                 "pattern": "^[A-Z]{3}$",
                 "type": "string"
+              },
+              "groups": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "label": {
+                      "anyOf": [
+                        {
+                          "maxLength": 120,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "legIndexes": {
+                      "items": {
+                        "maximum": 24,
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "maxItems": 25,
+                      "minItems": 2,
+                      "type": "array"
+                    },
+                    "oddsAmerican": {
+                      "maximum": 1000000,
+                      "minimum": -1000000,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "legIndexes",
+                    "oddsAmerican"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 12,
+                "minItems": 1,
+                "type": "array"
               },
               "intent": {
                 "enum": [
@@ -4812,7 +4962,7 @@
         "readOnlyHint": true,
         "title": "List Grade jobs"
       },
-      "description": "Read the authenticated account’s current Grade library, with optional limit 1-20 and account-bound cursor. Never starts research.",
+      "description": "Read the authenticated account’s current Grade library, with optional limit 1-20 and account-bound cursor. Each row’s headline is its Rocky letter (A+ to F, or NG) and report.rockyGradeSummary its label and score. Never starts research.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -5139,7 +5289,7 @@
         "readOnlyHint": true,
         "title": "Read saved Grade report"
       },
-      "description": "Return the verified immutable saved report for an owned completed Grade jobId. Returns unavailable until the real saved report is readable; never grades again.",
+      "description": "Return the verified immutable saved report for an owned completed Grade jobId. Returns unavailable until the real saved report is readable; never grades again. headline is the letter the app shows: Rocky’s Grade A+, A, B, C, D, F or NG (No grade) with its label. rockySummary carries the ten research factors, each leg’s modeled win probability against its break-even and its EV, the joint probability of all legs with the correlation used, confidence, top risks and the NG reasons (probabilities and EV as fractions).",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -5869,6 +6019,37 @@
               }
             ]
           },
+          "personalizedRockyGrade": {
+            "properties": {
+              "adjustmentBps": {},
+              "baseCalculationDigest": {},
+              "calculationDigest": {},
+              "caps": {},
+              "gradeSettings": {},
+              "label": {},
+              "letter": {},
+              "picksSharePct": {},
+              "policyVersion": {},
+              "riskDeductionBps": {},
+              "score": {},
+              "version": {}
+            },
+            "required": [
+              "version",
+              "baseCalculationDigest",
+              "gradeSettings",
+              "policyVersion",
+              "picksSharePct",
+              "riskDeductionBps",
+              "adjustmentBps",
+              "score",
+              "letter",
+              "label",
+              "caps",
+              "calculationDigest"
+            ],
+            "type": "object"
+          },
           "profileDigest": {
             "pattern": "^[a-f0-9]{64}$",
             "type": "string"
@@ -6093,6 +6274,51 @@
               "partial"
             ],
             "type": "string"
+          },
+          "rockyGrade": {
+            "properties": {
+              "calculationDigest": {},
+              "calibrationVersion": {},
+              "caps": {},
+              "confidence": {},
+              "factors": {},
+              "inputs": {},
+              "label": {},
+              "legs": {},
+              "letter": {},
+              "noGradeReasons": {},
+              "picksScore": {},
+              "priceScore": {},
+              "risks": {},
+              "score": {},
+              "scoreLetter": {},
+              "state": {},
+              "ticket": {},
+              "ticketDigest": {},
+              "version": {}
+            },
+            "required": [
+              "version",
+              "calibrationVersion",
+              "ticketDigest",
+              "state",
+              "letter",
+              "label",
+              "score",
+              "picksScore",
+              "priceScore",
+              "scoreLetter",
+              "noGradeReasons",
+              "caps",
+              "factors",
+              "legs",
+              "ticket",
+              "confidence",
+              "risks",
+              "inputs",
+              "calculationDigest"
+            ],
+            "type": "object"
           },
           "ruleVersion": {
             "const": "bsd-value-letters-v1",
@@ -7364,7 +7590,7 @@
         "readOnlyHint": true,
         "title": "Read the league order"
       },
-      "description": "Read BetSlip Doctor’s league order right now: leagues with games in play first, then the soonest tip within 6 hours, then by games in the next 24 hours, then this week’s popularity times season phase (rank, weight, phase, inSeason, featured). `slate` carries the default league and the featured game (the in-play or soonest game with the most markets), refreshed every 5 minutes. Live, Home, Pick’Em and the Doctor’s slate use this same order. Read-only; no account data.",
+      "description": "Read BetSlip Doctor’s league order right now: leagues with games in play first, then the soonest tip within 6 hours, then by games in the next 24 hours, then this week’s popularity times season phase (rank, weight, phase, inSeason, featured). `slate` carries the default league and the featured game (the in-play or soonest game with the most markets), refreshed every 5 minutes. Lists only leagues in season with a DraftKings price right now (the same leagues as the app’s chips, search and league lists); a league leaves when it has no priced game and comes back by itself when it does. Read-only; no account data.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {},
@@ -7527,7 +7753,7 @@
         "readOnlyHint": false,
         "title": "Add a Doctor parlay to the slip"
       },
-      "description": "Put one of the Doctor’s posted parlays (key from get_doctor_parlays) on this account’s slip in one step, with a unique commandKey. Checks every leg’s current price at the parlay’s book, saves the parlay as a private unplaced ticket and returns its legs (marketSelectionId, oddsAmerican, line, eventId) and ticketId; counts one tail per account per parlay. Same paid-leg lock as get_doctor_parlays; never places a bet. Reuse its commandKey on every retry.",
+      "description": "Put one of the Doctor’s posted parlays (key from get_doctor_parlays) on this account’s slip in one step, with a unique commandKey. Checks every leg’s current price at the parlay’s book, saves the parlay as a private unplaced ticket and returns its legs (marketSelectionId, oddsAmerican, line, eventId) and ticketId; counts one tail per account per parlay. Run check_slip with the ticketId before Grade or the book link. Same paid-leg lock as get_doctor_parlays; never places a bet. Reuse its commandKey on every retry.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -7617,6 +7843,60 @@
         }
       ],
       "title": "Fire a Tail post"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "tail.post"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Save a Tail post"
+      },
+      "description": "Save (active true) or unsave (active false) a Tail postId for this account, with a unique commandKey: the app’s Save on a post and on another bettor’s Tail Grade report. Private to this account; read saved posts with get_tail_feed feed bookmarks. Never places a wager. Reuse its commandKey on every retry.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "commandKey": {
+            "maxLength": 120,
+            "minLength": 16,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "type": "string"
+          },
+          "postId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "commandKey",
+          "postId",
+          "active"
+        ],
+        "type": "object"
+      },
+      "name": "save_tail_post",
+      "securitySchemes": [
+        {
+          "scopes": [
+            "tail.post"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Save a Tail post"
     },
     {
       "_meta": {
@@ -8431,7 +8711,7 @@
         "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": false,
-        "title": "Save a slip"
+        "title": "Save an app ticket"
       },
       "description": "Save one app ticket (the quote_grade ticket contract) to this account's saved slips through the app's POST tickets, with a stable client_mutation_id for retries. Stores the slip only; never prepares or places a wager.",
       "inputSchema": {
@@ -8878,7 +9158,7 @@
           "type": "oauth2"
         }
       ],
-      "title": "Save a slip"
+      "title": "Save an app ticket"
     },
     {
       "_meta": {
@@ -9851,7 +10131,7 @@
         "readOnlyHint": true,
         "title": "Search games, players and markets"
       },
-      "description": "Search the same way the app’s Home and Live search does. query is the typed text (a team, game, player or market name, e.g. \"Bears\" or \"Rasmussen\"); category is games (default), players or markets. Optional league (LGUE_ id) or sport (SPRT_ id) narrows it, limit is 1-20 and cursor is the previous result’s next. Games come back recently started first, then upcoming; each carries its eventId for get_box_score, price_shop_slip or the board. Players carry playerId and team; markets carry selectionId, market, side and line. Search results are names and ids only: no prices or scores.",
+      "description": "Search the same way the app’s Home and Live search does. query is the typed text (a team, game, player or market name, e.g. \"Bears\" or \"Rasmussen\"); category is games (default), players or markets. Optional league (LGUE_ id) or sport (SPRT_ id) narrows it, limit is 1-20 and cursor is the previous result’s next. Games come back recently started first, then upcoming; each carries its eventId for get_box_score, price_shop_slip or the board. Players carry playerId and team; markets carry selectionId, market, side and line. A player and a stat together (e.g. \"Bijan Robinson receptions\") answer his lines on that stat in his team's next game with DraftKings' current price (prices: selectionId, line, oddsAmerican). Other results are names and ids only.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
@@ -9999,6 +10279,112 @@
         "securitySchemes": [
           {
             "scopes": [
+              "odds.read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Check my slip"
+      },
+      "description": "The app slip’s rule for this conversation’s slip. Send legs (ids plus the oddsAmerican, line, observedAt and startsAt they were added with) or a ticketId from add_doctor_parlay_to_slip or copy_tail_slip. Legs whose game started or finished or whose line is gone come back in removed: drop them. legs stay, at current odds and line. empty: the slip is gone, build a new one. Run before Grade, before a book link, and when they return.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "legs": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "bookId": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "pattern": "^[A-Za-z0-9_-]+$",
+                  "type": "string"
+                },
+                "eventId": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "pattern": "^[A-Za-z0-9_-]+$",
+                  "type": "string"
+                },
+                "line": {
+                  "anyOf": [
+                    {
+                      "maxLength": 100,
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "marketSelectionId": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "pattern": "^[A-Za-z0-9_-]+$",
+                  "type": "string"
+                },
+                "observedAt": {
+                  "maxLength": 40,
+                  "type": "string"
+                },
+                "oddsAmerican": {
+                  "maximum": 1000000,
+                  "minimum": -1000000,
+                  "type": "integer"
+                },
+                "startsAt": {
+                  "anyOf": [
+                    {
+                      "maxLength": 40,
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "marketSelectionId",
+                "eventId",
+                "bookId"
+              ],
+              "type": "object"
+            },
+            "maxItems": 25,
+            "minItems": 1,
+            "type": "array"
+          },
+          "ticketId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "check_slip",
+      "securitySchemes": [
+        {
+          "scopes": [
+            "odds.read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Check my slip"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
               "account.preferences"
             ],
             "type": "oauth2"
@@ -10081,6 +10467,502 @@
         }
       ],
       "title": "Upgrade my plan"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "tail.post"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Tail: reply, react, follow, lists, reports, profile"
+      },
+      "description": "The Tail actions the app has, on its own routes, for this account. Public posts, deletes and reports send nothing until body.confirmation carries the app's literal: first call returns the preview; show it, get the customer's yes, then call again. reply: POST tail/posts/{postId}/replies {text} (confirmation PUBLISH_REPLY); remove_reply: POST tail/replies/{replyId}/remove (confirmation DELETE_REPLY); like: POST tail/posts/{postId}/like {active}; bookmark: POST tail/posts/{postId}/bookmark {active}; pin: POST tail/posts/{postId}/pin {active}; vote: POST tail/posts/{postId}/vote {choice: place|pass|null}; repost: POST tail/posts/{postId}/repost {active}; quote: POST tail/posts/{postId}/quotes {expectedRevision, text} (confirmation PUBLISH_QUOTE); poll_vote: POST tail/posts/{postId}/poll-vote {option 0-3}; relation: POST tail/relations {profileId, kind follow|mute|block, active}; list_create: POST tail/lists {name, description} (confirmation CREATE_LIST); list_edit: POST tail/lists/{listId} {expectedRevision, name, description}; list_member: POST tail/lists/{listId}/members {profileId, active}; list_remove: POST tail/lists/{listId}/remove (confirmation DELETE_LIST); report_post: POST tail/reports {postId, reason, details} (confirmation REPORT_POST); report_reply: POST tail/replies/{replyId}/report {reason, details} (confirmation REPORT_REPLY); report_profile: POST tail/profiles/{profileId}/report {reason, details} (confirmation REPORT_PROFILE); delete_post: POST tail/posts/{postId}/remove (confirmation DELETE_POST); profile_edit: POST tail/profile {expectedRevision, displayName, bio, settings}; claim_handle: POST account/handle {handle (3-20 of a-z 0-9 _), displayName, bio?, settings: {visibility: public|hidden, rankVisibility: auto|on|off}} (confirmation CREATE_PROFILE); profile_photo: POST tail/profile/photo {expectedRevision, photo: {mime image/jpeg|image/png, base64} or null}.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "enum": [
+              "reply",
+              "remove_reply",
+              "like",
+              "bookmark",
+              "pin",
+              "vote",
+              "repost",
+              "quote",
+              "poll_vote",
+              "relation",
+              "list_create",
+              "list_edit",
+              "list_member",
+              "list_remove",
+              "report_post",
+              "report_reply",
+              "report_profile",
+              "delete_post",
+              "profile_edit",
+              "claim_handle",
+              "profile_photo"
+            ],
+            "type": "string"
+          },
+          "body": {
+            "description": "The app request body for this action, unchanged.",
+            "type": "object"
+          },
+          "commandKey": {
+            "description": "Writes: one stable key per write, reused on every retry.",
+            "maxLength": 120,
+            "minLength": 16,
+            "type": "string"
+          },
+          "listId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "postId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "profileId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "replyId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "name": "tail_social",
+      "securitySchemes": [
+        {
+          "scopes": [
+            "tail.post"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Tail: reply, react, follow, lists, reports, profile"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "account.preferences"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Notifications"
+      },
+      "description": "This account's notification inbox and settings, the same as the app's bell. feed: GET notifications/feed params {filter all|mentions|verified, limit 1-25, cursor}; item: GET notifications/items/{itemId}; read: POST notifications/read {action read, ids} or {action read_all}; settings: GET notifications/settings; set_settings: POST notifications/settings {confirmation SET_NOTIFICATION_PREFERENCES, expectedRevision, channels, pushRoast}.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "enum": [
+              "feed",
+              "item",
+              "read",
+              "settings",
+              "set_settings"
+            ],
+            "type": "string"
+          },
+          "body": {
+            "description": "The app request body for this action, unchanged.",
+            "type": "object"
+          },
+          "commandKey": {
+            "description": "Writes: one stable key per write, reused on every retry.",
+            "maxLength": 120,
+            "minLength": 16,
+            "type": "string"
+          },
+          "itemId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            "description": "The app query (filters, limit, cursor) for a read.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "name": "notifications",
+      "securitySchemes": [
+        {
+          "scopes": [
+            "account.preferences"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Notifications"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "doctor.use"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Doctor: decisions, reply buttons, memory"
+      },
+      "description": "The Doctor actions beside the conversation, as the app does them. Record a decision only when the customer says what they did; change memory consent only when they ask. decision: GET doctor/messages/{messageId}/decision params {beforeRevision}; record_decision: POST doctor/messages/{messageId}/decision {messageId, messageDigest, threadId, binding, expectedRevision, confirmation SAVE_RESPONSE, decision followed|changed|skipped|unknown, modifiedTicketId}; saved_reply: GET doctor/messages/{messageId}/saved-reply params {messageDigest, threadId, ticketId|reportId|historyKind+historyId}; grade_this: POST doctor/messages/{messageId}/grade-quote app body; compare_books: POST doctor/messages/{messageId}/book-prices app body; revise_ticket: POST doctor/messages/{messageId}/revisions app body; book_check: GET doctor/book-comparisons/{comparisonId}; delete_thread: POST doctor/threads/{threadId}/delete (confirmation DELETE); memory_status: GET doctor/memory; memory_context: GET doctor/memory/context; memory_consent: POST doctor/memory/consent {enabled, expectedGeneration, confirmation ALLOW_HONCHO_MEMORY|DISABLE_HONCHO_MEMORY}; memory_forget_all: POST doctor/memory/forget {expectedGeneration} (confirmation FORGET_RECALLED_MEMORY); notes_consent: POST memory/consent {enabled, expectedGeneration} (on/off switch).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "enum": [
+              "decision",
+              "record_decision",
+              "saved_reply",
+              "grade_this",
+              "compare_books",
+              "revise_ticket",
+              "book_check",
+              "delete_thread",
+              "memory_status",
+              "memory_context",
+              "memory_consent",
+              "memory_forget_all",
+              "notes_consent"
+            ],
+            "type": "string"
+          },
+          "body": {
+            "description": "The app request body for this action, unchanged.",
+            "type": "object"
+          },
+          "commandKey": {
+            "description": "Writes: one stable key per write, reused on every retry.",
+            "maxLength": 120,
+            "minLength": 16,
+            "type": "string"
+          },
+          "comparisonId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "messageId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            "description": "The app query (filters, limit, cursor) for a read.",
+            "type": "object"
+          },
+          "threadId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "name": "doctor_actions",
+      "securitySchemes": [
+        {
+          "scopes": [
+            "doctor.use"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Doctor: decisions, reply buttons, memory"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "account.preferences"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Account settings"
+      },
+      "description": "This account's settings, exactly as the app's Settings screens read and write them. set_preferences: POST account/preferences {any app preference field, gradeDepthDefault}; favorite_teams: GET account/favorite-teams; set_favorite_teams: POST account/favorite-teams app body; set_timezone: POST account/timezone {timezone}; quota: GET account/quota; book_balances: GET sportsbooks/balances; set_book_currency: POST sportsbooks/currency app body {accountId, identityDigest, expectedRevision, currency, confirmation}; seen_books: GET sportsbooks/seen; bug_report: POST bug-reports app body; bug_reports: GET bug-reports; bug_rewards: GET bug-reports/rewards.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "enum": [
+              "set_preferences",
+              "favorite_teams",
+              "set_favorite_teams",
+              "set_timezone",
+              "quota",
+              "book_balances",
+              "set_book_currency",
+              "seen_books",
+              "bug_report",
+              "bug_reports",
+              "bug_rewards"
+            ],
+            "type": "string"
+          },
+          "body": {
+            "description": "The app request body for this action, unchanged.",
+            "type": "object"
+          },
+          "commandKey": {
+            "description": "Writes: one stable key per write, reused on every retry.",
+            "maxLength": 120,
+            "minLength": 16,
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            "description": "The app query (filters, limit, cursor) for a read.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "name": "account_settings",
+      "securitySchemes": [
+        {
+          "scopes": [
+            "account.preferences"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Account settings"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "slips.track"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "History: record a bet, notes, links"
+      },
+      "description": "Write this account's History as the app does. Record a bet only when the customer says they placed it. save_manual: POST history/manual {id?, expectedRevision?, confirmation PLACED, input {ticketId, placedAt, status, outcome, ...}}; set_currency: POST history/currency app body; save_link: POST history/links app body (link an import to a manual record); recall_save: POST history/recall/organization app body (notes, tags, bookmark).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "enum": [
+              "save_manual",
+              "set_currency",
+              "save_link",
+              "recall_save"
+            ],
+            "type": "string"
+          },
+          "body": {
+            "description": "The app request body for this action, unchanged.",
+            "type": "object"
+          },
+          "commandKey": {
+            "description": "Writes: one stable key per write, reused on every retry.",
+            "maxLength": 120,
+            "minLength": 16,
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "name": "history_actions",
+      "securitySchemes": [
+        {
+          "scopes": [
+            "slips.track"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "History: record a bet, notes, links"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "slips.track"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Save a Live slip, confirm an import, read a bet link"
+      },
+      "description": "Ticket actions the app has, on its own routes. Saving stores the slip only; nothing is placed. save_live: POST tickets/live the app Live slip body (selections at the prices shown); import: POST tickets/import the app import confirmation body; from_link: POST slip/from-link {url}: a DraftKings or FanDuel bet link.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "enum": [
+              "save_live",
+              "import",
+              "from_link"
+            ],
+            "type": "string"
+          },
+          "body": {
+            "description": "The app request body for this action, unchanged.",
+            "type": "object"
+          },
+          "commandKey": {
+            "description": "Writes: one stable key per write, reused on every retry.",
+            "maxLength": 120,
+            "minLength": 16,
+            "type": "string"
+          },
+          "statedPrices": {
+            "description": "save_live: the X-BSD-Stated-Prices value the app sends for the prices shown.",
+            "maxLength": 8192,
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "name": "ticket_actions",
+      "securitySchemes": [
+        {
+          "scopes": [
+            "slips.track"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Save a Live slip, confirm an import, read a bet link"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "odds.read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Read a pasted betslip"
+      },
+      "description": "Text the customer pasted (a book's slip, a chat or note list, Rocky's \"Game 1: ... / Player — 8+ Rebounds (-225)\" format) read exactly as the app's Grade › Paste reads it: legs with market, selection, line, odds, player, stat and game, printed same-game groups, stake, payout, book and intent. Then each leg is matched by the app's own leg match (match.status matched | event_only | ambiguous | unmatched, eventId, marketId, catalog market) and the account's default region. A DraftKings or FanDuel link answers kind link with the url for ticket_actions from_link. Reads only; saves nothing.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "description": "The pasted slip text, unchanged.",
+            "maxLength": 16000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "type": "object"
+      },
+      "name": "read_pasted_slip",
+      "securitySchemes": [
+        {
+          "scopes": [
+            "odds.read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Read a pasted betslip"
     },
     {
       "_meta": {
@@ -10351,7 +11233,7 @@
     },
     {
       "_meta": {
-        "openai/outputTemplate": "ui://bsd/customer-cards-v3.html",
+        "openai/outputTemplate": "ui://bsd/customer-cards-v4.html",
         "openai/widgetAccessible": true,
         "securitySchemes": [
           {
@@ -10362,7 +11244,7 @@
           }
         ],
         "ui": {
-          "resourceUri": "ui://bsd/customer-cards-v3.html",
+          "resourceUri": "ui://bsd/customer-cards-v4.html",
           "visibility": [
             "model",
             "app"
@@ -10376,7 +11258,7 @@
         "readOnlyHint": true,
         "title": "Show saved Grade card"
       },
-      "description": "Return the verified immutable saved report for an owned completed Grade jobId. Returns unavailable until the real saved report is readable; never grades again. Show the saved result in an interactive BSD card in the chat. Use this tool when the customer wants to see their saved result. This is a read-only view.",
+      "description": "Return the verified immutable saved report for an owned completed Grade jobId. Returns unavailable until the real saved report is readable; never grades again. headline is the letter the app shows: Rocky’s Grade A+, A, B, C, D, F or NG (No grade) with its label. rockySummary carries the ten research factors, each leg’s modeled win probability against its break-even and its EV, the joint probability of all legs with the correlation used, confidence, top risks and the NG reasons (probabilities and EV as fractions). Show the saved result in an interactive BSD card in the chat. Use this tool when the customer wants to see their saved result. This is a read-only view.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -10403,7 +11285,7 @@
     },
     {
       "_meta": {
-        "openai/outputTemplate": "ui://bsd/customer-cards-v3.html",
+        "openai/outputTemplate": "ui://bsd/customer-cards-v4.html",
         "openai/widgetAccessible": true,
         "securitySchemes": [
           {
@@ -10414,7 +11296,7 @@
           }
         ],
         "ui": {
-          "resourceUri": "ui://bsd/customer-cards-v3.html",
+          "resourceUri": "ui://bsd/customer-cards-v4.html",
           "visibility": [
             "model",
             "app"
@@ -10460,7 +11342,7 @@
     },
     {
       "_meta": {
-        "openai/outputTemplate": "ui://bsd/customer-cards-v3.html",
+        "openai/outputTemplate": "ui://bsd/customer-cards-v4.html",
         "openai/widgetAccessible": true,
         "securitySchemes": [
           {
@@ -10471,7 +11353,7 @@
           }
         ],
         "ui": {
-          "resourceUri": "ui://bsd/customer-cards-v3.html",
+          "resourceUri": "ui://bsd/customer-cards-v4.html",
           "visibility": [
             "model",
             "app"
@@ -10551,7 +11433,7 @@
     },
     {
       "_meta": {
-        "openai/outputTemplate": "ui://bsd/customer-cards-v3.html",
+        "openai/outputTemplate": "ui://bsd/customer-cards-v4.html",
         "openai/widgetAccessible": true,
         "securitySchemes": [
           {
@@ -10562,7 +11444,7 @@
           }
         ],
         "ui": {
-          "resourceUri": "ui://bsd/customer-cards-v3.html",
+          "resourceUri": "ui://bsd/customer-cards-v4.html",
           "visibility": [
             "model",
             "app"
@@ -10612,7 +11494,7 @@
     },
     {
       "_meta": {
-        "openai/outputTemplate": "ui://bsd/customer-cards-v3.html",
+        "openai/outputTemplate": "ui://bsd/customer-cards-v4.html",
         "openai/widgetAccessible": true,
         "securitySchemes": [
           {
@@ -10623,7 +11505,7 @@
           }
         ],
         "ui": {
-          "resourceUri": "ui://bsd/customer-cards-v3.html",
+          "resourceUri": "ui://bsd/customer-cards-v4.html",
           "visibility": [
             "model",
             "app"
@@ -10779,7 +11661,7 @@
     },
     {
       "_meta": {
-        "openai/outputTemplate": "ui://bsd/customer-cards-v3.html",
+        "openai/outputTemplate": "ui://bsd/customer-cards-v4.html",
         "openai/widgetAccessible": true,
         "securitySchemes": [
           {
@@ -10790,7 +11672,7 @@
           }
         ],
         "ui": {
-          "resourceUri": "ui://bsd/customer-cards-v3.html",
+          "resourceUri": "ui://bsd/customer-cards-v4.html",
           "visibility": [
             "model",
             "app"
@@ -11130,7 +12012,7 @@
     },
     {
       "_meta": {
-        "openai/outputTemplate": "ui://bsd/customer-cards-v3.html",
+        "openai/outputTemplate": "ui://bsd/customer-cards-v4.html",
         "openai/widgetAccessible": true,
         "securitySchemes": [
           {
@@ -11141,7 +12023,7 @@
           }
         ],
         "ui": {
-          "resourceUri": "ui://bsd/customer-cards-v3.html",
+          "resourceUri": "ui://bsd/customer-cards-v4.html",
           "visibility": [
             "model",
             "app"
@@ -11183,7 +12065,7 @@
     },
     {
       "_meta": {
-        "openai/outputTemplate": "ui://bsd/customer-cards-v3.html",
+        "openai/outputTemplate": "ui://bsd/customer-cards-v4.html",
         "openai/widgetAccessible": true,
         "securitySchemes": [
           {
@@ -11195,7 +12077,7 @@
           }
         ],
         "ui": {
-          "resourceUri": "ui://bsd/customer-cards-v3.html",
+          "resourceUri": "ui://bsd/customer-cards-v4.html",
           "visibility": [
             "model",
             "app"
@@ -11352,7 +12234,7 @@
     },
     {
       "_meta": {
-        "openai/outputTemplate": "ui://bsd/customer-cards-v3.html",
+        "openai/outputTemplate": "ui://bsd/customer-cards-v4.html",
         "openai/widgetAccessible": true,
         "securitySchemes": [
           {
@@ -11364,7 +12246,7 @@
           }
         ],
         "ui": {
-          "resourceUri": "ui://bsd/customer-cards-v3.html",
+          "resourceUri": "ui://bsd/customer-cards-v4.html",
           "visibility": [
             "model",
             "app"
@@ -11428,7 +12310,7 @@
     },
     {
       "_meta": {
-        "openai/outputTemplate": "ui://bsd/customer-cards-v3.html",
+        "openai/outputTemplate": "ui://bsd/customer-cards-v4.html",
         "openai/widgetAccessible": true,
         "securitySchemes": [
           {
@@ -11441,7 +12323,7 @@
           }
         ],
         "ui": {
-          "resourceUri": "ui://bsd/customer-cards-v3.html",
+          "resourceUri": "ui://bsd/customer-cards-v4.html",
           "visibility": [
             "model",
             "app"
@@ -11455,7 +12337,7 @@
         "readOnlyHint": false,
         "title": "Save reviewed Tail slip"
       },
-      "description": "After the customer reviews every current leg and confirms the exact stake/currency/settlement fields, save the app’s owned Tail/Fade ticket using the preview binding and CONFIRM_COPY_TICKET. Keep commandKey stable on retries. Returns an unplaced slip; never places a wager or grades automatically.",
+      "description": "After the customer reviews every current leg and confirms the exact stake/currency/settlement fields, save the app’s owned Tail/Fade ticket using the preview binding and CONFIRM_COPY_TICKET. Keep commandKey stable on retries. Returns an unplaced slip; run check_slip with its ticketId before Grade or the book link. Never places a wager or grades automatically.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
@@ -11862,6 +12744,198 @@
         }
       ],
       "title": "Scan a betslip screenshot"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "doctor.use"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Look up a Doctor fact"
+      },
+      "description": "Start a Doctor consult from its quote, then call with its jobId and structured fact, public subject names, league, date, timezone and optional eventId. If the fields do not match a planned lookup, the lookup_not_planned error includes extra.plannedLookups: the exact allowed {fact, subject, league, date, timezone, eventId} fields. Retry with one of those entries and the same jobId. If the plan is not ready yet, retry after the consult has planned it. Returns the outcome, reason and linked sources after the consult succeeds. Use the quoted sources for facts and numbers.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "date": {
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+            "type": "string"
+          },
+          "eventId": {
+            "pattern": "^EVNT_[A-Za-z0-9_-]{1,100}$",
+            "type": "string"
+          },
+          "fact": {
+            "enum": [
+              "starter",
+              "lineup",
+              "injury_status",
+              "availability",
+              "weather",
+              "news",
+              "stats",
+              "result",
+              "line_move",
+              "schedule"
+            ],
+            "type": "string"
+          },
+          "jobId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "league": {
+            "anyOf": [
+              {
+                "enum": [
+                  "LGUE_nba",
+                  "LGUE_nfl",
+                  "LGUE_nhl",
+                  "LGUE_mlb",
+                  "LGUE_wnba",
+                  "LGUE_ncaaf",
+                  "LGUE_ncaab"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "subject": {
+            "items": {
+              "maxLength": 60,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 3,
+            "minItems": 1,
+            "type": "array"
+          },
+          "timezone": {
+            "maxLength": 64,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "fact",
+          "subject",
+          "league",
+          "date",
+          "timezone",
+          "jobId"
+        ],
+        "type": "object"
+      },
+      "name": "look_up_fact",
+      "securitySchemes": [
+        {
+          "scopes": [
+            "doctor.use"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Look up a Doctor fact"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "odds.read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Research a player prop"
+      },
+      "description": "Research a player and his prop the way the Doctor does: his last 5 and last 10 games against his season average and tonight’s line (overs, unders and average margin, hot/cold/steady), his games against tonight’s opponent, the prop against the opponent’s defense (what it allowed in its last 5 finals against the league average per team-game, good/average/bad and rank), both teams’ last 5 results and their head-to-head. league is a LGUE_ id; player is his name (leave it out, with team and opponent, for just both teams’ last 5 and head-to-head); team (or teamId) places him on a roster when the name alone is not enough; opponent defaults to his team’s next game; market (\"Points\", \"Passing Yards\", \"Shots on Goal\", \"Strikeouts\", \"PRA\") and line (tonight’s number, e.g. from search_markets) set the over/under counts. Public stats, saved and reused across users. Covers the NBA, WNBA, NFL, college football, NHL, MLB and college basketball; state unavailable says why.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "eventId": {
+            "pattern": "^EVNT_[A-Za-z0-9_-]{1,100}$",
+            "type": "string"
+          },
+          "league": {
+            "pattern": "^LGUE_[A-Za-z0-9_-]{1,60}$",
+            "type": "string"
+          },
+          "line": {
+            "maximum": 100000,
+            "minimum": -1000,
+            "type": "number"
+          },
+          "market": {
+            "maxLength": 80,
+            "minLength": 1,
+            "type": "string"
+          },
+          "opponent": {
+            "maxLength": 80,
+            "minLength": 1,
+            "type": "string"
+          },
+          "opponentTeamId": {
+            "pattern": "^TEAM_[A-Za-z0-9_-]{1,100}$",
+            "type": "string"
+          },
+          "player": {
+            "maxLength": 80,
+            "minLength": 1,
+            "type": "string"
+          },
+          "playerId": {
+            "pattern": "^PLYR_[A-Za-z0-9_-]{1,100}$",
+            "type": "string"
+          },
+          "team": {
+            "maxLength": 80,
+            "minLength": 1,
+            "type": "string"
+          },
+          "teamId": {
+            "pattern": "^TEAM_[A-Za-z0-9_-]{1,100}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "league"
+        ],
+        "type": "object"
+      },
+      "name": "get_player_research",
+      "securitySchemes": [
+        {
+          "scopes": [
+            "odds.read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Research a player prop"
     },
     {
       "_meta": {

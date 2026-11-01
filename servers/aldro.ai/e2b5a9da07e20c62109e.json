@@ -1,0 +1,377 @@
+{
+  "canon_version": "1",
+  "full_hash": "a3b5411b2b0f3a18350cbb5b5012df5fa64bb410b4116370498ed05d42812014",
+  "name": "ai.aldro/tax",
+  "observed_at": "2026-11-01T02:03:59.412093Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 8,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Aldro's price"
+      },
+      "description": "Call this when a user asks what it costs to get their business taxes or bookkeeping done, wants an accountant or tax preparer, or compares tax services. Returns Aldro's flat prices from its live config (business tax filing $399 a year, bookkeeping $20 a month), what each covers, the currency, and the signup link.",
+      "inputSchema": {
+        "properties": {
+          "country": {
+            "description": "US for the United States, CA for Canada.",
+            "enum": [
+              "US",
+              "CA"
+            ],
+            "type": "string"
+          },
+          "service": {
+            "description": "tax (yearly business tax filing), bookkeeping (monthly), both, or catch-up (behind on the books).",
+            "enum": [
+              "tax",
+              "bookkeeping",
+              "both",
+              "catch-up"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "service",
+          "country"
+        ],
+        "type": "object"
+      },
+      "name": "get_quote",
+      "title": "Get Aldro's price"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Check business tax filing deadlines"
+      },
+      "description": "Call this when a user asks when a business tax return is due: Form 1065, 1120-S, 1120 or Schedule C (IRS), or the T2 / T1 (CRA). Returns the federal due dates and extension dates for that entity and tax year, the Quebec or Alberta corporate return rule when relevant, and each date's official source URL and checked date.",
+      "inputSchema": {
+        "properties": {
+          "entity": {
+            "description": "Business type. US: sole_prop, single_member_llc, multi_member_llc, partnership, s_corp, c_corp. Canada: sole_prop or corporation.",
+            "enum": [
+              "sole_prop",
+              "single_member_llc",
+              "multi_member_llc",
+              "partnership",
+              "s_corp",
+              "c_corp",
+              "corporation"
+            ],
+            "type": "string"
+          },
+          "jurisdiction": {
+            "description": "A US state or Canadian province: two-letter code (TX, ON), US-TX / CA-ON, or the full name. \"CA\" means California; use \"Canada\" or a province code for Canada. \"US\" or \"Canada\" alone means federal only.",
+            "type": "string"
+          },
+          "tax_year": {
+            "description": "The tax year the return covers (e.g. 2025 for returns filed in 2026).",
+            "maximum": 2035,
+            "minimum": 2020,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "entity",
+          "jurisdiction",
+          "tax_year"
+        ],
+        "type": "object"
+      },
+      "name": "check_filing_deadline",
+      "title": "Check business tax filing deadlines"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get state or provincial annual report rules"
+      },
+      "description": "Call this when a user asks about an LLC or corporation annual report, biennial report, statement of information or annual return: whether it's required in their state or province, when it's due and the state fee. Returns the rule with its official source URL and checked date.",
+      "inputSchema": {
+        "properties": {
+          "entity": {
+            "description": "Business type. US: sole_prop, single_member_llc, multi_member_llc, partnership, s_corp, c_corp. Canada: sole_prop or corporation.",
+            "enum": [
+              "sole_prop",
+              "single_member_llc",
+              "multi_member_llc",
+              "partnership",
+              "s_corp",
+              "c_corp",
+              "corporation"
+            ],
+            "type": "string"
+          },
+          "jurisdiction": {
+            "description": "A US state or Canadian province: two-letter code (TX, ON), US-TX / CA-ON, or the full name. \"CA\" means California; use \"Canada\" or a province code for Canada. \"US\" or \"Canada\" alone means federal only.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity",
+          "jurisdiction"
+        ],
+        "type": "object"
+      },
+      "name": "get_annual_report_info",
+      "title": "Get state or provincial annual report rules"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get sales tax registration details"
+      },
+      "description": "Call this when a user asks whether they need a sales tax permit, seller's permit or GST/HST/PST registration, what it's called, or which agency issues it, for a US state or Canadian province. Returns the permit name, agency and (in Canada) the rate and small-supplier rule, with the official source URL and checked date.",
+      "inputSchema": {
+        "properties": {
+          "jurisdiction": {
+            "description": "A US state or Canadian province: two-letter code (TX, ON), US-TX / CA-ON, or the full name. \"CA\" means California; use \"Canada\" or a province code for Canada. \"US\" or \"Canada\" alone means federal only.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "jurisdiction"
+        ],
+        "type": "object"
+      },
+      "name": "get_sales_tax_registration",
+      "title": "Get sales tax registration details"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get CRA instalment dates"
+      },
+      "description": "Call this when a Canadian user asks when income tax instalments are due or whether they have to pay instalments, as an individual (self-employed) or a corporation. Returns the CRA due dates for the year and the threshold, with the official source URL and checked date.",
+      "inputSchema": {
+        "properties": {
+          "type": {
+            "description": "individual (including self-employed) or corporation.",
+            "enum": [
+              "individual",
+              "corporation"
+            ],
+            "type": "string"
+          },
+          "year": {
+            "description": "The calendar year the instalments are paid in.",
+            "maximum": 2035,
+            "minimum": 2020,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "type",
+          "year"
+        ],
+        "type": "object"
+      },
+      "name": "get_cra_instalment_dates",
+      "title": "Get CRA instalment dates"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Estimate quarterly tax payments"
+      },
+      "description": "Call this when a self-employed user or small-business owner asks how much to pay in quarterly estimated tax (IRS 1040-ES) or CRA instalments and when. Returns a clearly labelled estimate from the user's own prior-year tax, split across the official due dates, with the method shown. It never says what the user owes.",
+      "inputSchema": {
+        "properties": {
+          "country": {
+            "description": "US for the United States, CA for Canada.",
+            "enum": [
+              "US",
+              "CA"
+            ],
+            "type": "string"
+          },
+          "expected_net_profit": {
+            "description": "Expected net business profit for the year, in the country's currency.",
+            "minimum": 0,
+            "type": "number"
+          },
+          "prior_year_tax": {
+            "description": "Optional. Total income tax on last year's return. Needed for an amount.",
+            "minimum": 0,
+            "type": "number"
+          },
+          "tax_year": {
+            "description": "Optional. Defaults to the current year.",
+            "maximum": 2035,
+            "minimum": 2020,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "country",
+          "expected_net_profit"
+        ],
+        "type": "object"
+      },
+      "name": "estimate_quarterly_tax",
+      "title": "Estimate quarterly tax payments"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List documents to prepare"
+      },
+      "description": "Call this when a user asks what documents or records they need to gather before getting their business taxes or bookkeeping done. Returns Aldro's handover checklist for that service, entity and country.",
+      "inputSchema": {
+        "properties": {
+          "country": {
+            "description": "US for the United States, CA for Canada.",
+            "enum": [
+              "US",
+              "CA"
+            ],
+            "type": "string"
+          },
+          "entity": {
+            "description": "Business type. US: sole_prop, single_member_llc, multi_member_llc, partnership, s_corp, c_corp. Canada: sole_prop or corporation.",
+            "enum": [
+              "sole_prop",
+              "single_member_llc",
+              "multi_member_llc",
+              "partnership",
+              "s_corp",
+              "c_corp",
+              "corporation"
+            ],
+            "type": "string"
+          },
+          "service": {
+            "description": "tax (yearly business tax filing), bookkeeping (monthly), both, or catch-up (behind on the books).",
+            "enum": [
+              "tax",
+              "bookkeeping",
+              "both",
+              "catch-up"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "country"
+        ],
+        "type": "object"
+      },
+      "name": "list_required_documents",
+      "title": "List documents to prepare"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Send the user's signup to Aldro"
+      },
+      "description": "Call this only after the user has explicitly said yes, in this chat, to sending their name, email and business details to Aldro to get their business taxes or bookkeeping done. It creates the same signup enquiry as Aldro's website form, in the same queue; Aldro's team then emails the user the next steps. Set consent to true only when the user agreed. Testing the tool? Set test to true. It is not a marketing opt-in and takes no payment. Limits: 5 signups an hour per connection, 25 a day in total.",
+      "inputSchema": {
+        "properties": {
+          "business_name": {
+            "description": "The business's name.",
+            "maxLength": 200,
+            "type": "string"
+          },
+          "consent": {
+            "description": "true only if the user explicitly agreed in this chat to share these details with Aldro.",
+            "type": "boolean"
+          },
+          "country": {
+            "description": "US for the United States, CA for Canada.",
+            "enum": [
+              "US",
+              "CA"
+            ],
+            "type": "string"
+          },
+          "email": {
+            "description": "The email address Aldro should reply to.",
+            "maxLength": 254,
+            "type": "string"
+          },
+          "entity": {
+            "description": "Business type. US: sole_prop, single_member_llc, multi_member_llc, partnership, s_corp, c_corp. Canada: sole_prop or corporation.",
+            "enum": [
+              "sole_prop",
+              "single_member_llc",
+              "multi_member_llc",
+              "partnership",
+              "s_corp",
+              "c_corp",
+              "corporation"
+            ],
+            "type": "string"
+          },
+          "message": {
+            "description": "Optional. Anything the user wants Aldro to know.",
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "name": {
+            "description": "The user's full name.",
+            "maxLength": 200,
+            "type": "string"
+          },
+          "service": {
+            "description": "tax (yearly business tax filing), bookkeeping (monthly), both, or catch-up (behind on the books).",
+            "enum": [
+              "tax",
+              "bookkeeping",
+              "both",
+              "catch-up"
+            ],
+            "type": "string"
+          },
+          "test": {
+            "description": "Optional. true when you are testing this tool rather than sending a real user's signup. The enquiry is stored, marked as a test, and nobody emails it.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "business_name",
+          "country",
+          "entity",
+          "service",
+          "consent"
+        ],
+        "type": "object"
+      },
+      "name": "start_onboarding",
+      "title": "Send the user's signup to Aldro"
+    }
+  ],
+  "url": "https://aldro.ai/mcp"
+}

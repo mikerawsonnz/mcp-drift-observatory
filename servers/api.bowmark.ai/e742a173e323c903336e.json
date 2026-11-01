@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "bdfd2c73af3ea30356cb7078e8a351a232128c571a19c5c97c7b15e5c7a4a91c",
+  "full_hash": "c68145f33fa2cde05be5fa4cfe6e395a10f80a08299b808e9b4ff553ac427586",
   "name": "ai.bowmark/bowmark",
-  "observed_at": "2026-10-31T02:06:05.112593Z",
+  "observed_at": "2026-11-01T02:04:07.218350Z",
   "sources": [
     "official"
   ],
-  "tool_count": 23,
+  "tool_count": 24,
   "tools": [
     {
       "_meta": {
@@ -79,31 +79,48 @@
         "readOnlyHint": false,
         "title": "Do the task on the live websites and return the result"
       },
-      "description": "**Executes the task on the real websites** and returns the result. Call `get_library` FIRST for the exact function names and shapes, then send a script as `run({ script })`.\n\nTHE SCRIPT is a plain async JavaScript body, not a wrapping function. `bowmark` is a ready global: `await bowmark.<capability>.<fn>(...)`, or one site via `await bowmark.providers.<provider>.<fn>(...)`. `return` what you want back; `log(...)` for progress. Built-ins plus `URL`/`URLSearchParams` exist; `fetch`, `import`, `setTimeout` and a filesystem do not — `bowmark` is the only I/O.\n\nMIND THE CLOCK. Your client times a tool call out at around 55 seconds, and one capability call already spends 30-55 seconds, so default to ONE per script. Need several? Run them together in `Promise.allSettled` (a dropped leg still comes back as `partial`), never one after another, and never `await` inside a `for` loop. Keep the result under ~25,000 characters.\n\nCHECK `status` BEFORE `ok` — `ok` | `error` | `partial` | `needs_user` | `running`:\n• `running`: it is still going. Call `run({ runId })` to wait for the SAME run; never resend the script.\n• `partial`: `result` is real but narrower than asked; `incomplete` names what did not answer. Tell your user — never call it complete. `incomplete.failures[].fixable: true` means your argument was wrong: fix it and rerun.\n• `needs_user`: a site needs your user signed in; not a failure. Give them `meta.handoff.url`, name the sites, then call `wait_for_sign_in` with `meta.handoff.ref`. On `done`, send the SAME script unchanged.\n• `error`: there is no result; `error` says why.\n\nSaving files, one exit IP, saved secrets, `warnings`, `emptyHanded`, and the billed `browser_agent`/`delegate` fallbacks: `get_library({ query: \"run guide\" })`.",
+      "description": "**Executes the task on the real websites** and returns the result. Call `get_library` FIRST, then start with `run({ script })` — never add `runId`.\n\nTHE SCRIPT is a plain async JavaScript body, not a wrapping function. `bowmark` is a ready global: `await bowmark.<capability>.<fn>(...)`, or one site via `await bowmark.providers.<provider>.<fn>(...)`. `return` what you want back; `log(...)` for progress. Built-ins plus `URL`/`URLSearchParams` exist; `fetch`, `import`, `setTimeout` and a filesystem do not — `bowmark` is the only I/O.\n\nMIND THE CLOCK. Your client times a tool call out at around 55 seconds, and one capability call already spends 30-55 seconds, so default to ONE per script. Need several? Run them together in `Promise.allSettled` (a dropped leg still comes back as `partial`), never one after another, and never `await` inside a `for` loop. Keep the result under ~25,000 characters.\n\nCHECK `status` BEFORE `ok` — `ok` | `error` | `partial` | `needs_user` | `running`:\n• `running`: it is still going. Call `run({ runId })` to wait for the SAME run; never resend the script.\n• `partial`: `result` is real but narrower than asked; `incomplete` names what did not answer. Tell your user — never call it complete. `incomplete.failures[].fixable: true` means your argument was wrong: fix it and rerun.\n• `needs_user`: a site needs your user signed in; not a failure. Give them `meta.handoff.url`, name the sites, then call `wait_for_sign_in` with `meta.handoff.ref`. On `done`, send the SAME script unchanged.\n• `error`: there is no result; `error` says why.\n\nSaving files, one exit IP, saved secrets, `warnings`, `emptyHanded`, and the billed `browser_agent`/`delegate` fallbacks: `get_library({ query: \"run guide\" })`.",
       "execution": {
         "taskSupport": "forbidden"
       },
       "inputSchema": {
-        "additionalProperties": false,
-        "properties": {
-          "egress": {
-            "description": "Optional. `\"link\"` sends every request of this run through the user's own Chrome (Bowmark Link) and fails with \"Link not connected\" when it is not open; `\"default\"` or leaving it out uses Bowmark's own route. The result echoes it as `egress`.",
-            "enum": [
-              "default",
-              "link"
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "egress": {
+                "description": "Optional. `\"link\"` sends every request of this run through the user's own Chrome (Bowmark Link) and fails with \"Link not connected\" when it is not open; `\"default\"` or leaving it out uses Bowmark's own route. The result echoes it as `egress`.",
+                "enum": [
+                  "default",
+                  "link"
+                ],
+                "type": "string"
+              },
+              "script": {
+                "description": "The JavaScript script body to execute (async, against the `bowmark` global). e.g. `const { flights, warnings } = await bowmark.flights.search({from:'SFO',to:'JFK',depart:'2026-09-01'}); return { best: flights.sort((a,b)=>a.price-b.price)[0], warnings };`",
+                "type": "string"
+              }
+            },
+            "required": [
+              "script"
             ],
-            "type": "string"
+            "type": "object"
           },
-          "runId": {
-            "description": "Only to collect a run an earlier call answered `status: \"running\"` for: pass its `runId` and no `script`, and this call waits for that same run's result.",
-            "format": "uuid",
-            "type": "string"
-          },
-          "script": {
-            "description": "The JavaScript script body to execute (async, against the `bowmark` global). e.g. `const { flights, warnings } = await bowmark.flights.search({from:'SFO',to:'JFK',depart:'2026-09-01'}); return { best: flights.sort((a,b)=>a.price-b.price)[0], warnings };`",
-            "type": "string"
+          {
+            "additionalProperties": false,
+            "properties": {
+              "runId": {
+                "description": "Only to collect a run an earlier call answered `status: \"running\"` for: pass its `runId` and no `script`, and this call waits for that same run's result.",
+                "format": "uuid",
+                "type": "string"
+              }
+            },
+            "required": [
+              "runId"
+            ],
+            "type": "object"
           }
-        },
+        ],
         "type": "object"
       },
       "name": "run",
@@ -314,7 +331,7 @@
         "readOnlyHint": false,
         "title": "Open a page for the user (jig)"
       },
-      "description": "Make the user a \"jig\": their own copy of a website, running through Bowmark, that you curate as they talk to you. Asked for \"a jig of YouTube\" or \"Amazon, no promotions, best products first\", build a page that LOOKS like that site — layout, views, controls — with Bowmark's name and logo where the site's would be, every list filled by Bowmark library functions as this user. Then stay in the loop: the user keeps talking here, and you change what it shows (`jig_update` state) or how it looks (`jig_update` html) while their tab updates live.\n\nGive the user the link that comes back; that tab is the app. Start from a built-in (`template`) when one fits, else write the page (`html`) — call `get_library({ query: \"jig guide\" })` FIRST for the component kit and layout classes. Reopen an existing jig with `jig_open({ jigId })` (find it via `jig_list`) rather than rebuilding it. Before curating (\"clear the slop\"), call `jig_look` to see what the page shows now and what the user just did.\n\nInside the page, one global, `window.bowmark`: `bowmark.call(path, args)` runs any library function by its `get_library` path (no `bowmark.` prefix), metered for this user; `bowmark.batch([...])` runs up to 8 together. `bowmark.state`/`onState(fn)` is what you pass here and change with `jig_update` — put every curation choice there. `bowmark.setState(patch)` saves a user click back into it. `bowmark.show({ view, items })` reports what is on screen (what `jig_look` reads). `bowmark.tellModel(text)` notes what happened; `bowmark.say(text)` posts here as the user, chat panel only. `bowmark.open(url)`; `bowmark.theme` is light/dark. Full signatures: the jig guide.\n\nNo `fetch`, no external script/style/font. A call needing sign-in pauses behind a banner the page draws, resuming once signed in. No chat box in the page — the user talks to you here.\n\nBOWMARK'S LOOK, THE SITE'S LAYOUT: build from the kit's premade components in Bowmark's colors, never the site's, and never invent a page title. Components and built-ins: the jig guide.",
+      "description": "Make the user a \"jig\": their own copy of a website, running through Bowmark, that you curate as they talk to you. Asked for \"a jig of YouTube\" or \"Amazon, no promotions, best products first\", build a page that LOOKS like that site — layout, views, controls — with Bowmark's name and logo where the site's would be, every list filled by Bowmark library functions as this user. Then stay in the loop: the user keeps talking here, and you change what it shows (`jig_update` state) or how it looks (`jig_update` html) while their tab updates live.\n\nGive the user the link that comes back; that tab is the app. Start from a built-in (`template`) when one fits, else write the page (`html`) — call `get_library({ query: \"jig guide\" })` FIRST for the component kit and layout classes. Reopen an existing jig with `jig_open({ jigId })` (find it via `jig_list`) rather than rebuilding it. Before curating (\"clear the slop\"), call `jig_look` to see what the page shows now and what the user just did.\n\nInside the page, one global, `window.bowmark`: `bowmark.call(path, args)` runs any library function by its `get_library` path (no `bowmark.` prefix), metered for this user; `bowmark.batch([...])` runs up to 8 together. `bowmark.state`/`onState(fn)` is what you pass here and change with `jig_update` — put every curation choice there. `bowmark.setState(patch)` saves a user click back into it. `bowmark.show({ view, items })` reports what is on screen (what `jig_look` reads). `bowmark.tellModel(text)` notes what happened; `bowmark.say(text)` posts here as the user, chat panel only. `bowmark.open(url)`. Use `location.hash` for views; back/forward work. Full signatures: the jig guide.\n\nNo `fetch`, no external script/style/font. A call needing sign-in pauses behind a banner until the user signs in. No chat box in the page — the user talks to you here.\n\nBOWMARK'S LOOK, THE SITE'S LAYOUT: build from the kit's premade components in Bowmark's colors, never the site's, and never invent a page title. Components and built-ins: the jig guide.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -744,6 +761,99 @@
         "type": "object"
       },
       "title": "Report what Bowmark could not do for this task"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Check what your account has spent"
+      },
+      "description": "See the real cost of calls on this account, itemized by resource (provider calls, browser sessions, IP leases) and aggregated in dollars. Pass no arguments to see this month; pass `month: '2026-09'` to see a past month (format `YYYY-MM`). Returns `totalUsd` and line items with `sku`, `quantity`, `unit` and `usd`. This is the EXACT amount your account has been charged, matching the invoice.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "month": {
+            "description": "Past month in format YYYY-MM. Omit for current month.",
+            "pattern": "^\\d{4}-\\d{2}$",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_usage",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "lines": {
+            "description": "Itemized charges by resource",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "quantity": {
+                  "description": "Number of calls or units",
+                  "type": "number"
+                },
+                "sku": {
+                  "description": "Resource type (e.g., 'api.provider', 'browser.session')",
+                  "type": "string"
+                },
+                "unit": {
+                  "description": "Unit of measurement (e.g., 'call', 'minute')",
+                  "type": "string"
+                },
+                "usd": {
+                  "description": "Amount charged in USD",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "sku",
+                "quantity",
+                "unit",
+                "usd"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "month": {
+            "description": "The month in YYYY-MM format",
+            "type": "string"
+          },
+          "totalUsd": {
+            "description": "Total amount charged for the month in USD",
+            "type": "number"
+          },
+          "unitemizedUsd": {
+            "description": "Any unitemized charges in USD",
+            "type": "number"
+          }
+        },
+        "required": [
+          "month",
+          "totalUsd",
+          "lines",
+          "unitemizedUsd"
+        ],
+        "type": "object"
+      },
+      "title": "Check what your account has spent"
     },
     {
       "_meta": {

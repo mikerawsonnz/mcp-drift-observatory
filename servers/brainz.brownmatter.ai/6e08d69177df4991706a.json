@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "898e5b6ab53987e2004c6cb81f571856d99d332718a607f48ada0b7baf35a10b",
+  "full_hash": "2f79e2404db80e5a77568587b87c6308b545534636e6ce19c81343190fba3a77",
   "name": "ai.brownmatter/brainz",
-  "observed_at": "2026-10-29T02:05:03.749468Z",
+  "observed_at": "2026-11-01T02:04:09.361921Z",
   "sources": [
     "official"
   ],
-  "tool_count": 16,
+  "tool_count": 17,
   "tools": [
     {
       "annotations": {
@@ -549,7 +549,7 @@
         "readOnlyHint": false,
         "title": "Dream (nightly consolidation)"
       },
-      "description": "Dreaming: a scheduled consolidation sweep over this vault. Light stages what changed since the last dream (near-duplicate concepts, finished task outcomes, hygiene counts); REM asks an LLM for proposals; deep applies the ones that pass threshold gates: merges duplicates (edges redirected, the other tombstoned), promotes outcome knowledge into concepts, adds missing links, and files a task for each contradiction. A sweep that would touch too much of the vault is rejected; every applied dream keeps preimages and can be reverted. {action: \"status\"} shows schedule + last dream; {action: \"run\"} dreams now; {action: \"diary\"} reads the Dream Diary; {action: \"revert\", id} undoes one dream; {action: \"configure\", enabled?, cadenceHours?} sets it up. Without an LLM only light runs.",
+      "description": "Dreaming: a scheduled consolidation sweep over this vault. Light stages what changed since the last dream (near-duplicate concepts, finished task outcomes, hygiene counts); REM asks an LLM for proposals; deep applies the ones that pass threshold gates: merges duplicates (edges redirected, the other tombstoned), promotes outcome knowledge into concepts, adds missing links, and files a task for each contradiction. A sweep that would touch too much of the vault is rejected; every applied dream keeps preimages and can be reverted. {action: \"status\"} shows schedule + last dream; {action: \"run\"} dreams now; {action: \"diary\"} reads the Dream Diary; {action: \"revert\", id} undoes one dream; {action: \"configure\", ...} sets the schedule, mode (apply, propose, light-only), phases, thresholds, caps, a stricter loss rail and the LLM choice; {action: \"apply\", id, proposals?} decides a proposed dream. Without an LLM only light runs.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -558,28 +558,56 @@
         "additionalProperties": false,
         "properties": {
           "action": {
-            "description": "\"status\" reports whether dreaming is on, its cadence, the last/next dream and any sweep in flight. \"run\" starts (or continues) a sweep NOW and advances it as far as one request allows. \"diary\" returns recent Dream Diary entries (newest first). \"revert\" undoes one dream via its preimages (requires `id`). \"configure\" turns dreaming on/off and sets the cadence.",
+            "description": "\"status\" reports the settings, the last/next dream and any sweep in flight. \"run\" starts (or continues) a sweep NOW and advances it as far as one request allows. \"diary\" returns recent Dream Diary entries (newest first). \"revert\" undoes one dream via its preimages (requires `id`). \"configure\" changes this vault's dreaming settings. \"apply\" decides a proposed dream (propose mode): applies the listed `proposals` (all when omitted) and rejects the rest (requires `id`).",
             "enum": [
               "status",
               "run",
               "diary",
               "revert",
-              "configure"
+              "configure",
+              "apply"
             ],
             "type": "string"
           },
           "cadenceHours": {
-            "description": "With \"configure\": hours between dreams (default 24).",
+            "description": "With \"configure\": Hours between dreams (default 24).",
             "maximum": 168,
             "minimum": 1,
             "type": "integer"
           },
+          "caps": {
+            "additionalProperties": false,
+            "description": "With \"configure\": Most changes per dream: maxMerges 5 (1-20), maxPromotions 5 (1-20), maxLinks 10 (1-50), maxContradictions 3 (1-10).",
+            "properties": {
+              "maxContradictions": {
+                "maximum": 10,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "maxLinks": {
+                "maximum": 50,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "maxMerges": {
+                "maximum": 20,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "maxPromotions": {
+                "maximum": 20,
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
           "enabled": {
-            "description": "With \"configure\": turn nightly dreaming on or off.",
+            "description": "With \"configure\": Turn scheduled dreaming on or off.",
             "type": "boolean"
           },
           "id": {
-            "description": "With \"revert\": the dream id to undo (from \"diary\" or \"status\").",
+            "description": "With \"revert\" or \"apply\": the dream id (from \"diary\" or \"status\").",
             "type": "string"
           },
           "limit": {
@@ -587,6 +615,122 @@
             "maximum": 50,
             "minimum": 1,
             "type": "integer"
+          },
+          "llm": {
+            "additionalProperties": false,
+            "description": "With \"configure\": Cloud: which LLM the REM step uses — \"auto\" (default), \"workers-ai\", or \"byok\" (only the account's own key) — and a model id for the account's own key; null clears it.",
+            "properties": {
+              "model": {
+                "anyOf": [
+                  {
+                    "maxLength": 200,
+                    "minLength": 1,
+                    "pattern": "^[A-Za-z0-9._:/@-]+$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "provider": {
+                "enum": [
+                  "auto",
+                  "workers-ai",
+                  "byok"
+                ],
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "lossRail": {
+            "additionalProperties": false,
+            "description": "With \"configure\": How much of the vault one dream may modify: maxTouchFraction (0.01-0.2) and minTouchAllowance (0-3). Can only be made stricter than the defaults.",
+            "properties": {
+              "maxTouchFraction": {
+                "maximum": 0.2,
+                "minimum": 0.01,
+                "type": "number"
+              },
+              "minTouchAllowance": {
+                "maximum": 3,
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "mode": {
+            "description": "With \"configure\": \"apply\" writes the changes that pass the gates (default); \"propose\" holds them in the Dream Diary until approved with {action: \"apply\"}; \"light-only\" never calls an LLM.",
+            "enum": [
+              "apply",
+              "propose",
+              "light-only"
+            ],
+            "type": "string"
+          },
+          "phases": {
+            "additionalProperties": false,
+            "description": "With \"configure\": Turn individual kinds of change on or off: merges, promotions, links, contradictions.",
+            "properties": {
+              "contradictions": {
+                "type": "boolean"
+              },
+              "links": {
+                "type": "boolean"
+              },
+              "merges": {
+                "type": "boolean"
+              },
+              "promotions": {
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
+          "proposals": {
+            "description": "With \"apply\": the proposal numbers (`n`) to approve; omit for all, [] to reject all.",
+            "items": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "maxItems": 200,
+            "type": "array"
+          },
+          "runHourUtc": {
+            "anyOf": [
+              {
+                "maximum": 23,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "With \"configure\": Preferred UTC hour for a dream when the cadence is 24h or more; null clears it."
+          },
+          "thresholds": {
+            "additionalProperties": false,
+            "description": "With \"configure\": Minimum confidence (0.5-1) per kind: merge 0.8, promote 0.7, link 0.7, contradiction 0.6 by default.",
+            "properties": {
+              "contradiction": {
+                "$ref": "#/properties/thresholds/properties/merge"
+              },
+              "link": {
+                "$ref": "#/properties/thresholds/properties/merge"
+              },
+              "merge": {
+                "maximum": 1,
+                "minimum": 0.5,
+                "type": "number"
+              },
+              "promote": {
+                "$ref": "#/properties/thresholds/properties/merge"
+              }
+            },
+            "type": "object"
           }
         },
         "required": [
@@ -757,6 +901,40 @@
       },
       "name": "create_task",
       "title": "Create a task"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Create a vault"
+      },
+      "description": "Create a new, empty vault owned by you and add it to this connection. Returns the new vault and the vaults this connection can now use. Once a connection covers more than one vault, every vault tool takes a `vault` argument (a slug or id) and list_vaults lists the vaults. Each account has a vault limit and an hourly creation limit.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "description": "The new vault's display name.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "slug": {
+            "description": "Optional slug (lowercase letters, digits, dashes). Derived from `name` when omitted; must not already be used by one of your vaults.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "create_vault",
+      "title": "Create a vault"
     }
   ],
   "url": "https://brainz.brownmatter.ai/mcp"

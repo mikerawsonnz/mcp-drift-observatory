@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "bca6bd7b3c992b1725e0e4f3875411bbbf8fdb408f9e67aeb5be0b26aa361a3e",
+  "full_hash": "0cef4dd3f00f2c0a3519cf99b79d2598afb898e1b39d32f1119d11f155e26779",
   "name": "ai.budgetseo/budget-seo-mcp",
-  "observed_at": "2026-10-30T02:04:34.916890Z",
+  "observed_at": "2026-11-01T02:04:08.012558Z",
   "sources": [
     "official"
   ],
-  "tool_count": 16,
+  "tool_count": 17,
   "tools": [
     {
       "annotations": {
@@ -226,6 +226,84 @@
             ],
             "type": "object"
           },
+          "searchConsole": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "connected": {
+                    "type": "boolean"
+                  },
+                  "projects": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "averagePosition": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        },
+                        "clicks": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        },
+                        "clicksDelta": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        },
+                        "impressions": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        },
+                        "linked": {
+                          "type": "boolean"
+                        },
+                        "projectId": {
+                          "type": "string"
+                        },
+                        "projectName": {
+                          "type": "string"
+                        },
+                        "siteUrl": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "projectId",
+                        "projectName",
+                        "linked",
+                        "siteUrl",
+                        "clicks",
+                        "impressions",
+                        "averagePosition",
+                        "clicksDelta"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "connected",
+                  "projects"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "since": {
             "type": "string"
           },
@@ -261,7 +339,8 @@
           "changes",
           "plan",
           "usage",
-          "nextCheckAt"
+          "nextCheckAt",
+          "searchConsole"
         ],
         "type": "object"
       },
@@ -575,6 +654,9 @@
                 },
                 "name": {
                   "type": "string"
+                },
+                "searchConsoleLinked": {
+                  "type": "boolean"
                 }
               },
               "required": [
@@ -582,7 +664,8 @@
                 "name",
                 "domain",
                 "keywordCount",
-                "isPlanLocked"
+                "isPlanLocked",
+                "searchConsoleLinked"
               ],
               "type": "object"
             },
@@ -852,6 +935,40 @@
               "null"
             ]
           },
+          "searchConsole": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "averagePosition": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "clicks": {
+                    "type": "number"
+                  },
+                  "ctr": {
+                    "type": "number"
+                  },
+                  "impressions": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "clicks",
+                  "impressions",
+                  "ctr",
+                  "averagePosition"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "searchVolume": {
             "type": [
               "number",
@@ -882,7 +999,8 @@
           "aiOverviewCited",
           "history",
           "competitors",
-          "checklist"
+          "checklist",
+          "searchConsole"
         ],
         "type": "object"
       },
@@ -1048,6 +1166,211 @@
         "type": "object"
       },
       "title": "AI visibility"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Real Google Search Console clicks, impressions, CTR, and average position for one project. Last 28 days, plus the previous 28 days. Does not spend lookup credits. If linked is false, the project is not connected and clicks must not be invented.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "projectId": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "type": "object"
+      },
+      "name": "get_search_performance",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "lastSyncedAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "linked": {
+            "type": "boolean"
+          },
+          "property": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "current": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "averagePosition": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "clicks": {
+                        "type": "number"
+                      },
+                      "ctr": {
+                        "type": "number"
+                      },
+                      "impressions": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "clicks",
+                      "impressions",
+                      "ctr",
+                      "averagePosition"
+                    ],
+                    "type": "object"
+                  },
+                  "previous": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "averagePosition": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "clicks": {
+                        "type": "number"
+                      },
+                      "ctr": {
+                        "type": "number"
+                      },
+                      "impressions": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "clicks",
+                      "impressions",
+                      "ctr",
+                      "averagePosition"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "current",
+                  "previous"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "siteUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "topQueries": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "averagePosition": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "clicks": {
+                  "type": "number"
+                },
+                "ctr": {
+                  "type": "number"
+                },
+                "impressions": {
+                  "type": "number"
+                },
+                "query": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "query",
+                "clicks",
+                "impressions",
+                "ctr",
+                "averagePosition"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "trackedKeywords": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "averagePosition": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "clicks": {
+                  "type": "number"
+                },
+                "ctr": {
+                  "type": "number"
+                },
+                "impressions": {
+                  "type": "number"
+                },
+                "keyword": {
+                  "type": "string"
+                },
+                "keywordId": {
+                  "type": "string"
+                },
+                "query": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "query",
+                "clicks",
+                "impressions",
+                "ctr",
+                "averagePosition",
+                "keywordId",
+                "keyword"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "windowDays": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "linked",
+          "siteUrl",
+          "lastSyncedAt",
+          "windowDays",
+          "property",
+          "trackedKeywords",
+          "topQueries"
+        ],
+        "type": "object"
+      },
+      "title": "Search Console performance"
     },
     {
       "annotations": {
