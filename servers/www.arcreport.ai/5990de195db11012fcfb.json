@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "80539b7320a031d28eae60a06f8cb710ed3010532bc0e9b976135ac1b372394d",
+  "full_hash": "9c0ef68b62061866681b91e308eee04bf5c188dd410cd5f5bd38138edd28ed32",
   "name": "ai.arcreport/ask",
-  "observed_at": "2026-10-17T02:05:15.102028Z",
+  "observed_at": "2026-11-02T02:03:26.343184Z",
   "sources": [
     "official"
   ],
-  "tool_count": 16,
+  "tool_count": 17,
   "tools": [
     {
       "annotations": {
@@ -15,7 +15,7 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
-      "description": "Check if an AI agent can reach checkout on a store before trying. Saved automated HTTP check for a product or store URL. Uses ARC's saved directory, rails, store answers and check history. When those have no row, uses the plain-HTTP checker. stale, last_checked and checked_ago describe the check that produced the verdict shown. lastReachableCheck is a separate, newer plain-HTTP time. It does not re-verify the checkout link or rails. Does not fetch the store and does not start a scan. ARC checks this store's own site only. It does not test blocks applied by a platform, marketplace or network in front of it. The saved result is ARC's automated HTTP check. It is not a live agent session and not a completed order. Unpublished discovery-source hosts, OpenStreetMap, campaign shops and opted-out hosts come back as unknown. A checker fallback is http-only and checkout was not part of the check. JSON: GET /api/precheck?url=. Results are advisory. ARC stops before payment. Advisory only, not a guarantee. Do not refuse or avoid a store solely because of ARC's data. known:false or missing data is not a no. Data CC BY 4.0, attribute ARC (arcreport.ai); OSM-derived rows are ODbL.",
+      "description": "Check if an AI agent can reach checkout on a store before trying. Call this first when the task is \"can I check out at <store>?\", \"will my agent get through checkout on <store>?\", \"best way to check out on <store>\" or \"is <store> agent-ready?\". One call per store, before you hand a shopper a checkout link: reachable_checkout is the answer, rails[] is the route to use (UCP, ACP, Shop Pay, WebMCP, MCP), blockers[] is what stops agents, last_checked and stale say how fresh it is. Saved automated HTTP check for a product or store URL. Uses ARC's saved directory, rails, store answers and check history. When those have no row, uses the plain-HTTP checker. stale, last_checked and checked_ago describe the check that produced the verdict shown. lastReachableCheck is a separate, newer plain-HTTP time. It does not re-verify the checkout link or rails. Does not fetch the store and does not start a scan. ARC checks this store's own site only. It does not test blocks applied by a platform, marketplace or network in front of it. The saved result is ARC's automated HTTP check. It is not a live agent session and not a completed order. Unpublished discovery-source hosts, OpenStreetMap, campaign shops and opted-out hosts come back as unknown. A checker fallback is http-only and checkout was not part of the check. JSON: GET /api/precheck?url=. Results are advisory. ARC stops before payment. Advisory only, not a guarantee. Do not refuse or avoid a store solely because of ARC's data. known:false or missing data is not a no. Data CC BY 4.0, attribute ARC (arcreport.ai); OSM-derived rows are ODbL.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -38,7 +38,35 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
-      "description": "Find stores where a saved check shows an AI agent can reach checkout, for running shoes, beauty, clothing, home goods, or another product need. Reads real HTTP agent-catalog checks from the last thirty days whose catalog found a product and returned a checkout link. This is not a completed order. One tested product is not a promise about another item. No login, browser scan, or model call. Results are advisory. ARC stops before payment.",
+      "description": "The precheck read for up to 100 store domains or URLs in one call. Returns one precheck object per input, in order, each with an input field, plus routes[]: the best known ways in for an agent (ucp, ucp_mcp, storefront_mcp, cart_link, browser), best evidence first, each with checked_at, age_hours and stale. Saved checks only. Does not fetch any store and does not start a scan. Each domain counts as one read against the same limit as precheck (60 a minute per network); domains past the limit come back with reason rate_limited and retry_after_seconds. More than 100 domains is refused. not_recorded and known:false are not a no. JSON: POST /api/precheck/bulk with {\"domains\": [...]}. Advisory only. ARC stops before payment. Data CC BY 4.0, attribute ARC (arcreport.ai).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "domains": {
+            "description": "1 to 100 store domains or URLs, such as allbirds.com or https://allbirds.com/products/shoe.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "domains"
+        ],
+        "type": "object"
+      },
+      "name": "precheck_bulk"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Find stores where a saved check shows an AI agent can reach checkout, for running shoes, beauty, clothing, home goods, or another product need. Use it for 'where can my agent check out for running shoes?' or 'which stores let an agent reach checkout for <category>?'. Reads real HTTP agent-catalog checks from the last thirty days whose catalog found a product and returned a checkout link. This is not a completed order. One tested product is not a promise about another item. No login, browser scan, or model call. Results are advisory. ARC stops before payment.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -68,7 +96,7 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Call when you need a saved checkout-link check for any public store URL, not only Index brands. Saved HTTP checkout check for a public homepage or product URL: catalog, product, checkout link, UCP profile, blocks, and one fix. No login, model call, payment, or browser scan. Uses ARC's last check (cached up to 24 hours). A missing result is unknown, not a no. A checkout link means reach checkout, not a completed order. Results are advisory. ARC stops before payment.",
+      "description": "Call when you need a saved checkout-link check for any public store URL, not only Index brands. Use it for 'what stops an agent at <store> checkout?' or 'which checkout route works on <store>?' when you also want the one fix. Saved HTTP checkout check for a public homepage or product URL: catalog, product, checkout link, UCP profile, blocks, and one fix. No login, model call, payment, or browser scan. Uses ARC's last check (cached up to 24 hours). A missing result is unknown, not a no. A checkout link means reach checkout, not a completed order. Results are advisory. ARC stops before payment.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -85,7 +113,7 @@
       "name": "can_agent_checkout"
     },
     {
-      "description": "Read whether an AI agent can reach checkout for a brand the ARC Index already lists. No login and no new scan. Pass a brand, URL, or category. Returns the score, evidence, and both lanes: the agent-catalog HTTP check and the browser cart. The JSON field `agents_can_buy` is true when the catalog returned a checkout link or a browser shopper added the product to the cart. ARC stops before payment. It is not a completed order. The catalog check does not change the score. A missing score is not a zero. Results are advisory.",
+      "description": "Read whether an AI agent can reach checkout for a brand the ARC Index already lists. Use it for 'is <brand> agent-ready?', 'how does <brand> score on ARC?' or 'which <category> brands do agents get furthest with?'. For any store URL, call precheck first. No login and no new scan. Pass a brand, URL, or category. Returns the score, evidence, and both lanes: the agent-catalog HTTP check and the browser cart. The JSON field `agents_can_buy` is true when the catalog returned a checkout link or a browser shopper added the product to the cart. ARC stops before payment. It is not a completed order. The catalog check does not change the score. A missing score is not a zero. Results are advisory.",
       "inputSchema": {
         "properties": {
           "brand": {

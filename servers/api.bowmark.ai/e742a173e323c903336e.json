@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "c68145f33fa2cde05be5fa4cfe6e395a10f80a08299b808e9b4ff553ac427586",
+  "full_hash": "4880fd31b71700529a7d6dde6fceee773a2c5ed8a655f890e0e87a6b6b0a205a",
   "name": "ai.bowmark/bowmark",
-  "observed_at": "2026-11-01T02:04:07.218350Z",
+  "observed_at": "2026-11-02T02:03:32.540831Z",
   "sources": [
     "official"
   ],
-  "tool_count": 24,
+  "tool_count": 26,
   "tools": [
     {
       "_meta": {
@@ -79,7 +79,7 @@
         "readOnlyHint": false,
         "title": "Do the task on the live websites and return the result"
       },
-      "description": "**Executes the task on the real websites** and returns the result. Call `get_library` FIRST, then start with `run({ script })` — never add `runId`.\n\nTHE SCRIPT is a plain async JavaScript body, not a wrapping function. `bowmark` is a ready global: `await bowmark.<capability>.<fn>(...)`, or one site via `await bowmark.providers.<provider>.<fn>(...)`. `return` what you want back; `log(...)` for progress. Built-ins plus `URL`/`URLSearchParams` exist; `fetch`, `import`, `setTimeout` and a filesystem do not — `bowmark` is the only I/O.\n\nMIND THE CLOCK. Your client times a tool call out at around 55 seconds, and one capability call already spends 30-55 seconds, so default to ONE per script. Need several? Run them together in `Promise.allSettled` (a dropped leg still comes back as `partial`), never one after another, and never `await` inside a `for` loop. Keep the result under ~25,000 characters.\n\nCHECK `status` BEFORE `ok` — `ok` | `error` | `partial` | `needs_user` | `running`:\n• `running`: it is still going. Call `run({ runId })` to wait for the SAME run; never resend the script.\n• `partial`: `result` is real but narrower than asked; `incomplete` names what did not answer. Tell your user — never call it complete. `incomplete.failures[].fixable: true` means your argument was wrong: fix it and rerun.\n• `needs_user`: a site needs your user signed in; not a failure. Give them `meta.handoff.url`, name the sites, then call `wait_for_sign_in` with `meta.handoff.ref`. On `done`, send the SAME script unchanged.\n• `error`: there is no result; `error` says why.\n\nSaving files, one exit IP, saved secrets, `warnings`, `emptyHanded`, and the billed `browser_agent`/`delegate` fallbacks: `get_library({ query: \"run guide\" })`.",
+      "description": "**Executes the task on the real websites** and returns the result. Call `get_library` FIRST, then start with `run({ script })` — never add `runId`.\n\nTHE SCRIPT is a plain async JavaScript body, not a wrapping function. `bowmark` is a ready global: `await bowmark.<capability>.<fn>(...)`, or one site via `await bowmark.providers.<provider>.<fn>(...)`. `return` what you want back; `log(...)` for progress. Built-ins plus `URL`/`URLSearchParams` exist; `fetch`, `import`, `setTimeout` and a filesystem do not — `bowmark` is the only I/O.\n\nMIND THE CLOCK. Your client times a tool call out at around 55 seconds, and one capability call already spends 30-55 seconds, so default to ONE per script. Need several? Run them together in `Promise.allSettled` (a dropped leg still comes back as `partial`), never one after another, and never `await` inside a `for` loop. Keep the result under ~25,000 characters.\n\nCHECK `status` BEFORE `ok` — `ok` | `error` | `partial` | `needs_user` | `running`:\n• `running`: it is still going. Call `run({ runId })` to wait for the SAME run; never resend the script.\n• `partial`: `result` is real but narrower than asked, usually the site's doing; `incomplete` names what did not answer. Tell your user — never call it complete. `incomplete.failures[].fixable: true` means your argument was wrong: fix it and rerun.\n• `needs_user`: a site needs your user signed in; not a failure. Give them `meta.handoff.url`, name the sites, then call `wait_for_sign_in` with `meta.handoff.ref`. On `done`, send the SAME script unchanged.\n• `error`: there is no result; `error` says why.\n\nSaving files, one exit IP, saved secrets, `warnings`, `emptyHanded`, and the billed `browser_agent`/`delegate` fallbacks: `get_library({ query: \"run guide\" })`.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -331,7 +331,7 @@
         "readOnlyHint": false,
         "title": "Open a page for the user (jig)"
       },
-      "description": "Make the user a \"jig\": their own copy of a website, running through Bowmark, that you curate as they talk to you. Asked for \"a jig of YouTube\" or \"Amazon, no promotions, best products first\", build a page that LOOKS like that site — layout, views, controls — with Bowmark's name and logo where the site's would be, every list filled by Bowmark library functions as this user. Then stay in the loop: the user keeps talking here, and you change what it shows (`jig_update` state) or how it looks (`jig_update` html) while their tab updates live.\n\nGive the user the link that comes back; that tab is the app. Start from a built-in (`template`) when one fits, else write the page (`html`) — call `get_library({ query: \"jig guide\" })` FIRST for the component kit and layout classes. Reopen an existing jig with `jig_open({ jigId })` (find it via `jig_list`) rather than rebuilding it. Before curating (\"clear the slop\"), call `jig_look` to see what the page shows now and what the user just did.\n\nInside the page, one global, `window.bowmark`: `bowmark.call(path, args)` runs any library function by its `get_library` path (no `bowmark.` prefix), metered for this user; `bowmark.batch([...])` runs up to 8 together. `bowmark.state`/`onState(fn)` is what you pass here and change with `jig_update` — put every curation choice there. `bowmark.setState(patch)` saves a user click back into it. `bowmark.show({ view, items })` reports what is on screen (what `jig_look` reads). `bowmark.tellModel(text)` notes what happened; `bowmark.say(text)` posts here as the user, chat panel only. `bowmark.open(url)`. Use `location.hash` for views; back/forward work. Full signatures: the jig guide.\n\nNo `fetch`, no external script/style/font. A call needing sign-in pauses behind a banner until the user signs in. No chat box in the page — the user talks to you here.\n\nBOWMARK'S LOOK, THE SITE'S LAYOUT: build from the kit's premade components in Bowmark's colors, never the site's, and never invent a page title. Components and built-ins: the jig guide.",
+      "description": "Make the user a \"jig\": their own copy of a website, running through Bowmark, that you curate as they talk to you. Asked for \"a jig of YouTube\", build a page that LOOKS like that site with Bowmark's logo where the site's would be, filled by Bowmark library functions as this user: every function the library has for that site gets its place. Then keep curating as they talk: `jig_update` changes state or html, live.\n\nGive the user the link that comes back; that tab is the app. Start from a built-in (`template`) when one fits, else write the page (`html`) — call `get_library({ query: \"jig guide\" })` FIRST for the component kit and layout classes. Reopen one with `jig_open({ jigId })` (`jig_list`), never rebuild it. Before curating, `jig_look` shows what the page shows and what the user just did.\n\nInside the page, one global, `window.bowmark`: `bowmark.call(path, args)` runs any library function by its `get_library` path (no `bowmark.` prefix), metered for this user; `bowmark.batch([...])` runs up to 8 together. `bowmark.state`/`onState(fn)` holds every curation choice (you change it with `jig_update`); `setState(patch)` saves a user click. `show({ view, items })` tells `jig_look` what is on screen. Also `tellModel`, `say`, `open`, `theme`, `img`, `section`: the jig guide. Views: `location.hash`, so back/forward work.\n\nFAST AND FAILURE-PROOF by default: paint a skeleton at once; fill the screen with ONE `bowmark.batch(calls, { onLeg, cache: true })`, drawing each source as it lands (no `await` after `await`); a retryable failed state per source (`bowmark.section`); `bowmark.img(url, px)`, lazy below the fold. `jig_look` reports load speed: fix what its `advice` names.\n\nNo `fetch`, no external script/style/font. A call needing sign-in pauses behind a banner until the user signs in. No chat box in the page: the user talks to you.\n\nBOWMARK'S LOOK, THE SITE'S LAYOUT: build from the kit's components in Bowmark's colors, never the site's, and never invent a page title. Components and built-ins: the jig guide.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -408,13 +408,35 @@
         "readOnlyHint": false,
         "title": "Steer an open page (jig)"
       },
-      "description": "Change a page you opened with `jig_open`: merge `state` into its state (a key set to null is removed), or replace its `html` or `title`. The open page updates itself within a few seconds — do not call `jig_open` again. Use this whenever the user asks, in chat, for the page to show something different.",
+      "description": "Change a page you opened with `jig_open`: merge `state` into its state (a key set to null is removed), replace its `html` or `title`, or change part of the html with `edits` ([{ find, replace }], each find exactly once) instead of resending the whole page. The open page updates itself within a few seconds — do not call `jig_open` again. Use this whenever the user asks, in chat, for the page to show something different.",
       "execution": {
         "taskSupport": "forbidden"
       },
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
+          "edits": {
+            "description": "Find/replace on the current html, applied in order.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "find": {
+                  "type": "string"
+                },
+                "replace": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "find",
+                "replace"
+              ],
+              "type": "object"
+            },
+            "maxItems": 50,
+            "minItems": 1,
+            "type": "array"
+          },
           "html": {
             "type": "string"
           },
@@ -466,6 +488,9 @@
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
+          "cache": {
+            "type": "boolean"
+          },
           "jigId": {
             "format": "uuid",
             "type": "string"
@@ -481,6 +506,47 @@
       },
       "name": "jig_view",
       "title": "Jig view"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://bowmark/jig-v1",
+          "visibility": [
+            "app"
+          ]
+        },
+        "ui/resourceUri": "ui://bowmark/jig-v1"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Jig cache"
+      },
+      "description": "Used by an open jig to save a call's last good result. You do not need to call this.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "jigId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "value": {}
+        },
+        "required": [
+          "jigId",
+          "key"
+        ],
+        "type": "object"
+      },
+      "name": "jig_cache",
+      "title": "Jig cache"
     },
     {
       "_meta": {
@@ -523,13 +589,50 @@
       "title": "Jig seen"
     },
     {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://bowmark/jig-v1",
+          "visibility": [
+            "app"
+          ]
+        },
+        "ui/resourceUri": "ui://bowmark/jig-v1"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Jig perf"
+      },
+      "description": "Used by an open jig to report how fast it loaded. You do not need to call this.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "jigId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "report": {}
+        },
+        "required": [
+          "jigId"
+        ],
+        "type": "object"
+      },
+      "name": "jig_perf",
+      "title": "Jig perf"
+    },
+    {
       "annotations": {
         "destructiveHint": false,
         "openWorldHint": false,
         "readOnlyHint": true,
         "title": "Look at a page (jig)"
       },
-      "description": "See what an open jig is showing the user right now — the items on screen, which view they are on — plus what they just did on it (watched, hid, searched) and its current state. Call it before you curate: when the user says \"clear the slop\" or \"why is this here\", look first, then change the page with `jig_update`.",
+      "description": "See what an open jig is showing the user right now — the items on screen, which view they are on — plus what they just did on it (watched, hid, searched) and its current state. Call it before you curate: when the user says \"clear the slop\" or \"why is this here\", look first, then change the page with `jig_update`. It also says how fast the page last loaded and which calls failed (`perf`, `advice`): fix what `advice` names with `jig_update`.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -588,13 +691,30 @@
             },
             "type": "array"
           },
+          "cancel": {
+            "items": {
+              "pattern": "^[A-Za-z0-9_-]{16,64}$",
+              "type": "string"
+            },
+            "maxItems": 32,
+            "type": "array"
+          },
           "jigId": {
             "format": "uuid",
+            "type": "string"
+          },
+          "ref": {
+            "pattern": "^[A-Za-z0-9_-]{16,64}$",
             "type": "string"
           },
           "runId": {
             "format": "uuid",
             "type": "string"
+          },
+          "timeoutMs": {
+            "maximum": 600000,
+            "minimum": 0,
+            "type": "integer"
           }
         },
         "required": [
