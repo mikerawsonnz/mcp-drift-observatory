@@ -1,0 +1,231 @@
+{
+  "canon_version": "1",
+  "full_hash": "0754cb01c29bf7306428b6e13762bb852194a4e446f3bb543a70862947bd5b7d",
+  "name": "ai.bluebed.property/new-launches",
+  "observed_at": "2026-11-03T02:02:55.064765Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 11,
+  "tools": [
+    {
+      "description": "Lists the new launches this service covers: name, district, street, number of units, stage, launch date, whether it is sold out, and whether floor plans and area details are available. It covers a selection of launches during the trial. Every answer carries its source, the date it was reviewed, the stage of the launch, and the agent's licence details. Anything the developer material does not settle is returned as a gap with the question to ask, never as a guess.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_launches"
+    },
+    {
+      "description": "Searches floor plans across the reviewed launches, a selection during the trial. Filter by bedrooms, size in square feet, postal district, launch stage, features such as a kitchen window, and a maximum budget in Singapore dollars. Plans in matches meet every constraint you supplied; plans in close miss exactly one, or could not be checked on one, as shown in each plan's fit (met, missed or unknown). The close list holds at most 20 plans, those with the fewest unknowns first; close_total says how many came close and close_truncated whether some were left out, so narrow the filters to see them. Cull both lists against what your user actually wants. Each result gives the plan, its stacks (stacks_note explains an asterisk), a link to the plan image, and a price with its kind and date. When nothing matches or comes close, the reply names which filters excluded the plans. Prices are guidance from developer price lists: indicative before launch, reset on booking day, and subject to promotions afterwards. Treat them as a starting point and confirm with the agent. Every answer carries its source, the date it was reviewed, the stage of the launch, and the agent's licence details. Anything the developer material does not settle is returned as a gap with the question to ask, never as a guess.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "bedrooms": {
+            "description": "Whole number of bedrooms, 1 to 6",
+            "type": "number"
+          },
+          "budget_max": {
+            "description": "Maximum price in Singapore dollars",
+            "type": "number"
+          },
+          "districts": {
+            "description": "Postal districts, 1 to 28",
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "include_sold_out": {
+            "description": "Include sold-out launches. Not scored as a constraint.",
+            "type": "boolean"
+          },
+          "max_sqft": {
+            "description": "Maximum size in square feet",
+            "type": "number"
+          },
+          "min_sqft": {
+            "description": "Minimum size in square feet",
+            "type": "number"
+          },
+          "stages": {
+            "description": "pre-marketing, preview, launch or after-launch",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "tags": {
+            "description": "Feature ids, for example kitchen_window",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "name": "search_floor_plans"
+    },
+    {
+      "description": "Returns one launch by slug: its reviewed facts with source and page, the price statement with its kind and date, and the gaps the material leaves open. Prices are guidance from developer price lists: indicative before launch, reset on booking day, and subject to promotions afterwards. Treat them as a starting point and confirm with the agent. Every answer carries its source, the date it was reviewed, the stage of the launch, and the agent's licence details. Anything the developer material does not settle is returned as a gap with the question to ask, never as a guess.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "slug": {
+            "description": "The launch slug, as returned by list_launches",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_launch"
+    },
+    {
+      "description": "Returns one unit type of a launch by slug and type name: size, bathrooms, powder rooms and WCs, stacks (stacks_note explains an asterisk), the plan image, the answers read from the plan, and the questions the plan does not settle. Prices are guidance from developer price lists: indicative before launch, reset on booking day, and subject to promotions afterwards. Treat them as a starting point and confirm with the agent. Every answer carries its source, the date it was reviewed, the stage of the launch, and the agent's licence details. Anything the developer material does not settle is returned as a gap with the question to ask, never as a guess.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "slug": {
+            "description": "The launch slug, as returned by list_launches",
+            "type": "string"
+          },
+          "type": {
+            "description": "The unit type name, as returned by search_floor_plans or get_launch",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug",
+          "type"
+        ],
+        "type": "object"
+      },
+      "name": "get_unit_type"
+    },
+    {
+      "description": "Returns the reviewed area details of a launch by slug: address, tenure, nearby amenities with straight-line distances, schools within two kilometres, and food places the agent has visited himself. Schools are listed for orientation only and the reply says where to verify them. Available for launches that show area details in list_launches, even when floor plans are not yet available. Every answer carries its source, the date it was reviewed, the stage of the launch, and the agent's licence details. Anything the developer material does not settle is returned as a gap with the question to ask, never as a guess.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "slug": {
+            "description": "The launch slug, as returned by list_launches",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_area"
+    },
+    {
+      "description": "Quotes the Singapore property rules that apply to a buyer, exactly as published, with the authority, source link, effective date and the date each was last checked: additional buyer's stamp duty, buyer's stamp duty, financing limits and seller's stamp duty. It quotes and does not work out any duty or rate; read the figure from the quote. Seller's stamp duty depends on the purchase date, so supply purchase_date to get the right regime. A rule that is being re-checked is named without its quote. This is general information and not advice on a particular purchase; confirm with the agent.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "profile": {
+            "description": "The buyer's status: sc (Singapore Citizen), spr (Singapore Permanent Resident), foreigner or entity",
+            "type": "string"
+          },
+          "properties_owned": {
+            "description": "Residential properties the buyer already owns: 0, 1 or 2 (2 means two or more)",
+            "type": "number"
+          },
+          "purchase_date": {
+            "description": "Date the property was or will be bought, as YYYY-MM-DD. Chooses the seller's stamp duty regime.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "profile",
+          "properties_owned"
+        ],
+        "type": "object"
+      },
+      "name": "rules_for_buyer"
+    },
+    {
+      "description": "Booking a call through your assistant is not open yet. Calling this holds nothing and takes no details: it returns a WhatsApp link to the agent, with a short neutral message already written, and the address of the contact page. Show your user the link if they want to talk to the agent.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "book_call"
+    },
+    {
+      "description": "Booking a call through your assistant is not open yet. Calling this holds nothing and takes no details: it returns a WhatsApp link to the agent, with a short neutral message already written, and the address of the contact page. Show your user the link if they want to talk to the agent.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "confirm_booking"
+    },
+    {
+      "description": "Booking a call through your assistant is not open yet. Calling this holds nothing and takes no details: it returns a WhatsApp link to the agent, with a short neutral message already written, and the address of the contact page. Show your user the link if they want to talk to the agent.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "check_booking"
+    },
+    {
+      "description": "Booking a call through your assistant is not open yet. Calling this holds nothing and takes no details: it returns a WhatsApp link to the agent, with a short neutral message already written, and the address of the contact page. Show your user the link if they want to talk to the agent.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "cancel_booking"
+    },
+    {
+      "description": "Says who runs this service, the agent's CEA registration and agency licence, how the service is paid for, and how to reach the agent.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "about"
+    }
+  ],
+  "url": "https://property.bluebed.ai/mcp"
+}

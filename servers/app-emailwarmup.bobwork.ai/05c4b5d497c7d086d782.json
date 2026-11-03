@@ -1,0 +1,1210 @@
+{
+  "canon_version": "1",
+  "full_hash": "cfb54a9659e9465a412665839e215c6faeda59c9eea75ae6c11e69746ac30787",
+  "name": "ai.bobwork/emailwarmup",
+  "observed_at": "2026-11-03T02:02:55.053838Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 45,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Your account: email, credit balance, free mailbox allowance (10, or 20 for accounts created before 27 October 2026, plus referral bonus), paid extras and your referral link.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "get_account"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Every connected mailbox with warm-up day, status, 7-day spam rate, today's and last 7 days' numbers, and whether it is ready for outbound.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "list_mailboxes"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "One mailbox's warm-up status and health.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "description": "Mailbox address, e.g. sales@yourdomain.com",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "type": "object"
+      },
+      "name": "get_mailbox"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "The last 100 warm-up events for a mailbox (sent, received, replied, rescued from spam, errors).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "description": "Mailbox address, e.g. sales@yourdomain.com",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "type": "object"
+      },
+      "name": "mailbox_activity"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Totals across your mailboxes: today and last 7 days (sent, received, rescued, replied), active and ready counts.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "warmup_stats"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "IMAP/SMTP presets (Gmail app password, Yahoo, iCloud, Zoho, Lark, SES, SendGrid, Mailgun…) with hosts and ports, plus the Google and Zoho API routes.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "list_providers"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Connect any mailbox with IMAP + SMTP. The login is tested before it is saved. Use an app password when two-factor sign-in is on. Give a preset (see list_providers) or the hosts. Warm-up starts the same day.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "description": "Mailbox address, e.g. sales@yourdomain.com",
+            "type": "string"
+          },
+          "host": {
+            "description": "IMAP host (if no preset)",
+            "type": "string"
+          },
+          "name": {
+            "description": "Display name on sent mail",
+            "type": "string"
+          },
+          "password": {
+            "description": "Mailbox password or app password",
+            "type": "string"
+          },
+          "port": {
+            "type": "integer"
+          },
+          "preset": {
+            "description": "e.g. gmail-imap, yahoo, icloud, zoho, lark, aws-ses, sendgrid, mailgun, other",
+            "type": "string"
+          },
+          "smtp_host": {
+            "type": "string"
+          },
+          "smtp_password": {
+            "type": "string"
+          },
+          "smtp_port": {
+            "type": "integer"
+          },
+          "smtp_user": {
+            "description": "Relay platforms only (SES/SendGrid/Mailgun)",
+            "type": "string"
+          },
+          "user": {
+            "description": "Login if not the email",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object"
+      },
+      "name": "connect_imap_mailbox"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Connect a Zoho Mail mailbox through the Zoho API (works on Zoho's free plan). Needs a Self Client id, secret and a generated code from api-console.zoho.com.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "client_id": {
+            "type": "string"
+          },
+          "client_secret": {
+            "type": "string"
+          },
+          "code": {
+            "description": "Self Client code (valid 10 minutes)",
+            "type": "string"
+          },
+          "dc": {
+            "default": "com",
+            "description": "Zoho data centre: com, eu, in, com.au, jp, ca",
+            "type": "string"
+          },
+          "email": {
+            "description": "Mailbox address, e.g. sales@yourdomain.com",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "client_id",
+          "client_secret",
+          "code"
+        ],
+        "type": "object"
+      },
+      "name": "connect_zoho_mailbox"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Get a link the user opens to connect Gmail / Google Workspace with Google sign-in (one click, any device). The mailbox appears in list_mailboxes a few minutes after they allow it.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "renew": {
+            "description": "Make a fresh link",
+            "type": "boolean"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "google_connect_link"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Change a mailbox's display name, daily warm-up cap (1-100, null = default) or time zone (IANA, e.g. Europe/London).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "daily_cap": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "email": {
+            "description": "Mailbox address, e.g. sales@yourdomain.com",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "timezone": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "type": "object"
+      },
+      "name": "update_mailbox"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Pause warm-up for a mailbox.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "description": "Mailbox address, e.g. sales@yourdomain.com",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "type": "object"
+      },
+      "name": "pause_mailbox"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Resume warm-up for a mailbox.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "description": "Mailbox address, e.g. sales@yourdomain.com",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "type": "object"
+      },
+      "name": "resume_mailbox"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Sign in to the mailbox now and report whether the stored login still works.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "description": "Mailbox address, e.g. sales@yourdomain.com",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "type": "object"
+      },
+      "name": "test_mailbox"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Remove a mailbox and delete its stored login. Irreversible: ask the user first, then pass confirm=true.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "confirm": {
+            "type": "boolean"
+          },
+          "email": {
+            "description": "Mailbox address, e.g. sales@yourdomain.com",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "confirm"
+        ],
+        "type": "object"
+      },
+      "name": "remove_mailbox"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Shared network (default: warm with every mailbox on the service) or private pool (only your own mailboxes write to each other; needs 2+).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "private_pool": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "private_pool"
+        ],
+        "type": "object"
+      },
+      "name": "set_pool_mode"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Client workspaces (agencies): each client's mailboxes are kept separate under one login and one bill. Returns id, name and mailbox count. Each mailbox in list_mailboxes has a workspace id (null = My mailboxes).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "list_workspaces"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create a client workspace, e.g. the client's company name (max 100 per account).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "description": "Client name, up to 60 characters",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "create_workspace"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Rename a client workspace.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "workspace_id": {
+            "description": "Workspace id (ws_…) from list_workspaces",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_id",
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "rename_workspace"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Delete a client workspace. Its mailboxes are NOT deleted: they move back to My mailboxes and keep warming. The client's report link stops working.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "workspace_id": {
+            "description": "Workspace id (ws_…) from list_workspaces",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_id"
+        ],
+        "type": "object"
+      },
+      "name": "delete_workspace"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Put a mailbox in a client workspace. Leave workspace_id out (or empty) to move it back to My mailboxes.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "description": "Mailbox address, e.g. sales@yourdomain.com",
+            "type": "string"
+          },
+          "workspace_id": {
+            "description": "Workspace id (ws_…) from list_workspaces",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "type": "object"
+      },
+      "name": "move_mailbox_to_workspace"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "The public read-only report link for one client workspace (mailbox health, spam rate, SPF/DKIM/DMARC). The client opens it without a login; it shows no prices and nothing about other clients.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "workspace_id": {
+            "description": "Workspace id (ws_…) from list_workspaces",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_workspace_report"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "SPF, DKIM selector, DMARC policy and MX for every domain you have connected.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "domain_health"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Look up a domain's SPF record.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "description": "Domain, e.g. yourdomain.com",
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "type": "object"
+      },
+      "name": "check_spf"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Find a domain's DKIM key: tries the selector you give, selectors seen in real mail, then 45 common ones.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "description": "Domain, e.g. yourdomain.com",
+            "type": "string"
+          },
+          "selector": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "type": "object"
+      },
+      "name": "check_dkim"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Look up a domain's DMARC record and policy.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "description": "Domain, e.g. yourdomain.com",
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "type": "object"
+      },
+      "name": "check_dmarc"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Prepaid credit balance, prices and recent charges (Outbound emails, AI drafts).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "get_credits"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Your Outbound campaigns with status and stats.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "list_campaigns"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "One campaign: its emails, mailboxes, stats and time left.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "campaign_id": {
+            "description": "Campaign id from list_campaigns",
+            "type": "string"
+          }
+        },
+        "required": [
+          "campaign_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_campaign"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Create a draft Outbound campaign (nothing is sent). Emails can use {first_name}, {company} and any contact field. Any connected mailbox can send; one that is still warming shows a warning first.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "daily_limit": {
+            "description": "Per mailbox per day",
+            "type": "integer"
+          },
+          "emails": {
+            "description": "1-4 emails in order",
+            "items": {
+              "properties": {
+                "body": {
+                  "type": "string"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "wait_days": {
+                  "description": "Days after the previous email (ignored for the first)",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "body"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "mailboxes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "emails"
+        ],
+        "type": "object"
+      },
+      "name": "create_campaign"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Edit a paused or draft campaign. Fields you leave out keep their value.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "campaign_id": {
+            "description": "Campaign id from list_campaigns",
+            "type": "string"
+          },
+          "daily_limit": {
+            "type": "integer"
+          },
+          "emails": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "mailboxes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "campaign_id"
+        ],
+        "type": "object"
+      },
+      "name": "update_campaign"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Add up to 1,000 contacts to a campaign. Each needs email; other fields (first_name, company…) fill the placeholders. Duplicates and unsubscribed addresses are skipped.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "campaign_id": {
+            "description": "Campaign id from list_campaigns",
+            "type": "string"
+          },
+          "contacts": {
+            "items": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "email"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "campaign_id",
+          "contacts"
+        ],
+        "type": "object"
+      },
+      "name": "add_contacts"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Contacts in a campaign and where each is in the sequence (first 200).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "campaign_id": {
+            "description": "Campaign id from list_campaigns",
+            "type": "string"
+          }
+        },
+        "required": [
+          "campaign_id"
+        ],
+        "type": "object"
+      },
+      "name": "list_campaign_contacts"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Start or resume a campaign. This SENDS real email and uses credits. Confirm with the user first. accept_sending_rules=true means the user agrees to https://emailwarmup.bobwork.ai/terms#outbound-beta (only people who may receive it, honest sender, unsubscribe honoured). If a chosen mailbox is still warming the call fails with warming:true; show the user the message and set accept_warming_risk=true only after they explicitly agree. Without credits it fails with credits_required:true: use create_credits_checkout.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "accept_sending_rules": {
+            "type": "boolean"
+          },
+          "accept_warming_risk": {
+            "description": "The user agreed to send from mailboxes that have not finished warm-up",
+            "type": "boolean"
+          },
+          "campaign_id": {
+            "description": "Campaign id from list_campaigns",
+            "type": "string"
+          }
+        },
+        "required": [
+          "campaign_id"
+        ],
+        "type": "object"
+      },
+      "name": "start_campaign"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Pause a running campaign.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "campaign_id": {
+            "description": "Campaign id from list_campaigns",
+            "type": "string"
+          }
+        },
+        "required": [
+          "campaign_id"
+        ],
+        "type": "object"
+      },
+      "name": "pause_campaign"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Payment status after you gave the user a checkout link: credit balance, whether the extra-mailbox subscription is active, mailboxes vs the free limit, and checkouts still waiting for payment. Confirms a paid checkout straight away.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "get_billing_status"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Get a Stripe Checkout url for extra mailboxes beyond the free limit (monthly, or yearly = 10 months' price for 12). The USER opens it and pays; you cannot. Then poll get_billing_status. Returns already:true when the account is subscribed. Prices come back in the result (prices).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "yearly": {
+            "description": "Bill yearly instead of monthly",
+            "type": "boolean"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "create_billing_checkout"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Get a Stripe Checkout url to top up prepaid credits for Outbound sending and AI drafts (one-off $5, $10, $25 or $100; credits never expire). The USER opens it and pays; you cannot. Then poll get_billing_status.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "usd": {
+            "enum": [
+              5,
+              10,
+              25,
+              100
+            ],
+            "type": "integer"
+          }
+        },
+        "required": [
+          "usd"
+        ],
+        "type": "object"
+      },
+      "name": "create_credits_checkout"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Domains bought in the domain shop, their hosted mailboxes, renewal date and price, plus IMAP/SMTP settings.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "list_bought_domains"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Find available lookalike domains for cold email, with first-term and renewal prices.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "q": {
+            "description": "Brand or domain, e.g. acme",
+            "type": "string"
+          }
+        },
+        "required": [
+          "q"
+        ],
+        "type": "object"
+      },
+      "name": "search_domains"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Buy domains with up to 3 mailboxes each. Returns a Stripe checkout link for the person to pay; setup starts once paid. Needs accept_sending_rules true.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "accept_sending_rules": {
+            "type": "boolean"
+          },
+          "domains": {
+            "items": {
+              "properties": {
+                "domain": {
+                  "description": "Domain, e.g. yourdomain.com",
+                  "type": "string"
+                },
+                "mailboxes": {
+                  "items": {
+                    "properties": {
+                      "local": {
+                        "description": "Part before @, e.g. john",
+                        "type": "string"
+                      },
+                      "name": {
+                        "description": "Display name",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "local"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "domain"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "domains",
+          "accept_sending_rules"
+        ],
+        "type": "object"
+      },
+      "name": "buy_domains"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Add mailboxes to a domain you bought here ($3 per mailbox per month). Returns a Stripe checkout link.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "description": "Domain, e.g. yourdomain.com",
+            "type": "string"
+          },
+          "mailboxes": {
+            "items": {
+              "properties": {
+                "local": {
+                  "description": "Part before @, e.g. john",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Display name",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "local"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "domain",
+          "mailboxes"
+        ],
+        "type": "object"
+      },
+      "name": "add_hosted_mailboxes"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Password, IMAP and SMTP settings for one of your hosted mailboxes.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "description": "Mailbox address, e.g. sales@yourdomain.com",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "type": "object"
+      },
+      "name": "hosted_mailbox_login"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "DNS records on a domain you bought here.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "description": "Domain, e.g. yourdomain.com",
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "type": "object"
+      },
+      "name": "list_dns_records"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Add a DNS record to a domain you bought here. name = subdomain ('' for the domain itself). Types A, AAAA, CNAME, ALIAS, MX, TXT, CAA, SRV.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "domain": {
+            "description": "Domain, e.g. yourdomain.com",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "prio": {
+            "type": "integer"
+          },
+          "ttl": {
+            "type": "integer"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain",
+          "type",
+          "content"
+        ],
+        "type": "object"
+      },
+      "name": "add_dns_record"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Delete a DNS record by id (from list_dns_records). Deleting MX, SPF, DKIM or DMARC stops the mailboxes working.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "description": "Domain, e.g. yourdomain.com",
+            "type": "string"
+          },
+          "record_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain",
+          "record_id"
+        ],
+        "type": "object"
+      },
+      "name": "delete_dns_record"
+    }
+  ],
+  "url": "https://app-emailwarmup.bobwork.ai/mcp"
+}
