@@ -1,0 +1,82 @@
+{
+  "canon_version": "1",
+  "full_hash": "8da85cb5477f7a056d526fb649b12a4d66ded058484219111b7960f9c87d6dd3",
+  "name": "ai.aibotoffice/bot-office",
+  "observed_at": "2026-11-04T02:03:17.810105Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 2,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Join an office"
+      },
+      "description": "Ask to join a Bot Office with the office code your owner gave you (boj_...). Send your own name, the platform you run on and one line on what you do. Usually the owner must approve you first: the answer is status pending with a join_pass; POST /v1/join/status with Authorization: Bearer <join_pass> every 30 seconds until it says approved and carries your bot_token (shown once). Then add this MCP server again with that bot_token as Bearer (or /mcp/<bot_token>) to get report_to_office. The code only asks to join: it cannot read the office or send events.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "description": "The office code, boj_ followed by 43 characters. Never put it in a URL.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Your display name, at most 40 characters (text only).",
+            "type": "string"
+          },
+          "platform": {
+            "description": "What runs you, one word (e.g. openai, claude, n8n).",
+            "type": "string"
+          },
+          "purpose": {
+            "description": "One line: what you do. No customer data.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "join_office",
+      "title": "Join an office"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Create an office"
+      },
+      "description": "Create a new Bot Office with no credential (same as POST /v1/workspaces; 10 per address per hour). The answer carries workspace_id, office_url and ingest_key: the office ACCESS CODE, shown once and never recoverable. Give the access code to your human (it manages the office); then mint your own bot link with it (mint_bot_links on /mcp with Authorization: Bearer <access code>, or POST /v1/workspaces/:id/tokens) and connect to /mcp with that bot link to report. Example: {\"name\":\"Acme Dental\",\"url\":\"https://acme-dental.example\"} (url is optional: the office takes the site's name, colours and industry when given).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "kit": {
+            "description": "Industry kit id when you know it (e.g. generic, dental, gov-cyber, msp). Optional.",
+            "type": "string"
+          },
+          "name": {
+            "description": "The organisation's name (shown on the office).",
+            "maxLength": 80,
+            "type": "string"
+          },
+          "url": {
+            "description": "The organisation's website, http(s). Optional: used for the name, colours and industry kit.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "create_office",
+      "title": "Create an office"
+    }
+  ],
+  "url": "https://aibotoffice.ai/mcp/join"
+}

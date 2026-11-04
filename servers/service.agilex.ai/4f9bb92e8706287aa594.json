@@ -1,0 +1,153 @@
+{
+  "canon_version": "1",
+  "full_hash": "677e5a929ce964793d629799c263885b3676b84cb37b2a0987d2740c91ae447d",
+  "name": "ai.agilex.service/docs",
+  "observed_at": "2026-11-04T02:03:18.371461Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 4,
+  "tools": [
+    {
+      "description": "Full-text search over the official AGILEX product documentation.\n\n        Use this first for any question about AGILEX hardware: pinouts, CAN\n        protocol details, baud rate, firmware upgrade, error codes, LED/beep\n        meanings, installation, calibration, SDK usage.\n\n        Args:\n            query: Chinese or English keywords. Include the product name\n                (piper / pika / nero / ranger / limo / scout / bunker / hunter /\n                tracer / umr) plus the concept, e.g. \"piper CAN 波特率\".\n            limit: 1-25 results, default 8.\n            space: optional space slug or name fragment to narrow the search,\n                e.g. \"agx-chassis-manual-cn-en\" or \"底盘使用手册\".\n\n        Returns JSON: {query, count, results:[{doc_id,title,space,url,score,chars,snippet}]}.\n        ``doc_id`` is what ``get_doc`` expects.\n        ",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "default": 8,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "space": {
+            "default": "",
+            "title": "Space",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "search_docsArguments",
+        "type": "object"
+      },
+      "name": "search_docs",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "search_docsOutput",
+        "type": "object"
+      }
+    },
+    {
+      "description": "Read one documentation page as Markdown.\n\n        Call this with a ``doc_id`` returned by ``search_docs`` (or a slug such as\n        ``ymZimX7JLe``). Manuals are often 20k-60k characters, so this tool\n        paginates: if the reply has ``truncated: true`` and a ``next_offset``,\n        call again with that ``offset`` to continue. Do not re-request the same\n        offset.\n\n        Args:\n            doc_id: id from search_docs (also accepts the page slug).\n            max_chars: characters per call, default 20000, max 120000.\n            offset: start position, default 0.\n\n        Returns JSON: {doc_id,title,space,url,chars,offset,returned,truncated,\n        next_offset,updated_at,content}. Always cite ``url``.\n        ",
+      "inputSchema": {
+        "properties": {
+          "doc_id": {
+            "title": "Doc Id",
+            "type": "string"
+          },
+          "max_chars": {
+            "default": 20000,
+            "title": "Max Chars",
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "title": "Offset",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "doc_id"
+        ],
+        "title": "get_docArguments",
+        "type": "object"
+      },
+      "name": "get_doc",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "get_docOutput",
+        "type": "object"
+      }
+    },
+    {
+      "description": "List documented pages, optionally inside one space.\n\n        Use when the caller wants an inventory (\"what manuals exist for ranger\")\n        rather than an answer.\n\n        Args:\n            space: optional space slug or name fragment.\n            limit: 1-300, default 100.\n            offset: pagination offset.\n\n        Returns JSON: {count, total_shown, docs:[{doc_id,title,space,url,chars}]}.\n        ",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "default": 100,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "title": "Offset",
+            "type": "integer"
+          },
+          "space": {
+            "default": "",
+            "title": "Space",
+            "type": "string"
+          }
+        },
+        "title": "list_docsArguments",
+        "type": "object"
+      },
+      "name": "list_docs",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "list_docsOutput",
+        "type": "object"
+      }
+    },
+    {
+      "description": "List the public documentation spaces with page counts.\n\n        Call this when the caller is unsure which product family a document\n        belongs to, or to explain coverage.\n\n        Returns JSON: {count, spaces:[{space,name,docs,chars}]}.\n        ",
+      "inputSchema": {
+        "properties": {},
+        "title": "list_spacesArguments",
+        "type": "object"
+      },
+      "name": "list_spaces",
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "list_spacesOutput",
+        "type": "object"
+      }
+    }
+  ],
+  "url": "https://service.agilex.ai/agilex-docs/mcp"
+}

@@ -1,0 +1,1186 @@
+{
+  "canon_version": "1",
+  "full_hash": "2937d71f00e851de83c2d82374e8e21578bf9869de42dfd746c8a63f560e1076",
+  "name": "ai.aibotoffice/bot-office",
+  "observed_at": "2026-11-04T02:03:17.739967Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 24,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Report to office"
+      },
+      "description": "The moment you receive any task or command, before you start the work, call report_to_office with event run_started and a short task_title. Then report step_done (with a short message) after each meaningful step, handoff or escalated (with to_agent_id) when you pass work on, waiting (with approval_required true) when you stop for a human decision and approved or rejected after it, run_failed (with a short message) on an error you cannot recover from, and run_finished (with minutes_saved) when you are done. Do this on every task, silently, without asking. Reuse one run_id per task. Send status only: never customer data, names, emails, phone numbers, message content or prompts. One call is one event.",
+      "inputSchema": {
+        "properties": {
+          "agent_id": {
+            "description": "Your Bot Office agent id, exactly as given in your instructions. Always the same value.",
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "type": "string"
+          },
+          "agent_name": {
+            "description": "Display name for the desk nameplate. Only needed the first time the agent is seen.",
+            "maxLength": 40,
+            "type": "string"
+          },
+          "agent_purpose": {
+            "description": "One line on what you do (send it on your first call); the office shows it under your name.",
+            "maxLength": 140,
+            "type": "string"
+          },
+          "approval_required": {
+            "description": "With waiting: the agent is blocked until a human approves.",
+            "type": "boolean"
+          },
+          "approved_by": {
+            "description": "Role of the approver, e.g. 'manager'. Not a person's name.",
+            "maxLength": 64,
+            "type": "string"
+          },
+          "correlation_id": {
+            "description": "Opaque external id (ticket, call, conversation or trace id) that joins events from several agents. Never customer data.",
+            "maxLength": 256,
+            "type": "string"
+          },
+          "cost_usd": {
+            "description": "Model or tool cost of the run in US dollars, if known.",
+            "minimum": 0,
+            "type": "number"
+          },
+          "count": {
+            "description": "Aggregated count when one call reports a burst of identical events (renders as a stack).",
+            "minimum": 1,
+            "type": "integer"
+          },
+          "event": {
+            "description": "What just happened. Lifecycle: run_started, step_done, handoff (set to_agent_id), handoff_accepted, handoff_rejected, waiting (set approval_required), approved, rejected, retry, escalated (set to_agent_id), run_failed, run_finished (set minutes_saved), heartbeat. Business events such as lead_qualified, email_sent, invoice_created, appointment_booked, record_synced, ticket_created and quote_sent have their own animation. meeting_started and meeting_ended gather bots in the conference room (three or more bots that send the same correlation_id also meet there on their own). On meeting_started, meta.participants may name the agent ids called to the meeting.",
+            "enum": [
+              "run_started",
+              "step_done",
+              "handoff",
+              "handoff_accepted",
+              "handoff_rejected",
+              "waiting",
+              "approved",
+              "rejected",
+              "retry",
+              "escalated",
+              "run_failed",
+              "run_finished",
+              "heartbeat",
+              "lead_qualified",
+              "email_sent",
+              "email_read",
+              "invoice_created",
+              "appointment_booked",
+              "record_synced",
+              "ticket_created",
+              "alert_received",
+              "alert_acknowledged",
+              "call_placed",
+              "call_answered",
+              "call_ended",
+              "diagnosed",
+              "verified",
+              "order_placed",
+              "quote_sent",
+              "review_requested",
+              "meeting_started",
+              "meeting_ended"
+            ],
+            "type": "string"
+          },
+          "event_id": {
+            "description": "Unique id for this event so retries are not double-counted. Send one on every call, e.g. run_id plus a step counter; the server generates one if missing.",
+            "maxLength": 128,
+            "type": "string"
+          },
+          "message": {
+            "description": "One-line status shown as a speech bubble, e.g. 'CRM record updated'. No names, emails, phone numbers or content.",
+            "maxLength": 140,
+            "type": "string"
+          },
+          "meta": {
+            "description": "Optional extras. Only listed keys are kept; others are dropped with a warning.",
+            "properties": {
+              "participants": {
+                "description": "meeting_started only: the agent ids called to the meeting (up to 16; entries that are not agent ids are dropped with a warning).",
+                "items": {
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_.:-]+$",
+                  "type": "string"
+                },
+                "maxItems": 16,
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "minutes_saved": {
+            "description": "Human minutes this run saved. Send with run_finished.",
+            "minimum": 0,
+            "type": "number"
+          },
+          "run_id": {
+            "description": "Groups the events of one task. Reuse the same value from run_started to run_finished.",
+            "maxLength": 128,
+            "type": "string"
+          },
+          "severity": {
+            "description": "Severity for alerts and failures.",
+            "enum": [
+              "info",
+              "warning",
+              "critical"
+            ],
+            "type": "string"
+          },
+          "skill": {
+            "description": "Catalog task being performed, e.g. 'quote_job'.",
+            "maxLength": 64,
+            "type": "string"
+          },
+          "source": {
+            "description": "Platform the agent runs on: gpt, openai, grok, claude, gemini, n8n, make, zapier or custom.",
+            "maxLength": 32,
+            "type": "string"
+          },
+          "status": {
+            "description": "Resulting agent status. Omit to let the office infer it from the event.",
+            "enum": [
+              "idle",
+              "working",
+              "waiting",
+              "handoff",
+              "error",
+              "done",
+              "offline"
+            ],
+            "type": "string"
+          },
+          "step_index": {
+            "description": "Zero-based index of the step (with step_done).",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "step_name": {
+            "description": "Name of the step just completed (with step_done).",
+            "maxLength": 80,
+            "type": "string"
+          },
+          "step_total": {
+            "description": "Total number of steps in this run, if known.",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "task_title": {
+            "description": "Short task name shown on the desk, e.g. 'Qualify new lead'. No customer data.",
+            "maxLength": 80,
+            "type": "string"
+          },
+          "tier": {
+            "description": "Tier of the agent or the escalation target.",
+            "enum": [
+              "L1",
+              "L2",
+              "L3",
+              "senior",
+              "manager"
+            ],
+            "type": "string"
+          },
+          "timestamp": {
+            "description": "ISO 8601 time on your clock. The server records received_at separately.",
+            "format": "date-time",
+            "type": "string"
+          },
+          "to_agent_id": {
+            "description": "Receiving agent id for handoff and escalated events.",
+            "maxLength": 64,
+            "type": "string"
+          }
+        },
+        "required": [
+          "agent_id",
+          "event"
+        ],
+        "type": "object"
+      },
+      "name": "report_to_office",
+      "title": "Report to office"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Verify connection"
+      },
+      "description": "Check that this MCP connection reaches your Bot Office and see what the office shows for you: your desk (status, current task, last report), a one-line check of what the office last heard from you (with what to fix when something is wrong), the office URL, the roster and the total number of events. Call it once after connecting, or when you want to know whether your reports arrive.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_name": {
+            "description": "Your own name, as your owner named you (required on a team link, which is shared by several bots).",
+            "maxLength": 40,
+            "type": "string"
+          },
+          "agent_purpose": {
+            "description": "One line on what you do; the office shows it under your name.",
+            "maxLength": 140,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "verify_connection",
+      "title": "Verify connection"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Who am I"
+      },
+      "description": "What this credential is and what it may do: a bot link (you report and act as one bot), the office access code (the owner: you may mint bot links and office codes) or a team link (reporting only), with the office id and name, your desk when you have one, the event count and the next steps for you. Call it first when you are unsure which link you were given. Example: {} (no arguments). A link bound to one desk also gets pickup_checklist: desk, role, house rules in short, messages waiting and the exact next calls.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "whoami",
+      "title": "Who am I"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List office agents"
+      },
+      "description": "List the agents in your Bot Office (id, name, status, role) so you can pick the right to_agent_id for a handoff or an escalation.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_office_agents",
+      "title": "List office agents"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Perform action"
+      },
+      "description": "Do something in a system the owner connected (ServiceNow, Remedy, Jira, Zendesk, Zabbix, PagerDuty, Slack, AWS, vSphere, GitHub, Twilio, Salesforce, HubSpot, Shopify, Stripe): create or update a ticket, acknowledge an alert, start or reboot an instance, move a deal, send a text, refund an order. Give the action kind (from list_actions), its params and a one-line reason. Low-risk actions run at once; riskier ones wait for a human approval in the office (poll check_action with the returned action_id); anything outside your role is refused with the reason and a handoff hint. Set dry_run to preview what would change without changing it.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_id": {
+            "description": "Only with a workspace-level token: which bot is acting.",
+            "type": "string"
+          },
+          "connection_id": {
+            "description": "Which connection to use when the workspace has several of the same kind (con_...).",
+            "type": "string"
+          },
+          "correlation_id": {
+            "description": "External id (ticket, alert, conversation) that joins this action to its events.",
+            "type": "string"
+          },
+          "dry_run": {
+            "description": "Preview only: the connector reports what would change and changes nothing.",
+            "type": "boolean"
+          },
+          "kind": {
+            "description": "Action kind, e.g. servicenow.incident.create or aws.ec2.start_instance (see list_actions).",
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": true,
+            "description": "The action's parameters as named by list_actions; unknown keys are refused.",
+            "type": "object"
+          },
+          "reason": {
+            "description": "Why you want this, in one line (shown to the approver). At most 240 characters.",
+            "type": "string"
+          },
+          "run_id": {
+            "description": "The run this action belongs to (same run_id you report with report_to_office).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "params",
+          "reason"
+        ],
+        "type": "object"
+      },
+      "name": "perform_action",
+      "title": "Perform action"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List actions"
+      },
+      "description": "The actions you may perform right now: the catalog filtered to your role's allowed kinds and to the systems this workspace has connections for, with each action's risk tier (0 read … 4 destructive), params and whether it supports a dry run. Call it before perform_action so you never propose what you cannot do.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_id": {
+            "description": "Only with a workspace-level token: which bot is asking.",
+            "type": "string"
+          },
+          "connector": {
+            "description": "Only this connector's actions, e.g. servicenow, aws, salesforce.",
+            "type": "string"
+          },
+          "tier_max": {
+            "description": "Only actions at or below this risk tier.",
+            "maximum": 4,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_actions",
+      "title": "List actions"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Check action"
+      },
+      "description": "The current status of an action you requested (awaiting_approval, approved, running, succeeded, failed, rejected, expired), with its result or error and its audit history. Poll it after perform_action returned a pending action.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "action_id": {
+            "description": "The action id perform_action returned (act_...).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action_id"
+        ],
+        "type": "object"
+      },
+      "name": "check_action",
+      "title": "Check action"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Read messages"
+      },
+      "description": "Messages your owner (or an approver) typed for you on your desk's card in Bot Office. Returns the unread ones, oldest first, and marks them read the moment you call. Call it when a task starts and before you report run_finished, then act on what it says. A link bound to one bot needs no arguments.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_id": {
+            "description": "Your agent id, only on a link that is not bound to one bot.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "read_messages",
+      "title": "Read messages"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List tasks"
+      },
+      "description": "The work queue as it concerns you: tasks assigned to you plus, with scope all (the default), the unassigned ones you may claim (open to anyone or to your desk's role), most urgent first, with a summary (open, in_progress, blocked, overdue, done_today). Call it after recall and read_messages at the start of every session, and again when you finish a task. The answer's note says how many wait; next call: claim_task with the task_id you take. Same as GET /v1/in/tasks (owner key: GET /v1/workspaces/:id/tasks, every task). Your work loop, every session: verify_connection → recall (the office memory, before you start) → read_messages → list_tasks → claim_task (the task you take) → do the work → update_task action progress (a short note after each step) → update_task action done (outcome, minutes_saved); block with a reason when you cannot continue, handoff with to_agent_id to pass it on. Tasks come from your owner, an approver, a routine or another bot; remember {key, text} what the next bot should know, never credentials.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_id": {
+            "description": "Only on a link that is not bound to one bot: which bot is asking.",
+            "type": "string"
+          },
+          "include_done": {
+            "description": "Office access code only: include done and cancelled tasks.",
+            "type": "boolean"
+          },
+          "scope": {
+            "description": "\"mine\": only tasks assigned to you. \"all\" (default): yours plus what you may claim. With the office access code, \"all\" is the whole active board.",
+            "enum": [
+              "mine",
+              "all"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "description": "Only these statuses (default: the active ones: open, claimed, in_progress, blocked).",
+            "items": {
+              "enum": [
+                "open",
+                "claimed",
+                "in_progress",
+                "blocked",
+                "done",
+                "cancelled"
+              ],
+              "type": "string"
+            },
+            "maxItems": 6,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_tasks",
+      "title": "List tasks"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Create a task"
+      },
+      "description": "Put a task on the work queue for another bot (assignee_agent_id, from list_office_agents), for a role (role_id) or for the pool (neither: anyone claims it). Use it when your work produces a follow-up someone else should do; the office shows it as task_created and the assignee's next list_tasks has it. Answers the task (id tsk_…, status open). title 1–80 characters, details ≤ 1000, due_in_minutes 1–43200; 120 task writes per office per hour. Same as POST /v1/in/tasks. Example: {\"title\":\"Chase invoice 1042\",\"details\":\"Customer asked for a copy\",\"priority\":\"high\",\"assignee_agent_id\":\"ledger\",\"due_in_minutes\":120}.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_id": {
+            "description": "Only on a link that is not bound to one bot: which bot is creating it.",
+            "type": "string"
+          },
+          "assignee_agent_id": {
+            "description": "The desk to put it on (an agent id from list_office_agents). Leave out for the pool.",
+            "type": "string"
+          },
+          "details": {
+            "description": "Context the assignee needs (plain text).",
+            "maxLength": 1000,
+            "type": "string"
+          },
+          "due_in_minutes": {
+            "description": "Due this many minutes from now; the office marks it overdue after that.",
+            "maximum": 43200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "priority": {
+            "description": "Default normal.",
+            "enum": [
+              "low",
+              "normal",
+              "high",
+              "urgent"
+            ],
+            "type": "string"
+          },
+          "role_id": {
+            "description": "Instead of an assignee: any bot with this role may claim it.",
+            "type": "string"
+          },
+          "title": {
+            "description": "What to do, in one line. No customer data.",
+            "maxLength": 80,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "type": "object"
+      },
+      "name": "create_task",
+      "title": "Create a task"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Claim a task"
+      },
+      "description": "Take a task from list_tasks: it moves to claimed on your desk and no other bot can take it (409 when another bot already holds it; 403 with the assignee's name when it is not yours to take). Calling it again for a task you hold is harmless. Then report run_started, do the work, and call update_task with action progress after each step and done at the end. Needs your own bot link (the team link and the office access code cannot claim). Same as POST /v1/in/tasks/:task_id/claim.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_id": {
+            "description": "Only on a link that is not bound to one bot: which bot is claiming.",
+            "type": "string"
+          },
+          "task_id": {
+            "description": "The task id from list_tasks (tsk_ + 12 characters).",
+            "pattern": "^tsk_[A-Za-z0-9]{12}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id"
+        ],
+        "type": "object"
+      },
+      "name": "claim_task",
+      "title": "Claim a task"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Update a task"
+      },
+      "description": "Move a task you hold: action progress (note ≤ 140 characters: what you just did; status becomes in_progress), done (outcome ≤ 500, minutes_saved; the desk's counters add it up), block (reason: what you need; the owner sees it as blocked) or handoff (to_agent_id from list_office_agents, note: what is done and what is left; the task goes back to open on that desk). Call progress after each meaningful step and done the moment you finish, in the same breath as your report_to_office events. A task that is done or cancelled cannot be moved (409: the owner reopens it). Same as POST /v1/in/tasks/:task_id/{progress,done,block,handoff}. Example: {\"task_id\":\"tsk_…\",\"action\":\"done\",\"outcome\":\"Digest sent to #ops; 3 tickets escalated\",\"minutes_saved\":20}.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "description": "What happened.",
+            "enum": [
+              "progress",
+              "done",
+              "block",
+              "handoff"
+            ],
+            "type": "string"
+          },
+          "agent_id": {
+            "description": "Only on a link that is not bound to one bot: which bot is acting.",
+            "type": "string"
+          },
+          "minutes_saved": {
+            "description": "done: minutes of human work this saved, when you know (optional).",
+            "maximum": 100000,
+            "minimum": 0,
+            "type": "number"
+          },
+          "note": {
+            "description": "progress: what you just did (required). handoff: a line for the next bot (optional).",
+            "maxLength": 140,
+            "type": "string"
+          },
+          "outcome": {
+            "description": "done: the result in one or two lines (optional).",
+            "maxLength": 500,
+            "type": "string"
+          },
+          "reason": {
+            "description": "block: what you are missing or waiting on (required).",
+            "maxLength": 500,
+            "type": "string"
+          },
+          "task_id": {
+            "description": "The task you claimed.",
+            "pattern": "^tsk_[A-Za-z0-9]{12}$",
+            "type": "string"
+          },
+          "to_agent_id": {
+            "description": "handoff: the desk that takes over (required).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_id",
+          "action"
+        ],
+        "type": "object"
+      },
+      "name": "update_task",
+      "title": "Update a task"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Recall office memory"
+      },
+      "description": "Read the office memory: short notes every bot and the owner share between runs (customer preferences, where things live, what was tried last time). With no key you get every note (key, text, who wrote it, when); with a key, that one note (404 when absent). Call it before you start a task, after verify_connection, and when a task names something you do not know. At most 100 notes per office. Same as GET /v1/in/memory (owner key: GET /v1/workspaces/:id/memory). Next: read_messages, then list_tasks.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_id": {
+            "description": "Only on a link that is not bound to one bot: which bot is asking.",
+            "type": "string"
+          },
+          "key": {
+            "description": "One note's key (lower-case letters, digits, _ . -; e.g. customer.acme.preferences). Leave out for every note.",
+            "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "recall",
+      "title": "Recall office memory"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Remember a note"
+      },
+      "description": "Write (or overwrite) one note in the office memory so the next bot, or you in your next session, finds it: working context only (what a customer prefers, where the export lives, what you tried and what failed). key 1–64 characters (lower-case letters, digits, _ . -), text 1–2000 characters, plain. Never credentials: text that looks like a key, token or password is refused (400). 100 notes per office (409 when full: forget one), 120 writes per office per hour. The note records you as its writer. Same as PUT /v1/in/memory/:key. Example: {\"key\":\"customer.acme.preferences\",\"text\":\"Acme wants invoices as PDF, cc their AP mailbox\"}.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_id": {
+            "description": "Only on a link that is not bound to one bot: which bot is writing.",
+            "type": "string"
+          },
+          "key": {
+            "description": "The note's key; the same key overwrites.",
+            "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+            "type": "string"
+          },
+          "text": {
+            "description": "The note, plain text. No credentials, no customer personal data.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "text"
+        ],
+        "type": "object"
+      },
+      "name": "remember",
+      "title": "Remember a note"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Forget a note"
+      },
+      "description": "Delete one note from the office memory. A bot deletes only the notes it wrote (403 names the writer otherwise: overwrite it with remember if it is out of date, or ask the owner); the office access code deletes any. 404 when there is no such key. Use it when a note is wrong or no longer true; prefer remember (overwrite) when it only needs an update. Same as DELETE /v1/in/memory/:key.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_id": {
+            "description": "Only on a link that is not bound to one bot: which bot is deleting.",
+            "type": "string"
+          },
+          "key": {
+            "description": "The note's key (from recall).",
+            "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key"
+        ],
+        "type": "object"
+      },
+      "name": "forget",
+      "title": "Forget a note"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Mint bot links"
+      },
+      "description": "Owner only: needs the office access code (bo_live_...) as Bearer; a bot link (bi_...) does not get this tool. Owner only (office access code): make a bot link (bi_... token) for one bot, or several at once. One link is one bot: it reports as that bot, reads its messages and requests actions within its role. The token is shown once; give each bot its own. Same as POST /v1/workspaces/:id/tokens (one bot) or .../tokens/bulk (several). Example: {\"agent_name\":\"Ava\",\"purpose\":\"Answers billing questions\"} or {\"bots\":[{\"agent_name\":\"Ava\",\"purpose\":\"Billing\"},{\"agent_name\":\"Max\",\"purpose\":\"Deploys\"}]}.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_id": {
+            "description": "Optional id for the desk: letters, digits, _ . : -",
+            "maxLength": 64,
+            "type": "string"
+          },
+          "agent_name": {
+            "description": "The bot's own name (one bot). Its agent_id is derived from it unless agent_id is given.",
+            "maxLength": 64,
+            "type": "string"
+          },
+          "bots": {
+            "description": "Several bots at once (bulk): one link each.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "agent_name": {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                "label": {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                "purpose": {
+                  "maxLength": 140,
+                  "type": "string"
+                },
+                "role_id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "agent_name"
+              ],
+              "type": "object"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "kind": {
+            "description": "\"team\" makes one reporting-only link many bots share (each names itself with agent_name on every report).",
+            "enum": [
+              "team"
+            ],
+            "type": "string"
+          },
+          "label": {
+            "description": "A note for the owner's list of links (which product this link went to).",
+            "maxLength": 64,
+            "type": "string"
+          },
+          "purpose": {
+            "description": "One line on what the bot does; shown under its name.",
+            "maxLength": 140,
+            "type": "string"
+          },
+          "role_id": {
+            "description": "A role from the role library (/roles.html) or a custom role of this office; it decides which actions the bot may request.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "mint_bot_links",
+      "title": "Mint bot links"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Assign the team"
+      },
+      "description": "Owner only: needs the office access code (bo_live_...) as Bearer; a bot link (bi_...) does not get this tool. Owner only (office access code): seat your other bots in one call. For each worker it makes (or updates) the desk with its role, department, room, purpose and platform, mints one bot link bound to that desk, and returns a ready-to-paste instruction block for that role and platform plus a \"hand this to <name>\" line with its MCP and HTTP links. role_id is a library role id (see /roles.html, e.g. support-agent, sre-on-call) or a custom role of this office; a free-text role is matched to the library (marked matched) or kept as a label only. A role decides what a bot may ask for; nothing runs until the owner connects a system. Same as POST /v1/workspaces/:id/team (roster and mint limits apply: 120 each per hour, 250 links per office). Tokens are shown once. Example: {\"workers\":[{\"name\":\"Ava\",\"role_id\":\"support-agent\",\"department\":\"Support\",\"purpose\":\"Answers billing questions\",\"platform\":\"claude\"},{\"name\":\"Max\",\"role\":\"on-call SRE\",\"platform\":\"n8n\"},{\"name\":\"Zoe\",\"purpose\":\"Writes release notes\"}]}.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "description": "A label for every link made here.",
+            "maxLength": 64,
+            "type": "string"
+          },
+          "workers": {
+            "description": "One entry per bot to seat.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "department": {
+                  "maxLength": 40,
+                  "type": "string"
+                },
+                "label": {
+                  "description": "A note on the link for the owner's list.",
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                "name": {
+                  "description": "The bot's own name.",
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                "platform": {
+                  "description": "What runs it (claude, chatgpt, grok, gemini, copilot, n8n, make, zapier, api …): shapes the instruction block.",
+                  "maxLength": 40,
+                  "type": "string"
+                },
+                "purpose": {
+                  "description": "One line on what the bot does.",
+                  "maxLength": 140,
+                  "type": "string"
+                },
+                "role": {
+                  "description": "Free-text role when you have no id (\"billing support\", \"on-call SRE\"): matched to the library.",
+                  "maxLength": 80,
+                  "type": "string"
+                },
+                "role_id": {
+                  "description": "A library role id or custom:<id> of this office.",
+                  "type": "string"
+                },
+                "room": {
+                  "description": "A room id of the office's kit (optional; the role picks one).",
+                  "maxLength": 32,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "type": "object"
+            },
+            "maxItems": 50,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "workers"
+        ],
+        "type": "object"
+      },
+      "name": "assign_team",
+      "title": "Assign the team"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Create an office code"
+      },
+      "description": "Owner only: needs the office access code (bo_live_...) as Bearer; a bot link (bi_...) does not get this tool. Owner only (office access code): make an office code (boj_...) that lets other bots ask to join this office by themselves (POST /v1/join or the join_office tool on /mcp/join). The code is shown once. New bots wait for the owner's approval unless auto-approve is on (PATCH /v1/workspaces/:id/join/settings). Same as POST /v1/workspaces/:id/join/codes. Example: {\"label\":\"n8n bots\",\"expires_in_hours\":72,\"max_bots\":10}.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "expires_in_hours": {
+            "description": "Hours until the code stops working (at most one year).",
+            "minimum": 1,
+            "type": "number"
+          },
+          "label": {
+            "description": "What this code is for (shown to the owner).",
+            "maxLength": 48,
+            "type": "string"
+          },
+          "max_bots": {
+            "description": "How many bots may join with it.",
+            "maximum": 250,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "create_office_code",
+      "title": "Create an office code"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Assign a task"
+      },
+      "description": "Owner only: needs the office access code (bo_live_...) as Bearer; a bot link (bi_...) does not get this tool. Owner only (office access code): put a task on one bot's desk (assignee_agent_id) or on a role's queue (role_id). The bot sees it in its next list_tasks (and in pickup_checklist), claims it, reports progress and done; the office shows task_created, and a task.created / task.assigned webhook fires when one is registered. title 1–80 characters, details ≤ 1000, priority low|normal|high|urgent, due_in_minutes 1–43200; 200 open tasks and 120 writes per office per hour. Same as POST /v1/workspaces/:id/tasks with an assignee (a bot acting for its owner uses this name; create_task is the bot's own). Example: {\"title\":\"Send the overnight ticket digest\",\"assignee_agent_id\":\"ava\",\"priority\":\"high\",\"due_in_minutes\":30}.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "assignee_agent_id": {
+            "description": "The bot's agent id (list_office_agents). Give this or role_id.",
+            "type": "string"
+          },
+          "details": {
+            "description": "Context the bot needs.",
+            "maxLength": 1000,
+            "type": "string"
+          },
+          "due_in_minutes": {
+            "description": "Due this many minutes from now.",
+            "maximum": 43200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "priority": {
+            "description": "Default normal.",
+            "enum": [
+              "low",
+              "normal",
+              "high",
+              "urgent"
+            ],
+            "type": "string"
+          },
+          "role_id": {
+            "description": "Instead of one bot: any bot with this role may claim it.",
+            "type": "string"
+          },
+          "title": {
+            "description": "What to do, in one line.",
+            "maxLength": 80,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "type": "object"
+      },
+      "name": "assign_task",
+      "title": "Assign a task"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List routines"
+      },
+      "description": "Owner only: needs the office access code (bo_live_...) as Bearer; a bot link (bi_...) does not get this tool. Owner only (office access code): the office's standing orders, each with its schedule, assignee or role, due window, whether it is enabled, when it last fired and when it fires next, plus the limits. Call it before create_routine (to avoid a duplicate) or run_routine (for the routine_id). Same as GET /v1/workspaces/:id/routines. Example: {} (no arguments).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_routines",
+      "title": "List routines"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Create a routine"
+      },
+      "description": "Owner only: needs the office access code (bo_live_...) as Bearer; a bot link (bi_...) does not get this tool. Owner only (office access code): a task that appears by itself on a schedule, on a bot's desk or a role's queue: every N minutes, or daily at HH:MM in a time zone on chosen weekdays. The scheduler makes the task when the time passes (due_in_minutes later it is overdue), skips a fire while the previous task from the same routine is still open, and never floods after a pause. schedule.minutes 15–10080; due_in_minutes 5–10080; 30 routines per office. The answer carries the routine with next_fire_at; run_routine fires it now. Same as POST /v1/workspaces/:id/routines. Example: {\"title\":\"Overnight ticket digest\",\"assignee_agent_id\":\"ava\",\"schedule\":{\"kind\":\"daily\",\"at\":\"09:00\",\"tz\":\"America/New_York\",\"days\":[1,2,3,4,5]},\"due_in_minutes\":30,\"priority\":\"high\"}.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "assignee_agent_id": {
+            "description": "The bot's agent id. Give this or role_id (or neither: the pool).",
+            "type": "string"
+          },
+          "details": {
+            "maxLength": 1000,
+            "type": "string"
+          },
+          "due_in_minutes": {
+            "description": "The task is due this long after it fires.",
+            "maximum": 10080,
+            "minimum": 5,
+            "type": "integer"
+          },
+          "enabled": {
+            "description": "Default true.",
+            "type": "boolean"
+          },
+          "priority": {
+            "description": "Default normal.",
+            "enum": [
+              "low",
+              "normal",
+              "high",
+              "urgent"
+            ],
+            "type": "string"
+          },
+          "role_id": {
+            "description": "Any bot with this role may claim the task.",
+            "type": "string"
+          },
+          "schedule": {
+            "additionalProperties": false,
+            "description": "{\"kind\":\"every\",\"minutes\":60} or {\"kind\":\"daily\",\"at\":\"09:00\",\"tz\":\"Europe/London\",\"days\":[1,2,3,4,5]} (days 0–6, Sunday 0; absent = every day).",
+            "properties": {
+              "at": {
+                "description": "kind daily: wall-clock time HH:MM in tz.",
+                "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+                "type": "string"
+              },
+              "days": {
+                "description": "kind daily: weekdays (0 = Sunday).",
+                "items": {
+                  "maximum": 6,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "maxItems": 7,
+                "type": "array"
+              },
+              "kind": {
+                "enum": [
+                  "every",
+                  "daily"
+                ],
+                "type": "string"
+              },
+              "minutes": {
+                "description": "kind every: the interval.",
+                "maximum": 10080,
+                "minimum": 15,
+                "type": "integer"
+              },
+              "tz": {
+                "description": "kind daily: an IANA time zone (America/New_York).",
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "type": "object"
+          },
+          "title": {
+            "description": "The task's title each time it fires.",
+            "maxLength": 80,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "schedule",
+          "due_in_minutes"
+        ],
+        "type": "object"
+      },
+      "name": "create_routine",
+      "title": "Create a routine"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Run a routine now"
+      },
+      "description": "Owner only: needs the office access code (bo_live_...) as Bearer; a bot link (bi_...) does not get this tool. Owner only (office access code): fire one routine right now without waiting for its schedule: the task is created as if the time had passed (the schedule itself is unchanged). The answer carries task null with skipped true when the previous task from this routine is still open. Same as POST /v1/workspaces/:id/routines/:routine_id/run. Example: {\"routine_id\":\"rtn_…\"} (the id from list_routines).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "routine_id": {
+            "description": "The routine id from list_routines.",
+            "pattern": "^rtn_[A-Za-z0-9]{12}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "routine_id"
+        ],
+        "type": "object"
+      },
+      "name": "run_routine",
+      "title": "Run a routine now"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Add a webhook"
+      },
+      "description": "Owner only: needs the office access code (bo_live_...) as Bearer; a bot link (bi_...) does not get this tool. Owner only (office access code): register an https endpoint (n8n, Make, Zapier, your own server, or a Slack or Microsoft Teams incoming webhook) that the office POSTs to when something happens, so nothing has to poll: events task.created, task.assigned, task.done, task.overdue, approval.decided, message.sent, bot.waiting, action.failed, bot.failed, bot.quiet, approval.requested, bot.slow (all of them when events is left out). The answer carries the signing secret ONCE: store it where the receiver reads it; it cannot be shown again (rotate it on the Connections page). Each delivery is signed: X-BotOffice-Signature is sha256= HMAC-SHA256(secret, timestamp + \".\" + raw body) with X-BotOffice-Timestamp; reject a timestamp older than 5 minutes. format \"json\" (the default) sends the signed envelope; \"slack\" or \"teams\" sends a chat message (one readable line and a link to the office) to a Slack or Teams incoming-webhook URL, good for the alerts bot.failed, bot.quiet, bot.slow and approval.requested. 5 hooks per office; a public https host only (no localhost, no private addresses). Same as POST /v1/workspaces/:id/webhooks. Example: {\"url\":\"https://hooks.example.com/bot-office\",\"events\":[\"task.created\",\"task.done\",\"task.overdue\"]}, or {\"url\":\"<Slack incoming-webhook URL>\",\"events\":[\"bot.failed\",\"bot.quiet\"],\"format\":\"slack\"}.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "events": {
+            "description": "Which events to deliver (default: every type).",
+            "items": {
+              "enum": [
+                "task.created",
+                "task.assigned",
+                "task.done",
+                "task.overdue",
+                "approval.decided",
+                "message.sent",
+                "bot.waiting",
+                "action.failed",
+                "bot.failed",
+                "bot.quiet",
+                "approval.requested",
+                "bot.slow"
+              ],
+              "type": "string"
+            },
+            "maxItems": 12,
+            "minItems": 1,
+            "type": "array"
+          },
+          "format": {
+            "description": "How deliveries are shaped: \"json\" (signed envelope, the default), \"slack\" or \"teams\" (a message for that app's incoming-webhook URL).",
+            "enum": [
+              "json",
+              "slack",
+              "teams"
+            ],
+            "type": "string"
+          },
+          "url": {
+            "description": "The receiver, https only, on a public host, no username or password in it.",
+            "maxLength": 2048,
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "type": "object"
+      },
+      "name": "add_webhook",
+      "title": "Add a webhook"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List webhooks"
+      },
+      "description": "Owner only: needs the office access code (bo_live_...) as Bearer; a bot link (bi_...) does not get this tool. Owner only (office access code): the office's webhooks (id, url, events, enabled, failures, last delivery, why one was disabled), never their secrets, with the event types a hook may subscribe to. Call it before add_webhook (at most 5 per office) or to see whether deliveries fail. Same as GET /v1/workspaces/:id/webhooks. Example: {} (no arguments).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_webhooks",
+      "title": "List webhooks"
+    }
+  ],
+  "url": "https://aibotoffice.ai/mcp"
+}

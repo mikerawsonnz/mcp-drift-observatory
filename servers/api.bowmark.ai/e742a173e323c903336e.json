@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "11b2ca5f080c6680207378a931d7e469c6b07b534ed0c244e36d95069232ad53",
+  "full_hash": "490bc6ec8455d2f57a40e45aae5914c78baed010208e37719ddecf9384d3c534",
   "name": "ai.bowmark/bowmark",
-  "observed_at": "2026-11-03T02:02:55.947893Z",
+  "observed_at": "2026-11-04T02:03:27.147765Z",
   "sources": [
     "official"
   ],
@@ -84,43 +84,26 @@
         "taskSupport": "forbidden"
       },
       "inputSchema": {
-        "oneOf": [
-          {
-            "additionalProperties": false,
-            "properties": {
-              "egress": {
-                "description": "Optional. `\"link\"` sends every request of this run through the user's own Chrome (Bowmark Link) and fails with \"Link not connected\" when it is not open; `\"default\"` or leaving it out uses Bowmark's own route. The result echoes it as `egress`.",
-                "enum": [
-                  "default",
-                  "link"
-                ],
-                "type": "string"
-              },
-              "script": {
-                "description": "The JavaScript script body to execute (async, against the `bowmark` global). e.g. `const { flights, warnings } = await bowmark.flights.search({from:'SFO',to:'JFK',depart:'2026-09-01'}); return { best: flights.sort((a,b)=>a.price-b.price)[0], warnings };`",
-                "type": "string"
-              }
-            },
-            "required": [
-              "script"
+        "additionalProperties": false,
+        "properties": {
+          "egress": {
+            "description": "Optional. `\"link\"` sends every request of this run through the user's own Chrome (Bowmark Link) and fails with \"Link not connected\" when it is not open; `\"default\"` or leaving it out uses Bowmark's own route. The result echoes it as `egress`.",
+            "enum": [
+              "default",
+              "link"
             ],
-            "type": "object"
+            "type": "string"
           },
-          {
-            "additionalProperties": false,
-            "properties": {
-              "runId": {
-                "description": "Only to collect a run an earlier call answered `status: \"running\"` for: pass its `runId` and no `script`, and this call waits for that same run's result.",
-                "format": "uuid",
-                "type": "string"
-              }
-            },
-            "required": [
-              "runId"
-            ],
-            "type": "object"
+          "runId": {
+            "description": "Send EXACTLY ONE of `script` or `runId`, never both and never neither. `runId` is only to collect a run an earlier call answered `status: \"running\"` for: pass its `runId` alone, with no `script`, and this call waits for that same run's result. Leave it out when starting a run.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "script": {
+            "description": "Send EXACTLY ONE of `script` or `runId`, never both and never neither; `script` starts a new run. The JavaScript script body to execute (async, against the `bowmark` global). e.g. `const { flights, warnings } = await bowmark.flights.search({from:'SFO',to:'JFK',depart:'2026-09-01'}); return { best: flights.sort((a,b)=>a.price-b.price)[0], warnings };`",
+            "type": "string"
           }
-        ],
+        },
         "type": "object"
       },
       "name": "run",
@@ -744,9 +727,9 @@
         "idempotentHint": false,
         "openWorldHint": true,
         "readOnlyHint": false,
-        "title": "Call one Bowmark function in a session that keeps its browser"
+        "title": "Call one Bowmark function and keep the session open for the next call"
       },
-      "description": "Runs ONE library function in a Bowmark session, so a flow that needs several calls in the SAME browser can finish: a booking that texts the user a code, a cart filled over several steps, a form that waits on an answer from the user. `run` cannot do these, because every run starts a fresh browser and the held page dies with it.\n\n`path` is the function as a script writes it after `bowmark.`, split on the dots: `[\"providers\",\"opentable\",\"startBooking\"]`. `args` are its arguments, in order. Look both up in `get_library` first. Omit `sessionId` on the first call: a session opens and its `sessionId` comes back. Pass that `sessionId` on every later call so it runs in the same browser.\n\nThe answer is `{ sessionId, ok, status, result, logs, error?, code? }`. `status` is `ok`, `error` or `needs_user`. `needs_user` pauses only this call for a sign-in and the session stays open: give the user `meta.handoff.url`, then repeat the call. A session closes itself after a few idle minutes, so ask the user for anything you need (a texted code) right away and make the next call as soon as they answer. Call `session_close` when the task is done.",
+      "description": "Runs ONE library function in a Bowmark session, so a flow that needs several calls in the SAME session can finish: a booking that texts the user a code, a cart filled over several steps, a form that waits on an answer from the user. `run` cannot do these, because every run starts fresh and nothing it held survives to the next run.\n\n`path` is the function as a script writes it after `bowmark.`, split on the dots: `[\"providers\",\"opentable\",\"startBooking\"]`. `args` are its arguments, in order. Look both up in `get_library` first. Omit `sessionId` on the first call: a session opens and its `sessionId` comes back. Pass that `sessionId` on every later call so it runs in the same session.\n\nThe answer is `{ sessionId, ok, status, result, logs, error?, code? }`. `status` is `ok`, `error` or `needs_user`. `needs_user` pauses only this call for a sign-in and the session stays open: give the user `meta.handoff.url`, then repeat the call. A session closes itself after a few idle minutes, so ask the user for anything you need (a texted code) right away and make the next call as soon as they answer. Call `session_close` when the task is done.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -778,7 +761,7 @@
         "type": "object"
       },
       "name": "session_call",
-      "title": "Call one Bowmark function in a session that keeps its browser"
+      "title": "Call one Bowmark function and keep the session open for the next call"
     },
     {
       "_meta": {
@@ -800,7 +783,7 @@
         "readOnlyHint": false,
         "title": "End a Bowmark session"
       },
-      "description": "Ends a session `session_call` opened and frees its browser. Pass the `sessionId`. Closing one that is already closed is harmless.",
+      "description": "Ends a session `session_call` opened and frees what it held. Pass the `sessionId`. Closing one that is already closed is harmless.",
       "execution": {
         "taskSupport": "forbidden"
       },
