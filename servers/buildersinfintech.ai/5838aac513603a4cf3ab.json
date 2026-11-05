@@ -1,13 +1,40 @@
 {
   "canon_version": "1",
-  "full_hash": "bf66ad0279bafe6dc7d91fa19bb08ea4825deb6cbe0eee3e8c4ddae343501ddd",
+  "full_hash": "328060e3c6cfe3735215e77cd26161e59b090f94539704bf0397b0e925ceb691",
   "name": "ai.buildersinfintech/fintech-data",
-  "observed_at": "2026-11-03T02:02:56.551717Z",
+  "observed_at": "2026-11-05T02:03:10.998784Z",
   "sources": [
     "official"
   ],
-  "tool_count": 23,
+  "tool_count": 25,
   "tools": [
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "The weekly digest for one topic (currently the topics with a digest, e.g. 'stablecoins', 'agentic-payments'): published news tagged with the topic or its sub-topics in one ISO week (Monday to Monday, Europe/Rome), newest first, plus the approved funding rounds linked to those stories. Amounts are never converted. Arguments: topic (required, topic slug), week (optional, 'YYYY-Www', e.g. '2026-W45'; omit for the current week). Always returns available_weeks (last 12 weeks with at least one story). Unknown topic → error listing the digest topics. Unknown arguments are rejected.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "topic": {
+            "description": "Topic slug, e.g. 'stablecoins'.",
+            "type": "string"
+          },
+          "week": {
+            "description": "ISO week 'YYYY-Www' (e.g. '2026-W45'). Omit for the current week.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "type": "object"
+      },
+      "name": "get_topic_digest",
+      "title": "Get a weekly topic digest"
+    },
     {
       "annotations": {
         "idempotentHint": true,
@@ -335,6 +362,27 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
+      "description": "The monthly Fintech Signals report: stored figures for approved equity rounds in one month (headline rounds and per-currency totals/medians, comparison with previous months, largest rounds per currency, stages, countries with 3+ rounds, topics with 5+ rounds, investors with 2+ rounds, and debt/fund/IPO items not counted). Amounts are never converted; totals and rankings are per currency. Arguments: month (optional, 'YYYY-MM'); omit for the latest published edition. Always returns available_months. Each report carries date_published and date_modified (revised_at, else the item's last content update, else published). Unknown arguments are rejected.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "month": {
+            "description": "Month, 'YYYY-MM' (e.g. '2026-10'). Omit for the latest.",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "get_signals_report",
+      "title": "Get a Fintech Signals monthly report"
+    },
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
       "description": "Follow-on scorecard for one investor by slug: of the portfolio companies it first backed at least the window ago, the share that raised a later approved round (equity or IPO) within the window, at least gap_days after entry. Only returned when the investor has at least min_eligible eligible companies. Arguments: slug (required). Unknown arguments are rejected.",
       "inputSchema": {
         "additionalProperties": false,
@@ -534,10 +582,19 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
-      "description": "Full-text search across published news, newsletter issues, podcast episodes, public entity pages, funding rounds and products. Result kinds: news, newsletter, podcast, company, investor, person, topic, country, funding_round, product; funding_round results also carry company, round_type (as recorded; null when not disclosed), round_label (a stage derived from the amount, only when round_type is empty; not the official round name), category, amount, currency, display_amount and announced_at. Arguments: q (or query): text to search for, at least 2 characters — required, this tool has no plain-list mode. Unknown arguments are rejected.",
+      "description": "Full-text search across published news, newsletter issues, podcast episodes, public entity pages, funding rounds and products. Result kinds: news, newsletter, podcast, company, investor, person, topic, country, funding_round, product; funding_round results also carry company, round_type (as recorded; null when not disclosed), round_label (a stage derived from the amount, only when round_type is empty; not the official round name), category, amount, currency, display_amount and announced_at; news, newsletter and podcast results carry editorial_format ('news', 'analysis' or 'signals'). Arguments: q (or query): text to search for, at least 2 characters — required, this tool has no plain-list mode. editorial_format (optional, 'news' | 'analysis' | 'signals'; 'signals' = the monthly funding report, see get_signals_report): return only publication items with that format. Unknown arguments are rejected.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
+          "editorial_format": {
+            "description": "Optional: only news/newsletter/podcast items with this format.",
+            "enum": [
+              "news",
+              "analysis",
+              "signals"
+            ],
+            "type": "string"
+          },
           "kinds": {
             "description": "Restrict to kinds, e.g. ['news','podcast','company','funding_round','product'].",
             "items": {

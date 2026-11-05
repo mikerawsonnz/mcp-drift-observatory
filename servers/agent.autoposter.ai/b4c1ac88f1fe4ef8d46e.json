@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "84faf3ca4dac6903cc92414f6a252f16b8efe3d135b7c81fe056e65f9233aa58",
+  "full_hash": "fc0b252ea8b3967fa79d2a3302c4314d8b632b0b22bb03307e9799430b49d157",
   "name": "ai.autoposter/autoposter",
-  "observed_at": "2026-10-30T02:04:28.467078Z",
+  "observed_at": "2026-11-05T02:03:05.551962Z",
   "sources": [
     "official"
   ],
@@ -27,7 +27,7 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
-      "description": "Lists all connected social media accounts (X, LinkedIn, Instagram, TikTok, YouTube, Threads, Bluesky, Pinterest, Facebook) in the current Autoposter workspace.",
+      "description": "Lists all connected social media accounts (LinkedIn, X (Twitter), Instagram, TikTok, YouTube, Threads, Bluesky, Pinterest, Facebook, Telegram) in the current Autoposter workspace.",
       "inputSchema": {
         "properties": {},
         "type": "object"
@@ -181,7 +181,7 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Uploads an image or video to Auto Poster media library. Accepts files generated in ChatGPT (e.g. DALL-E images in /mnt/data/), uploaded files, or public image URLs. Direct chat download limit is 100MB. For larger videos or files (>100MB), tell the user to provide a direct public file URL or use autoposter_get_media_upload_url for direct S3 upload up to 5GB. If the image exists only in the chat or on the user's device and cannot be sent here, use autoposter_create_upload_link instead.",
+      "description": "Uploads an image or video to Auto Poster media library. Accepts a file object supplied by the client, a public image or video URL, a data URI, or base64 data. Direct chat download limit is 100MB. For larger videos or files (>100MB), tell the user to provide a direct public file URL or use autoposter_get_media_upload_url for direct S3 upload up to 5GB. If the image exists only in the chat or on the user's device and cannot be sent here, use autoposter_create_upload_link instead.",
       "inputSchema": {
         "$defs": {
           "MediaFile": {
@@ -210,7 +210,7 @@
         "properties": {
           "file": {
             "$ref": "#/$defs/MediaFile",
-            "description": "File object provided by ChatGPT for AI-generated images or uploaded files."
+            "description": "File object supplied by the client (download_url, file_id, optional mime_type and file_name) for generated or uploaded files."
           },
           "name": {
             "description": "Optional display name or title for the media file.",
@@ -446,7 +446,7 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Creates a draft post for human review. If API key lacks direct publish, post is saved as pending_approval and notifications are sent to workspace approvers. Accepts mediaUrls (public URLs) or files (AI-generated images or uploaded files from chat up to 100MB). For large video files over 100MB, tell the user to provide a direct public file URL or use autoposter_get_media_upload_url.",
+      "description": "Creates a draft post for human review. If API key lacks direct publish, post is saved as pending_approval and notifications are sent to workspace approvers. Accepts mediaUrls (public URLs) or files (client-supplied file objects up to 100MB). For large video files over 100MB, tell the user to provide a direct public file URL or use autoposter_get_media_upload_url.",
       "inputSchema": {
         "$defs": {
           "MediaFile": {
@@ -485,7 +485,7 @@
             "type": "string"
           },
           "files": {
-            "description": "Optional files generated in chat or uploaded by user to attach to the post.",
+            "description": "Optional client-supplied file objects to attach to the post.",
             "items": {
               "$ref": "#/$defs/MediaFile"
             },
@@ -616,11 +616,11 @@
         ]
       },
       "annotations": {
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Schedules a post for a future date/time. Automatically converts local time using workspace/user timezone into UTC. Accepts mediaUrls (public URLs) or files (AI-generated images or uploaded files from chat up to 100MB). For large video files over 100MB, tell the user to provide a direct public file URL or use autoposter_get_media_upload_url.",
+      "description": "Schedules a post for a future date/time. Automatically converts local time using workspace/user timezone into UTC. Accepts mediaUrls (public URLs) or files (client-supplied file objects up to 100MB). For large video files over 100MB, tell the user to provide a direct public file URL or use autoposter_get_media_upload_url.",
       "inputSchema": {
         "$defs": {
           "MediaFile": {
@@ -659,7 +659,7 @@
             "type": "string"
           },
           "files": {
-            "description": "Optional files generated in chat or uploaded by user to attach to the post.",
+            "description": "Optional client-supplied file objects to attach to the post.",
             "items": {
               "$ref": "#/$defs/MediaFile"
             },
@@ -811,7 +811,7 @@
         ]
       },
       "annotations": {
-        "destructiveHint": false,
+        "destructiveHint": true,
         "openWorldHint": true,
         "readOnlyHint": false
       },
@@ -1362,7 +1362,8 @@
           ],
           "type": "oauth2"
         }
-      ]
+      ],
+      "title": "Get Profile"
     }
   ],
   "url": "https://agent.autoposter.ai/mcp"

@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "9f6caff56f3cb44c8840591faa2da0599261289fdb1acefbd8865b5d83a020e2",
+  "full_hash": "8951d649cb864ae4b0c362c94473a03195b63061110ea9581669abf4c63f3ab0",
   "name": "ai.bamf/bamf",
-  "observed_at": "2026-11-04T02:03:23.312021Z",
+  "observed_at": "2026-11-05T02:03:05.790790Z",
   "sources": [
     "official"
   ],
-  "tool_count": 152,
+  "tool_count": 154,
   "tools": [
     {
       "annotations": {
@@ -1061,6 +1061,27 @@
         "type": "object"
       },
       "name": "bamf.list_posts"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Finish Draft"
+      },
+      "description": "Finish a draft before it is shown for approval: review the whole draft end to end (every platform version, tweet, slide and image) for coherence, flow, completeness, brand and foreign logos, then fix what is unfinished (split or tighten tweets, write missing tweets or slides, align the set's facts, regenerate a failed visual, clean a source's branding). Returns ready (Top pick eligible) or finishing with the open defects. Never schedules or publishes.",
+      "inputSchema": {
+        "properties": {
+          "post_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "post_id"
+        ],
+        "type": "object"
+      },
+      "name": "bamf.finish_draft"
     },
     {
       "annotations": {
@@ -3976,6 +3997,55 @@
         "destructiveHint": false,
         "openWorldHint": false,
         "readOnlyHint": true,
+        "title": "List Style Options"
+      },
+      "description": "Return 4 style options (style_id, label, preview image_url, source library|yours|brand, description) for a visual format. ALWAYS call this before the first visual of a request (infographic, carousel, image, quote card, motion, video), show the user the 4 images as a labelled 2x2, and ask them to pick one, 'show 4 more' (page+1) or 'try another format' (other_formats). Then pass the chosen style_id to the generate tool. Read-only; never returns other creators' names, avatars or original posts.",
+      "inputSchema": {
+        "properties": {
+          "author_id": {
+            "description": "Creator whose approved designs and brand styles are included.",
+            "type": "string"
+          },
+          "format": {
+            "enum": [
+              "infographic",
+              "carousel",
+              "image",
+              "quote",
+              "motion",
+              "video"
+            ],
+            "type": "string"
+          },
+          "page": {
+            "default": 1,
+            "description": "1-based; increment for 'show 4 more'.",
+            "type": "number"
+          },
+          "platform": {
+            "default": "linkedin",
+            "enum": [
+              "linkedin",
+              "x",
+              "instagram",
+              "tiktok",
+              "youtube"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "format"
+        ],
+        "type": "object"
+      },
+      "name": "bamf.list_style_options"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
         "title": "Instantiate Design Reference"
       },
       "description": "Return a design reference's template markdown with BAMF slots (name, logo, palette, fonts) filled from the creator's brand kit. Read-only; provide reference_id or slug plus brand_kit_project_id or creator_id.",
@@ -4233,7 +4303,7 @@
         "readOnlyHint": false,
         "title": "Generate Image"
       },
-      "description": "Create a BAMF image generation job. Supports quote cards, creator portraits, infographics, animated infographics (GIF + MP4 via format=motion_infographic), and package-bound LinkedIn profile banners/Featured images. Pass reference_bindings to preserve official identity/product/brand truth separately from inspiration used only for style/layout. For profile_banner/profile_featured, profile_package_id and profile_asset_kind are required; BAMF enforces one output and deterministic LinkedIn crop dimensions, then returns a durable profile_package_asset from bamf.get_job. For image_quote, create an original standalone visual quote from the post takeaway instead of asking the user to choose a pull quote or copying source text. Poll with bamf.get_job before attaching or scheduling.",
+      "description": "STYLE CARDS FIRST: before the first visual of a request, call bamf.list_style_options and show the user the 4 options as a labelled 2x2 of images; ask them to pick (or say 'show 4 more' or 'try another format'), then pass the chosen style_id. Never generate a visual blind. Create a BAMF image generation job. Supports quote cards, creator portraits, infographics, animated infographics (GIF + MP4 via format=motion_infographic), and package-bound LinkedIn profile banners/Featured images. Pass reference_bindings to preserve official identity/product/brand truth separately from inspiration used only for style/layout. For profile_banner/profile_featured, profile_package_id and profile_asset_kind are required; BAMF enforces one output and deterministic LinkedIn crop dimensions, then returns a durable profile_package_asset from bamf.get_job. For image_quote, create an original standalone visual quote from the post takeaway instead of asking the user to choose a pull quote or copying source text. Poll with bamf.get_job before attaching or scheduling.",
       "inputSchema": {
         "properties": {
           "alt_text": {
@@ -4383,6 +4453,10 @@
             },
             "type": "array"
           },
+          "style_id": {
+            "description": "Style the user picked from bamf.list_style_options. Resolved to its reference image and layout notes server side; the brand kit still applies.",
+            "type": "string"
+          },
           "visual_copy_strategy": {
             "description": "Guidance for additive visible text; image quotes should be fresh companion thoughts, not pull quotes.",
             "type": "string"
@@ -4413,7 +4487,7 @@
         "readOnlyHint": false,
         "title": "Generate Carousel"
       },
-      "description": "Generate carousel slide images, package them as a LinkedIn-ready PDF, and optionally attach it to a post. Pass reference_bindings to preserve official identity/product/brand truth separately from inspiration used only for style/layout. Slide copy should follow the source post structure when relevant while rephrasing for clearer, more emotional visual impact instead of repeating the post verbatim. For data-backed decks, pass source_urls/research_notes or run bamf.run_research first; visible data must be source-backed. If likenessReferenceImageUrls is omitted, BAMF uses the creator avatar/LinkedIn profile image as the default likeness reference.",
+      "description": "STYLE CARDS FIRST: before the first visual of a request, call bamf.list_style_options and show the user the 4 options as a labelled 2x2 of images; ask them to pick (or say 'show 4 more' or 'try another format'), then pass the chosen style_id. Never generate a visual blind. Generate carousel slide images, package them as a LinkedIn-ready PDF, and optionally attach it to a post. Pass reference_bindings to preserve official identity/product/brand truth separately from inspiration used only for style/layout. Slide copy should follow the source post structure when relevant while rephrasing for clearer, more emotional visual impact instead of repeating the post verbatim. For data-backed decks, pass source_urls/research_notes or run bamf.run_research first; visible data must be source-backed. If likenessReferenceImageUrls is omitted, BAMF uses the creator avatar/LinkedIn profile image as the default likeness reference.",
       "inputSchema": {
         "properties": {
           "creator_id": {
@@ -4521,6 +4595,10 @@
             },
             "type": "array"
           },
+          "style_id": {
+            "description": "Style the user picked from bamf.list_style_options. Resolved to its reference image and layout notes server side; the brand kit still applies.",
+            "type": "string"
+          },
           "title": {
             "type": "string"
           },
@@ -4544,7 +4622,7 @@
         "readOnlyHint": false,
         "title": "Generate Video"
       },
-      "description": "Create a paid Higgsfield Seedance 2.5 video job. Pass image_url or an official likeness reference binding to use image-to-video and preserve the creator shown in the approved source image; otherwise BAMF uses text-to-video. Poll with bamf.get_job; success returns a BAMF-hosted MP4 media asset plus the provider request receipt.",
+      "description": "STYLE CARDS FIRST: before the first visual of a request, call bamf.list_style_options and show the user the 4 options as a labelled 2x2 of images; ask them to pick (or say 'show 4 more' or 'try another format'), then pass the chosen style_id. Never generate a visual blind. Create a paid Higgsfield Seedance 2.5 video job. Pass image_url or an official likeness reference binding to use image-to-video and preserve the creator shown in the approved source image; otherwise BAMF uses text-to-video. Poll with bamf.get_job; success returns a BAMF-hosted MP4 media asset plus the provider request receipt.",
       "inputSchema": {
         "properties": {
           "aspect_ratio": {
@@ -4606,6 +4684,10 @@
               "720p",
               "1080p"
             ],
+            "type": "string"
+          },
+          "style_id": {
+            "description": "Style the user picked from bamf.list_style_options. Resolved to its reference image and layout notes server side; the brand kit still applies.",
             "type": "string"
           }
         },
