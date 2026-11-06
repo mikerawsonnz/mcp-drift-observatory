@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "5f18e800d4645a93aa3c534d2e1d235218f55d29eb3092929a0ad6349bd90b95",
+  "full_hash": "0dc985bf71a6d874436ca77599ef84ebde1ac0109a6653a4f86e19cba738891d",
   "name": "ai.athenahq/mcp",
-  "observed_at": "2026-11-04T02:03:21.842575Z",
+  "observed_at": "2026-11-06T02:02:18.922621Z",
   "sources": [
     "official"
   ],
-  "tool_count": 113,
+  "tool_count": 124,
   "tools": [
     {
       "_meta": {
@@ -2401,7 +2401,7 @@
         "readOnlyHint": true,
         "title": "Get content detail"
       },
-      "description": "Fetch the full detail of a single tracked content item — its brief and body text (drafts, optimize rewrites, snipes, authored and scraped pages), plus status, cited source URLs, and links. Use after get_tracked_content to read the actual text behind a content_id. A status of generated_brief means the brief is ready while the article is still being written. Pages registered via track_content_urls return a null body and null status until their page text is fetched from the app — a null body on an external page means not fetched yet, not missing content; citation tracking does not need the body. `prompts` lists the prompts this page was WRITTEN FOR (the same ids create_content takes), newest-linked last, capped at 100 with the true size in `prompts_total`. When prompts_total exceeds 100 the rest are not currently readable through any tool — report the total, do not imply the list is complete. Entries carry status active, paused or deleted: a deleted prompt is still part of what the page was written for and still shows in the Content Hub, but get_prompts will not list it, so use the text returned here. An empty array means the page has no prompt targeting, which is normal for imported or externally tracked pages. That is a different question from get_content_citation_prompts, which lists prompts whose AI responses CITED the page. To see the reworded variants actually asked of the models for these prompts, pass their ids to get_responses (each row carries base_prompt plus the variation as prompt) or query the responses cube via query_rows on the prompt_variation dimension.",
+      "description": "Fetch the full detail of a single tracked content item — its brief and body text (drafts, optimize rewrites, snipes, authored and scraped pages), plus status, cited source URLs, and links. Use after get_tracked_content to read the actual text behind a content_id. A status of generated_brief means the brief is ready while the article is still being written. Pages registered via track_content_urls return a null body and null status until their page text is fetched from the app — a null body on an external page means not fetched yet, not missing content; citation tracking does not need the body. `prompts` lists the prompts this page was WRITTEN FOR (the same ids create_content takes), newest-linked last, capped at 100 with the true size in `prompts_total`. When prompts_total exceeds 100 the rest are not currently readable through any tool — report the total, do not imply the list is complete. Entries carry status active, paused or deleted: a deleted prompt is still part of what the page was written for and still shows in the Content Hub, but get_prompts will not list it, so use the text returned here. An empty array means the page has no prompt targeting, which is normal for imported or externally tracked pages. That is a different question from get_content_citation_prompts, which lists prompts whose AI responses CITED the page. For an optimize item, source_url is the live page it is based on, available as soon as the item exists; url stays null until publish_content records the published page and marks the item done, so read source_url to link a request in review to its page. source_url is null for other content types and for optimize items based on pasted text or a file. To see the reworded variants actually asked of the models for these prompts, pass their ids to get_responses (each row carries base_prompt plus the variation as prompt) or query the responses cube via query_rows on the prompt_variation dimension.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -2623,6 +2623,12 @@
               "null"
             ]
           },
+          "source_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "status": {
             "anyOf": [
               {
@@ -2682,6 +2688,7 @@
           "title",
           "url",
           "normalized_url",
+          "source_url",
           "type",
           "sheet_id",
           "status",
@@ -13529,6 +13536,746 @@
         "destructiveHint": false,
         "openWorldHint": false,
         "readOnlyHint": true,
+        "title": "Get AI insight"
+      },
+      "description": "Read one stored AI insight in full, by its id from get_ai_insights: its title, headline, body, suggested action, why it happened (with reasons and their pages), its numbers (facts, each with the table it came from), its move (subject, metric, current and previous values, the direction that is good news, and a definition of what the series counts and what it is out of), its evidence (topics, competitors, prompts, URLs), and the scope its numbers were computed under (window, comparison period, Default schedule, the prompts active at the analysis, prompt-type filter, the models the citation tables leave out). The numbers are the card's as of its analysis: quote them as such, with the window and the date the analysis ran (analyzed_at). A recompute with the other tools counts today's active prompts, so it can differ. Returns a not-found error for an insight that is not this website's, and status 'no_access' when AI Insights is not part of the organization's setup.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "insight_id": {
+            "description": "The insight's id, from get_ai_insights.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "website_id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "website_id",
+          "insight_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_ai_insight",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "insight": {
+            "additionalProperties": {},
+            "properties": {
+              "action": {
+                "additionalProperties": {},
+                "properties": {
+                  "started": {
+                    "type": "boolean"
+                  },
+                  "target": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": {},
+                        "properties": {
+                          "kind": {
+                            "type": "string"
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "prompt_id": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "url": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "verb": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "verb",
+                          "label",
+                          "url",
+                          "prompt_id"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "text": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "text",
+                  "target",
+                  "started"
+                ],
+                "type": "object"
+              },
+              "analysis": {
+                "additionalProperties": {},
+                "properties": {
+                  "completed_at": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "run_id": {
+                    "type": "string"
+                  },
+                  "window_end": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "window_start": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "run_id",
+                  "window_start",
+                  "window_end",
+                  "completed_at"
+                ],
+                "type": "object"
+              },
+              "analyzed_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "body": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              },
+              "comparison": {
+                "anyOf": [
+                  {
+                    "additionalProperties": {},
+                    "properties": {
+                      "end": {
+                        "type": "string"
+                      },
+                      "label": {
+                        "type": "string"
+                      },
+                      "start": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "start",
+                      "end",
+                      "label"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "confidence": {
+                "type": "string"
+              },
+              "evidence": {
+                "additionalProperties": {},
+                "properties": {
+                  "competitors": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "prompts": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "topics": {
+                    "items": {
+                      "additionalProperties": {},
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "urls": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "topics",
+                  "competitors",
+                  "prompts",
+                  "urls"
+                ],
+                "type": "object"
+              },
+              "facts": {
+                "items": {
+                  "additionalProperties": {},
+                  "properties": {
+                    "label": {
+                      "type": "string"
+                    },
+                    "source": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "unit": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "label",
+                    "value",
+                    "unit",
+                    "source"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "headline": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "impact": {
+                "type": "string"
+              },
+              "move": {
+                "anyOf": [
+                  {
+                    "additionalProperties": {},
+                    "properties": {
+                      "current": {
+                        "type": "number"
+                      },
+                      "definition": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "direction": {
+                        "enum": [
+                          "higher_is_better",
+                          "lower_is_better",
+                          "level",
+                          "unknown"
+                        ],
+                        "type": "string"
+                      },
+                      "flags": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "metric": {
+                        "type": "string"
+                      },
+                      "n": {
+                        "type": "number"
+                      },
+                      "previous": {
+                        "anyOf": [
+                          {
+                            "additionalProperties": {},
+                            "properties": {
+                              "label": {
+                                "type": "string"
+                              },
+                              "value": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "value",
+                              "label"
+                            ],
+                            "type": "object"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "series": {
+                        "type": "string"
+                      },
+                      "since": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "subject": {
+                        "additionalProperties": {},
+                        "properties": {
+                          "kind": {
+                            "type": "string"
+                          },
+                          "label": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "label"
+                        ],
+                        "type": "object"
+                      }
+                    },
+                    "required": [
+                      "subject",
+                      "metric",
+                      "series",
+                      "definition",
+                      "current",
+                      "previous",
+                      "since",
+                      "direction",
+                      "flags",
+                      "n"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "rating": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "scope": {
+                "additionalProperties": {},
+                "properties": {
+                  "citation_models_excluded": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "prompt_scope": {
+                    "enum": [
+                      "non_branded",
+                      "all"
+                    ],
+                    "type": "string"
+                  },
+                  "prompt_status": {
+                    "const": "active",
+                    "type": "string"
+                  },
+                  "prompt_type_filter": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": {},
+                        "properties": {
+                          "eq": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "eq"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "schedule": {
+                    "const": "default",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "schedule",
+                  "prompt_status",
+                  "prompt_scope",
+                  "prompt_type_filter",
+                  "citation_models_excluded",
+                  "note"
+                ],
+                "type": "object"
+              },
+              "status": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "why": {
+                "anyOf": [
+                  {
+                    "additionalProperties": {},
+                    "properties": {
+                      "reasons": {
+                        "items": {
+                          "additionalProperties": {},
+                          "properties": {
+                            "kind": {
+                              "type": "string"
+                            },
+                            "published_date": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "text": {
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "url": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "text",
+                            "url",
+                            "title",
+                            "published_date"
+                          ],
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "since": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "text",
+                      "since",
+                      "reasons"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "window": {
+                "additionalProperties": {},
+                "properties": {
+                  "days": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "end": {
+                    "type": "string"
+                  },
+                  "start": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "start",
+                  "end",
+                  "days"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "headline",
+              "body",
+              "category",
+              "impact",
+              "confidence",
+              "status",
+              "rating",
+              "analyzed_at",
+              "window",
+              "analysis",
+              "comparison",
+              "scope",
+              "move",
+              "why",
+              "facts",
+              "evidence",
+              "action"
+            ],
+            "type": "object"
+          },
+          "status": {
+            "enum": [
+              "ready",
+              "no_access"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [],
+          "type": "oauth2"
+        }
+      ]
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get AI insights"
+      },
+      "description": "List the website's stored AI insights: the precomputed cards on the AI Insights page, each a verified finding of one past analysis, newest analysis first and higher impact first. Each has its id, title, headline, category, impact, the days its numbers cover (window), the time the analysis ran (analyzed_at), its status (available, done, or discarded = hidden by the team), the team's rating, and its move's subject and metric. Call this first for an open-ended request for insights or for what to do ('give me some insights', 'what's interesting', 'what should I prioritize'), and answer from these cards instead of running a new analysis: highest impact first, each by its title and headline. Always state the window and the date the analysis ran, and offer a fresh look with the other analytics tools. Read one card in full with get_ai_insight. Paged: 20 by default; for more, pass limit (up to 50) and offset set to the returned next_offset until it is null. Default status is available. Returns status 'no_access' when AI Insights is not part of the organization's setup. Then, or when no insight is listed, answer from the other analytics tools.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "offset": {
+            "description": "How many to skip: the previous read's next_offset.",
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "status": {
+            "description": "The lifecycle to list: available (default), done, or discarded (hidden by the team).",
+            "enum": [
+              "available",
+              "done",
+              "discarded"
+            ],
+            "type": "string"
+          },
+          "website_id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "website_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_ai_insights",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "has_more": {
+            "type": "boolean"
+          },
+          "insights": {
+            "items": {
+              "additionalProperties": {},
+              "properties": {
+                "analyzed_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "category": {
+                  "type": "string"
+                },
+                "headline": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "impact": {
+                  "type": "string"
+                },
+                "metric": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "rating": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "status": {
+                  "type": "string"
+                },
+                "subject": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "title": {
+                  "type": "string"
+                },
+                "window": {
+                  "additionalProperties": {},
+                  "properties": {
+                    "end": {
+                      "type": "string"
+                    },
+                    "start": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "start",
+                    "end"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "headline",
+                "category",
+                "impact",
+                "window",
+                "analyzed_at",
+                "status",
+                "rating",
+                "subject",
+                "metric"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "next_offset": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "status": {
+            "enum": [
+              "ready",
+              "no_access"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [],
+          "type": "oauth2"
+        }
+      ]
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
         "title": "Get brand facts"
       },
       "description": "List a website's brand facts from the Knowledge Base, newest first, with offset paging. By default excludes facts generated by Oracle analysis; pass include_oracle=true to include them. Filters: pillar, review status (default approved), source type, and unfiled=true for facts not under any published pillar (unfiled and pillar_id are mutually exclusive).",
@@ -15909,6 +16656,2412 @@
       },
       "annotations": {
         "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get site health analytics"
+      },
+      "description": "Live Google Analytics 4, Google Search Console and AI-citation figures for a website over the last 28 complete days, each beside the 28 days before (period gives both ranges; change_pct is null when the earlier period was zero). ga4: AI-referred sessions, their engagement rate and key events, organic and total sessions, AI share of sessions in percent, daily AI sessions, and the top 10 AI sources, AI landing pages and organic landing pages. gsc: clicks, impressions, CTR in percent and average position, a daily series, and the top 10 queries and pages. cited_pages: the website's pages AI answers cited most, with the Google figures for the same page. connected false means no Google property is linked for that provider; available false means it is linked but the read failed. Read live from Google, so a connection made a moment ago shows at once. Requires Site Health on the website's plan; otherwise the call fails with 403.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "website_id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "website_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_site_health_analytics",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "cited_pages": {
+            "additionalProperties": false,
+            "properties": {
+              "available": {
+                "type": "boolean"
+              },
+              "pages": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "ai_sessions": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "citations": {
+                      "type": "number"
+                    },
+                    "clicks": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "impressions": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "position": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "prompts": {
+                      "type": "number"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "url",
+                    "citations",
+                    "prompts",
+                    "ai_sessions",
+                    "clicks",
+                    "impressions",
+                    "position"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "available",
+              "pages"
+            ],
+            "type": "object"
+          },
+          "ga4": {
+            "additionalProperties": false,
+            "properties": {
+              "ai_daily": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "date": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "date",
+                    "value"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "ai_engagement_rate": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "ai_key_events": {
+                "additionalProperties": false,
+                "properties": {
+                  "change_pct": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "current": {
+                    "type": "number"
+                  },
+                  "previous": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "current",
+                  "previous",
+                  "change_pct"
+                ],
+                "type": "object"
+              },
+              "ai_landing_pages": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "previous": {
+                      "type": "number"
+                    },
+                    "sessions": {
+                      "type": "number"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "url",
+                    "sessions",
+                    "previous"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "ai_sessions": {
+                "additionalProperties": false,
+                "properties": {
+                  "change_pct": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "current": {
+                    "type": "number"
+                  },
+                  "previous": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "current",
+                  "previous",
+                  "change_pct"
+                ],
+                "type": "object"
+              },
+              "ai_share_pct": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "available": {
+                "type": "boolean"
+              },
+              "connected": {
+                "type": "boolean"
+              },
+              "organic_landing_pages": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "key_events": {
+                      "type": "number"
+                    },
+                    "sessions": {
+                      "type": "number"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "url",
+                    "sessions",
+                    "key_events"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "organic_sessions": {
+                "additionalProperties": false,
+                "properties": {
+                  "change_pct": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "current": {
+                    "type": "number"
+                  },
+                  "previous": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "current",
+                  "previous",
+                  "change_pct"
+                ],
+                "type": "object"
+              },
+              "property_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "sources": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "previous": {
+                      "type": "number"
+                    },
+                    "sessions": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "sessions",
+                    "previous"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "total_sessions": {
+                "additionalProperties": false,
+                "properties": {
+                  "change_pct": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "current": {
+                    "type": "number"
+                  },
+                  "previous": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "current",
+                  "previous",
+                  "change_pct"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "connected",
+              "available",
+              "property_name",
+              "ai_sessions",
+              "ai_engagement_rate",
+              "ai_key_events",
+              "organic_sessions",
+              "total_sessions",
+              "ai_share_pct",
+              "ai_daily",
+              "sources",
+              "ai_landing_pages",
+              "organic_landing_pages"
+            ],
+            "type": "object"
+          },
+          "gsc": {
+            "additionalProperties": false,
+            "properties": {
+              "available": {
+                "type": "boolean"
+              },
+              "clicks": {
+                "additionalProperties": false,
+                "properties": {
+                  "change_pct": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "current": {
+                    "type": "number"
+                  },
+                  "previous": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "current",
+                  "previous",
+                  "change_pct"
+                ],
+                "type": "object"
+              },
+              "connected": {
+                "type": "boolean"
+              },
+              "ctr": {
+                "additionalProperties": false,
+                "properties": {
+                  "change_pct": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "current": {
+                    "type": "number"
+                  },
+                  "previous": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "current",
+                  "previous",
+                  "change_pct"
+                ],
+                "type": "object"
+              },
+              "daily": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "clicks": {
+                      "type": "number"
+                    },
+                    "date": {
+                      "type": "string"
+                    },
+                    "impressions": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "date",
+                    "clicks",
+                    "impressions"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "impressions": {
+                "additionalProperties": false,
+                "properties": {
+                  "change_pct": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "current": {
+                    "type": "number"
+                  },
+                  "previous": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "current",
+                  "previous",
+                  "change_pct"
+                ],
+                "type": "object"
+              },
+              "pages": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "clicks": {
+                      "type": "number"
+                    },
+                    "ctr": {
+                      "type": "number"
+                    },
+                    "impressions": {
+                      "type": "number"
+                    },
+                    "position": {
+                      "type": "number"
+                    },
+                    "previous_clicks": {
+                      "type": "number"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "clicks",
+                    "impressions",
+                    "ctr",
+                    "position",
+                    "previous_clicks",
+                    "url"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "position": {
+                "additionalProperties": false,
+                "properties": {
+                  "change_pct": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "current": {
+                    "type": "number"
+                  },
+                  "previous": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "current",
+                  "previous",
+                  "change_pct"
+                ],
+                "type": "object"
+              },
+              "queries": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "clicks": {
+                      "type": "number"
+                    },
+                    "ctr": {
+                      "type": "number"
+                    },
+                    "impressions": {
+                      "type": "number"
+                    },
+                    "position": {
+                      "type": "number"
+                    },
+                    "previous_clicks": {
+                      "type": "number"
+                    },
+                    "query": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "clicks",
+                    "impressions",
+                    "ctr",
+                    "position",
+                    "previous_clicks",
+                    "query"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "site_url": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "connected",
+              "available",
+              "site_url",
+              "clicks",
+              "impressions",
+              "ctr",
+              "position",
+              "daily",
+              "queries",
+              "pages"
+            ],
+            "type": "object"
+          },
+          "period": {
+            "additionalProperties": false,
+            "properties": {
+              "end_date": {
+                "type": "string"
+              },
+              "previous_end_date": {
+                "type": "string"
+              },
+              "previous_start_date": {
+                "type": "string"
+              },
+              "start_date": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "start_date",
+              "end_date",
+              "previous_start_date",
+              "previous_end_date"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [],
+          "type": "oauth2"
+        }
+      ]
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get site health issue pages"
+      },
+      "description": "Page through every page one Site Health issue affects, 50 per page, open pages first and most recently seen first within a status. Give the check from the issue list; filter by status; page is 0-based and has_more says whether to continue; page 0 starts from the first affected page, so it repeats the sample pages the issue list showed inline. page_id returns that one page's row for the check. Each row carries the finding_id and task_revision an update of the page's task needs, the finding's detail, recommendation and evidence, the assignee, and the dates it was first and last seen and last checked. Requires Site Health on the website's plan; otherwise the call fails with 403.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "check": {
+            "description": "The check id of the issue, from the issue list.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "page": {
+            "description": "Zero-based page of 50 affected pages.",
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "page_id": {
+            "description": "Only this page's row for the check, wherever it sits.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "status": {
+            "description": "Only pages in this status.",
+            "enum": [
+              "open",
+              "in_progress",
+              "fixed",
+              "verified",
+              "dismissed"
+            ],
+            "type": "string"
+          },
+          "website_id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "website_id",
+          "check"
+        ],
+        "type": "object"
+      },
+      "name": "get_site_health_issue_pages",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "has_more": {
+            "type": "boolean"
+          },
+          "pages": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "assignee": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "detail": {
+                  "type": "string"
+                },
+                "draft": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "run_id": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "run_id",
+                        "status"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "evidence": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "evidence_links": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "label": {
+                        "type": "string"
+                      },
+                      "url": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "label",
+                      "url"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "finding_id": {
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "first_seen_at": {
+                  "type": "string"
+                },
+                "last_checked_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "last_seen_at": {
+                  "type": "string"
+                },
+                "page_id": {
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "page_title": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "property_id": {
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "recommendation": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "resolved_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "robots_txt_rule": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "excerpt": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "line": {
+                                "exclusiveMinimum": 0,
+                                "maximum": 9007199254740991,
+                                "type": "integer"
+                              },
+                              "text": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "line",
+                              "text"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "line": {
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991,
+                          "type": "integer"
+                        },
+                        "url": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "url",
+                        "line",
+                        "excerpt"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "shared_value": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "status": {
+                  "enum": [
+                    "open",
+                    "in_progress",
+                    "fixed",
+                    "verified",
+                    "dismissed"
+                  ],
+                  "type": "string"
+                },
+                "task_revision": {
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "finding_id",
+                "page_id",
+                "property_id",
+                "url",
+                "status",
+                "page_title",
+                "detail",
+                "recommendation",
+                "shared_value",
+                "evidence",
+                "evidence_links",
+                "robots_txt_rule",
+                "first_seen_at",
+                "last_seen_at",
+                "resolved_at",
+                "last_checked_at",
+                "assignee",
+                "task_revision",
+                "draft"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [],
+          "type": "oauth2"
+        }
+      ]
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get site health issues"
+      },
+      "description": "List a website's Site Health issues: one group per kind of problem (check) with its title, why it matters, severity (critical, warning, opportunity), priority (high, medium, low), owner (writer, developer or either; null when unknown), effort (minutes, hours, days), whether it is site-wide, counts of affected pages by status (open, in_progress, fixed, verified, dismissed), up to three sections it concentrates in, and sample affected pages with each page's detail, recommendation, evidence, assignee and task_revision. Filter by status, check, a search term, the stored URLs of specific pages (page_urls), or assignee \"me\" (signed-in connections only). Groups are paged: page is 0-based, page_size defaults to 25 (max 200) and total counts the groups that match; counts totals pages by status across the whole site, ignoring the status filter. A group carries at most 50 sample pages (10 when a tool calls it, which also caps page_size at 25); has_more_pages says to read the rest with the issue pages read (get_site_health_issue_pages or POST /v1/seo/issues/pages), whose page 0 repeats the sample pages. has_evidence false means the site has never been crawled or audited. Requires Site Health on the website's plan; otherwise the call fails with 403.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "assignee": {
+            "const": "me",
+            "description": "Only pages assigned to the signed-in user. Not available to API keys.",
+            "type": "string"
+          },
+          "check": {
+            "description": "One check id, as `check` names it in an earlier result.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "page": {
+            "description": "Zero-based page of groups.",
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "page_size": {
+            "description": "Groups per page, 25 by default and 200 at most (25 at most when a tool calls it).",
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "page_urls": {
+            "description": "Only issues on these pages, up to 50, in the stored URL form: no protocol, no trailing slash, www kept.",
+            "items": {
+              "maxLength": 2048,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "search": {
+            "description": "Matches the issue title or an affected page URL.",
+            "maxLength": 200,
+            "type": "string"
+          },
+          "status": {
+            "description": "Only groups with at least one page in this status. Group and site counts ignore it.",
+            "enum": [
+              "open",
+              "in_progress",
+              "fixed",
+              "verified",
+              "dismissed"
+            ],
+            "type": "string"
+          },
+          "website_id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "website_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_site_health_issues",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "counts": {
+            "additionalProperties": false,
+            "properties": {
+              "dismissed": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "fixed": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "in_progress": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "open": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verified": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "open",
+              "in_progress",
+              "fixed",
+              "verified"
+            ],
+            "type": "object"
+          },
+          "groups": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "bucket": {
+                  "enum": [
+                    "technical_cleanup",
+                    "content_restructuring",
+                    "content_enrichment"
+                  ],
+                  "type": "string"
+                },
+                "check": {
+                  "type": "string"
+                },
+                "counts": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "dismissed": {
+                      "maximum": 9007199254740991,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "fixed": {
+                      "maximum": 9007199254740991,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "in_progress": {
+                      "maximum": 9007199254740991,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "open": {
+                      "maximum": 9007199254740991,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "verified": {
+                      "maximum": 9007199254740991,
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "open",
+                    "in_progress",
+                    "fixed",
+                    "verified"
+                  ],
+                  "type": "object"
+                },
+                "effort": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "minutes",
+                        "hours",
+                        "days"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "has_more_pages": {
+                  "type": "boolean"
+                },
+                "owner": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "writer",
+                        "developer",
+                        "either"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "pages": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "assignee": {
+                        "anyOf": [
+                          {
+                            "additionalProperties": false,
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name"
+                            ],
+                            "type": "object"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "detail": {
+                        "type": "string"
+                      },
+                      "draft": {
+                        "anyOf": [
+                          {
+                            "additionalProperties": false,
+                            "properties": {
+                              "run_id": {
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "run_id",
+                              "status"
+                            ],
+                            "type": "object"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "evidence": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "evidence_links": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "label": {
+                              "type": "string"
+                            },
+                            "url": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "label",
+                            "url"
+                          ],
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "finding_id": {
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "type": "string"
+                      },
+                      "first_seen_at": {
+                        "type": "string"
+                      },
+                      "last_checked_at": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "last_seen_at": {
+                        "type": "string"
+                      },
+                      "page_id": {
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "type": "string"
+                      },
+                      "page_title": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "property_id": {
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "type": "string"
+                      },
+                      "recommendation": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "resolved_at": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "robots_txt_rule": {
+                        "anyOf": [
+                          {
+                            "additionalProperties": false,
+                            "properties": {
+                              "excerpt": {
+                                "items": {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "line": {
+                                      "exclusiveMinimum": 0,
+                                      "maximum": 9007199254740991,
+                                      "type": "integer"
+                                    },
+                                    "text": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "line",
+                                    "text"
+                                  ],
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "line": {
+                                "exclusiveMinimum": 0,
+                                "maximum": 9007199254740991,
+                                "type": "integer"
+                              },
+                              "url": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "url",
+                              "line",
+                              "excerpt"
+                            ],
+                            "type": "object"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "shared_value": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "status": {
+                        "enum": [
+                          "open",
+                          "in_progress",
+                          "fixed",
+                          "verified",
+                          "dismissed"
+                        ],
+                        "type": "string"
+                      },
+                      "task_revision": {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "url": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "finding_id",
+                      "page_id",
+                      "property_id",
+                      "url",
+                      "status",
+                      "page_title",
+                      "detail",
+                      "recommendation",
+                      "shared_value",
+                      "evidence",
+                      "evidence_links",
+                      "robots_txt_rule",
+                      "first_seen_at",
+                      "last_seen_at",
+                      "resolved_at",
+                      "last_checked_at",
+                      "assignee",
+                      "task_revision",
+                      "draft"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "priority": {
+                  "enum": [
+                    "high",
+                    "medium",
+                    "low"
+                  ],
+                  "type": "string"
+                },
+                "sections": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "audited": {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "open": {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "section": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "section",
+                      "open",
+                      "audited"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "severity": {
+                  "enum": [
+                    "critical",
+                    "warning",
+                    "opportunity"
+                  ],
+                  "type": "string"
+                },
+                "site_wide": {
+                  "type": "boolean"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "why_it_matters": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "check",
+                "title",
+                "why_it_matters",
+                "owner",
+                "effort",
+                "bucket",
+                "severity",
+                "priority",
+                "site_wide",
+                "counts",
+                "sections",
+                "pages",
+                "has_more_pages"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "has_evidence": {
+            "type": "boolean"
+          },
+          "page_size": {
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991,
+            "type": "integer"
+          },
+          "total": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [],
+          "type": "oauth2"
+        }
+      ]
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get site health page"
+      },
+      "description": "Read one audited page of a Site Health property: what the last audit measured (title, meta description, canonical URL, HTTP status code, word count, whether it is indexable, how the server HTML and the rendered page differ, PageSpeed with performance_score 0 to 100, largest_contentful_paint_ms and interaction_to_next_paint_ms in milliseconds and cumulative_layout_shift unitless, and the hreflang audit), the status of every audit of the page, and every finding on it with its check, detail, recommendation, evidence, severity, priority_score, when it was resolved, and verification: whether the last audit of that check passed, failed or left it unverified, with the reason. page_id comes from get_site_health_pages or from an issue's affected pages. Requires Site Health on the website's plan; otherwise the call fails with 403.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "page_id": {
+            "description": "The page, from the inventory or an issue's affected pages.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "website_id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "website_id",
+          "page_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_site_health_page",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "findings": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "check": {
+                  "type": "string"
+                },
+                "detail": {
+                  "type": "string"
+                },
+                "evidence": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "presentation": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "description": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "canonical": {
+                          "type": "string"
+                        },
+                        "date": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "iso": {
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                              "type": "string"
+                            },
+                            "kind": {
+                              "const": "dormant-lastmod",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "iso"
+                          ],
+                          "type": "object"
+                        },
+                        "messages": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "messages"
+                      ],
+                      "type": "object"
+                    },
+                    "priority_reasons": {
+                      "items": {
+                        "anyOf": [
+                          {
+                            "additionalProperties": false,
+                            "properties": {
+                              "canonical": {
+                                "type": "string"
+                              },
+                              "date": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "iso": {
+                                    "format": "date-time",
+                                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                                    "type": "string"
+                                  },
+                                  "kind": {
+                                    "const": "dormant-lastmod",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "iso"
+                                ],
+                                "type": "object"
+                              },
+                              "messages": {
+                                "items": {
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              }
+                            },
+                            "required": [
+                              "messages"
+                            ],
+                            "type": "object"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "type": "array"
+                    },
+                    "recommendation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "canonical": {
+                          "type": "string"
+                        },
+                        "date": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "iso": {
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                              "type": "string"
+                            },
+                            "kind": {
+                              "const": "dormant-lastmod",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "iso"
+                          ],
+                          "type": "object"
+                        },
+                        "messages": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "messages"
+                      ],
+                      "type": "object"
+                    },
+                    "source": {
+                      "const": "technical-findings-v1",
+                      "type": "string"
+                    },
+                    "title": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "canonical": {
+                          "type": "string"
+                        },
+                        "date": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "iso": {
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                              "type": "string"
+                            },
+                            "kind": {
+                              "const": "dormant-lastmod",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "iso"
+                          ],
+                          "type": "object"
+                        },
+                        "messages": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "messages"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ],
+                  "type": "object"
+                },
+                "priority_score": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "recommendation": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "resolved_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "severity": {
+                  "type": "string"
+                },
+                "verification": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "audited_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "content_digest": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "reason": {
+                      "type": "string"
+                    },
+                    "run_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "passed",
+                        "failed",
+                        "unverified"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "reason",
+                    "audited_at",
+                    "run_id",
+                    "content_digest"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "id",
+                "check",
+                "detail",
+                "severity",
+                "priority_score",
+                "recommendation",
+                "evidence",
+                "resolved_at",
+                "verification"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "history": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "audited_at": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "status",
+                "audited_at"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "id": {
+            "type": "string"
+          },
+          "last_audit_status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "last_audited_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "measurement": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "canonical_url": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "experience": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "cumulative_layout_shift": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "field_data_scope": {
+                        "anyOf": [
+                          {
+                            "enum": [
+                              "url",
+                              "origin"
+                            ],
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "interaction_to_next_paint_ms": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "largest_contentful_paint_ms": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "measured_at": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "performance_score": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "status": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "status",
+                      "performance_score",
+                      "largest_contentful_paint_ms",
+                      "interaction_to_next_paint_ms",
+                      "cumulative_layout_shift"
+                    ],
+                    "type": "object"
+                  },
+                  "hreflang_audit": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "annotations_checked": {
+                        "type": "number"
+                      },
+                      "issues": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "detail": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "detail"
+                          ],
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "pages_with_annotations": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "pages_with_annotations",
+                      "annotations_checked",
+                      "issues"
+                    ],
+                    "type": "object"
+                  },
+                  "indexable": {
+                    "type": "boolean"
+                  },
+                  "meta_description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "rendering": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "captured_at": {
+                        "type": "string"
+                      },
+                      "differences": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "reason": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "rendered": {
+                        "anyOf": [
+                          {
+                            "additionalProperties": false,
+                            "properties": {
+                              "digest": {
+                                "type": "string"
+                              },
+                              "excerpt": {
+                                "type": "string"
+                              },
+                              "h1": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "schema_types": {
+                                "items": {
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              },
+                              "title": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "word_count": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "word_count",
+                              "digest",
+                              "excerpt",
+                              "title",
+                              "h1",
+                              "schema_types"
+                            ],
+                            "type": "object"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "server": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "digest": {
+                            "type": "string"
+                          },
+                          "excerpt": {
+                            "type": "string"
+                          },
+                          "h1": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "schema_types": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "title": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "word_count": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "word_count",
+                          "digest",
+                          "excerpt",
+                          "title",
+                          "h1",
+                          "schema_types"
+                        ],
+                        "type": "object"
+                      },
+                      "source": {
+                        "const": "Jina rendered HTML",
+                        "type": "string"
+                      },
+                      "status": {
+                        "enum": [
+                          "complete",
+                          "unavailable",
+                          "not_sampled"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "status",
+                      "source",
+                      "captured_at",
+                      "server",
+                      "rendered",
+                      "differences",
+                      "reason"
+                    ],
+                    "type": "object"
+                  },
+                  "status_code": {
+                    "type": "number"
+                  },
+                  "title": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "word_count": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "title",
+                  "meta_description",
+                  "canonical_url",
+                  "status_code",
+                  "word_count",
+                  "indexable"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "property_id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [],
+          "type": "oauth2"
+        }
+      ]
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get site health pages"
+      },
+      "description": "Browse the pages of one Site Health property, 50 per page (page is 1-based) sorted by URL, each with its last audit status and time, its count of open findings and whether it is a priority page (cited by AI answers or a top Google page, so audits read it first). Narrow by check (pages with an open finding of it), one URL, or a search term; total counts the pages that match. groups lists every check with an open finding on the property and its page count, ignoring the filters, highest priority first. Page ids feed get_site_health_page and start_site_health_audit. Requires Site Health on the website's plan; otherwise the call fails with 403.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "check": {
+            "description": "Only pages with an open finding of this check.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "page": {
+            "description": "One-based page of 50 pages, sorted by URL.",
+            "maximum": 100000,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "property_id": {
+            "description": "The property to browse, from the properties list.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "search": {
+            "description": "Only pages whose URL contains this text.",
+            "maxLength": 500,
+            "type": "string"
+          },
+          "url": {
+            "description": "Only the page at this URL.",
+            "maxLength": 2048,
+            "minLength": 1,
+            "type": "string"
+          },
+          "website_id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "website_id",
+          "property_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_site_health_pages",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "groups": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "check": {
+                  "type": "string"
+                },
+                "count": {
+                  "type": "number"
+                },
+                "priority": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "check",
+                "count",
+                "priority"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "page": {
+            "type": "number"
+          },
+          "page_size": {
+            "type": "number"
+          },
+          "pages": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "is_priority": {
+                  "type": "boolean"
+                },
+                "last_audit_status": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "last_audited_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "open_findings": {
+                  "type": "number"
+                },
+                "path": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "url",
+                "path",
+                "last_audit_status",
+                "last_audited_at",
+                "open_findings",
+                "is_priority"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [],
+          "type": "oauth2"
+        }
+      ]
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get site health properties"
+      },
+      "description": "List a website's Site Health properties, the crawl scopes Site Health audits: root URL, included and excluded path prefixes, subdomains, sitemaps, page ceiling (max_pages), whether the property is enabled, the live page count, and the latest crawl or audit run with its status, trigger, counts and timestamps. Use it for the property_id that get_site_health_pages and start_site_health_audit take, and to see whether a run is in progress before starting another. Requires Site Health on the website's plan; otherwise the call fails with 403.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "website_id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "website_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_site_health_properties",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "properties": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "crawl_delay_ms": {
+                  "type": "number"
+                },
+                "exclude_prefixes": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "include_all_subdomains": {
+                  "type": "boolean"
+                },
+                "include_prefixes": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "include_sitemaps": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "include_subdomains": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "is_enabled": {
+                  "type": "boolean"
+                },
+                "latest_run": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "audit_after": {
+                          "type": "boolean"
+                        },
+                        "audit_pending": {
+                          "type": "boolean"
+                        },
+                        "blocked_count": {
+                          "type": "number"
+                        },
+                        "completed_at": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "discovered_count": {
+                          "type": "number"
+                        },
+                        "error": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "failed_count": {
+                          "type": "number"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "kind": {
+                          "type": "string"
+                        },
+                        "sample": {
+                          "type": "boolean"
+                        },
+                        "scanned_count": {
+                          "type": "number"
+                        },
+                        "skipped_count": {
+                          "type": "number"
+                        },
+                        "started_at": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "trigger": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "status",
+                        "trigger",
+                        "started_at",
+                        "completed_at",
+                        "discovered_count",
+                        "scanned_count",
+                        "skipped_count",
+                        "blocked_count",
+                        "failed_count",
+                        "error"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "live_pages": {
+                  "type": "number"
+                },
+                "max_pages": {
+                  "type": "number"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "root_url": {
+                  "type": "string"
+                },
+                "website_id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "website_id",
+                "name",
+                "root_url",
+                "include_prefixes",
+                "exclude_prefixes",
+                "include_subdomains",
+                "include_all_subdomains",
+                "include_sitemaps",
+                "is_enabled",
+                "max_pages",
+                "crawl_delay_ms",
+                "live_pages",
+                "latest_run"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [],
+          "type": "oauth2"
+        }
+      ]
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
         "openWorldHint": false,
         "readOnlyHint": true,
         "title": "List Outreach contacts"
@@ -18236,6 +21389,97 @@
       },
       "annotations": {
         "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Start site health audit"
+      },
+      "description": "Start a Site Health audit of one property. mode full (the default) crawls the property, then audits every page the crawl leaves; a crawl already running is joined and audits when it ends. mode sample audits a few pages from every section plus the priority pages; page_ids (1 to 100) re-audits only those pages, which is how a fix is checked. Refused with 400 when the property is disabled. mode full is refused with 409 when a full audit already covers the property or a sample or page_ids audit holds it (try again once that ends). mode sample and page_ids are refused with 409 while any crawl or audit of the property runs, with 400 when the property has no pages yet, and with 404 when a page id is not in the current inventory. Returns the run id (null while a crawl runs first, since its audit run is created when the crawl ends), the property name, how many pages the run reads (in mode full, the inventory before the crawl), whether it is a sample and whether a crawl runs first. Results reach the issue list as the run progresses; the properties list shows the run's status. Requires Site Health on the website's plan; otherwise the call fails with 403.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "mode": {
+            "description": "full crawls the property first and audits every page it leaves; sample audits a few pages per section plus the priority pages.",
+            "enum": [
+              "full",
+              "sample"
+            ],
+            "type": "string"
+          },
+          "page_ids": {
+            "description": "Re-audit only these pages (1 to 100), from the inventory or an issue's affected pages. Overrides mode.",
+            "items": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "property_id": {
+            "description": "The property to audit, from the properties list.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "website_id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "website_id",
+          "property_id"
+        ],
+        "type": "object"
+      },
+      "name": "start_site_health_audit",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "crawl_first": {
+            "type": "boolean"
+          },
+          "page_count": {
+            "type": "number"
+          },
+          "property_name": {
+            "type": "string"
+          },
+          "run_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sample": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [],
+          "type": "oauth2"
+        }
+      ]
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
         "openWorldHint": false,
         "readOnlyHint": false,
         "title": "Track content urls"
@@ -19438,6 +22682,254 @@
               "string",
               "null"
             ]
+          }
+        },
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [],
+          "type": "oauth2"
+        }
+      ]
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Update site health issue"
+      },
+      "description": "Set the work status (todo, in_progress, or dismissed for not an issue) or the assignee of a whole Site Health issue: every unresolved finding of one check across the website, in one write, as the status and assignee controls on an issue do. Omit a field to leave it as it is; unassign true (or assignee_user_id null) unassigns every page. Returns how many task rows changed; a repeated write changes none. The assignee is emailed once for the pages they now hold. Signed-in connections only: an API key has no teammate to act as, so API-key connections are not offered this tool and a direct call is refused with 403. Requires Site Health on the website's plan; otherwise the call fails with 403.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "assignee_user_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A teammate with analytics access on the website, as get_user_by_email or an earlier assignee.id gives it; null unassigns every page (chat tools send unassign true instead); absent leaves assignees as they are."
+          },
+          "check": {
+            "description": "The check id of the issue, from the issue list.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "unassign": {
+            "description": "true clears the assignee. Chat tools must use this: a null assignee_user_id is dropped as unspecified. Cannot be sent with an assignee_user_id.",
+            "type": "boolean"
+          },
+          "website_id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "work_status": {
+            "description": "todo, in_progress or dismissed (not an issue).",
+            "enum": [
+              "todo",
+              "in_progress",
+              "dismissed"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "website_id",
+          "check"
+        ],
+        "type": "object"
+      },
+      "name": "update_site_health_issue",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "assignee_user_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "check": {
+            "type": "string"
+          },
+          "updated": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "work_status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "todo",
+                  "in_progress",
+                  "dismissed"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [],
+          "type": "oauth2"
+        }
+      ]
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Update site health task"
+      },
+      "description": "Assign one Site Health finding to a teammate or set its work status: todo, in_progress, ready_to_verify, or dismissed (not an issue, which stays closed even when a later audit finds it again). Pass the page's finding_id and task_revision from the issue list or the issue pages read as finding_id and revision; a revision that is no longer current, or a finding that has since recurred, is refused with 409, so re-read first. unassign true (or assignee_user_id null) clears the assignee; the teammate must have analytics access on the website. A newly assigned teammate is emailed. Returns the new revision with the before and after assignee and status. Signed-in connections only: an API key has no teammate to act as, so API-key connections are not offered this tool and a direct call is refused with 403. Requires Site Health on the website's plan; otherwise the call fails with 403.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "assignee_user_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A teammate with analytics access on the website, as get_user_by_email or an earlier assignee.id gives it; null clears the assignee (chat tools send unassign true instead)."
+          },
+          "finding_id": {
+            "description": "The finding, as `finding_id` names it on an affected page.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "revision": {
+            "description": "The page's `task_revision` from the same read; a stale value is refused.",
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "unassign": {
+            "description": "true clears the assignee. Chat tools must use this: a null assignee_user_id is dropped as unspecified. Cannot be sent with an assignee_user_id.",
+            "type": "boolean"
+          },
+          "website_id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "work_status": {
+            "description": "todo, in_progress, ready_to_verify or dismissed (not an issue).",
+            "enum": [
+              "todo",
+              "in_progress",
+              "ready_to_verify",
+              "dismissed"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "website_id",
+          "finding_id",
+          "revision"
+        ],
+        "type": "object"
+      },
+      "name": "update_site_health_task",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "after": {
+            "additionalProperties": false,
+            "properties": {
+              "assignee_user_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "work_status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "assignee_user_id",
+              "work_status"
+            ],
+            "type": "object"
+          },
+          "before": {
+            "additionalProperties": false,
+            "properties": {
+              "assignee_user_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "work_status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "assignee_user_id",
+              "work_status"
+            ],
+            "type": "object"
+          },
+          "check": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "number"
+          },
+          "task_id": {
+            "type": "string"
           }
         },
         "type": "object"

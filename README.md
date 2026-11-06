@@ -5,27 +5,36 @@ servers: what tools each one **declared**, byte-exactly, and when that declarati
 
 One commit per crawl cycle. A change to a server's tool surface appears as a diff.
 
-## Latest crawl: 2026-11-05 02:03 UTC
+## Latest crawl: 2026-11-06 02:02 UTC
 
-11 of 262 observable servers changed their declared tools. Attempted 295: 262 observable, 26 auth-walled, 6 unreachable, 1 blocked.
+19 of 264 observable servers changed their declared tools. Attempted 374: 264 observable, 83 auth-walled, 18 unreachable, 9 blocked.
 
-- [ae.beachclubs/mcp](deltas/2026-11-05/342c8a5bf0901ef67c50.json): schema changed; 1 field(s) changed
-- [ai.agentblueprint/agent-blueprint](deltas/2026-11-05/c66f724ebb6312c16f24.json): description changed; 1 field(s) changed
-- [ai.agenticfabricationnetwork/ufp](deltas/2026-11-05/db3010688319f7ebe01c.json): count changed, description changed, schema changed, tool removed; 1 tool(s) removed; 3 field(s) changed; signals: length_more_than_doubled
-- [ai.agilex.service/docs](deltas/2026-11-05/4f9bb92e8706287aa594.json): annotation changed, count changed, description changed, schema changed, tool added; 1 tool(s) added; 27 field(s) changed
-- [ai.annsa/annsa](deltas/2026-11-05/59d41e60a9e6430b00b0.json): description changed, schema changed; 107 field(s) changed; signals: imperative_language_introduced **(notable)**
-- [ai.autoposter/autoposter](deltas/2026-11-05/b4c1ac88f1fe4ef8d46e.json): annotation changed, description changed, field changed, schema changed; 10 field(s) changed
-- [ai.bamf/bamf](deltas/2026-11-05/bcec739ff4350c4ddf27.json): count changed, description changed, schema changed, tool added; 2 tool(s) added; 9 field(s) changed
-- [ai.beexcellent/reference](deltas/2026-11-05/fed44102cd8d6f46fdce.json): count changed, tool added; 2 tool(s) added
-- [ai.beliefstate/investor-research](deltas/2026-11-05/d29176e06366706dabab.json): schema changed; 25644 field(s) changed; signals: length_more_than_doubled
-- [ai.buildersinfintech/fintech-data](deltas/2026-11-05/5838aac513603a4cf3ab.json): count changed, description changed, schema changed, tool added; 2 tool(s) added; 6 field(s) changed
-- [ai.catalystproject/evidence-graph](deltas/2026-11-05/3ee907b964adff5cc9f7.json): description changed; 3 field(s) changed
+- [ad.tide/mcp](deltas/2026-11-06/cf57e535ac93234bd658.json): count changed, tool added; 1 tool(s) added
+- [ae.brainy/grocery-prices](deltas/2026-11-06/9443ab886276db8be110.json): schema changed; 17 field(s) changed
+- [ai.agentgates/compute](deltas/2026-11-06/8e123eb71203886e049b.json): description changed, schema changed; 47 field(s) changed
+- [ai.agenticfabricationnetwork/ufp](deltas/2026-11-06/db3010688319f7ebe01c.json): annotation changed, description changed, schema changed; 460 field(s) changed
+- [ai.agentsindex/mcp](deltas/2026-11-06/ae90c62287403cba0474.json): description changed; 1 field(s) changed
+- [ai.annsa/annsa](deltas/2026-11-06/59d41e60a9e6430b00b0.json): description changed, schema changed; 72 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled **(notable)**
+- [ai.arcreport/ask](deltas/2026-11-06/5990de195db11012fcfb.json): description changed; 2 field(s) changed; signals: url_introduced
+- [ai.arcreport/mcp](deltas/2026-11-06/5b7f6412bf3c3e91b70c.json): description changed; 1 field(s) changed
+- [ai.athenahq/mcp](deltas/2026-11-06/d1c9dc97b241abc09e4e.json): count changed, description changed, schema changed, tool added; 11 tool(s) added; 26 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled **(notable)**
+- [ai.bamf/bamf](deltas/2026-11-06/bcec739ff4350c4ddf27.json): count changed, description changed, tool added; 3 tool(s) added; 2 field(s) changed; signals: length_more_than_doubled
+- [ai.beliefstate/investor-research](deltas/2026-11-06/d29176e06366706dabab.json): schema changed; 31954 field(s) changed; signals: length_more_than_doubled
+- [ai.betslipdoctor/mcp](deltas/2026-11-06/f29327f2a9147dd897c0.json): annotation changed, description changed, field changed, schema changed; 2136 field(s) changed; signals: length_more_than_doubled
+- [ai.bitroad/bitroad](deltas/2026-11-06/e36f79dd929c8eb0f088.json): count changed, description changed, schema changed, tool added; 7 tool(s) added; 21 field(s) changed; signals: imperative_language_introduced **(notable)**
+- [ai.botappetit/bot-appetit](deltas/2026-11-06/e19ce61dadbaa55281fe.json): annotation changed, description changed, field changed; 85 field(s) changed
+- [ai.bowmark/bowmark](deltas/2026-11-06/5f2d24be930573ed8878.json): count changed, description changed, schema changed, tool added; 7 tool(s) added; 10 field(s) changed; signals: imperative_language_introduced **(notable)**
+- [ai.bowmark/bowmark](deltas/2026-11-06/e742a173e323c903336e.json): count changed, description changed, schema changed, tool added; 7 tool(s) added; 10 field(s) changed; signals: imperative_language_introduced **(notable)**
+- [ai.buildersinfintech/fintech-data](deltas/2026-11-06/5838aac513603a4cf3ab.json): count changed, description changed, schema changed, tool added; 4 tool(s) added; 9 field(s) changed
+- [ai.catalystproject/evidence-graph](deltas/2026-11-06/3ee907b964adff5cc9f7.json): description changed, schema changed; 68 field(s) changed; signals: length_more_than_doubled
+- [ai.celestio/celestio](deltas/2026-11-06/5a10e65fdbb6102578c7.json): schema changed; 14 field(s) changed
 
-Changes per day: [2026-10-30](deltas/2026-10-30/) 11, [2026-10-31](deltas/2026-10-31/) 14, [2026-11-01](deltas/2026-11-01/) 11, [2026-11-02](deltas/2026-11-02/) 13, [2026-11-03](deltas/2026-11-03/) 13, [2026-11-04](deltas/2026-11-04/) 12, [2026-11-05](deltas/2026-11-05/) 11
+Changes per day: [2026-10-31](deltas/2026-10-31/) 14, [2026-11-01](deltas/2026-11-01/) 11, [2026-11-02](deltas/2026-11-02/) 13, [2026-11-03](deltas/2026-11-03/) 13, [2026-11-04](deltas/2026-11-04/) 12, [2026-11-05](deltas/2026-11-05/) 11, [2026-11-06](deltas/2026-11-06/) 19
 
 ## What this is
 
-`servers/<host>/<key>.json` is the current declared tool surface for one server.
+`servers/<host>/<key>.json` is the current declared tool surface for one server, and
+`servers/<host>/` has a page listing its tools and every observed change. [`servers/`](servers/) lists every host.
 `deltas/<date>/<key>.json` is a single observed change, with the hash before and after.
 `index.json` summarises coverage, including the servers we could **not** observe.
 
@@ -63,7 +72,9 @@ shows what was published and when, without trusting us or Witness.
   (has this server changed since a hash you hold?) and `drift_hash` (reproduce our hash yourself) are free.
 - **Signed feed (RSS-A):** https://storage.googleapis.com/c2md-493808-gosce-rssa/feeds/drift/feed.rss, one entry
   per crawl with changes.
+- **Follow one server:** each server page links an Atom feed of changes to that server alone
+  (`https://github.com/<this repo>/commits/main/servers/<host>.atom`), quiet unless its declared tools change.
 - **The RSS-A Agent Network board:** the observatory posts each crawl's changes there,
-  https://hub.rssa.getvda.ai/network/board
+  https://hub.rssa.getvda.ai/network/board?via=drift-archive
 
 _Generated by [GOSCE](https://agents.getvda.ai). Not affiliated with any server listed._

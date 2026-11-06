@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "490bc6ec8455d2f57a40e45aae5914c78baed010208e37719ddecf9384d3c534",
+  "full_hash": "c4e3d3107d8fda0c69e3db91b33faaa4a33cb8d283b8a9f3053f14a8f995c552",
   "name": "ai.bowmark/bowmark",
-  "observed_at": "2026-11-04T02:03:27.147765Z",
+  "observed_at": "2026-11-06T02:02:27.241170Z",
   "sources": [
     "official"
   ],
-  "tool_count": 26,
+  "tool_count": 33,
   "tools": [
     {
       "_meta": {
@@ -330,6 +330,11 @@
             "format": "uuid",
             "type": "string"
           },
+          "slug": {
+            "description": "The jig's name in its link, bowmark.ai/jig/<slug>: lowercase letters, digits and hyphens. Omit it and one is made from the title. Rename later with `jig_update`.",
+            "maxLength": 60,
+            "type": "string"
+          },
           "state": {
             "additionalProperties": {},
             "description": "The page's starting state — what you steer it with later via `jig_update`.",
@@ -373,7 +378,7 @@
         "readOnlyHint": true,
         "title": "List the user's pages (jigs)"
       },
-      "description": "The jigs this user has made, newest change first: id, title, the built-in it started from, and when it last changed. Call it when the user mentions a page they made before (\"my YouTube feed\", \"that dashboard\"), then reopen it with `jig_open({ jigId })` instead of building a new one.",
+      "description": "The jigs this user has, newest change first: id, slug, title, the built-in it started from, and when it last changed. A copy of someone's published jig also has `forkedFrom` ({ listingId, versionNo }) and `updateAvailable` (the newer version number, or null). Call it when the user mentions a page they made before (\"my YouTube feed\", \"that dashboard\"), then reopen it with `jig_open({ jigId })` instead of building a new one. When `updateAvailable` is set, tell the user and offer to update it (`jig_pull_update`).",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -383,6 +388,220 @@
       },
       "name": "jig_list",
       "title": "List the user's pages (jigs)"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Search published pages (jigs)"
+      },
+      "description": "Search the public jigs other people published: \"is there a jig for my Amazon orders?\". Call it BEFORE building a page from scratch. Leave `q` empty for the newest. Pass `site` (a host like youtube.com) for the jigs of one site. Results: id, title, tagline, slug, ownerHandle, sites, functions (path, effectClass), effects, currentVersion, installCount; `nextCursor` (when set) is passed back as `cursor` for the next page. Needs no account.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "description": "The `nextCursor` of the previous page.",
+            "type": "string"
+          },
+          "limit": {
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "q": {
+            "description": "Words to find, matched against title, tagline, description, slug and sites. At most 200 characters.",
+            "type": "string"
+          },
+          "site": {
+            "description": "Only jigs that work on this site, a bare host like youtube.com (subdomains count). No scheme or path.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "jig_search",
+      "title": "Search published pages (jigs)"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Publish a page (jig) to the store"
+      },
+      "description": "Publish the user's jig (name it by `jigId` or your jig's `jigSlug`) as a listing others can get: it snapshots the page and state AS THEY ARE NOW into version N+1, and later edits stay private until you publish again. Call with `dryRun: true` first and show the user what would ship: every function the page calls (tagged read / write / pay), its sites, and the `defaultState` a copy starts with — blank anything personal with `defaultState`. A first publish needs the user's public `handle` (the @name in bowmark.ai/jigs/@<handle>/<slug>, permanent; ask them). `visibility: \"unlisted\"` is reachable by link only; `\"public\"` also appears in search. Returns the store URL. To unlist a published jig or change its title, tagline or description, call again with the new values and `detailsOnly: true`: no new version is written.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "changelog": {
+            "description": "What changed in this version.",
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "defaultState": {
+            "additionalProperties": {},
+            "description": "The state a copy starts with. Default: the jig's own default (its template's, or the version it was installed from), never its live state.",
+            "type": "object"
+          },
+          "description": {
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "detailsOnly": {
+            "description": "Change only the listing (visibility, title, tagline, description); writes no version. Use it to unlist.",
+            "type": "boolean"
+          },
+          "dryRun": {
+            "description": "Return exactly what would ship and write nothing.",
+            "type": "boolean"
+          },
+          "extraSites": {
+            "description": "Extra sites to list it under for discovery. The derived ones always stay.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "type": "array"
+          },
+          "handle": {
+            "description": "The user's public handle, first publish only.",
+            "maxLength": 40,
+            "type": "string"
+          },
+          "jigId": {
+            "description": "The jig's id. Give this or `jigSlug`.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "jigSlug": {
+            "description": "The slug of the caller's OWN jig (from `jig_list`), instead of `jigId`. Not the listing `slug` below.",
+            "maxLength": 300,
+            "type": "string"
+          },
+          "screenshots": {
+            "description": "Up to 8 screenshots (png/jpeg/webp ≤ 5 MB) or a short clip (mp4/webm ≤ 20 MB) for the store page, each a `url` or `base64` — give exactly one. YOU capture them (a screenshot of the page with sample data, never the user's private data); Bowmark never captures the user's live jig.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "base64": {
+                  "description": "The image or clip itself, base64. Use when you captured it yourself.",
+                  "type": "string"
+                },
+                "caption": {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                "url": {
+                  "description": "A public http(s) image/clip URL; Bowmark fetches it.",
+                  "maxLength": 2048,
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "maxItems": 8,
+            "type": "array"
+          },
+          "slug": {
+            "description": "First publish only; made from the title when omitted. It cannot change.",
+            "maxLength": 60,
+            "type": "string"
+          },
+          "tagline": {
+            "maxLength": 160,
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 120,
+            "type": "string"
+          },
+          "visibility": {
+            "enum": [
+              "public",
+              "unlisted"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "visibility"
+        ],
+        "type": "object"
+      },
+      "name": "jig_publish",
+      "title": "Publish a page (jig) to the store"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Get a published page (jig) into this account"
+      },
+      "description": "Copy someone's published jig into THIS user's account, from its current version. The copy is the user's own: it runs as them with their logins, never the author's, and can call only the functions its listing lists. Name it by `listing`: its id, `@handle/slug`, or its store URL (from `jig_search`). If the user already has a copy you get that one back with `alreadyHave: true`; pass `another: true` only when they want a second. Returns `jigId`, `slug`, `viewUrl` and `sitesNeedingLogin`: give the user each `signInUrl` (their own login, one-time link) and call `wait_for_sign_in` with its `ref`. Then open it with `jig_open({ jigId })`.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "another": {
+            "description": "Make a second copy even though the user already has one.",
+            "type": "boolean"
+          },
+          "listing": {
+            "description": "The listing id, `@handle/slug`, or the store URL bowmark.ai/jigs/@handle/slug.",
+            "maxLength": 300,
+            "type": "string"
+          }
+        },
+        "required": [
+          "listing"
+        ],
+        "type": "object"
+      },
+      "name": "jig_get",
+      "title": "Get a published page (jig) into this account"
     },
     {
       "annotations": {
@@ -428,9 +647,19 @@
             "format": "uuid",
             "type": "string"
           },
+          "mergedFrom": {
+            "description": "After merging an update from `jig_pull_update`: the `theirsVersion` you merged. Send it with the merged `html` (or `edits`); the copy is then based on that version, and any new functions it calls wait for the user's approval.",
+            "minimum": 1,
+            "type": "integer"
+          },
           "replaceState": {
             "description": "Start from {} instead of merging.",
             "type": "boolean"
+          },
+          "slug": {
+            "description": "Rename the jig's link, bowmark.ai/jig/<slug>. The old link keeps working and redirects.",
+            "maxLength": 60,
+            "type": "string"
           },
           "state": {
             "additionalProperties": {},
@@ -448,6 +677,45 @@
       },
       "name": "jig_update",
       "title": "Steer an open page (jig)"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get an update for a copied page (jig)"
+      },
+      "description": "For a jig the user got from someone's listing (`jig_list` shows `updateAvailable`): the three pages a merge needs. `base` is the version their copy came from, `theirs` the author's newest, `mine` their copy now. Writes nothing. If `edited` is false, save `theirs` as is. Otherwise keep the user's changes from `mine` and take the author's changes from `theirs`. Then save with `jig_update({ jigId, html, mergedFrom: theirsVersion })`. `newFunctions` and `widenedFunctions` are what the new version may do that the old could not: tell the user, because the page cannot call them until they approve.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "jigId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "jigId"
+        ],
+        "type": "object"
+      },
+      "name": "jig_pull_update",
+      "title": "Get an update for a copied page (jig)"
     },
     {
       "_meta": {
@@ -958,6 +1226,118 @@
         "type": "object"
       },
       "title": "Check what your account has spent"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Serve Bowmark pages' AI calls"
+      },
+      "description": "Lets this chat answer the AI calls an open Bowmark page makes, so they cost nothing. Returns up to 5 pending jobs ({ jobId, system, prompt, toolName, inputSchema, leaseSeconds }); waits up to waitSeconds (max 15) when there are none. Answer each with llm_answer. Calling this marks the chat as attached for 20 seconds; stop calling it, or call llm_detach, to let calls go back to Bowmark's own model.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "waitSeconds": {
+            "description": "How long to wait for a job when none is pending. Capped at 15.",
+            "minimum": 0,
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "name": "llm_poll",
+      "title": "Serve Bowmark pages' AI calls"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Answer a Bowmark page's AI call"
+      },
+      "description": "Answers one job from llm_poll. `answer` must be an object matching that job's inputSchema. A wrong shape is refused with the reason and the job stays open, so correct it and call again.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "answer": {
+            "description": "The answer, matching the job's inputSchema."
+          },
+          "jobId": {
+            "description": "The jobId from llm_poll.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "jobId"
+        ],
+        "type": "object"
+      },
+      "name": "llm_answer",
+      "title": "Answer a Bowmark page's AI call"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Stop serving Bowmark pages' AI calls"
+      },
+      "description": "Detaches this chat at once, so open Bowmark pages' AI calls go back to Bowmark's own model instead of waiting for this chat.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "llm_detach",
+      "title": "Stop serving Bowmark pages' AI calls"
     },
     {
       "_meta": {

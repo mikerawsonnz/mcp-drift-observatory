@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "75087e7a6cc5cec8b3be025f1a8dfcfa253259cadfde83bbd89e612d2f595546",
+  "full_hash": "4b3eebe3e9b1e4e1d4b1248474e492afe2d59e2f52e5dc0a54b95aed9c216d7a",
   "name": "ai.agenticfabricationnetwork/ufp",
-  "observed_at": "2026-11-05T02:02:59.351865Z",
+  "observed_at": "2026-11-06T02:02:12.268784Z",
   "sources": [
     "official"
   ],
@@ -23,10 +23,10 @@
       },
       "annotations": {
         "destructiveHint": false,
-        "openWorldHint": false,
+        "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Get ranked, purchasable offers (price, ETA, preview image) for fabricating a physical item from a design file. process=fdm_print for 3D printing a model (STL/OBJ/PLY/3MF/AMF/STEP/IGES), process=cnc or process=sheetmetal for machined/bent metal parts (STEP, IGES, DXF), process=decal for stickers/decals from artwork (any common image or design file — PNG/JPG/HEIC/TIFF/GIF/BMP/WEBP/AVIF/SVG/PDF/AI/EPS/PSD/CDR, auto-converted). A .ufp file (UFP part container: the design plus saved spec/constraints in one) is accepted anywhere a design file is — its saved intent applies automatically and anything the user states now wins. If the user just drops a file and asks for a price, omit process — UFP routes it. Provide the design either as design_file (an image/file the user attached or you generated — preferred) or file_url (a public URL). REORDERS: if the user has a UFP part number (from a receipt email or a previous session, looks like UFP-… or part_…), pass it as part_number INSTEAD of any file — the stored design and spec are reused and re-shopped across all current vendors. Locked parts additionally require share_key (from the owner's share link). Returns offers across vendors like Google Flights returns flights.",
+      "description": "Get fabrication price and delivery offers for a design file or an existing AFN part number. Supports 3D printing, CNC machining, sheet metal, decals, print, and apparel. If the user just provides a file and asks for a price, omit process so AFN can route it to suitable makers. Provide the design as design_file (an attachment or generated file) or file_url (a public URL). For a reorder, pass the UFP part number as part_number instead of a file; locked parts also require share_key from the owner's share link. A .ufp part container is accepted as a design file, and its saved specification applies unless the user changes it.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -37,8 +37,7 @@
           "attachment_urls": {
             "description": "Additional files for the SAME part — the PDF drawing next to the STEP, spec sheets, BOMs. Pass everything the user gave you; UFP works out which file is the part and which are supporting documents.",
             "items": {
-              "format": "uri",
-              "type": "string"
+              "$ref": "#/properties/file_url"
             },
             "maxItems": 10,
             "type": "array"
@@ -77,36 +76,15 @@
                   "additionalProperties": false,
                   "properties": {
                     "p1": {
-                      "items": [
-                        {
-                          "type": "number"
-                        },
-                        {
-                          "type": "number"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ],
+                      "items": {
+                        "type": "number"
+                      },
                       "maxItems": 3,
                       "minItems": 3,
                       "type": "array"
                     },
                     "p2": {
-                      "items": [
-                        {
-                          "type": "number"
-                        },
-                        {
-                          "type": "number"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ],
-                      "maxItems": 3,
-                      "minItems": 3,
-                      "type": "array"
+                      "$ref": "#/properties/bends/items/properties/line/properties/p1"
                     }
                   },
                   "required": [
@@ -185,35 +163,33 @@
             "description": "Latest acceptable delivery date, ISO YYYY-MM-DD",
             "type": "string"
           },
+          "design_data_url": {
+            "description": "Inline design bytes as a data: URL (base64), for MCP clients that cannot pass a file reference",
+            "pattern": "^data\\:",
+            "type": "string"
+          },
           "design_file": {
-            "anyOf": [
-              {
-                "additionalProperties": false,
-                "properties": {
-                  "download_url": {
-                    "type": "string"
-                  },
-                  "file_id": {
-                    "type": "string"
-                  },
-                  "file_name": {
-                    "type": "string"
-                  },
-                  "mime_type": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "file_id",
-                  "download_url"
-                ],
-                "type": "object"
+            "additionalProperties": false,
+            "description": "The design file itself (user-attached or generated image/STL). ChatGPT supplies {file_id, download_url} automatically when the user attached a file — just bind the attachment here.",
+            "properties": {
+              "download_url": {
+                "type": "string"
               },
-              {
+              "file_id": {
+                "type": "string"
+              },
+              "file_name": {
+                "type": "string"
+              },
+              "mime_type": {
                 "type": "string"
               }
+            },
+            "required": [
+              "file_id",
+              "download_url"
             ],
-            "description": "The design file itself (user-attached or generated image/STL). ChatGPT supplies the file reference automatically when the user attached a file — just bind the attachment here. Other clients may pass a data: URL (base64) or a public https URL string. Preferred over file_url."
+            "type": "object"
           },
           "elastomer_finish": {
             "description": "Elastomer post-processing: as_printed (VCJ parts ship raw — the whole lane today)",
@@ -225,7 +201,6 @@
           },
           "file_url": {
             "description": "Public URL of the design file — only when the design lives at a URL",
-            "format": "uri",
             "type": "string"
           },
           "finish": {
@@ -251,20 +226,7 @@
               "additionalProperties": false,
               "properties": {
                 "axis": {
-                  "items": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "number"
-                    }
-                  ],
-                  "maxItems": 3,
-                  "minItems": 3,
-                  "type": "array"
+                  "$ref": "#/properties/bends/items/properties/line/properties/p1"
                 },
                 "depth_mm": {
                   "exclusiveMinimum": 0,
@@ -316,20 +278,7 @@
                   "type": "object"
                 },
                 "points": {
-                  "items": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "number"
-                    }
-                  ],
-                  "maxItems": 3,
-                  "minItems": 3,
-                  "type": "array"
+                  "$ref": "#/properties/bends/items/properties/line/properties/p1"
                 },
                 "thread": {
                   "maxLength": 32,
@@ -497,20 +446,7 @@
               "additionalProperties": false,
               "properties": {
                 "axis": {
-                  "items": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "number"
-                    }
-                  ],
-                  "maxItems": 3,
-                  "minItems": 3,
-                  "type": "array"
+                  "$ref": "#/properties/bends/items/properties/line/properties/p1"
                 },
                 "depth_mm": {
                   "exclusiveMinimum": 0,
@@ -616,100 +552,72 @@
           "bends": {
             "anyOf": [
               {
-                "anyOf": [
-                  {
-                    "not": {}
-                  },
-                  {
-                    "items": {
+                "description": "Sheet-metal bend lines, each as TWO POINTS in the part's own mm frame (flat DXF parts use z=0: a bend from (0,12.7) to (76.2,12.7) is p1 [0,12.7,0], p2 [76.2,12.7,0]). angle_deg is the target bend angle (90 = a right-angle flange), direction \"up\"/\"down\" is the fold direction relative to the flat pattern, radius_mm the requested inside radius (omit it — the shop resolves to its tooling and reports what it used). Pass these when the user articulates WHERE the bends go; a bare \"it has 2 bends\" is bend_count, not this.",
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "angle_deg": {
+                      "exclusiveMaximum": 180,
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    "direction": {
+                      "enum": [
+                        "up",
+                        "down"
+                      ],
+                      "type": "string"
+                    },
+                    "face_id": {
+                      "type": "integer"
+                    },
+                    "id": {
+                      "maxLength": 32,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "line": {
                       "additionalProperties": false,
                       "properties": {
-                        "angle_deg": {
-                          "exclusiveMaximum": 180,
-                          "exclusiveMinimum": 0,
-                          "type": "number"
-                        },
-                        "direction": {
-                          "enum": [
-                            "up",
-                            "down"
-                          ],
-                          "type": "string"
-                        },
-                        "face_id": {
-                          "type": "integer"
-                        },
-                        "id": {
-                          "maxLength": 32,
-                          "minLength": 1,
-                          "type": "string"
-                        },
-                        "line": {
-                          "additionalProperties": false,
-                          "properties": {
-                            "p1": {
-                              "items": [
-                                {
-                                  "type": "number"
-                                },
-                                {
-                                  "type": "number"
-                                },
-                                {
-                                  "type": "number"
-                                }
-                              ],
-                              "maxItems": 3,
-                              "minItems": 3,
-                              "type": "array"
-                            },
-                            "p2": {
-                              "items": [
-                                {
-                                  "type": "number"
-                                },
-                                {
-                                  "type": "number"
-                                },
-                                {
-                                  "type": "number"
-                                }
-                              ],
-                              "maxItems": 3,
-                              "minItems": 3,
-                              "type": "array"
-                            }
+                        "p1": {
+                          "items": {
+                            "type": "number"
                           },
-                          "required": [
-                            "p1",
-                            "p2"
-                          ],
-                          "type": "object"
+                          "maxItems": 3,
+                          "minItems": 3,
+                          "type": "array"
                         },
-                        "radius_mm": {
-                          "exclusiveMinimum": 0,
-                          "type": "number"
-                        },
-                        "source": {
-                          "enum": [
-                            "detected",
-                            "user"
-                          ],
-                          "type": "string"
+                        "p2": {
+                          "$ref": "#/properties/bends/anyOf/0/items/properties/line/properties/p1"
                         }
                       },
                       "required": [
-                        "line",
-                        "angle_deg",
-                        "direction"
+                        "p1",
+                        "p2"
                       ],
                       "type": "object"
                     },
-                    "maxItems": 50,
-                    "type": "array"
-                  }
-                ],
-                "description": "Sheet-metal bend lines, each as TWO POINTS in the part's own mm frame (flat DXF parts use z=0: a bend from (0,12.7) to (76.2,12.7) is p1 [0,12.7,0], p2 [76.2,12.7,0]). angle_deg is the target bend angle (90 = a right-angle flange), direction \"up\"/\"down\" is the fold direction relative to the flat pattern, radius_mm the requested inside radius (omit it — the shop resolves to its tooling and reports what it used). Pass these when the user articulates WHERE the bends go; a bare \"it has 2 bends\" is bend_count, not this."
+                    "radius_mm": {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    "source": {
+                      "enum": [
+                        "detected",
+                        "user"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "line",
+                    "angle_deg",
+                    "direction"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 50,
+                "type": "array"
               },
               {
                 "type": "null"
@@ -818,112 +726,79 @@
           "inserts": {
             "anyOf": [
               {
-                "anyOf": [
-                  {
-                    "not": {}
-                  },
-                  {
-                    "items": {
+                "description": "PEM-style hardware inserts pressed into holes of a sheet-metal part — one record per hole. `insert` is the species (nut | flush_nut | standoff | blind_standoff | stud) and `thread` its size (\"M4\", \"1/4-20\"); both are required. When known, add length_mm (standoff/stud post length), the hole's center (located_at_mm, part's own mm frame), its axis, the drilled diameter, and `points` — the signed unit vector the insert's functional side faces (flip = negate). Pass these when the user asks for press-in nuts/standoffs/studs; vendors with a hardware service price them.",
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "axis": {
+                      "$ref": "#/properties/bends/anyOf/0/items/properties/line/properties/p1"
+                    },
+                    "depth_mm": {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    "drilled_diameter_mm": {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    "face_id": {
+                      "type": "integer"
+                    },
+                    "hole": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "insert": {
+                      "enum": [
+                        "nut",
+                        "flush_nut",
+                        "standoff",
+                        "blind_standoff",
+                        "stud"
+                      ],
+                      "type": "string"
+                    },
+                    "length_mm": {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    "located_at_mm": {
                       "additionalProperties": false,
                       "properties": {
-                        "axis": {
-                          "items": [
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ],
-                          "maxItems": 3,
-                          "minItems": 3,
-                          "type": "array"
-                        },
-                        "depth_mm": {
-                          "exclusiveMinimum": 0,
+                        "x": {
                           "type": "number"
                         },
-                        "drilled_diameter_mm": {
-                          "exclusiveMinimum": 0,
+                        "y": {
                           "type": "number"
                         },
-                        "face_id": {
-                          "type": "integer"
-                        },
-                        "hole": {
-                          "minimum": 1,
-                          "type": "integer"
-                        },
-                        "insert": {
-                          "enum": [
-                            "nut",
-                            "flush_nut",
-                            "standoff",
-                            "blind_standoff",
-                            "stud"
-                          ],
-                          "type": "string"
-                        },
-                        "length_mm": {
-                          "exclusiveMinimum": 0,
+                        "z": {
                           "type": "number"
-                        },
-                        "located_at_mm": {
-                          "additionalProperties": false,
-                          "properties": {
-                            "x": {
-                              "type": "number"
-                            },
-                            "y": {
-                              "type": "number"
-                            },
-                            "z": {
-                              "type": "number"
-                            }
-                          },
-                          "required": [
-                            "x",
-                            "y",
-                            "z"
-                          ],
-                          "type": "object"
-                        },
-                        "points": {
-                          "items": [
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ],
-                          "maxItems": 3,
-                          "minItems": 3,
-                          "type": "array"
-                        },
-                        "thread": {
-                          "maxLength": 32,
-                          "minLength": 1,
-                          "type": "string"
                         }
                       },
                       "required": [
-                        "insert",
-                        "thread"
+                        "x",
+                        "y",
+                        "z"
                       ],
                       "type": "object"
                     },
-                    "maxItems": 200,
-                    "type": "array"
-                  }
-                ],
-                "description": "PEM-style hardware inserts pressed into holes of a sheet-metal part — one record per hole. `insert` is the species (nut | flush_nut | standoff | blind_standoff | stud) and `thread` its size (\"M4\", \"1/4-20\"); both are required. When known, add length_mm (standoff/stud post length), the hole's center (located_at_mm, part's own mm frame), its axis, the drilled diameter, and `points` — the signed unit vector the insert's functional side faces (flip = negate). Pass these when the user asks for press-in nuts/standoffs/studs; vendors with a hardware service price them."
+                    "points": {
+                      "$ref": "#/properties/bends/anyOf/0/items/properties/line/properties/p1"
+                    },
+                    "thread": {
+                      "maxLength": 32,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "insert",
+                    "thread"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 200,
+                "type": "array"
               },
               {
                 "type": "null"
@@ -1099,81 +974,61 @@
           "tapping": {
             "anyOf": [
               {
-                "anyOf": [
-                  {
-                    "not": {}
-                  },
-                  {
-                    "items": {
+                "description": "Tapped (threaded) holes for a sheet-metal part — one record per hole the user wants threads cut into. `thread` is the callout in the user's words (\"M6\", \"M4 x 0.7\", \"1/4-20\") and is all that's required; when known, add the hole's center in the part's own mm frame (located_at_mm), its unit axis, the pre-tap drilled diameter, and depth_mm so the shop taps the right hole. Pass these when the user asks for threaded/tapped holes; vendors with a tapping service price them.",
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "axis": {
+                      "$ref": "#/properties/bends/anyOf/0/items/properties/line/properties/p1"
+                    },
+                    "depth_mm": {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    "drilled_diameter_mm": {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    "face_id": {
+                      "type": "integer"
+                    },
+                    "hole": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "located_at_mm": {
                       "additionalProperties": false,
                       "properties": {
-                        "axis": {
-                          "items": [
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ],
-                          "maxItems": 3,
-                          "minItems": 3,
-                          "type": "array"
-                        },
-                        "depth_mm": {
-                          "exclusiveMinimum": 0,
+                        "x": {
                           "type": "number"
                         },
-                        "drilled_diameter_mm": {
-                          "exclusiveMinimum": 0,
+                        "y": {
                           "type": "number"
                         },
-                        "face_id": {
-                          "type": "integer"
-                        },
-                        "hole": {
-                          "minimum": 1,
-                          "type": "integer"
-                        },
-                        "located_at_mm": {
-                          "additionalProperties": false,
-                          "properties": {
-                            "x": {
-                              "type": "number"
-                            },
-                            "y": {
-                              "type": "number"
-                            },
-                            "z": {
-                              "type": "number"
-                            }
-                          },
-                          "required": [
-                            "x",
-                            "y",
-                            "z"
-                          ],
-                          "type": "object"
-                        },
-                        "thread": {
-                          "maxLength": 32,
-                          "minLength": 1,
-                          "type": "string"
+                        "z": {
+                          "type": "number"
                         }
                       },
                       "required": [
-                        "thread"
+                        "x",
+                        "y",
+                        "z"
                       ],
                       "type": "object"
                     },
-                    "maxItems": 200,
-                    "type": "array"
-                  }
-                ],
-                "description": "Tapped (threaded) holes for a sheet-metal part — one record per hole the user wants threads cut into. `thread` is the callout in the user's words (\"M6\", \"M4 x 0.7\", \"1/4-20\") and is all that's required; when known, add the hole's center in the part's own mm frame (located_at_mm), its unit axis, the pre-tap drilled diameter, and depth_mm so the shop taps the right hole. Pass these when the user asks for threaded/tapped holes; vendors with a tapping service price them."
+                    "thread": {
+                      "maxLength": 32,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "thread"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 200,
+                "type": "array"
               },
               {
                 "type": "null"
@@ -1233,100 +1088,72 @@
           "bends": {
             "anyOf": [
               {
-                "anyOf": [
-                  {
-                    "not": {}
-                  },
-                  {
-                    "items": {
+                "description": "Sheet-metal bend lines, each as TWO POINTS in the part's own mm frame (flat DXF parts use z=0: a bend from (0,12.7) to (76.2,12.7) is p1 [0,12.7,0], p2 [76.2,12.7,0]). angle_deg is the target bend angle (90 = a right-angle flange), direction \"up\"/\"down\" is the fold direction relative to the flat pattern, radius_mm the requested inside radius (omit it — the shop resolves to its tooling and reports what it used). Pass these when the user articulates WHERE the bends go; a bare \"it has 2 bends\" is bend_count, not this.",
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "angle_deg": {
+                      "exclusiveMaximum": 180,
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    "direction": {
+                      "enum": [
+                        "up",
+                        "down"
+                      ],
+                      "type": "string"
+                    },
+                    "face_id": {
+                      "type": "integer"
+                    },
+                    "id": {
+                      "maxLength": 32,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "line": {
                       "additionalProperties": false,
                       "properties": {
-                        "angle_deg": {
-                          "exclusiveMaximum": 180,
-                          "exclusiveMinimum": 0,
-                          "type": "number"
-                        },
-                        "direction": {
-                          "enum": [
-                            "up",
-                            "down"
-                          ],
-                          "type": "string"
-                        },
-                        "face_id": {
-                          "type": "integer"
-                        },
-                        "id": {
-                          "maxLength": 32,
-                          "minLength": 1,
-                          "type": "string"
-                        },
-                        "line": {
-                          "additionalProperties": false,
-                          "properties": {
-                            "p1": {
-                              "items": [
-                                {
-                                  "type": "number"
-                                },
-                                {
-                                  "type": "number"
-                                },
-                                {
-                                  "type": "number"
-                                }
-                              ],
-                              "maxItems": 3,
-                              "minItems": 3,
-                              "type": "array"
-                            },
-                            "p2": {
-                              "items": [
-                                {
-                                  "type": "number"
-                                },
-                                {
-                                  "type": "number"
-                                },
-                                {
-                                  "type": "number"
-                                }
-                              ],
-                              "maxItems": 3,
-                              "minItems": 3,
-                              "type": "array"
-                            }
+                        "p1": {
+                          "items": {
+                            "type": "number"
                           },
-                          "required": [
-                            "p1",
-                            "p2"
-                          ],
-                          "type": "object"
+                          "maxItems": 3,
+                          "minItems": 3,
+                          "type": "array"
                         },
-                        "radius_mm": {
-                          "exclusiveMinimum": 0,
-                          "type": "number"
-                        },
-                        "source": {
-                          "enum": [
-                            "detected",
-                            "user"
-                          ],
-                          "type": "string"
+                        "p2": {
+                          "$ref": "#/properties/bends/anyOf/0/items/properties/line/properties/p1"
                         }
                       },
                       "required": [
-                        "line",
-                        "angle_deg",
-                        "direction"
+                        "p1",
+                        "p2"
                       ],
                       "type": "object"
                     },
-                    "maxItems": 50,
-                    "type": "array"
-                  }
-                ],
-                "description": "Sheet-metal bend lines, each as TWO POINTS in the part's own mm frame (flat DXF parts use z=0: a bend from (0,12.7) to (76.2,12.7) is p1 [0,12.7,0], p2 [76.2,12.7,0]). angle_deg is the target bend angle (90 = a right-angle flange), direction \"up\"/\"down\" is the fold direction relative to the flat pattern, radius_mm the requested inside radius (omit it — the shop resolves to its tooling and reports what it used). Pass these when the user articulates WHERE the bends go; a bare \"it has 2 bends\" is bend_count, not this."
+                    "radius_mm": {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    "source": {
+                      "enum": [
+                        "detected",
+                        "user"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "line",
+                    "angle_deg",
+                    "direction"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 50,
+                "type": "array"
               },
               {
                 "type": "null"
@@ -1435,112 +1262,79 @@
           "inserts": {
             "anyOf": [
               {
-                "anyOf": [
-                  {
-                    "not": {}
-                  },
-                  {
-                    "items": {
+                "description": "PEM-style hardware inserts pressed into holes of a sheet-metal part — one record per hole. `insert` is the species (nut | flush_nut | standoff | blind_standoff | stud) and `thread` its size (\"M4\", \"1/4-20\"); both are required. When known, add length_mm (standoff/stud post length), the hole's center (located_at_mm, part's own mm frame), its axis, the drilled diameter, and `points` — the signed unit vector the insert's functional side faces (flip = negate). Pass these when the user asks for press-in nuts/standoffs/studs; vendors with a hardware service price them.",
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "axis": {
+                      "$ref": "#/properties/bends/anyOf/0/items/properties/line/properties/p1"
+                    },
+                    "depth_mm": {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    "drilled_diameter_mm": {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    "face_id": {
+                      "type": "integer"
+                    },
+                    "hole": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "insert": {
+                      "enum": [
+                        "nut",
+                        "flush_nut",
+                        "standoff",
+                        "blind_standoff",
+                        "stud"
+                      ],
+                      "type": "string"
+                    },
+                    "length_mm": {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    "located_at_mm": {
                       "additionalProperties": false,
                       "properties": {
-                        "axis": {
-                          "items": [
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ],
-                          "maxItems": 3,
-                          "minItems": 3,
-                          "type": "array"
-                        },
-                        "depth_mm": {
-                          "exclusiveMinimum": 0,
+                        "x": {
                           "type": "number"
                         },
-                        "drilled_diameter_mm": {
-                          "exclusiveMinimum": 0,
+                        "y": {
                           "type": "number"
                         },
-                        "face_id": {
-                          "type": "integer"
-                        },
-                        "hole": {
-                          "minimum": 1,
-                          "type": "integer"
-                        },
-                        "insert": {
-                          "enum": [
-                            "nut",
-                            "flush_nut",
-                            "standoff",
-                            "blind_standoff",
-                            "stud"
-                          ],
-                          "type": "string"
-                        },
-                        "length_mm": {
-                          "exclusiveMinimum": 0,
+                        "z": {
                           "type": "number"
-                        },
-                        "located_at_mm": {
-                          "additionalProperties": false,
-                          "properties": {
-                            "x": {
-                              "type": "number"
-                            },
-                            "y": {
-                              "type": "number"
-                            },
-                            "z": {
-                              "type": "number"
-                            }
-                          },
-                          "required": [
-                            "x",
-                            "y",
-                            "z"
-                          ],
-                          "type": "object"
-                        },
-                        "points": {
-                          "items": [
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ],
-                          "maxItems": 3,
-                          "minItems": 3,
-                          "type": "array"
-                        },
-                        "thread": {
-                          "maxLength": 32,
-                          "minLength": 1,
-                          "type": "string"
                         }
                       },
                       "required": [
-                        "insert",
-                        "thread"
+                        "x",
+                        "y",
+                        "z"
                       ],
                       "type": "object"
                     },
-                    "maxItems": 200,
-                    "type": "array"
-                  }
-                ],
-                "description": "PEM-style hardware inserts pressed into holes of a sheet-metal part — one record per hole. `insert` is the species (nut | flush_nut | standoff | blind_standoff | stud) and `thread` its size (\"M4\", \"1/4-20\"); both are required. When known, add length_mm (standoff/stud post length), the hole's center (located_at_mm, part's own mm frame), its axis, the drilled diameter, and `points` — the signed unit vector the insert's functional side faces (flip = negate). Pass these when the user asks for press-in nuts/standoffs/studs; vendors with a hardware service price them."
+                    "points": {
+                      "$ref": "#/properties/bends/anyOf/0/items/properties/line/properties/p1"
+                    },
+                    "thread": {
+                      "maxLength": 32,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "insert",
+                    "thread"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 200,
+                "type": "array"
               },
               {
                 "type": "null"
@@ -1716,81 +1510,61 @@
           "tapping": {
             "anyOf": [
               {
-                "anyOf": [
-                  {
-                    "not": {}
-                  },
-                  {
-                    "items": {
+                "description": "Tapped (threaded) holes for a sheet-metal part — one record per hole the user wants threads cut into. `thread` is the callout in the user's words (\"M6\", \"M4 x 0.7\", \"1/4-20\") and is all that's required; when known, add the hole's center in the part's own mm frame (located_at_mm), its unit axis, the pre-tap drilled diameter, and depth_mm so the shop taps the right hole. Pass these when the user asks for threaded/tapped holes; vendors with a tapping service price them.",
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "axis": {
+                      "$ref": "#/properties/bends/anyOf/0/items/properties/line/properties/p1"
+                    },
+                    "depth_mm": {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    "drilled_diameter_mm": {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    "face_id": {
+                      "type": "integer"
+                    },
+                    "hole": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "located_at_mm": {
                       "additionalProperties": false,
                       "properties": {
-                        "axis": {
-                          "items": [
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ],
-                          "maxItems": 3,
-                          "minItems": 3,
-                          "type": "array"
-                        },
-                        "depth_mm": {
-                          "exclusiveMinimum": 0,
+                        "x": {
                           "type": "number"
                         },
-                        "drilled_diameter_mm": {
-                          "exclusiveMinimum": 0,
+                        "y": {
                           "type": "number"
                         },
-                        "face_id": {
-                          "type": "integer"
-                        },
-                        "hole": {
-                          "minimum": 1,
-                          "type": "integer"
-                        },
-                        "located_at_mm": {
-                          "additionalProperties": false,
-                          "properties": {
-                            "x": {
-                              "type": "number"
-                            },
-                            "y": {
-                              "type": "number"
-                            },
-                            "z": {
-                              "type": "number"
-                            }
-                          },
-                          "required": [
-                            "x",
-                            "y",
-                            "z"
-                          ],
-                          "type": "object"
-                        },
-                        "thread": {
-                          "maxLength": 32,
-                          "minLength": 1,
-                          "type": "string"
+                        "z": {
+                          "type": "number"
                         }
                       },
                       "required": [
-                        "thread"
+                        "x",
+                        "y",
+                        "z"
                       ],
                       "type": "object"
                     },
-                    "maxItems": 200,
-                    "type": "array"
-                  }
-                ],
-                "description": "Tapped (threaded) holes for a sheet-metal part — one record per hole the user wants threads cut into. `thread` is the callout in the user's words (\"M6\", \"M4 x 0.7\", \"1/4-20\") and is all that's required; when known, add the hole's center in the part's own mm frame (located_at_mm), its unit axis, the pre-tap drilled diameter, and depth_mm so the shop taps the right hole. Pass these when the user asks for threaded/tapped holes; vendors with a tapping service price them."
+                    "thread": {
+                      "maxLength": 32,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "thread"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 200,
+                "type": "array"
               },
               {
                 "type": "null"
@@ -1941,7 +1715,6 @@
           },
           "return_url": {
             "description": "Exact URL of the page the user is on right now, IF the client application knows it (a web app embedding this tool passes its own page URL). The post-payment page shows a 'Return to <site>' button pointing here. Omit when unknown — never invent one.",
-            "format": "uri",
             "type": "string"
           },
           "shipping_option_id": {

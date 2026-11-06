@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "8951d649cb864ae4b0c362c94473a03195b63061110ea9581669abf4c63f3ab0",
+  "full_hash": "ada9109472468f534bdf42f1c17a754abbaf076478f62d22ee792766dee5520d",
   "name": "ai.bamf/bamf",
-  "observed_at": "2026-11-05T02:03:05.790790Z",
+  "observed_at": "2026-11-06T02:02:22.200352Z",
   "sources": [
     "official"
   ],
-  "tool_count": 154,
+  "tool_count": 157,
   "tools": [
     {
       "annotations": {
@@ -1554,6 +1554,150 @@
         "type": "object"
       },
       "name": "bamf.run_design_session"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Link Session to bamf.ai"
+      },
+      "description": "Register this Claude Code / Claude / ChatGPT session with BAMF so it shows in the user's bamf.ai Recent chats (with the client's logo) and can be continued there or resumed locally. Creates or updates one linked bamf.ai chat and returns its URL plus, for Claude Code, the documented resume command (claude --resume <id>). Safe to call repeatedly; it only bumps last activity. Send the same external_session_id each time.",
+      "inputSchema": {
+        "properties": {
+          "channel": {
+            "description": "Client surface. Detected from the client when omitted.",
+            "enum": [
+              "claude_code",
+              "claude_desktop",
+              "claude_ai",
+              "chatgpt",
+              "other"
+            ],
+            "type": "string"
+          },
+          "cwd": {
+            "description": "Working directory, used in the resume command.",
+            "type": "string"
+          },
+          "external_session_id": {
+            "description": "The client's own session id (Claude Code: the session UUID).",
+            "type": "string"
+          },
+          "machine": {
+            "description": "Machine label, e.g. mini or pro.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Short session title.",
+            "type": "string"
+          },
+          "workspace_id": {
+            "description": "Optional workspace UUID; defaults to the key's pin, else the user's most recent chat workspace.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "external_session_id"
+        ],
+        "type": "object"
+      },
+      "name": "bamf.link_session"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Hand Off Session"
+      },
+      "description": "Hand a working session between this agent and bamf.ai. direction=to_bamf stores a context packet (goal, decisions, open_steps, recent_turns, notes) into the linked bamf.ai chat (pass external_session_id, or agent_session_id) and returns its URL so the user can continue there. direction=from_bamf returns the packet and recent turns for a bamf.ai chat (agent_session_id) so you can continue it here. Never sends messages or posts.",
+      "inputSchema": {
+        "properties": {
+          "agent_session_id": {
+            "description": "bamf.ai chat id (required for from_bamf).",
+            "type": "string"
+          },
+          "channel": {
+            "enum": [
+              "claude_code",
+              "claude_desktop",
+              "claude_ai",
+              "chatgpt",
+              "other"
+            ],
+            "type": "string"
+          },
+          "cwd": {
+            "type": "string"
+          },
+          "direction": {
+            "enum": [
+              "to_bamf",
+              "from_bamf"
+            ],
+            "type": "string"
+          },
+          "external_session_id": {
+            "description": "This client's session id (to_bamf without agent_session_id).",
+            "type": "string"
+          },
+          "machine": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "packet": {
+            "properties": {
+              "decisions": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "goal": {
+                "type": "string"
+              },
+              "notes": {
+                "type": "string"
+              },
+              "open_steps": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "recent_turns": {
+                "items": {
+                  "properties": {
+                    "role": {
+                      "enum": [
+                        "user",
+                        "assistant"
+                      ],
+                      "type": "string"
+                    },
+                    "text": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "direction"
+        ],
+        "type": "object"
+      },
+      "name": "bamf.handoff_session"
     },
     {
       "annotations": {
@@ -3934,7 +4078,7 @@
         "readOnlyHint": true,
         "title": "List Brand Kits"
       },
-      "description": "List creator brand packs and generated brand kit projects/pages.",
+      "description": "List creator brand packs, generated brand kit projects/pages, and github_site_brand: the palette, fonts, theme, logos and DESIGN.md/BRAND.md guidelines read (read-only) from the creator's own site repo, kept current on every push.",
       "inputSchema": {
         "properties": {
           "creator_id": {
@@ -3999,7 +4143,7 @@
         "readOnlyHint": true,
         "title": "List Style Options"
       },
-      "description": "Return 4 style options (style_id, label, preview image_url, source library|yours|brand, description) for a visual format. ALWAYS call this before the first visual of a request (infographic, carousel, image, quote card, motion, video), show the user the 4 images as a labelled 2x2, and ask them to pick one, 'show 4 more' (page+1) or 'try another format' (other_formats). Then pass the chosen style_id to the generate tool. Read-only; never returns other creators' names, avatars or original posts.",
+      "description": "Return 4 style options (style_id, label, preview image_url, source library|yours|brand, source_label, description) for a visual format; the creator's swipe-liked looks (source_label \"Your liked style\") come first, then approved baselines. ALWAYS call this before the first visual of a request (infographic, carousel, image, quote card, motion, video). If the response has needs_tuning: true, the creator has fewer than 3 liked styles for the format: send them to style_swipe_url (opens in the built-in browser in Claude Code and the desktop app), wait for them to finish, then call this again. Never generate blind, and never render new designs to test taste: taste comes from real top-performer posts. Then show the 4 images as a labelled 2x2, and ask them to pick one, 'show 4 more' (page+1) or 'try another format' (other_formats). Pass the chosen style_id to the generate tool. Read-only; never returns other creators' names, avatars or original posts.",
       "inputSchema": {
         "properties": {
           "author_id": {
@@ -4040,6 +4184,36 @@
         "type": "object"
       },
       "name": "bamf.list_style_options"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Open Style Swipe"
+      },
+      "description": "Return the authenticated Style Swipe deep link (bamf.ai/creators/<author_id>/style-swipe?format=...) where a creator likes or passes real top-performing posts to tune their visual taste, plus likes_by_format, rules_set (brand rules saved) and needs_tuning_formats (formats with fewer than 3 likes). Give the user the url; in Claude Code and the desktop app it opens in the built-in browser. Wait for them to finish before generating. Read-only; it never changes anything.",
+      "inputSchema": {
+        "properties": {
+          "author_id": {
+            "description": "Creator to tune; defaults to the creator the key is scoped to.",
+            "type": "string"
+          },
+          "format": {
+            "description": "Deck to open first.",
+            "enum": [
+              "infographic",
+              "carousel",
+              "quote",
+              "personal",
+              "video"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "bamf.open_style_swipe"
     },
     {
       "annotations": {

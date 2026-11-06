@@ -1,13 +1,213 @@
 {
   "canon_version": "1",
-  "full_hash": "328060e3c6cfe3735215e77cd26161e59b090f94539704bf0397b0e925ceb691",
+  "full_hash": "45d56c2a0d741250676206d505f7787b8e1b0f7c6675575171184b6538194e33",
   "name": "ai.buildersinfintech/fintech-data",
-  "observed_at": "2026-11-05T02:03:10.998784Z",
+  "observed_at": "2026-11-06T02:02:27.823984Z",
   "sources": [
     "official"
   ],
-  "tool_count": 25,
+  "tool_count": 29,
   "tools": [
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Venture funds (fintech, partly fintech or generalist) with their manager, status, stages, latest close and size or target. Amounts are as announced, in their own currency, never converted. size is from the latest first/interim/final close with an amount; a target is never reported as size. Funds focused on other sectors are not included. Arguments: q (or query) matched against fund and manager name; fintech_focus; stage; country (ISO-style country slug, e.g. 'italy'); status; closed_after (YYYY-MM-DD: a close on or after this date); limit. Newest close first. Unknown arguments are rejected.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "closed_after": {
+            "description": "Only funds with a close on or after this date (YYYY-MM-DD).",
+            "type": "string"
+          },
+          "country": {
+            "description": "Country slug, e.g. 'united-kingdom'.",
+            "type": "string"
+          },
+          "fintech_focus": {
+            "description": "fintech, fintech_partial or generalist.",
+            "enum": [
+              "fintech",
+              "fintech_partial",
+              "generalist"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max rows (≤200).",
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "q": {
+            "description": "Text matched against fund and manager names.",
+            "type": "string"
+          },
+          "stage": {
+            "description": "Stage the fund invests in.",
+            "enum": [
+              "pre_seed",
+              "seed",
+              "series_a",
+              "growth",
+              "late",
+              "secondaries",
+              "venture_debt",
+              "fund_of_funds"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "description": "Fund status.",
+            "enum": [
+              "launched",
+              "first_close",
+              "interim_close",
+              "final_close"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "search_funds",
+      "title": "Search venture funds"
+    },
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Approved venture-fund closes, newest first: fund, manager, close_type (launch, target, first, interim, final, unspecified), date, amount and currency as announced, source. Amounts are as announced, in their own currency, never converted. size is from the latest first/interim/final close with an amount; a target is never reported as size. Funds focused on other sectors are not included. Arguments: since / until (YYYY-MM-DD), close_type, fintech_focus, limit. Without close_type only first, interim and final closes are listed. Unknown arguments are rejected.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "close_type": {
+            "description": "Only this close type.",
+            "enum": [
+              "launch",
+              "target",
+              "first",
+              "interim",
+              "final",
+              "unspecified"
+            ],
+            "type": "string"
+          },
+          "fintech_focus": {
+            "description": "fintech, fintech_partial or generalist.",
+            "enum": [
+              "fintech",
+              "fintech_partial",
+              "generalist"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max rows (≤200).",
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "since": {
+            "description": "Earliest close date (YYYY-MM-DD).",
+            "type": "string"
+          },
+          "until": {
+            "description": "Latest close date (YYYY-MM-DD).",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "list_fund_closes",
+      "title": "List fund closes"
+    },
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Funds that raised in the last 24 months and are backing fintech rounds in the last 12: approved funds (not other-sector) whose latest first/interim/final close is within 24 months and whose manager invested in public equity rounds in the last 12 months (at least 1 for fintech funds, 2 for generalist or unknown focus). Per fund: manager, latest close, size or target as announced (never converted), rounds_12m, rounds_since_close and the 3 latest rounds. Optional filters apply to the qualifying rounds: topic (topic slug, via the news linked to the round), country (company's country slug), stage (pre-seed, seed, series-a, series-b, series-c-plus, growth — derived from round_type). limit ≤ 50. Unknown arguments are rejected.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "country": {
+            "description": "Country slug, e.g. 'united-kingdom'.",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max rows (≤200).",
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "stage": {
+            "description": "Stage bucket of the rounds.",
+            "enum": [
+              "pre-seed",
+              "seed",
+              "series-a",
+              "series-b",
+              "series-c-plus",
+              "growth"
+            ],
+            "type": "string"
+          },
+          "topic": {
+            "description": "Topic slug, e.g. 'payments'.",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "list_deploying_funds",
+      "title": "List funds deploying now"
+    },
+    {
+      "annotations": {
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "How many investors backed public fintech equity rounds in the last 12 months that match a country / stage / sub-sector, the top 3 investors by matching rounds (with whether they have a fund on Deploying now), and a coverage caveat (share of rounds in the period with a known country). Optional filters apply to the qualifying rounds: topic (topic slug, via the news linked to the round), country (company's country slug), stage (pre-seed, seed, series-a, series-b, series-c-plus, growth — derived from round_type). All arguments optional. Unknown arguments are rejected.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "country": {
+            "description": "Country slug, e.g. 'italy'.",
+            "type": "string"
+          },
+          "stage": {
+            "description": "Stage bucket.",
+            "enum": [
+              "pre-seed",
+              "seed",
+              "series-a",
+              "series-b",
+              "series-c-plus",
+              "growth"
+            ],
+            "type": "string"
+          },
+          "topic": {
+            "description": "Topic slug, e.g. 'payments'.",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "coverage_check",
+      "title": "Coverage check: investors behind matching fintech rounds"
+    },
     {
       "annotations": {
         "idempotentHint": true,
@@ -178,11 +378,10 @@
             "type": "number"
           },
           "category": {
-            "description": "Round category: equity, debt, fund (fund close), grant or ipo (initial public offering; amount is the offering size when disclosed).",
+            "description": "Round category: equity, debt, grant or ipo (initial public offering; amount is the offering size when disclosed). Fund closes are not rounds: use search_funds and list_fund_closes.",
             "enum": [
               "equity",
               "debt",
-              "fund",
               "grant",
               "ipo"
             ],
@@ -261,11 +460,10 @@
         "additionalProperties": false,
         "properties": {
           "category": {
-            "description": "Round category (equity, debt, fund, grant, ipo). Defaults to equity.",
+            "description": "Round category (equity, debt, grant, ipo). Defaults to equity. Fund closes: use list_fund_closes.",
             "enum": [
               "equity",
               "debt",
-              "fund",
               "grant",
               "ipo"
             ],
@@ -302,7 +500,7 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
-      "description": "Counts for a slice of the funding database: rounds, countries, totals per announced currency, undisclosed rounds and rounds per category. Note: rounds, per_currency and undisclosed count equity rounds only, while by_category covers every category (equity, debt, fund, grant, ipo), so the category split can sum higher than the round count.",
+      "description": "Counts for a slice of the funding database: rounds, countries, totals per announced currency, undisclosed rounds and rounds per category. Note: rounds, per_currency and undisclosed count equity rounds only, while by_category covers every round category (equity, debt, grant, ipo; fund closes are separate, see list_fund_closes), so the category split can sum higher than the round count.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {

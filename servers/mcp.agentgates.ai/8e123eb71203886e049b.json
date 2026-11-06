@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "b25dc89bd8e9d6c2e29d447dea5f6f63bc47de6ed1a362cded05415a50c09b33",
+  "full_hash": "84a6dfd800d4b616b97a024eee918b14b4c5ab0075e10a06ce779280056320c2",
   "name": "ai.agentgates/compute",
-  "observed_at": "2026-11-03T02:02:45.864260Z",
+  "observed_at": "2026-11-06T02:02:12.045960Z",
   "sources": [
     "official"
   ],
@@ -54,6 +54,27 @@
           "plans": {
             "items": {
               "properties": {
+                "address": {
+                  "description": "\"own\": the machine's own fixed public address, in and out.",
+                  "type": "string"
+                },
+                "closedPorts": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                "dataIncludedGbPerHour": {
+                  "description": "Data out included for every hour bought, in GB.",
+                  "type": "number"
+                },
+                "dataPricePerGb": {
+                  "description": "Data out past that, in USD per GB.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "diskGb": {
                   "type": [
                     "number",
@@ -89,13 +110,55 @@
                 "id": {
                   "type": "string"
                 },
+                "maintenance": {
+                  "type": "string"
+                },
                 "memoryGb": {
                   "type": [
                     "number",
                     "null"
                   ]
                 },
+                "minutePrices": {
+                  "description": "Quarter-hour prices, only while the API sells them: send minutes in place of hours.",
+                  "items": {
+                    "properties": {
+                      "byNetwork": {
+                        "items": {
+                          "properties": {
+                            "network": {
+                              "type": "string"
+                            },
+                            "totalUsd": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "usdPerHour": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "minutes": {
+                        "type": "number"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
                 "name": {
+                  "type": "string"
+                },
+                "ports": {
+                  "description": "\"any\": every port but closedPorts.",
                   "type": "string"
                 },
                 "prices": {
@@ -131,6 +194,43 @@
                     "type": "object"
                   },
                   "type": "array"
+                },
+                "protocols": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "regions": {
+                  "description": "Only on a plan that lists regions: where it runs, each at its own price. Send one as region to compute_quote.",
+                  "items": {
+                    "properties": {
+                      "fromUsdPerHour": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "oneHourUsd": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "tier": {
+                  "description": "The plan's tier, where it has one.",
+                  "type": "string"
                 },
                 "trafficGb": {
                   "type": [
@@ -168,7 +268,7 @@
         "readOnlyHint": true,
         "title": "Price one machine (the x402 offer)"
       },
-      "description": "Gets the exact price of one machine without paying: sends the create request with no payment and returns the API's HTTP 402 offer, one leg per network, each with the amount in USDC, the address it is paid to, the token, how long a signature stays good, and what to sign. The API checks the plan, the hours and the setup first, so a refusal costs nothing. Pass `machine_id` and `hours` instead to price a renewal of a running machine (any wallet may pay one). To buy, sign one leg with your own wallet and send the same request with an X-PAYMENT header (compute_docs has the whole contract).",
+      "description": "Gets the exact price of one machine without paying: sends the create request with no payment and returns the API's HTTP 402 offer, one leg per network, each with the amount in USDC, the address it is paid to, the token, how long a signature stays good, and what to sign. The API checks the plan, the hours and the setup first, so a refusal costs nothing. Pass `machine_id` and `hours` instead to price a renewal of a running machine (any wallet may pay one). Where the API sells quarter-hours (compute_plans shows minutePrices), send `minutes` (15, 30 or 45) in place of `hours`. For a plan that lists regions (compute_plans shows them), send `region`. To buy, sign one leg with your own wallet and send the same request with an X-PAYMENT header (compute_docs has the whole contract).",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -177,7 +277,7 @@
             "type": "string"
           },
           "hours": {
-            "description": "Prepaid hours (within the plan's range), or hours to add on a renewal.",
+            "description": "Prepaid hours (within the plan's range), or hours to add on a renewal. Or send minutes.",
             "minimum": 1,
             "type": "integer"
           },
@@ -186,8 +286,17 @@
             "type": "string"
           },
           "machine_id": {
-            "description": "Price a renewal of this machine instead of a new one (with hours only).",
+            "description": "Price a renewal of this machine instead of a new one (with hours or minutes only).",
             "type": "string"
+          },
+          "minutes": {
+            "description": "In place of hours, where the API sells quarter-hours (compute_plans shows minutePrices): 15, 30 or 45 minutes, on every plan but GPU. A quarter-hour costs more per hour than an hour.",
+            "enum": [
+              15,
+              30,
+              45
+            ],
+            "type": "integer"
           },
           "plan": {
             "description": "A plan id from compute_plans. Not with machine_id.",
@@ -198,11 +307,12 @@
             "maximum": 65535,
             "minimum": 1,
             "type": "integer"
+          },
+          "region": {
+            "description": "For a plan that lists regions (compute_plans shows them): the region to run in, by its id. Absent, the plan's first.",
+            "type": "string"
           }
         },
-        "required": [
-          "hours"
-        ],
         "type": "object"
       },
       "name": "compute_quote",
