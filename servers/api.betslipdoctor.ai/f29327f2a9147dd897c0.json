@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "71c6b97488dad76ff7a4ed381e1c7513ad60b78a1acebe5e3f0c22eceabe5a55",
+  "full_hash": "0ce5e0e7e983ba9909a0fefb626127f49c9e689badcac55f4539e4140fd0adbe",
   "name": "ai.betslipdoctor/mcp",
-  "observed_at": "2026-11-06T02:02:23.538910Z",
+  "observed_at": "2026-11-07T02:03:30.714870Z",
   "sources": [
     "official"
   ],
@@ -589,6 +589,7 @@
             "description": "Source-bound categories require request; board_snapshot reads one complete prewarmed page without provider work; games uses the board filters.",
             "enum": [
               "games",
+              "answer_game",
               "event_catalog",
               "event_prices",
               "board_snapshot",
@@ -622,6 +623,35 @@
           },
           "request": {
             "anyOf": [
+              {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "additionalProperties": false,
+                "properties": {
+                  "book": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "cursor": {
+                    "maxLength": 800,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "gameId": {
+                    "maxLength": 128,
+                    "pattern": "^EVNT_[A-Za-z0-9_-]+$",
+                    "type": "string"
+                  },
+                  "markets": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "gameId",
+                  "markets"
+                ],
+                "type": "object"
+              },
               {
                 "allOf": [
                   {
@@ -1153,6 +1183,10 @@
               "deep",
               "elite"
             ],
+            "type": "string"
+          },
+          "doctorThreadId": {
+            "format": "uuid",
             "type": "string"
           },
           "force": {
@@ -3101,12 +3135,12 @@
             "type": "string"
           },
           "active": {
-            "description": "react: true adds fire, false removes it. save: true saves the post, false removes it.",
             "type": "boolean"
           },
           "commandKey": {
             "maxLength": 120,
             "minLength": 16,
+            "pattern": "^[a-zA-Z0-9_-]+$",
             "type": "string"
           },
           "confirmation": {
@@ -3114,77 +3148,199 @@
             "type": "string"
           },
           "consent": {
-            "description": "synced_record_consent only: true lets your connected sportsbook settle your posted picks on your public record (default false).",
             "type": "boolean"
           },
           "draft": {
-            "additionalProperties": false,
-            "description": "The exact app post draft: either a saved Grade report or a saved Doctor exchange.",
-            "properties": {
-              "messageId": {
-                "description": "Saved Doctor reply in that thread.",
-                "format": "uuid",
-                "type": "string"
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "messageId": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "pollOptions": {
+                    "items": {
+                      "maxLength": 50,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "maxItems": 4,
+                    "minItems": 2,
+                    "type": "array"
+                  },
+                  "source": {
+                    "const": "doctor_exchange",
+                    "type": "string"
+                  },
+                  "text": {
+                    "maxLength": 280,
+                    "type": "string"
+                  },
+                  "threadId": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "source",
+                  "threadId",
+                  "messageId",
+                  "text"
+                ],
+                "type": "object"
               },
-              "placement": {
-                "description": "Ticket post only.",
+              {
+                "anyOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "audience": {
+                        "const": "vip",
+                        "type": "string"
+                      },
+                      "placement": {
+                        "enum": [
+                          "asking",
+                          "self_reported_placed"
+                        ],
+                        "type": "string"
+                      },
+                      "pollOptions": {
+                        "items": {
+                          "maxLength": 50,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "maxItems": 4,
+                        "minItems": 2,
+                        "type": "array"
+                      },
+                      "publicGradeBreakdownVersion": {
+                        "const": "bsd-public-grade-breakdown-v1",
+                        "type": "string"
+                      },
+                      "publicGradeVersion": {
+                        "const": "bsd-public-grade-summary-v1",
+                        "type": "string"
+                      },
+                      "publicResearchGradeVersion": {
+                        "enum": [
+                          "bsd-public-research-grade-v1",
+                          "bsd-public-research-grade-v2"
+                        ],
+                        "type": "string"
+                      },
+                      "recordUnits": {
+                        "maximum": 5,
+                        "minimum": 0.5,
+                        "type": "number"
+                      },
+                      "reportId": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "showStake": {
+                        "type": "boolean"
+                      },
+                      "text": {
+                        "maxLength": 280,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "reportId",
+                      "text",
+                      "showStake",
+                      "placement"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "audience": {
+                        "const": "vip",
+                        "type": "string"
+                      },
+                      "placement": {
+                        "enum": [
+                          "asking",
+                          "self_reported_placed"
+                        ],
+                        "type": "string"
+                      },
+                      "pollOptions": {
+                        "items": {
+                          "maxLength": 50,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "maxItems": 4,
+                        "minItems": 2,
+                        "type": "array"
+                      },
+                      "publicGradeBreakdownVersion": {
+                        "const": "bsd-public-grade-breakdown-v2",
+                        "type": "string"
+                      },
+                      "publicGradeVersion": {
+                        "const": "bsd-public-grade-summary-v1",
+                        "type": "string"
+                      },
+                      "publicResearchGradeVersion": {
+                        "enum": [
+                          "bsd-public-research-grade-v1",
+                          "bsd-public-research-grade-v2"
+                        ],
+                        "type": "string"
+                      },
+                      "recordUnits": {
+                        "maximum": 5,
+                        "minimum": 0.5,
+                        "type": "number"
+                      },
+                      "reportId": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "showStake": {
+                        "type": "boolean"
+                      },
+                      "text": {
+                        "maxLength": 280,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "reportId",
+                      "text",
+                      "showStake",
+                      "placement",
+                      "publicGradeVersion",
+                      "publicGradeBreakdownVersion"
+                    ],
+                    "type": "object"
+                  }
+                ]
+              }
+            ]
+          },
+          "fWarning": {
+            "anyOf": [
+              {
                 "enum": [
-                  "asking",
-                  "self_reported_placed"
+                  "acknowledge",
+                  "dont_ask_again"
                 ],
                 "type": "string"
               },
-              "pollOptions": {
-                "items": {
-                  "maxLength": 50,
-                  "minLength": 1,
-                  "type": "string"
-                },
-                "maxItems": 4,
-                "minItems": 2,
-                "type": "array"
-              },
-              "reportId": {
-                "description": "Owned saved Grade job ID for a ticket post.",
-                "format": "uuid",
-                "type": "string"
-              },
-              "showStake": {
-                "description": "Ticket post only.",
-                "type": "boolean"
-              },
-              "source": {
-                "const": "doctor_exchange",
-                "type": "string"
-              },
-              "text": {
-                "maxLength": 280,
-                "type": "string"
-              },
-              "threadId": {
-                "description": "Owned Doctor thread for an exchange post.",
-                "format": "uuid",
-                "type": "string"
+              {
+                "type": "null"
               }
-            },
-            "required": [
-              "text"
-            ],
-            "type": "object"
-          },
-          "fWarning": {
-            "enum": [
-              "acknowledge",
-              "dont_ask_again",
-              null
-            ],
-            "type": [
-              "string",
-              "null"
             ]
           },
           "key": {
-            "description": "doctor_parlay_slip only: the parlay key from get_doctor_parlays, or the parlay.key on a Doctor reply (get_doctor_job / get_doctor_conversation).",
             "format": "uuid",
             "type": "string"
           },
@@ -3196,7 +3352,6 @@
             "type": "string"
           },
           "postId": {
-            "description": "react and save only: the Tail post.",
             "format": "uuid",
             "type": "string"
           },
@@ -3206,16 +3361,16 @@
           },
           "reaction": {
             "const": "fire",
-            "description": "react only.",
             "type": "string"
           },
           "reportId": {
-            "description": "share_report only: the saved Grade report to share.",
             "format": "uuid",
             "type": "string"
           },
           "show": {
-            "description": "record_settings only: true shows your record to others (default), false hides it from everyone but you.",
+            "type": "boolean"
+          },
+          "showStake": {
             "type": "boolean"
           },
           "version": {
@@ -3225,8 +3380,7 @@
         },
         "required": [
           "version",
-          "action",
-          "draft"
+          "action"
         ],
         "type": "object"
       },
@@ -4312,7 +4466,7 @@
         "readOnlyHint": false,
         "title": "Start Grade"
       },
-      "description": "Start the owned Grade quoteId after the customer has seen and accepted its allowance quote. Reserves app allowance and queues the same durable Grade job; consent, tier, plan usage and admission rules apply. Returns a job, not a completed answer. Reuse its commandKey on every retry.",
+      "description": "Start the owned Grade quoteId after the customer has seen and accepted its allowance quote. Reserves app allowance and queues the same durable Grade job; consent, tier, plan usage and admission rules apply. Optional doctorThreadId: the owned Doctor conversation whose parlay this is; its finished letter posts into that conversation, as in the app. Returns a job, not a completed answer. Reuse its commandKey on every retry.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -4320,6 +4474,10 @@
             "maxLength": 120,
             "minLength": 16,
             "pattern": "^[a-zA-Z0-9_-]+$",
+            "type": "string"
+          },
+          "doctorThreadId": {
+            "format": "uuid",
             "type": "string"
           },
           "quoteId": {
@@ -4900,7 +5058,7 @@
         "readOnlyHint": true,
         "title": "List Grade jobs"
       },
-      "description": "Read the authenticated account’s current Grade library, with optional limit 1-20 and account-bound cursor. Each row’s headline is its Rocky letter (A+ to F, or NG) and report.rockyGradeSummary its label and score. Never starts research.",
+      "description": "Read the authenticated account’s current Grade library, with optional limit 1-20 and account-bound cursor. Each row’s headline is its Rocky letter and report.rockyGradeSummary its label and score. When letterFine is present, show it; otherwise show letter. Never starts research.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -5250,7 +5408,7 @@
         "readOnlyHint": true,
         "title": "Read saved Grade report"
       },
-      "description": "Return the verified saved report for a completed Grade this account owns, by jobId. Returns unavailable until the saved report is readable; never grades again. headline is the letter the app shows: A+, A, B, C, D, F or NG (No grade), with its label. rockySummary carries each leg’s modeled win chance against its break-even and its EV, the chance all legs win, confidence, top risks and the NG reasons (chances and EV as fractions), and view: Research and Price, each a level (Strong, OK or Weak, or null when it couldn’t be checked) with a plain reason; what moved the Grade, by name; on Grades saved before 2026-11-05, the cap line when a better price capped the letter; and the checks that couldn’t run. The same breakdown the app shows.",
+      "description": "Return the verified saved report for a completed Grade this account owns, by jobId. Returns unavailable until the saved report is readable; never grades again. headline carries the saved coarse letter and, for newer Grades, letterFine; show letterFine when present, otherwise letter. rockySummary carries each leg’s modeled win chance against its break-even and its EV, the chance all legs win, confidence, top risks and the NG reasons (chances and EV as fractions), and view: Research and Price, each a level (Strong, OK or Weak, or null when it couldn’t be checked) with a plain reason; what moved the Grade, by name; on Grades saved before 2026-11-05, the cap line when a better price capped the letter; and the checks that couldn’t run. The same breakdown the app shows.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -5268,6 +5426,45 @@
       "outputSchema": {
         "$defs": {
           "s0": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/s1"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "s1": {
+            "additionalProperties": {},
+            "properties": {
+              "letter": {
+                "type": "string"
+              },
+              "letterFine": {
+                "enum": [
+                  "A+",
+                  "A",
+                  "A-",
+                  "B+",
+                  "B",
+                  "B-",
+                  "C+",
+                  "C",
+                  "C-",
+                  "D",
+                  "F",
+                  "NG"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "letter"
+            ],
+            "type": "object"
+          },
+          "s2": {
             "properties": {
               "level": {
                 "anyOf": [
@@ -5366,10 +5563,10 @@
                 "type": "boolean"
               },
               "price": {
-                "$ref": "#/$defs/s0"
+                "$ref": "#/$defs/s2"
               },
               "research": {
-                "$ref": "#/$defs/s0"
+                "$ref": "#/$defs/s2"
               },
               "unavailable": {
                 "items": {
@@ -5394,7 +5591,9 @@
             ],
             "type": "object"
           },
-          "headline": {},
+          "headline": {
+            "$ref": "#/$defs/s0"
+          },
           "id": {
             "format": "uuid",
             "type": "string"
@@ -5411,7 +5610,9 @@
           "ownerId": {},
           "parlayMarketGrade": {},
           "personalizedGrade": {},
-          "personalizedRockyGrade": {},
+          "personalizedRockyGrade": {
+            "$ref": "#/$defs/s0"
+          },
           "priceTrail": {},
           "profileDigest": {},
           "profileSnapshot": {},
@@ -5434,8 +5635,12 @@
             "minimum": 1,
             "type": "integer"
           },
-          "rockyGrade": {},
-          "rockySummary": {},
+          "rockyGrade": {
+            "$ref": "#/$defs/s0"
+          },
+          "rockySummary": {
+            "$ref": "#/$defs/s0"
+          },
           "ruleVersion": {},
           "sources": {},
           "stateManifestDigest": {},
@@ -10382,9 +10587,7 @@
         "additionalProperties": false,
         "properties": {
           "text": {
-            "description": "The pasted slip text, unchanged.",
-            "maxLength": 16000,
-            "minLength": 1,
+            "description": "The pasted slip text; the first 16,000 characters are read.",
             "type": "string"
           }
         },
@@ -10698,7 +10901,7 @@
         "readOnlyHint": true,
         "title": "Show saved Grade card"
       },
-      "description": "Return the verified saved report for a completed Grade this account owns, by jobId. Returns unavailable until the saved report is readable; never grades again. headline is the letter the app shows: A+, A, B, C, D, F or NG (No grade), with its label. rockySummary carries each leg’s modeled win chance against its break-even and its EV, the chance all legs win, confidence, top risks and the NG reasons (chances and EV as fractions), and view: Research and Price, each a level (Strong, OK or Weak, or null when it couldn’t be checked) with a plain reason; what moved the Grade, by name; on Grades saved before 2026-11-05, the cap line when a better price capped the letter; and the checks that couldn’t run. The same breakdown the app shows. Show the saved result in an interactive BSD card in the chat. Use this tool when the customer wants to see their saved result. This is a read-only view.",
+      "description": "Return the verified saved report for a completed Grade this account owns, by jobId. Returns unavailable until the saved report is readable; never grades again. headline carries the saved coarse letter and, for newer Grades, letterFine; show letterFine when present, otherwise letter. rockySummary carries each leg’s modeled win chance against its break-even and its EV, the chance all legs win, confidence, top risks and the NG reasons (chances and EV as fractions), and view: Research and Price, each a level (Strong, OK or Weak, or null when it couldn’t be checked) with a plain reason; what moved the Grade, by name; on Grades saved before 2026-11-05, the cap line when a better price capped the letter; and the checks that couldn’t run. The same breakdown the app shows. Show the saved result in an interactive BSD card in the chat. Use this tool when the customer wants to see their saved result. This is a read-only view.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {

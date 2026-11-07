@@ -6,13 +6,14 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://agent.autoposter.ai/mcp` | 14 | [`fc0b252ea8b3`](b4c1ac88f1fe4ef8d46e.json) | 2026-11-05 |
+| `https://agent.autoposter.ai/mcp` | 16 | [`91cefdb8eaf4`](b4c1ac88f1fe4ef8d46e.json) | 2026-11-07 |
 
 ## Tools at `https://agent.autoposter.ai/mcp`
 
 - `autoposter_create_upload_link`: `Creates a short-lived link where the user can upload images from their device into the Auto Poster media library. Use this when the user wa…`
 - `autoposter_delete_post`: `Deletes or cancels a draft, scheduled, or pending post by ID.`
 - `autoposter_draft_post`: `Creates a draft post for human review. If API key lacks direct publish, post is saved as pending_approval and notifications are sent to wor…`
+- `autoposter_get_analytics`: `Reads performance analytics. level 'posts' (default) returns per-post metrics (impressions, views, likes, comments, shares, clicks, ...) wi…`
 - `autoposter_get_media_upload_url`: `Only for clients that can perform an HTTP PUT or multipart POST (not chat-only clients such as Gemini): if you cannot make that request you…`
 - `autoposter_get_post`: `Retrieves a single post by ID including its state (drafts, pending_approval, queued, posted) and live link receipts.`
 - `autoposter_get_post_status`: `Checks delivery status of a post and returns live platform links/receipts once published.`
@@ -22,11 +23,13 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `autoposter_list_posts`: `Lists posts in the workspace. Supports filtering by state ('drafts', 'scheduled', 'queued', 'posted', 'failed', 'pending_approval'), captio…`
 - `autoposter_publish_draft`: `Approves and immediately publishes an existing draft or pending post. Requires an API key with direct publish permission.`
 - `autoposter_schedule_post`: `Schedules a post for a future date/time. Automatically converts local time using workspace/user timezone into UTC. Accepts mediaUrls (publi…`
+- `autoposter_update_post`: `Edits an existing draft, scheduled, pending_approval or declined post in place: text, title, visibility, media, first comment / thread, or…`
 - `autoposter_upload_media`: `Uploads an image or video to Auto Poster media library. Accepts a file object supplied by the client, a public image or video URL, a data U…`
 - `get_profile`: `Return the profile represented by this request's authenticated credentials. The opaque id is unique within this app and remains unchanged a…`
 
 ## Changes
 
+- 2026-11-07: [count changed, schema changed, tool added](../../deltas/2026-11-07/b4c1ac88f1fe4ef8d46e.json): `2 tool(s) added; 24 field(s) changed`
 - 2026-11-05: [annotation changed, description changed, field changed, schema changed](../../deltas/2026-11-05/b4c1ac88f1fe4ef8d46e.json): `10 field(s) changed`
 - 2026-10-30: [schema changed](../../deltas/2026-10-30/b4c1ac88f1fe4ef8d46e.json): `2 field(s) changed`
 - 2026-10-10: [schema changed](../../deltas/2026-10-10/b4c1ac88f1fe4ef8d46e.json): `18 field(s) changed`

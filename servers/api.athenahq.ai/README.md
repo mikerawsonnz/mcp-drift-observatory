@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.athenahq.ai/api/mcp` | 124 | [`0dc985bf71a6`](d1c9dc97b241abc09e4e.json) | 2026-11-06 |
+| `https://api.athenahq.ai/api/mcp` | 126 | [`873acc8dfeb2`](d1c9dc97b241abc09e4e.json) | 2026-11-07 |
 
 ## Tools at `https://api.athenahq.ai/api/mcp`
 
@@ -70,10 +70,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_pillars`: `List a website's Knowledge Base pillars (excluding archived ones) with approved-fact counts, whether a synthesized document exists, and whe…`
 - `get_pitch`: `Get a pitch report by ID including competitors, prompts, attributes, top citing sources, and aggregate metrics (brand mentions, sentiment,…`
 - `get_position_cumulative`: `Get cumulative position — average ranking position for each competitor across the date range.`
-- and 64 more in [d1c9dc97b241abc09e4e.json](d1c9dc97b241abc09e4e.json)
+- and 66 more in [d1c9dc97b241abc09e4e.json](d1c9dc97b241abc09e4e.json)
 
 ## Changes
 
+- 2026-11-07: [count changed, tool added](../../deltas/2026-11-07/d1c9dc97b241abc09e4e.json): `2 tool(s) added`
 - 2026-11-06: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-06/d1c9dc97b241abc09e4e.json): `11 tool(s) added; 26 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**
 - 2026-11-04: [schema changed](../../deltas/2026-11-04/d1c9dc97b241abc09e4e.json): `1 field(s) changed`
 - 2026-11-02: [schema changed](../../deltas/2026-11-02/d1c9dc97b241abc09e4e.json): `3 field(s) changed`

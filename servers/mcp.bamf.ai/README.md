@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.bamf.ai` | 157 | [`ada910947246`](bcec739ff4350c4ddf27.json) | 2026-11-06 |
+| `https://mcp.bamf.ai` | 160 | [`b2f70a86e7cb`](bcec739ff4350c4ddf27.json) | 2026-11-07 |
 
 ## Tools at `https://mcp.bamf.ai`
 
@@ -70,10 +70,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `bamf.get_outreach_campaign_status`: `Read redacted state, canonical workspace/list-version/connector bindings, readiness evidence, admission evidence, and any matching provider…`
 - `bamf.get_outreach_discovery_status`: `Read the status of one tenant- and principal-scoped outreach discovery session. This never mutates a provider.`
 - `bamf.get_profile`: `Return the profile represented by this request's authenticated credentials. The opaque id is unique within this app and remains unchanged a…`
-- and 97 more in [bcec739ff4350c4ddf27.json](bcec739ff4350c4ddf27.json)
+- and 100 more in [bcec739ff4350c4ddf27.json](bcec739ff4350c4ddf27.json)
 
 ## Changes
 
+- 2026-11-07: [count changed, tool added](../../deltas/2026-11-07/bcec739ff4350c4ddf27.json): `3 tool(s) added`
 - 2026-11-06: [count changed, description changed, tool added](../../deltas/2026-11-06/bcec739ff4350c4ddf27.json): `3 tool(s) added; 2 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-05: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-05/bcec739ff4350c4ddf27.json): `2 tool(s) added; 9 field(s) changed`
 - 2026-11-04: [count changed, tool added](../../deltas/2026-11-04/bcec739ff4350c4ddf27.json): `2 tool(s) added`

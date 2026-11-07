@@ -1,0 +1,117 @@
+{
+  "canon_version": "1",
+  "full_hash": "7016fb5a880d8463be7709be2cfbbecf72e6db7eea84b1ce6465e65194ee4c1b",
+  "name": "ai.28in28/agent-service-desk",
+  "observed_at": "2026-11-07T02:03:21.254180Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 3,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Reads the public DNS of one domain and reports SPF, DKIM, DMARC, MX, MTA-STS and TLS-RPT findings, risks, unknowns and the exact DNS changes to fix them. Read-only; nothing is stored.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "description": "Domain name, e.g. example.com",
+            "maxLength": 253,
+            "minLength": 3,
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "type": "object"
+      },
+      "name": "checkDomain",
+      "title": "Check email authentication of a domain"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Runs the email-authentication check of one domain and returns a machine-readable, NON-BINDING quote for Fix & Verify: price (EUR 99 net per domain), scope (exact DNS changes), acceptance criteria and the baseline to verify against later. Orders are not open: it creates no order, contract or payment and stores nothing. Keep the returned criteria and baseline to call verifyFixVerify after the records are published.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "description": "Domain name, e.g. example.com",
+            "maxLength": 253,
+            "minLength": 3,
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "type": "object"
+      },
+      "name": "quoteFixVerify",
+      "title": "Scope and quote Fix & Verify for a domain"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Re-runs the check of the domain and compares it with the acceptance criteria and baseline of an earlier quoteFixVerify result: PASS when every criterion is resolved and no new critical or high finding appeared. Read-only; nothing is stored; a pass is not an invoice while orders are closed.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "baseline": {
+            "description": "baseline.risk_codes from the quote",
+            "items": {
+              "pattern": "^[a-z0-9_]{1,48}$",
+              "type": "string"
+            },
+            "maxItems": 40,
+            "type": "array"
+          },
+          "criteria": {
+            "description": "acceptance.criteria from the quote",
+            "items": {
+              "pattern": "^[a-z0-9_]{1,48}$",
+              "type": "string"
+            },
+            "maxItems": 40,
+            "type": "array"
+          },
+          "domain": {
+            "description": "The quoted domain",
+            "maxLength": 253,
+            "minLength": 3,
+            "type": "string"
+          },
+          "token": {
+            "description": "next.verify.arguments.token from the quote",
+            "pattern": "^[0-9a-f]{32}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain",
+          "criteria",
+          "baseline",
+          "token"
+        ],
+        "type": "object"
+      },
+      "name": "verifyFixVerify",
+      "title": "Verify a Fix & Verify scope after the DNS change"
+    }
+  ],
+  "url": "https://28in28.ai/mcp"
+}

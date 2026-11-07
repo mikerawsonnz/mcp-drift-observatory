@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "ae18edd1feff3313f5d84dbb8a779e3b2c4953636f6d9e7f1332aabf2d64f027",
+  "full_hash": "8de1e4e7446105ddcc9b3aba2dbf3b0a9a5ed5c2012c90485f63f9d85e1aeb22",
   "name": "ai.beatra/beatra",
-  "observed_at": "2026-11-04T02:03:23.958415Z",
+  "observed_at": "2026-11-07T02:03:31.352574Z",
   "sources": [
     "official"
   ],
@@ -9614,7 +9614,7 @@
             "type": "string"
           },
           "input": {
-            "description": "Text to synthesize. It may contain speech markup such as {pause 0.5}, {laugh}, {pron 行 hang2} or {sub W3C 万维网联盟}; read the vocabulary and limits from the model card (beatra.models.list).",
+            "description": "Text to synthesize. It may contain speech markup such as {pause 0.5}, {laugh}, {pron 行 hang2} or {sub W3C 万维网联盟}; read the vocabulary and limits from the model card (beatra.models.list). Some models also accept inline emotion and performance markup, listed under script_markup on their card; other models skip it with a warning. Malformed markup is corrected or skipped with a markup_adjusted warning instead of failing the request. Some models accept fewer characters; read constraints.input_max_characters on the model card (ElevenLabs models: 10,000).",
             "maxLength": 50000,
             "minLength": 1,
             "title": "Input",
@@ -10113,7 +10113,7 @@
             "type": "string"
           },
           "input": {
-            "description": "Text to synthesize. It may contain speech markup such as {pause 0.5}, {laugh}, {pron 行 hang2} or {sub W3C 万维网联盟}; read the vocabulary and limits from the model card (beatra.models.list).",
+            "description": "Text to synthesize. It may contain speech markup such as {pause 0.5}, {laugh}, {pron 行 hang2} or {sub W3C 万维网联盟}; read the vocabulary and limits from the model card (beatra.models.list). Some models also accept inline emotion and performance markup, listed under script_markup on their card; other models skip it with a warning. Malformed markup is corrected or skipped with a markup_adjusted warning instead of failing the request. Some models accept fewer characters; read constraints.input_max_characters on the model card (ElevenLabs models: 10,000).",
             "maxLength": 50000,
             "minLength": 1,
             "title": "Input",
@@ -10261,6 +10261,33 @@
             "title": "SpeechMarkupAlias",
             "type": "object"
           },
+          "SpeechMarkupInlineEmotion": {
+            "additionalProperties": false,
+            "properties": {
+              "note": {
+                "title": "Note",
+                "type": "string"
+              },
+              "syntax": {
+                "title": "Syntax",
+                "type": "string"
+              },
+              "values": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Values",
+                "type": "array"
+              }
+            },
+            "required": [
+              "syntax",
+              "values",
+              "note"
+            ],
+            "title": "SpeechMarkupInlineEmotion",
+            "type": "object"
+          },
           "SpeechMarkupPause": {
             "additionalProperties": false,
             "properties": {
@@ -10351,8 +10378,26 @@
                 "title": "Escape",
                 "type": "string"
               },
+              "inline_emotion": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/SpeechMarkupInlineEmotion"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "pause": {
                 "$ref": "#/$defs/SpeechMarkupPause"
+              },
+              "performance": {
+                "items": {
+                  "$ref": "#/$defs/SpeechMarkupTag"
+                },
+                "title": "Performance",
+                "type": "array"
               },
               "pronunciation": {
                 "$ref": "#/$defs/SpeechMarkupPronunciation"
@@ -10587,6 +10632,7 @@
               }
             ],
             "default": null,
+            "description": "Non-blocking advisories: markup that was corrected or skipped (markup_adjusted), markup the model does not perform (markup_degraded), controls the model ignores (option_ignored), and voices scheduled for retirement (voice_retiring).",
             "title": "Warnings"
           },
           "weighted_characters": {
@@ -10791,7 +10837,7 @@
               }
             ],
             "default": null,
-            "description": "Optional short aligned excerpt (audio shorter than 8 seconds + its verbatim transcript) that the engine uses to raise clone similarity. Omit to clone from the main sample only."
+            "description": "Optional short aligned excerpt: audio shorter than 8 seconds plus its verbatim transcript. Used only by models whose card sets prompt_accepted=true; other models ignore it and return an option_ignored warning."
           },
           "sample": {
             "description": "Clean single-speaker voice sample (uploaded artifact or HTTPS URL), ~10s-5min",
@@ -11148,7 +11194,7 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Activate a cloned voice whose clone result says activation is required (status pending_activation). Voices that are already ready, including every MiniMax clone and every preset voice, never need this; calling it on them charges nothing and changes nothing. The clone result already carries the quote (activation.quote: price, terms, preview, confirmation_token). Only after the user explicitly agrees to the price and terms, call once with voice_id, confirmation_token and confirm_credits; this consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get; reuse the same client_request_id only for an identical retry. Called without confirmation_token (the token is gone or older than 24 hours), it returns a new quote and charges nothing.",
+      "description": "Activate a cloned voice whose clone result says activation is required (status pending_activation). Voices that are already ready, including every MiniMax clone, every ElevenLabs clone, and every preset voice, never need this; calling it on them charges nothing and changes nothing. The clone result already carries the quote (activation.quote: price, terms, preview, confirmation_token). Only after the user explicitly agrees to the price and terms, call once with voice_id, confirmation_token and confirm_credits; this consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get; reuse the same client_request_id only for an identical retry. Called without confirmation_token (the token is gone or older than 24 hours), it returns a new quote and charges nothing.",
       "inputSchema": {
         "description": "Activate a cloned voice that waits for activation: one call with the clone result's quote, after the user agrees.",
         "properties": {
@@ -11581,6 +11627,18 @@
                 "description": "Scene sample URL. Null until a sample has been published",
                 "title": "Preview Url Scene"
               },
+              "retirement": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/VoiceRetirement"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Present when a retirement is scheduled or has taken effect."
+              },
               "status": {
                 "default": "ready",
                 "enum": [
@@ -11772,6 +11830,35 @@
               }
             },
             "title": "VoicePreview",
+            "type": "object"
+          },
+          "VoiceRetirement": {
+            "description": "A scheduled retirement. Synthesis with the voice still works until retire_at.",
+            "properties": {
+              "replacement_voice_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Recommended replacement voice_id, or null when none is named",
+                "title": "Replacement Voice Id"
+              },
+              "retire_at": {
+                "description": "When the voice stops working (ISO 8601 UTC)",
+                "format": "date-time",
+                "title": "Retire At",
+                "type": "string"
+              }
+            },
+            "required": [
+              "retire_at"
+            ],
+            "title": "VoiceRetirement",
             "type": "object"
           }
         },
@@ -12372,6 +12459,18 @@
                 "description": "Scene sample URL. Null until a sample has been published",
                 "title": "Preview Url Scene"
               },
+              "retirement": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/VoiceRetirement"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Present when a retirement is scheduled or has taken effect."
+              },
               "status": {
                 "default": "ready",
                 "enum": [
@@ -12563,6 +12662,35 @@
               }
             },
             "title": "VoicePreview",
+            "type": "object"
+          },
+          "VoiceRetirement": {
+            "description": "A scheduled retirement. Synthesis with the voice still works until retire_at.",
+            "properties": {
+              "replacement_voice_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Recommended replacement voice_id, or null when none is named",
+                "title": "Replacement Voice Id"
+              },
+              "retire_at": {
+                "description": "When the voice stops working (ISO 8601 UTC)",
+                "format": "date-time",
+                "title": "Retire At",
+                "type": "string"
+              }
+            },
+            "required": [
+              "retire_at"
+            ],
+            "title": "VoiceRetirement",
             "type": "object"
           }
         },
@@ -13434,7 +13562,7 @@
           },
           "include_activation_required": {
             "default": false,
-            "description": "Also list voice clone models whose voices need a separate paid activation before use. Omit to get the default list.",
+            "description": "Also list voice clone models that are not in the default list: models whose voices need a separate paid activation before use, and models that must be chosen explicitly and are never picked by auto.",
             "title": "Include Activation Required",
             "type": "boolean"
           }
@@ -15238,6 +15366,33 @@
             "title": "SpeechMarkupAlias",
             "type": "object"
           },
+          "SpeechMarkupInlineEmotion": {
+            "additionalProperties": false,
+            "properties": {
+              "note": {
+                "title": "Note",
+                "type": "string"
+              },
+              "syntax": {
+                "title": "Syntax",
+                "type": "string"
+              },
+              "values": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Values",
+                "type": "array"
+              }
+            },
+            "required": [
+              "syntax",
+              "values",
+              "note"
+            ],
+            "title": "SpeechMarkupInlineEmotion",
+            "type": "object"
+          },
           "SpeechMarkupPause": {
             "additionalProperties": false,
             "properties": {
@@ -15328,8 +15483,26 @@
                 "title": "Escape",
                 "type": "string"
               },
+              "inline_emotion": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/SpeechMarkupInlineEmotion"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "pause": {
                 "$ref": "#/$defs/SpeechMarkupPause"
+              },
+              "performance": {
+                "items": {
+                  "$ref": "#/$defs/SpeechMarkupTag"
+                },
+                "title": "Performance",
+                "type": "array"
               },
               "pronunciation": {
                 "$ref": "#/$defs/SpeechMarkupPronunciation"

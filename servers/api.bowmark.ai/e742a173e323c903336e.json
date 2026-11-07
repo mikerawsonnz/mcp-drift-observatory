@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "c4e3d3107d8fda0c69e3db91b33faaa4a33cb8d283b8a9f3053f14a8f995c552",
+  "full_hash": "08182b48cd00a755b3794afb20075c7dab57483ea3d580b6dd08fa23ce69d62d",
   "name": "ai.bowmark/bowmark",
-  "observed_at": "2026-11-06T02:02:27.241170Z",
+  "observed_at": "2026-11-07T02:03:33.404733Z",
   "sources": [
     "official"
   ],
-  "tool_count": 33,
+  "tool_count": 34,
   "tools": [
     {
       "_meta": {
@@ -23,6 +23,7 @@
       },
       "annotations": {
         "destructiveHint": false,
+        "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": true,
         "title": "Check what Bowmark can do for this task"
@@ -57,6 +58,10 @@
     },
     {
       "_meta": {
+        "openai/toolInvocation": {
+          "invoked": "Ran your task",
+          "invoking": "Running your task on the live site…"
+        },
         "securitySchemes": [
           {
             "scopes": [
@@ -68,7 +73,11 @@
           }
         ],
         "ui": {
-          "resourceUri": "ui://bowmark/run-view-v7"
+          "resourceUri": "ui://bowmark/run-view-v7",
+          "toolInvocation": {
+            "invoked": "Ran your task",
+            "invoking": "Running your task on the live site…"
+          }
         },
         "ui/resourceUri": "ui://bowmark/run-view-v7"
       },
@@ -257,8 +266,16 @@
     },
     {
       "_meta": {
+        "openai/toolInvocation": {
+          "invoked": "Checked run progress",
+          "invoking": "Checking run progress…"
+        },
         "ui": {
           "resourceUri": "ui://bowmark/run-view-v7",
+          "toolInvocation": {
+            "invoked": "Checked run progress",
+            "invoking": "Checking run progress…"
+          },
           "visibility": [
             "app"
           ]
@@ -267,6 +284,7 @@
       },
       "annotations": {
         "destructiveHint": false,
+        "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": true,
         "title": "Run view"
@@ -293,6 +311,10 @@
     },
     {
       "_meta": {
+        "openai/toolInvocation": {
+          "invoked": "Opened the page",
+          "invoking": "Opening the page…"
+        },
         "securitySchemes": [
           {
             "scopes": [
@@ -304,17 +326,22 @@
           }
         ],
         "ui": {
-          "resourceUri": "ui://bowmark/jig-v2"
+          "resourceUri": "ui://bowmark/jig-v2",
+          "toolInvocation": {
+            "invoked": "Opened the page",
+            "invoking": "Opening the page…"
+          }
         },
         "ui/resourceUri": "ui://bowmark/jig-v2"
       },
       "annotations": {
         "destructiveHint": false,
+        "idempotentHint": false,
         "openWorldHint": false,
         "readOnlyHint": false,
         "title": "Open a page for the user (jig)"
       },
-      "description": "Make the user a \"jig\": their own copy of a website, running through Bowmark, that you curate as they talk to you. Asked for \"a jig of YouTube\", build a page that LOOKS like that site with Bowmark's logo where the site's would be, filled by Bowmark library functions as this user: every function the library has for that site gets its place. Then keep curating as they talk: `jig_update` changes state or html, live.\n\nGive the user the link that comes back; that tab is the app. Start from a built-in (`template`) when one fits, else write the page (`html`) — call `get_library({ query: \"jig guide\" })` FIRST for the component kit and layout classes. Reopen one with `jig_open({ jigId })` (`jig_list`), never rebuild it. Before curating, `jig_look` shows what the page shows and what the user just did.\n\nInside the page, one global, `window.bowmark`: `bowmark.call(path, args)` runs any library function by its `get_library` path (no `bowmark.` prefix), metered for this user; `bowmark.batch([...])` runs up to 8 together. `bowmark.state`/`onState(fn)` holds every curation choice (you change it with `jig_update`); `setState(patch)` saves a user click. `show({ view, items })` tells `jig_look` what is on screen. Also `tellModel`, `say`, `open`, `theme`, `img`, `section`: the jig guide. Views: `location.hash`, so back/forward work.\n\nFAST AND FAILURE-PROOF by default: paint a skeleton at once; fill the screen with ONE `bowmark.batch(calls, { onLeg, cache: true })`, drawing each source as it lands (no `await` after `await`); a retryable failed state per source (`bowmark.section`); `bowmark.img(url, px)`, lazy below the fold. `jig_look` reports load speed: fix what its `advice` names.\n\nNo `fetch`, no external script/style/font. A call needing sign-in pauses behind a banner until the user signs in. No chat box in the page: the user talks to you.\n\nTHE SITE'S LAYOUT, NONE OF ITS DARK PATTERNS: `get_library({ query: \"jig layout <host>\" })` gives its regions and what to strip. Kit colors, never the site's; no invented title.",
+      "description": "Make the user a \"jig\": their own copy of a website, running through Bowmark, that you curate as they talk to you. Asked for \"a jig of YouTube\", build a page that LOOKS like that site with Bowmark's logo where the site's would be, filled by Bowmark library functions as this user: every function the library has for that site gets its place. Then keep curating as they talk: `jig_update` changes state or html, live.\n\nGive the user the link that comes back; that tab is the app. Start from a built-in (`template`) when one fits, else write the page (`html`) — call `get_library({ query: \"jig guide\" })` FIRST for the component kit and layout classes. Reopen one with `jig_open({ jigId })` (`jig_list`), never rebuild it. Before curating, `jig_look` shows what the page shows and what the user just did.\n\nInside the page, one global, `window.bowmark`: `bowmark.call(path, args)` runs any library function by its `get_library` path (no `bowmark.` prefix), metered for this user; `bowmark.batch([...])` runs up to 8 together. `bowmark.state`/`onState(fn)` holds curation choices (you change it with `jig_update`); `setState(patch)` saves a user click. `show({ view, items })` tells `jig_look` what is on screen. Also `tellModel`, `say`, `open`, `download`, `theme`, `img`, `section`: the jig guide. Views: `location.hash`, so back/forward work.\n\nFAST AND FAILURE-PROOF by default: paint a skeleton at once; fill the screen with ONE `bowmark.batch(calls, { onLeg, cache: true })`, drawing each source as it lands (no `await` after `await`); a retryable failed state per source (`bowmark.section`); `bowmark.img(url, px)`, lazy below the fold. `jig_look` reports load speed: fix what its `advice` names.\n\nNo `fetch`, no external script/style/font. A call needing sign-in pauses behind a banner until the user signs in. No chat box in the page: the user talks to you.\n\nTHE SITE'S LAYOUT, NONE OF ITS DARK PATTERNS: `get_library({ query: \"jig layout <host>\" })` gives its regions and what to strip. Kit colors, never the site's; no invented title.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -331,7 +358,7 @@
             "type": "string"
           },
           "slug": {
-            "description": "The jig's name in its link, bowmark.ai/jig/<slug>: lowercase letters, digits and hyphens. Omit it and one is made from the title. Rename later with `jig_update`.",
+            "description": "The jig's name in its link, bowmark.ai/jig/@<handle>/<slug> (bowmark.ai/jig/<slug> until the user has a handle): lowercase letters, digits and hyphens. Omit it and one is made from the title. Rename later with `jig_update`.",
             "maxLength": 60,
             "type": "string"
           },
@@ -374,6 +401,7 @@
       },
       "annotations": {
         "destructiveHint": false,
+        "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": true,
         "title": "List the user's pages (jigs)"
@@ -453,7 +481,7 @@
         "readOnlyHint": false,
         "title": "Publish a page (jig) to the store"
       },
-      "description": "Publish the user's jig (name it by `jigId` or your jig's `jigSlug`) as a listing others can get: it snapshots the page and state AS THEY ARE NOW into version N+1, and later edits stay private until you publish again. Call with `dryRun: true` first and show the user what would ship: every function the page calls (tagged read / write / pay), its sites, and the `defaultState` a copy starts with — blank anything personal with `defaultState`. A first publish needs the user's public `handle` (the @name in bowmark.ai/jigs/@<handle>/<slug>, permanent; ask them). `visibility: \"unlisted\"` is reachable by link only; `\"public\"` also appears in search. Returns the store URL. To unlist a published jig or change its title, tagline or description, call again with the new values and `detailsOnly: true`: no new version is written.",
+      "description": "Publish the user's jig (name it by `jigId` or your jig's `jigSlug`) as a listing others can get: it snapshots the page and state AS THEY ARE NOW into version N+1, and later edits stay private until you publish again. Call with `dryRun: true` first and show the user what would ship: every function the page calls (tagged read / write / pay), its sites, and the `defaultState` a copy starts with — blank anything personal with `defaultState`. A first publish needs the user's public `handle` (the @name in bowmark.ai/jigs/@<handle>/<slug>, permanent; ask them, or claim it earlier with `jig_set_handle`). `visibility: \"unlisted\"` is reachable by link only; `\"public\"` also appears in search. Returns the store URL. To unlist a published jig or change its title, tagline or description, call again with the new values and `detailsOnly: true`: no new version is written.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -573,6 +601,44 @@
       },
       "annotations": {
         "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Claim the user's public handle (permanent)"
+      },
+      "description": "Claim the user's public handle: the @name in the links to pages they publish, bowmark.ai/jigs/@<handle>/<slug>. It is PUBLIC and PERMANENT: it can never be changed or released. Ask the user which one they want BEFORE calling, suggesting one from their name, and never choose it for them. A handle is 2 to 30 lowercase letters, digits and single hyphens. Calling again with the handle they already hold is fine. A taken or invalid handle is refused with a free `suggestedHandle` to offer instead. Call it with no `handle` to see whether they have one and a free one to suggest; that writes nothing. `jig_open` tells you when a new jig's owner has none yet.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "handle": {
+            "description": "The handle the user chose, with or without the @. Omit it to only look.",
+            "maxLength": 40,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "jig_set_handle",
+      "title": "Claim the user's public handle (permanent)"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
         "idempotentHint": false,
         "openWorldHint": false,
         "readOnlyHint": false,
@@ -657,7 +723,7 @@
             "type": "boolean"
           },
           "slug": {
-            "description": "Rename the jig's link, bowmark.ai/jig/<slug>. The old link keeps working and redirects.",
+            "description": "Rename the jig's link, the <slug> in bowmark.ai/jig/@<handle>/<slug>. The old link keeps working and redirects.",
             "maxLength": 60,
             "type": "string"
           },
@@ -719,8 +785,16 @@
     },
     {
       "_meta": {
+        "openai/toolInvocation": {
+          "invoked": "Loaded the page",
+          "invoking": "Loading the page…"
+        },
         "ui": {
           "resourceUri": "ui://bowmark/jig-v2",
+          "toolInvocation": {
+            "invoked": "Loaded the page",
+            "invoking": "Loading the page…"
+          },
           "visibility": [
             "app"
           ]
@@ -729,6 +803,7 @@
       },
       "annotations": {
         "destructiveHint": false,
+        "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": true,
         "title": "Jig view"
@@ -761,8 +836,16 @@
     },
     {
       "_meta": {
+        "openai/toolInvocation": {
+          "invoked": "Saved the page's last result",
+          "invoking": "Saving the page's last result…"
+        },
         "ui": {
           "resourceUri": "ui://bowmark/jig-v2",
+          "toolInvocation": {
+            "invoked": "Saved the page's last result",
+            "invoking": "Saving the page's last result…"
+          },
           "visibility": [
             "app"
           ]
@@ -771,6 +854,7 @@
       },
       "annotations": {
         "destructiveHint": false,
+        "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": false,
         "title": "Jig cache"
@@ -802,8 +886,16 @@
     },
     {
       "_meta": {
+        "openai/toolInvocation": {
+          "invoked": "Reported what the page shows",
+          "invoking": "Reporting what the page shows…"
+        },
         "ui": {
           "resourceUri": "ui://bowmark/jig-v2",
+          "toolInvocation": {
+            "invoked": "Reported what the page shows",
+            "invoking": "Reporting what the page shows…"
+          },
           "visibility": [
             "app"
           ]
@@ -812,6 +904,7 @@
       },
       "annotations": {
         "destructiveHint": false,
+        "idempotentHint": false,
         "openWorldHint": false,
         "readOnlyHint": false,
         "title": "Jig seen"
@@ -842,8 +935,16 @@
     },
     {
       "_meta": {
+        "openai/toolInvocation": {
+          "invoked": "Reported how fast the page loaded",
+          "invoking": "Reporting how fast the page loaded…"
+        },
         "ui": {
           "resourceUri": "ui://bowmark/jig-v2",
+          "toolInvocation": {
+            "invoked": "Reported how fast the page loaded",
+            "invoking": "Reporting how fast the page loaded…"
+          },
           "visibility": [
             "app"
           ]
@@ -852,6 +953,7 @@
       },
       "annotations": {
         "destructiveHint": false,
+        "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": false,
         "title": "Jig perf"
@@ -880,6 +982,7 @@
     {
       "annotations": {
         "destructiveHint": false,
+        "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": true,
         "title": "Look at a page (jig)"
@@ -906,8 +1009,16 @@
     },
     {
       "_meta": {
+        "openai/toolInvocation": {
+          "invoked": "Called Bowmark from the page",
+          "invoking": "Calling Bowmark from the page…"
+        },
         "ui": {
           "resourceUri": "ui://bowmark/jig-v2",
+          "toolInvocation": {
+            "invoked": "Called Bowmark from the page",
+            "invoking": "Calling Bowmark from the page…"
+          },
           "visibility": [
             "app"
           ]
@@ -916,6 +1027,7 @@
       },
       "annotations": {
         "destructiveHint": true,
+        "idempotentHint": false,
         "openWorldHint": true,
         "readOnlyHint": false,
         "title": "Jig call"
@@ -1149,6 +1261,7 @@
       },
       "annotations": {
         "destructiveHint": false,
+        "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": true,
         "title": "Check what your account has spent"
@@ -1465,6 +1578,7 @@
       },
       "annotations": {
         "destructiveHint": false,
+        "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": true,
         "title": "See which of the user's logins Bowmark already holds"
@@ -1556,6 +1670,7 @@
       },
       "annotations": {
         "destructiveHint": false,
+        "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": true,
         "title": "Get the user a link to one of their own stored logins"
@@ -1595,6 +1710,7 @@
       },
       "annotations": {
         "destructiveHint": false,
+        "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": true,
         "title": "See which sites Bowmark is already signed in to"
@@ -1669,6 +1785,7 @@
       },
       "annotations": {
         "destructiveHint": false,
+        "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": true,
         "title": "Wait for the user to finish signing in"

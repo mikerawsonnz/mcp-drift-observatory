@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://buildersinfintech.ai/mcp` | 29 | [`45d56c2a0d74`](5838aac513603a4cf3ab.json) | 2026-11-06 |
+| `https://buildersinfintech.ai/mcp` | 31 | [`7576f158fa1a`](5838aac513603a4cf3ab.json) | 2026-11-07 |
 
 ## Tools at `https://buildersinfintech.ai/mcp`
 
@@ -21,6 +21,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_organization`: `Full public profile for one organization by slug: description, country, funding rounds (raised or led), people, any disclosure, editor_disc…`
 - `get_person`: `Full public profile for one person by slug: bio, roles and coverage.`
 - `get_product`: `Full public listing for one product by slug: description, category, markets, customer type, API, pricing model, links, the company and an a…`
+- `get_report`: `One report by slug: publisher and co-publishers, date, type, gated flag, summary, up to 5 key figures (value and unit exactly as written, e…`
 - `get_signals_report`: `The monthly Fintech Signals report: stored figures for approved equity rounds in one month (headline rounds and per-currency totals/medians…`
 - `get_topic_digest`: `The weekly digest for one topic (currently the topics with a digest, e.g. 'stablecoins', 'agentic-payments'): published news tagged with th…`
 - `largest_rounds`: `Largest disclosed equity rounds, ranked per currency (amounts are never converted between currencies).`
@@ -39,9 +40,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `search_people`: `Search founders, operators and investors covered by the publication. Arguments: q (or query): text to search for, matched against the full…`
 - `search_podcast_knowledge`: `Search attributed facts and question-and-answer pairs from Builders in Fintech podcast episodes (as stated by the guest, not independently…`
 - `search_products`: `Search fintech products by text, category, market, API availability, agent access (has_mcp, has_sandbox, has_api) or customer type. Each pr…`
+- `search_reports`: `Fintech reports, white papers, surveys and data, newest first, with publisher, type, date and gated flag. Reports are published by the comp…`
 
 ## Changes
 
+- 2026-11-07: [count changed, tool added](../../deltas/2026-11-07/5838aac513603a4cf3ab.json): `2 tool(s) added`
 - 2026-11-06: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-06/5838aac513603a4cf3ab.json): `4 tool(s) added; 9 field(s) changed`
 - 2026-11-05: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-05/5838aac513603a4cf3ab.json): `2 tool(s) added; 6 field(s) changed`
 - 2026-11-03: [description changed](../../deltas/2026-11-03/5838aac513603a4cf3ab.json): `1 field(s) changed`

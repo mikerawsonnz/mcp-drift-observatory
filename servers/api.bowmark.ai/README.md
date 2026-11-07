@@ -6,8 +6,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.bowmark.ai/mcp` | 33 | [`c4e3d3107d8f`](5f2d24be930573ed8878.json) | 2026-11-06 |
-| `https://api.bowmark.ai/mcp/registry` | 33 | [`c4e3d3107d8f`](e742a173e323c903336e.json) | 2026-11-06 |
+| `https://api.bowmark.ai/mcp` | 34 | [`08182b48cd00`](5f2d24be930573ed8878.json) | 2026-11-07 |
+| `https://api.bowmark.ai/mcp/registry` | 34 | [`08182b48cd00`](e742a173e323c903336e.json) | 2026-11-07 |
 
 ## Tools at `https://api.bowmark.ai/mcp`
 
@@ -27,6 +27,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `jig_pull_update`: `For a jig the user got from someone's listing ('jig_list' shows 'updateAvailable'): the three pages a merge needs. 'base' is the version th…`
 - `jig_search`: `Search the public jigs other people published: "is there a jig for my Amazon orders?". Call it BEFORE building a page from scratch. Leave '…`
 - `jig_seen`: `Used by an open jig to report what it shows. You do not need to call this.`
+- `jig_set_handle`: `Claim the user's public handle: the @name in the links to pages they publish, bowmark.ai/jigs/@<handle>/<slug>. It is PUBLIC and PERMANENT:…`
 - `jig_update`: `Change a page you opened with 'jig_open': merge 'state' into its state (a key set to null is removed), replace its 'html' or 'title', or ch…`
 - `jig_view`: `Used by an open jig to pick up its latest state. You do not need to call this.`
 - `lease_ip`: `Some sites (LinkedIn, marked 📍 in 'get_library') only accept a login from the address it signed in from. A dedicated IP is one address that…`
@@ -63,6 +64,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `jig_pull_update`: `For a jig the user got from someone's listing ('jig_list' shows 'updateAvailable'): the three pages a merge needs. 'base' is the version th…`
 - `jig_search`: `Search the public jigs other people published: "is there a jig for my Amazon orders?". Call it BEFORE building a page from scratch. Leave '…`
 - `jig_seen`: `Used by an open jig to report what it shows. You do not need to call this.`
+- `jig_set_handle`: `Claim the user's public handle: the @name in the links to pages they publish, bowmark.ai/jigs/@<handle>/<slug>. It is PUBLIC and PERMANENT:…`
 - `jig_update`: `Change a page you opened with 'jig_open': merge 'state' into its state (a key set to null is removed), replace its 'html' or 'title', or ch…`
 - `jig_view`: `Used by an open jig to pick up its latest state. You do not need to call this.`
 - `lease_ip`: `Some sites (LinkedIn, marked 📍 in 'get_library') only accept a login from the address it signed in from. A dedicated IP is one address that…`
@@ -83,6 +85,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-07: [annotation changed, count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-07/5f2d24be930573ed8878.json): `1 tool(s) added; 51 field(s) changed`
+- 2026-11-07: [annotation changed, count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-07/e742a173e323c903336e.json): `1 tool(s) added; 51 field(s) changed`
 - 2026-11-06: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-06/e742a173e323c903336e.json): `7 tool(s) added; 10 field(s) changed; signals: imperative_language_introduced` **(notable)**
 - 2026-11-06: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-06/5f2d24be930573ed8878.json): `7 tool(s) added; 10 field(s) changed; signals: imperative_language_introduced` **(notable)**
 - 2026-11-04: [annotation changed, description changed, field changed, schema changed](../../deltas/2026-11-04/e742a173e323c903336e.json): `29 field(s) changed`
@@ -101,8 +105,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - 2026-10-29: [count changed, tool added](../../deltas/2026-10-29/e742a173e323c903336e.json): `7 tool(s) added; signals: imperative_language_introduced` **(notable)**
 - 2026-10-27: [schema changed](../../deltas/2026-10-27/e742a173e323c903336e.json): `2 field(s) changed`
 - 2026-10-27: [schema changed](../../deltas/2026-10-27/5f2d24be930573ed8878.json): `2 field(s) changed`
-- 2026-10-25: [description changed](../../deltas/2026-10-25/5f2d24be930573ed8878.json): `1 field(s) changed`
-- 2026-10-25: [description changed](../../deltas/2026-10-25/e742a173e323c903336e.json): `1 field(s) changed`
 
 ## Check it from your agent
 

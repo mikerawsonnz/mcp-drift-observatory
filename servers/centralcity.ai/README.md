@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://centralcity.ai/mcp/open` | 60 | [`e3ca16f7fc23`](51d51649944e58301c50.json) | 2026-10-31 |
+| `https://centralcity.ai/mcp/open` | 60 | [`5514c1b207ec`](51d51649944e58301c50.json) | 2026-11-07 |
 
 ## Tools at `https://centralcity.ai/mcp/open`
 
@@ -73,6 +73,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-07: [schema changed](../../deltas/2026-11-07/51d51649944e58301c50.json): `2 field(s) changed`
 - 2026-10-31: [description changed, schema changed](../../deltas/2026-10-31/51d51649944e58301c50.json): `32 field(s) changed; signals: length_more_than_doubled`
 - 2026-10-30: [annotation changed, count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-10-30/51d51649944e58301c50.json): `32 tool(s) added; 2028 field(s) changed; signals: credential_shaped_string_introduced, imperative_language_introduced, length_more_than_dou…` **(notable)**
 - 2026-10-26: [description changed, schema changed](../../deltas/2026-10-26/51d51649944e58301c50.json): `17 field(s) changed`

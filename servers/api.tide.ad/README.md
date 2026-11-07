@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.tide.ad/mcp` | 38 | [`2e5310f061cd`](cf57e535ac93234bd658.json) | 2026-11-06 |
+| `https://api.tide.ad/mcp` | 38 | [`875b828aa141`](cf57e535ac93234bd658.json) | 2026-11-07 |
 
 ## Tools at `https://api.tide.ad/mcp`
 
@@ -33,7 +33,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `order_book`: `DeepBook order books. With nothing: every pool with best bid, ask and 24h volume. With pool: its depth and latest trades. With address: the…`
 - `owner_agents`: `The AI agents one address runs on Sui: Agent Passes, allowances it granted, Sui Agent Payments grants, t2000 wallets it funded and agent wa…`
 - `package_info`: `A Move package. With only id: its modules, functions and upgrade history. With module and function: how to call it, each parameter explaine…`
-- `perp_market`: `One perpetual futures market on Sui (Aftermath or Bluefin): mark and index price, 24h change and volume, open interest, funding (last, esti…`
+- `perp_market`: `One perpetual futures market on Sui (Aftermath, Bluefin or Parchment): mark and index price, 24h change and volume, open interest, funding…`
 - `price`: `USD prices for up to 50 coins, now or at a past time. Pass coin types or symbols. Example: { coins: ["SUI", "DEEP"] }.`
 - `receipt_for_transaction`: `Before you sign: send the exact unsigned bytes and your intent; tide dry-runs them on mainnet and returns a receipt signed by tide (ed25519…`
 - `search`: `Find anything on Sui by text: coins by symbol or name, SuiNS names, perps markets, pools, packages, addresses, objects and digests. Returns…`
@@ -51,6 +51,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-07: [description changed, schema changed](../../deltas/2026-11-07/cf57e535ac93234bd658.json): `3 field(s) changed`
 - 2026-11-06: [count changed, tool added](../../deltas/2026-11-06/cf57e535ac93234bd658.json): `1 tool(s) added`
 
 ## Check it from your agent

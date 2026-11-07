@@ -1,20 +1,104 @@
 {
   "canon_version": "1",
-  "full_hash": "53bc354086e328aa06c2d97694d537f46a4f384e28d6d288d5c897e072441729",
+  "full_hash": "763ac4ca9f0e52a0713b5c47ec958c964676bd9b52b9d2ee267803d61a91cc47",
   "name": "ai.1court.state/court-directory",
-  "observed_at": "2026-11-04T02:03:14.694502Z",
+  "observed_at": "2026-11-07T02:03:21.215631Z",
   "sources": [
     "official"
   ],
-  "tool_count": 6,
+  "tool_count": 9,
   "tools": [
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List deadline rule sets"
+      },
+      "description": "List every deadline rule set 1Court covers, with rule counts and scope. Coverage: Deadlines: California in depth (civil, family, probate, eviction, small claims, government claims, criminal, juvenile, appeals, agencies, pre-suit clocks, special proceedings, statutes of limitations; local rules for all 58 counties), federal civil and criminal, federal bankruptcy, and a partial Texas set. Other states’ deadlines are not covered. Court directory: every U.S. county. Use the rule_set ids with search_rules, get_rule and calculate_deadline.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_rule_sets"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Search deadline rules"
+      },
+      "description": "Find deadline rules by plain words (for example \"opposition to motion\", \"answer complaint\", \"notice of appeal\"). Searches rule names, ids, citations and triggers. Optionally limit to one rule_set (TX, CA, CA-FAM, CA-APP, US, US-BK, US-CRIM, CA-PROB, CA-UD, CA-SC, CA-GOV, CA-CRIM, CA-JUV, CA-AGENCY, CA-PRESUIT, CA-SPECIAL, CA-SOL). Returns up to 20 rules with their rule_set, rule_id and rule page URL; use get_rule or calculate_deadline next.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "query": {
+            "description": "Words describing the deadline, e.g. \"opposition to motion\" or \"CCP 1005\"",
+            "type": "string"
+          },
+          "rule_set": {
+            "description": "Optional rule set id: TX, CA, CA-FAM, CA-APP, US, US-BK, US-CRIM, CA-PROB, CA-UD, CA-SC, CA-GOV, CA-CRIM, CA-JUV, CA-AGENCY, CA-PRESUIT, CA-SPECIAL, CA-SOL",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_rules"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get a deadline rule with its text"
+      },
+      "description": "Get one deadline rule: its period, trigger, citation, the verbatim rule text, the official source URL, the 1Court rule page, any disclosed alternate reading (safe-date policy) and any fixed statutory dates. Show the user the citation and source link with every date or rule. Results are not legal advice.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "county": {
+            "description": "California county slug, to include that county’s local rules",
+            "type": "string"
+          },
+          "court": {
+            "description": "Court id for local rules (cacd, cand, casd, caed, ca9, cacb, canb, casb, caeb, 1dca to 6dca)",
+            "type": "string"
+          },
+          "rule_id": {
+            "description": "Rule id from search_rules or list_deadline_rules",
+            "type": "string"
+          },
+          "rule_set": {
+            "description": "Rule set id: TX, CA, CA-FAM, CA-APP, US, US-BK, US-CRIM, CA-PROB, CA-UD, CA-SC, CA-GOV, CA-CRIM, CA-JUV, CA-AGENCY, CA-PRESUIT, CA-SPECIAL, CA-SOL",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rule_set",
+          "rule_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_rule"
+    },
     {
       "annotations": {
         "openWorldHint": false,
         "readOnlyHint": true,
         "title": "List court deadline types"
       },
-      "description": "List the court deadline types 1Court can calculate for a jurisdiction. Available ids: TX; CA (civil), CA-FAM (family), CA-PROB (probate), CA-UD (unlawful detainer), CA-SC (small claims), CA-GOV (government claims), CA-CRIM (criminal), CA-JUV (juvenile dependency and delinquency), CA-PRESUIT (employment, housing and pre-suit clocks: foreclosure, HOA, ADA/Unruh, FEHA, EEOC, PAGA, arbitration fees, med-mal notice, CEQA, mechanics liens), CA-AGENCY (WCAB, OAH, CUIAB, SPB, PERB, Labor Commissioner, Cal/OSHA Appeals Board, Office of Tax Appeals, DMV, CPUC, ALRB, State Bar Court), CA-SPECIAL (eminent domain, elections, LPS, elder abuse, traffic), CA-APP (appeals and writs), CA-SOL (statutes of limitations); US (federal civil and appellate), US-CRIM (federal criminal), US-BK (bankruptcy). Add county (California superior court, e.g. los-angeles) or court (cacd, cand, casd, caed, ca9 for US and US-CRIM; cacb, canb, casb, caeb for US-BK; 1dca to 6dca for CA-APP) to include local rules. Returns each deadline with the governing rule citation for each. Use before calculate_deadline to get valid deadline_type ids.",
+      "description": "List the deadline types 1Court can calculate for one rule set (TX, CA, CA-FAM, CA-APP, US, US-BK, US-CRIM, CA-PROB, CA-UD, CA-SC, CA-GOV, CA-CRIM, CA-JUV, CA-AGENCY, CA-PRESUIT, CA-SPECIAL, CA-SOL). Add county (California superior court, e.g. los-angeles) or court (cacd, cand, casd, caed, ca9 for US and US-CRIM; cacb, canb, casb, caeb for US-BK; 1dca to 6dca for CA-APP) to include local rules. Coverage: Deadlines: California in depth (civil, family, probate, eviction, small claims, government claims, criminal, juvenile, appeals, agencies, pre-suit clocks, special proceedings, statutes of limitations; local rules for all 58 counties), federal civil and criminal, federal bankruptcy, and a partial Texas set. Other states’ deadlines are not covered. Court directory: every U.S. county.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -30,7 +114,7 @@
             "type": "string"
           },
           "state": {
-            "description": "Rule-set id: TX, CA, CA-FAM, CA-PROB, CA-UD, CA-SC, CA-GOV, CA-CRIM, CA-JUV, CA-PRESUIT, CA-AGENCY, CA-SPECIAL, CA-APP, CA-SOL, US, US-CRIM, or US-BK",
+            "description": "Rule set id: TX, CA, CA-FAM, CA-APP, US, US-BK, US-CRIM, CA-PROB, CA-UD, CA-SC, CA-GOV, CA-CRIM, CA-JUV, CA-AGENCY, CA-PRESUIT, CA-SPECIAL, CA-SOL",
             "type": "string"
           }
         },
@@ -47,7 +131,7 @@
         "readOnlyHint": true,
         "title": "Calculate a court deadline"
       },
-      "description": "Calculate a court deadline deterministically from cited rules (weekends, legal holidays, short-period and mail-service rules applied). Returns the date, each computation step, and the rule text and source. Always show the user the citation and caveats; this is not legal advice.",
+      "description": "Calculate a court deadline from cited rules (weekends, court holidays, service extensions and local rules applied). Returns the date, each counting step, the verbatim rule text and source for every rule used, any safe-date disclosure and any fixed statutory dates. Ask the user for the trigger date and how the paper was served; do not assume them. Show the user the citation and source link with every date or rule. Results are not legal advice. Coverage: Deadlines: California in depth (civil, family, probate, eviction, small claims, government claims, criminal, juvenile, appeals, agencies, pre-suit clocks, special proceedings, statutes of limitations; local rules for all 58 counties), federal civil and criminal, federal bankruptcy, and a partial Texas set. Other states’ deadlines are not covered. Court directory: every U.S. county.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -63,15 +147,15 @@
             "type": "string"
           },
           "deadline_type": {
-            "description": "Deadline id from list_deadline_rules, e.g. \"answer_district_county\"",
+            "description": "Rule id from search_rules or list_deadline_rules, e.g. \"noticed_motion_opposition\"",
             "type": "string"
           },
           "service_method": {
-            "description": "How the triggering paper or summons was served, e.g. \"mail\" (TX), \"mail_in_state\", \"electronic\", \"substituted\" (CA). Omit for personal service.",
+            "description": "How the triggering paper was served, e.g. \"mail\" (TX), \"mail_in_state\", \"electronic\", \"substituted\" (CA). Omit for personal service.",
             "type": "string"
           },
           "state": {
-            "description": "Rule-set id: TX, CA, CA-FAM, CA-PROB, CA-UD, CA-SC, CA-GOV, CA-CRIM, CA-JUV, CA-PRESUIT, CA-AGENCY, CA-SPECIAL, CA-APP, CA-SOL, US, US-CRIM, or US-BK",
+            "description": "Rule set id: TX, CA, CA-FAM, CA-APP, US, US-BK, US-CRIM, CA-PROB, CA-UD, CA-SC, CA-GOV, CA-CRIM, CA-JUV, CA-AGENCY, CA-PRESUIT, CA-SPECIAL, CA-SOL",
             "type": "string"
           },
           "trigger_date": {
@@ -94,7 +178,7 @@
         "readOnlyHint": true,
         "title": "List covered states"
       },
-      "description": "List all U.S. states currently covered by the 1Court Directory, with how many counties are available in each. Use this to discover coverage before looking up a specific county.",
+      "description": "List the U.S. states in the 1Court Directory, with how many counties each has. Use this to discover coverage before looking up a county.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -111,7 +195,7 @@
         "readOnlyHint": true,
         "title": "List counties in a state"
       },
-      "description": "List the counties covered in a given U.S. state (accepts a full state name, 2-letter code, or slug). Returns each county name and its 1Court page URL.",
+      "description": "List the counties covered in a U.S. state (full name, 2-letter code or slug), each with its 1Court page URL.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -134,9 +218,9 @@
       "annotations": {
         "openWorldHint": false,
         "readOnlyHint": true,
-        "title": "Get county court & filing info"
+        "title": "Get county court and filing info"
       },
-      "description": "Get verified court information for a specific U.S. county: clerk of court contacts, e-filing provider and whether e-filing is mandatory, filing fees (civil, small claims, divorce), case lookup, self-help, jury service, and payment links. Data is sourced from official court/clerk records. Always cite the returned 1Court source URL.",
+      "description": "Get verified court information for one U.S. county: clerk contacts, courthouse address, e-filing provider and whether it is mandatory, filing fees, case lookup, self-help, jury service and payment links, with the date it was last verified. civil_filing_fee is null when not yet verified (fee_status \"unknown\"), and some counties have no fixed fee (fee_status \"clerk_sets_deposit\"). Tell the user to confirm fees with the clerk before filing, and cite the 1Court page URL.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -164,9 +248,9 @@
       "annotations": {
         "openWorldHint": false,
         "readOnlyHint": true,
-        "title": "Search courts by name"
+        "title": "Search courts"
       },
-      "description": "Search the 1Court Directory by county or state name and get matching counties with their 1Court page URLs. Use when you are unsure of the exact county or state format.",
+      "description": "Search the 1Court Directory by county or state name, courthouse name, city, or phone number. Returns matching counties and courthouses with their 1Court page URLs.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -174,7 +258,7 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "properties": {
           "query": {
-            "description": "A county or state name, e.g. \"Maricopa\", \"Cook County\", or \"Nevada\"",
+            "description": "A county, state, courthouse name, city or phone number, e.g. \"Maricopa\", \"Van Nuys courthouse\", \"Jersey City\", \"201-748-0156\"",
             "type": "string"
           }
         },

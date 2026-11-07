@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.beatra.ai/mcp` | 33 | [`ae18edd1feff`](4f93d616eb97e76f800a.json) | 2026-11-04 |
+| `https://mcp.beatra.ai/mcp` | 33 | [`8de1e4e74461`](4f93d616eb97e76f800a.json) | 2026-11-07 |
 
 ## Tools at `https://mcp.beatra.ai/mcp`
 
@@ -46,6 +46,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-07: [description changed, schema changed](../../deltas/2026-11-07/4f93d616eb97e76f800a.json): `72 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**
 - 2026-11-04: [schema changed](../../deltas/2026-11-04/4f93d616eb97e76f800a.json): `7 field(s) changed`
 - 2026-10-31: [count changed, description changed, schema changed, tool added](../../deltas/2026-10-31/4f93d616eb97e76f800a.json): `1 tool(s) added; 163 field(s) changed; signals: length_more_than_doubled`
 - 2026-10-29: [description changed, schema changed](../../deltas/2026-10-29/4f93d616eb97e76f800a.json): `49 field(s) changed; signals: length_more_than_doubled`

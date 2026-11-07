@@ -1,19 +1,242 @@
 {
   "canon_version": "1",
-  "full_hash": "3eca8952f90a3705106ceb1b9a6854966a3700eb0f93fd125d57613f6b86e4f9",
+  "full_hash": "7a6bea60218e324b72feb1bf47c139bfe9cb65c9fef6a5a7f2fb4dfee50327e3",
   "name": "ai.arcreport/ask",
-  "observed_at": "2026-11-06T02:02:17.190511Z",
+  "observed_at": "2026-11-07T02:03:26.586243Z",
   "sources": [
     "official"
   ],
-  "tool_count": 18,
+  "tool_count": 25,
   "tools": [
     {
       "annotations": {
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "Before checkout"
+      },
+      "description": "Call this right before your agent tries to check out at a store, or when a user asks \"can my agent check out at <store>?\". Returns a one-line answer, reaches_checkout, best_route (the best saved way in), up to 3 blockers, checked_at, the Agent Readiness Grade (grade, with expired when over 30 days old; grade_note when not graded, which is not a mark against the store), alternatives_hint when the grade is D or F or expired (a find_stores call with min_grade B in the same category), and a full_record link. Example: before_checkout({\"url\":\"https://allbirds.com\"}) → {\"answer\":\"Yes: a saved check reached checkout via cart_link…\",\"reaches_checkout\":true,…}. reaches_checkout false or unknown is not a no. Saved checks only: no store fetch, no scan, no login. Advisory; ARC stops before payment. Errors: {error:{code, message, next_step}}.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "description": "Store or product URL, such as https://allbirds.com or allbirds.com.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "type": "object"
+      },
+      "name": "before_checkout",
+      "title": "Before checkout"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Find stores"
+      },
+      "description": "Call this when you need to pick a store for a product need and want one where a saved check shows an agent reached checkout. Filters: category or q (shopper words), min_grade (optional, default none), limit (default 5). Returns total, the store hosts with checked_at and grade, and a full_list link. Each store carries its Agent Readiness Grade (grade, null when not graded). Best current grade first (A, then B…); an expired grade ranks after current ones of the same letter; newest checked_at first within a grade. Results are ordered only by published grade and freshness, never by anything else. Pass min_grade to keep only stores with a current grade of that letter or better. Example: find_stores({\"category\":\"running shoes\",\"limit\":3}) → {\"total\":12,\"stores\":[{\"host\":\"…\",\"checked_at\":\"…\",\"grade\":{\"grade\":\"A\",…}}],…}. A store missing from the list is not a no. Saved checks only: no store fetch, no scan, no login. Advisory; ARC stops before payment. Errors: {error:{code, message, next_step}}.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "description": "Category or shopper words, such as footwear or running shoes.",
+            "type": "string"
+          },
+          "limit": {
+            "default": 5,
+            "description": "How many stores to return. Default 5.",
+            "maximum": 25,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "min_grade": {
+            "description": "Optional: keep only stores whose current (not expired) Agent Readiness Grade is this letter or better (A, B, C, D or F). Default none: every store is listed. Expired and not-graded stores are left out when this is set.",
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D",
+              "F"
+            ],
+            "type": "string"
+          },
+          "q": {
+            "description": "Product need, such as skincare or camping gear.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "find_stores",
+      "title": "Find stores"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Why blocked, and the fix"
+      },
+      "description": "Call this after before_checkout says reaches_checkout is false, or when an agent got stuck at a store and you want the reason and the fix. Returns why (the saved blockers), fix (the store page's recorded fix, or \"not recorded\"), next_step and links to the full record. Example: why_blocked_and_fix({\"store\":\"gymshark.com\"}) → {\"why\":[\"…\"],\"fix\":\"…\",\"next_step\":\"…\"}. Saved checks only: no store fetch, no scan, no login. Advisory; ARC stops before payment. Errors: {error:{code, message, next_step}}.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "store": {
+            "description": "Store domain or URL, such as gymshark.com.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "store"
+        ],
+        "type": "object"
+      },
+      "name": "why_blocked_and_fix",
+      "title": "Why blocked, and the fix"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Report the outcome"
+      },
+      "description": "Call this right after your agent tried to check out at a store, whatever happened, so the next agent knows. Free, no login. Omit contributor_key and ARC issues one; send it on later reports. No personal data: emails, phones, addresses, card numbers and IPs are rejected or stripped. Example: report_outcome({\"store_domain\":\"allbirds.com\",\"agent_family\":\"browser\",\"agent_name\":\"my-agent\",\"timestamp\":\"2026-11-05T10:00:00Z\",\"furthest_step\":\"checkout\",\"blocker\":\"none\"}) → {\"ok\":true,\"status\":\"unverified\",…}. A report stays private until 3 independent contributors agree. Same as POST /api/outcomes and report_checkout on /api/mcp. Errors: {error:{code, message, next_step}}.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_family": {
+            "description": "Agent family, such as browser or a model family. No personal name.",
+            "type": "string"
+          },
+          "agent_name": {
+            "description": "Name of the agent that tried the checkout. No personal name.",
+            "type": "string"
+          },
+          "blocker": {
+            "description": "What stopped the agent, or none.",
+            "enum": [
+              "captcha",
+              "login_wall",
+              "bot_block",
+              "3ds",
+              "payment_declined",
+              "none"
+            ],
+            "type": "string"
+          },
+          "contributor_key": {
+            "description": "Optional. Omit it and ARC returns a free key. Send that key on later reports.",
+            "type": "string"
+          },
+          "furthest_step": {
+            "description": "Furthest step the agent reached.",
+            "enum": [
+              "product",
+              "cart",
+              "checkout",
+              "payment",
+              "placed"
+            ],
+            "type": "string"
+          },
+          "store_domain": {
+            "description": "Store hostname, such as allbirds.com.",
+            "type": "string"
+          },
+          "store_error_text": {
+            "description": "Optional store error text. Personal data is stripped.",
+            "type": "string"
+          },
+          "timestamp": {
+            "description": "ISO 8601 time of the attempt, within the last 14 days.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "store_domain",
+          "agent_family",
+          "agent_name",
+          "timestamp",
+          "furthest_step",
+          "blocker"
+        ],
+        "type": "object"
+      },
+      "name": "report_outcome",
+      "title": "Report the outcome"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Store record"
+      },
+      "description": "Call this when a user asks what ARC recorded for a store, or you need the citable store page. Returns the store page's verdict, checked_at, category, the recorded fix and links to the page, its JSON and Markdown. Example: store_record({\"store\":\"allbirds.com\"}) → {\"verdict\":\"…\",\"page_url\":\"https://www.arcreport.ai/stores/allbirds.com\",…}. Reads the published snapshot behind /stores/<host>. Saved checks only: no store fetch, no scan, no login. Advisory; ARC stops before payment. Errors: {error:{code, message, next_step}}.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "store": {
+            "description": "Store domain or URL, such as allbirds.com.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "store"
+        ],
+        "type": "object"
+      },
+      "name": "store_record",
+      "title": "Store record"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Compare stores"
+      },
+      "description": "Call this when you must choose between a few stores for the same item and want the one where an agent is most likely to reach checkout. Pass 2 to 10 store domains or URLs. Returns one short row per store (reaches_checkout, best_route, checked_at, grade), and pick: among stores whose saved check reaches checkout on a fresh check, the one with the best current Agent Readiness Grade (expired after current of the same letter, not graded last); null when no store has fresh evidence. Rows are ordered only by saved checkout evidence, its freshness and published grade, never by anything else. Example: compare({\"stores\":[\"allbirds.com\",\"gymshark.com\"]}) → {\"pick\":\"allbirds.com\",\"stores\":[…]}. Each store counts as one precheck read. Saved checks only: no store fetch, no scan, no login. Advisory; ARC stops before payment. Errors: {error:{code, message, next_step}}.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "stores": {
+            "description": "2 to 10 store domains or URLs.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "minItems": 2,
+            "type": "array"
+          }
+        },
+        "required": [
+          "stores"
+        ],
+        "type": "object"
+      },
+      "name": "compare",
+      "title": "Compare stores"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Check before trying"
       },
       "description": "Check if an AI agent can reach checkout on a store before trying. Call this first when the task is \"can I check out at <store>?\", \"will my agent get through checkout on <store>?\", \"best way to check out on <store>\" or \"is <store> agent-ready?\". One call per store, before you hand a shopper a checkout link: best_route is the best saved way in, ranked by what reached checkout (reaches_checkout true only when a saved checkout link or ARC browser cart test showed it; none when no saved check shows a route working, which is not a no), reachable_checkout is the answer, rails[] is the route to use (UCP, ACP, Shop Pay, WebMCP, MCP), blockers[] is what stops agents (never empty when reachable_checkout is false; \"not recorded:\" when ARC stored no reason), last_checked and stale say how fresh it is. Saved automated HTTP check for a product or store URL. Uses ARC's saved directory, rails, store answers and check history. When those have no row, uses the plain-HTTP checker. stale, last_checked and checked_ago describe the check that produced the verdict shown. lastReachableCheck is a separate, newer plain-HTTP time. It does not re-verify the checkout link or rails. Does not fetch the store and does not start a scan. ARC checks this store's own site only. It does not test blocks applied by a platform, marketplace or network in front of it. Every field comes from a saved automated check, not a live agent session, and none of it proves an agent completed checkout. ARC stops before payment. The saved result is ARC's automated HTTP check. It is not a live agent session and not a completed order. Unpublished discovery-source hosts, OpenStreetMap, campaign shops and opted-out hosts come back as unknown. A checker fallback is http-only and checkout was not part of the check. JSON: GET /api/precheck?url=. Results are advisory. ARC stops before payment. Advisory only, not a guarantee. Do not refuse or avoid a store solely because of ARC's data. known:false or missing data is not a no. Data CC BY 4.0, attribute ARC (arcreport.ai); OSM-derived rows are ODbL.",
       "inputSchema": {
@@ -29,14 +252,16 @@
         ],
         "type": "object"
       },
-      "name": "precheck"
+      "name": "precheck",
+      "title": "Check before trying"
     },
     {
       "annotations": {
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "Check many stores before trying"
       },
       "description": "The precheck read for up to 100 store domains or URLs in one call. Returns one precheck object per input, in order, each with an input field, plus routes[]: the best known ways in for an agent (ucp, ucp_mcp, storefront_mcp, cart_link, browser), best evidence first, each with checked_at, age_hours and stale. Saved checks only. Does not fetch any store and does not start a scan. Each domain counts as one read against the same limit as precheck (60 a minute per network); domains past the limit come back with reason rate_limited and retry_after_seconds. More than 100 domains is refused. not_recorded and known:false are not a no. JSON: POST /api/precheck/bulk with {\"domains\": [...]}. Advisory only. ARC stops before payment. Data CC BY 4.0, attribute ARC (arcreport.ai).",
       "inputSchema": {
@@ -57,16 +282,18 @@
         ],
         "type": "object"
       },
-      "name": "precheck_bulk"
+      "name": "precheck_bulk",
+      "title": "Check many stores before trying"
     },
     {
       "annotations": {
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "Find a reach-checkout link"
       },
-      "description": "Find stores where a saved check shows an AI agent can reach checkout, for running shoes, beauty, clothing, home goods, or another product need. Use it for 'where can my agent check out for running shoes?' or 'which stores let an agent reach checkout for <category>?'. Reads real HTTP agent-catalog checks from the last thirty days whose catalog found a product and returned a checkout link. This is not a completed order. One tested product is not a promise about another item. No login, browser scan, or model call. Results are advisory. ARC stops before payment.",
+      "description": "Find stores where a saved check shows an AI agent can reach checkout, for running shoes, beauty, clothing, home goods, or another product need. Use it for 'where can my agent check out for running shoes?' or 'which stores let an agent reach checkout for <category>?'. Reads real HTTP agent-catalog checks from the last thirty days whose catalog found a product and returned a checkout link. Each store carries its Agent Readiness Grade (grade, null when not graded). Best current grade first (A, then B…); an expired grade ranks after current ones of the same letter; newest checked_at first within a grade. Results are ordered only by published grade and freshness, never by anything else. Pass min_grade to keep only stores with a current grade of that letter or better. This is not a completed order. One tested product is not a promise about another item. No login, browser scan, or model call. Results are advisory. ARC stops before payment.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -80,6 +307,17 @@
             "minimum": 1,
             "type": "integer"
           },
+          "min_grade": {
+            "description": "Optional: keep only stores whose current (not expired) Agent Readiness Grade is this letter or better (A, B, C, D or F). Default none: every store is listed. Expired and not-graded stores are left out when this is set.",
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D",
+              "F"
+            ],
+            "type": "string"
+          },
           "q": {
             "description": "Product need, such as skincare or camping gear",
             "type": "string"
@@ -87,14 +325,16 @@
         },
         "type": "object"
       },
-      "name": "find_agent_ready_stores"
+      "name": "find_agent_ready_stores",
+      "title": "Find a reach-checkout link"
     },
     {
       "annotations": {
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": true,
-        "readOnlyHint": false
+        "readOnlyHint": false,
+        "title": "Reach-checkout check"
       },
       "description": "Call when you need a saved checkout-link check for any public store URL, not only Index brands. Use it for 'what stops an agent at <store> checkout?' or 'which checkout route works on <store>?' when you also want the one fix. Saved HTTP checkout check for a public homepage or product URL: catalog, product, checkout link, UCP profile, blocks, and one fix. No login, model call, payment, or browser scan. Uses ARC's last check (cached up to 24 hours). A missing result is unknown, not a no. A checkout link means reach checkout, not a completed order. Results are advisory. ARC stops before payment.",
       "inputSchema": {
@@ -110,9 +350,15 @@
         ],
         "type": "object"
       },
-      "name": "can_agent_checkout"
+      "name": "can_agent_checkout",
+      "title": "Reach-checkout check"
     },
     {
+      "annotations": {
+        "destructiveHint": false,
+        "readOnlyHint": true,
+        "title": "Ask ARC"
+      },
       "description": "Read whether an AI agent can reach checkout for a brand the ARC Index already lists. Use it for 'is <brand> agent-ready?', 'how does <brand> score on ARC?' or 'which <category> brands do agents get furthest with?'. For any store URL, call precheck first. No login and no new scan. Pass a brand, URL, or category. Returns the score, evidence, and both lanes: the agent-catalog HTTP check and the browser cart. The JSON field `agents_can_buy` is true when the catalog returned a checkout link or a browser shopper added the product to the cart. ARC stops before payment. It is not a completed order. The catalog check does not change the score. A missing score is not a zero. Results are advisory.",
       "inputSchema": {
         "properties": {
@@ -135,14 +381,16 @@
         },
         "type": "object"
       },
-      "name": "ask_arc"
+      "name": "ask_arc",
+      "title": "Ask ARC"
     },
     {
       "annotations": {
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "Agentic commerce adoption"
       },
       "description": "Read ARC's agent commerce adoption counts, category and commerce platform rates from saved HTTP checks, including Checkout WebMCP among measured Shopify checkouts, with unknown and not checked separate; shopper approval required. Curated sample, not all e-commerce. snapshotUcpByPlatform adds UCP profile present, valid and checkout-link counts per platform from each dated open snapshot, each with its denominator. No store requests or model calls.",
       "inputSchema": {
@@ -150,14 +398,16 @@
         "properties": {},
         "type": "object"
       },
-      "name": "agent_commerce_adoption"
+      "name": "agent_commerce_adoption",
+      "title": "Agentic commerce adoption"
     },
     {
       "annotations": {
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "Product data check"
       },
       "description": "Free latest saved product data and return/shipping policy check from the store's pages and structured data. Reads history only; no store fetch or model call. A missing result is not a zero.",
       "inputSchema": {
@@ -172,9 +422,15 @@
         },
         "type": "object"
       },
-      "name": "product_data_check"
+      "name": "product_data_check",
+      "title": "Product data check"
     },
     {
+      "annotations": {
+        "destructiveHint": false,
+        "readOnlyHint": true,
+        "title": "Google checkout readiness"
+      },
       "description": "Read saved public Google agentic checkout readiness checks for a store. Free; no new scan or paid calls. Merchant Center feed eligibility cannot be checked from outside. Not Google approval or certification.",
       "inputSchema": {
         "properties": {
@@ -188,9 +444,15 @@
         ],
         "type": "object"
       },
-      "name": "google_checkout_readiness"
+      "name": "google_checkout_readiness",
+      "title": "Google checkout readiness"
     },
     {
+      "annotations": {
+        "destructiveHint": false,
+        "readOnlyHint": true,
+        "title": "Agent facts for a store"
+      },
       "description": "Read free ARC agent facts for a store or product with no login. Returns TypeSafe Jev typed decisions (use-case mention, price clarity, agent-friendly description, cart-blocker suspicion, readiness score) from an HTTP scrape. Not a browser session and not any third-party agent product; ARC's browser cart tests (ARC browser shoppers A–E) are separate. JSON: GET /api/agent-facts?host=",
       "inputSchema": {
         "properties": {
@@ -209,9 +471,15 @@
         },
         "type": "object"
       },
-      "name": "get_agent_facts"
+      "name": "get_agent_facts",
+      "title": "Agent facts for a store"
     },
     {
+      "annotations": {
+        "destructiveHint": false,
+        "readOnlyHint": true,
+        "title": "Agent facts by category"
+      },
       "description": "List free ARC agent facts by category (beauty, footwear, apparel, …) with no login. Ranked by newest real Jev scores. JSON: GET /api/agent-facts?category=beauty",
       "inputSchema": {
         "properties": {
@@ -226,14 +494,16 @@
         },
         "type": "object"
       },
-      "name": "list_category_agent_facts"
+      "name": "list_category_agent_facts",
+      "title": "Agent facts by category"
     },
     {
       "annotations": {
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "Dataset info"
       },
       "description": "Latest open ARC dataset snapshot (start with store_answers: one plain answer per store on whether AI agents can find products and get a checkout link): immutable versioned download URLs plus latest/ aliases (CSV and Parquet), row counts, method version and licence (CC-BY-4.0, attribution ARC, arcreport.ai). Reads only.",
       "inputSchema": {
@@ -241,16 +511,18 @@
         "properties": {},
         "type": "object"
       },
-      "name": "dataset_info"
+      "name": "dataset_info",
+      "title": "Dataset info"
     },
     {
       "annotations": {
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "Protocol matrix"
       },
-      "description": "Read ARC's neutral Protocol Matrix: for UCP, ACP, PAP, WebMCP, MCP and agent payment protocols, how many checked stores declare, validate, answer and transact, with evidence labels (Measured / Inferred / Not measured). Saved checks only; no store requests or model calls. CC-BY-4.0.",
+      "description": "Read ARC's neutral Protocol Matrix: for UCP, ACP, PAP, WebMCP, MCP and agent payment protocols, how many checked stores declare, validate, answer and return a checkout link, with evidence labels (Measured / Inferred / Not measured). Saved checks only; no store requests or model calls. CC-BY-4.0.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -269,14 +541,16 @@
         },
         "type": "object"
       },
-      "name": "protocol_matrix"
+      "name": "protocol_matrix",
+      "title": "Protocol matrix"
     },
     {
       "annotations": {
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "Agent leaderboard"
       },
       "description": "Read ARC's open agent leaderboard: cart success over the fixed ARC-100 v1 test set for each agent path ARC measures (ARC browser shoppers A-E, the UCP path, the storefront MCP path), with n, dates, evidence labels and Wilson 95% intervals, plus unverified outside submissions. Saved results only; no store requests or model calls. CC-BY-4.0.",
       "inputSchema": {
@@ -289,14 +563,16 @@
         },
         "type": "object"
       },
-      "name": "agent_leaderboard"
+      "name": "agent_leaderboard",
+      "title": "Agent leaderboard"
     },
     {
       "annotations": {
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": false
+        "readOnlyHint": false,
+        "title": "Submit a leaderboard run"
       },
       "description": "Submit your agent's run against ARC-100 v1 to ARC's open leaderboard. Free. The run is listed as 'unverified' until ARC re-runs a sample. Format: arc-leaderboard-submission/v1 (see /leaderboard/spec). Runs must stop before payment. Limit 5 per network per day. Same as POST /api/leaderboard/submit.",
       "inputSchema": {
@@ -428,14 +704,16 @@
         ],
         "type": "object"
       },
-      "name": "submit_leaderboard_run"
+      "name": "submit_leaderboard_run",
+      "title": "Submit a leaderboard run"
     },
     {
       "annotations": {
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": true,
-        "readOnlyHint": false
+        "readOnlyHint": false,
+        "title": "Submit stores"
       },
       "description": "Add stores to ARC's free, open agent-commerce directory (CC-BY dataset). Pass url for one store or hosts for up to 50. Each new host is validated (live HTTPS, not parked, not redirecting to another brand); accepted hosts are queued for ARC's plain-HTTP rails checks (UCP, WebMCP, MCP, policies, product data) and appear in the dataset with source=submitted. No model calls, no login. Rate limited per caller.",
       "inputSchema": {
@@ -471,11 +749,13 @@
         },
         "type": "object"
       },
-      "name": "submit_store"
+      "name": "submit_store",
+      "title": "Submit stores"
     },
     {
       "annotations": {
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "Store card"
       },
       "description": "Read a public store card and saved brand claim. No outbound fetch or model calls. Brand statements are from the brand and not measured by ARC; claims never change scores.",
       "inputSchema": {
@@ -490,12 +770,14 @@
         ],
         "type": "object"
       },
-      "name": "store_card"
+      "name": "store_card",
+      "title": "Store card"
     },
     {
       "annotations": {
         "openWorldHint": true,
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "Validate a UCP profile"
       },
       "description": "Validate a Universal Commerce Protocol (UCP) business profile against the published UCP JSON Schema (current release) and spec rules: authority binding, https endpoints, orphaned extensions and, for a URL, hosting headers (no redirects, Cache-Control public max-age>=60). Pass url (store host, homepage or profile URL; /.well-known/ucp is added for a homepage) or profile (the JSON). Returns errors, warnings and info, each with a path and the spec section. Free, no login, no model call. Validation is not certification. JSON: GET /api/ucp/validate?url=",
       "inputSchema": {
@@ -510,14 +792,16 @@
         },
         "type": "object"
       },
-      "name": "validate_ucp_profile"
+      "name": "validate_ucp_profile",
+      "title": "Validate a UCP profile"
     },
     {
       "annotations": {
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true
+        "readOnlyHint": true,
+        "title": "Agent Shopping Index pilot"
       },
       "description": "ARC Agent Shopping Index pilot results (pilot, not a ranking): whether 3 AI models, called through the OpenRouter API (not the consumer apps), reached a checkout step on their own on 35 non-Shopify stores, stopped before payment, with no accounts. Two runs: per model, hand-verified checkouts pooled over both runs with Wilson 95% intervals, the per-run counts side by side, the run-to-run flip count and each run's review agreement; plus each run's full data (cart or better, blocks, median steps and time, cost per checkout, every store × model outcome). One reviewer, and the pooled intervals overlap for every model pair. Page: https://www.arcreport.ai/benchmarks/agent-shopping/pilot-2026-11. Reads only.",
       "inputSchema": {
@@ -525,7 +809,33 @@
         "properties": {},
         "type": "object"
       },
-      "name": "get_benchmark"
+      "name": "get_benchmark",
+      "title": "Agent Shopping Index pilot"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Generate the fix"
+      },
+      "description": "Starter files and snippets for the failed Agent Readiness Grade audits of one store: robots.txt allow rules for AI agents and crawlers, a UCP profile skeleton (or the Shopify setting path), Product JSON-LD with price and stock placeholders, and an llms.txt. Built only from ARC's saved check; each starter is labelled \"Starter, review before publishing\" and checked by ARC's own validators. Read-only: it does not fetch or change the store, and it never fills in a price. A store with no grade returns no starters.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "store": {
+            "description": "Store host, e.g. allbirds.com",
+            "type": "string"
+          }
+        },
+        "required": [
+          "store"
+        ],
+        "type": "object"
+      },
+      "name": "generate_fixes",
+      "title": "Generate the fix"
     }
   ],
   "url": "https://www.arcreport.ai/api/ask"

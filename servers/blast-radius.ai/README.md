@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://blast-radius.ai/mcp` | 9 | [`2631fd42b93d`](6e0fc9f43e7d724c3c48.json) | 2026-09-27 |
+| `https://blast-radius.ai/mcp` | 9 | [`f1cc8a17fdee`](6e0fc9f43e7d724c3c48.json) | 2026-11-07 |
 
 ## Tools at `https://blast-radius.ai/mcp`
 
@@ -22,6 +22,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-07: [description changed](../../deltas/2026-11-07/6e0fc9f43e7d724c3c48.json): `1 field(s) changed`
 - 2026-09-27: [count changed, description changed, tool added](../../deltas/2026-09-27/6e0fc9f43e7d724c3c48.json): `2 tool(s) added; 4 field(s) changed`
 - 2026-09-10: [description changed](../../deltas/2026-09-10/6e0fc9f43e7d724c3c48.json): `1 field(s) changed`
 
