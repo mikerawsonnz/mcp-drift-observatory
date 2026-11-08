@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "08182b48cd00a755b3794afb20075c7dab57483ea3d580b6dd08fa23ce69d62d",
+  "full_hash": "a6605af9fe7e77e87992e03e4e9125e055e434f418682f5f6962daecf5d733a2",
   "name": "ai.bowmark/bowmark",
-  "observed_at": "2026-11-07T02:03:33.444480Z",
+  "observed_at": "2026-11-08T02:02:33.728253Z",
   "sources": [
     "official"
   ],
-  "tool_count": 34,
+  "tool_count": 35,
   "tools": [
     {
       "_meta": {
@@ -96,10 +96,11 @@
         "additionalProperties": false,
         "properties": {
           "egress": {
-            "description": "Optional. `\"link\"` sends every request of this run through the user's own Chrome (Bowmark Link) and fails with \"Link not connected\" when it is not open; `\"default\"` or leaving it out uses Bowmark's own route. The result echoes it as `egress`.",
+            "description": "Optional. `\"link\"` sends every request of this run through the user's own Chrome (Bowmark Link) and fails with \"Link not connected\" when it is not open; `\"link-first\"` tries the user's Chrome first and falls back to Bowmark's own route (use it when the answer must come from the user's own address, e.g. a YouTube stream URL that will play in their browser); `\"default\"` or leaving it out uses Bowmark's own route. The result echoes what was applied as `egress` (`\"default\"` when a `\"link-first\"` run found no Chrome).",
             "enum": [
               "default",
-              "link"
+              "link",
+              "link-first"
             ],
             "type": "string"
           },
@@ -122,7 +123,8 @@
           "egress": {
             "enum": [
               "default",
-              "link"
+              "link",
+              "link-first"
             ],
             "type": "string"
           },
@@ -341,13 +343,20 @@
         "readOnlyHint": false,
         "title": "Open a page for the user (jig)"
       },
-      "description": "Make the user a \"jig\": their own copy of a website, running through Bowmark, that you curate as they talk to you. Asked for \"a jig of YouTube\", build a page that LOOKS like that site with Bowmark's logo where the site's would be, filled by Bowmark library functions as this user: every function the library has for that site gets its place. Then keep curating as they talk: `jig_update` changes state or html, live.\n\nGive the user the link that comes back; that tab is the app. Start from a built-in (`template`) when one fits, else write the page (`html`) — call `get_library({ query: \"jig guide\" })` FIRST for the component kit and layout classes. Reopen one with `jig_open({ jigId })` (`jig_list`), never rebuild it. Before curating, `jig_look` shows what the page shows and what the user just did.\n\nInside the page, one global, `window.bowmark`: `bowmark.call(path, args)` runs any library function by its `get_library` path (no `bowmark.` prefix), metered for this user; `bowmark.batch([...])` runs up to 8 together. `bowmark.state`/`onState(fn)` holds curation choices (you change it with `jig_update`); `setState(patch)` saves a user click. `show({ view, items })` tells `jig_look` what is on screen. Also `tellModel`, `say`, `open`, `download`, `theme`, `img`, `section`: the jig guide. Views: `location.hash`, so back/forward work.\n\nFAST AND FAILURE-PROOF by default: paint a skeleton at once; fill the screen with ONE `bowmark.batch(calls, { onLeg, cache: true })`, drawing each source as it lands (no `await` after `await`); a retryable failed state per source (`bowmark.section`); `bowmark.img(url, px)`, lazy below the fold. `jig_look` reports load speed: fix what its `advice` names.\n\nNo `fetch`, no external script/style/font. A call needing sign-in pauses behind a banner until the user signs in. No chat box in the page: the user talks to you.\n\nTHE SITE'S LAYOUT, NONE OF ITS DARK PATTERNS: `get_library({ query: \"jig layout <host>\" })` gives its regions and what to strip. Kit colors, never the site's; no invented title.",
+      "description": "Make the user a \"jig\": their own copy of a website, that you curate as they talk. Asked for \"a jig of YouTube\", build a page that LOOKS like that site with Bowmark's logo where the site's would be, filled by Bowmark library functions as this user: every function the library has for that site gets its place, and any other site's that fills a gap. Then keep curating: `jig_update` changes state or html, live.\n\nGive the user the link that comes back; that tab is the app. Start from a built-in (`template`) when one fits, else write `files` (React, compiled for you; `jig_read` reads them) or `html` — call `get_library({ query: \"jig guide\" })` FIRST for the component kit and layout classes. Reopen one with `jig_open({ jigId })`, never rebuild it. Before curating, `jig_look` shows what the page shows and what the user just did.\n\nInside the page, one global, `window.bowmark`: `bowmark.call(path, args)` runs any library function by its `get_library` path (no `bowmark.` prefix), metered for this user; `bowmark.batch([...])` runs up to 8 together. `bowmark.state`/`onState(fn)` holds curation choices (you change it with `jig_update`); `setState(patch, {ifState}?)` saves a click. `show({ view, items })` tells `jig_look` what is on screen. Also `tellModel`, `say`, `open`, `download`, `theme`, `img`, `section`: see the guide. Views: `location.hash`.\n\nFAST AND FAILURE-PROOF by default: paint a skeleton at once; fill the screen with ONE `bowmark.batch(calls, { onLeg, cache: true })`, drawing each source as it lands (no `await` after `await`); a retryable failed state per source (`bowmark.section`); `bowmark.img(url, px)`, lazy below the fold. `jig_look` reports load speed: fix what its `advice` names.\n\nNo `fetch`, no external script/style/font. A call needing sign-in pauses behind a banner. No chat box in the page: the user talks to you.\n\nTHE SITE'S LAYOUT, NONE OF ITS DARK PATTERNS: `get_library({ query: \"jig layout <host>\" })` gives its regions and what to strip. Kit colors, never the site's; no invented title.",
       "execution": {
         "taskSupport": "forbidden"
       },
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
+          "files": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "A project instead of `html`: { path: text }, e.g. index.html, main.tsx, App.tsx. React/JSX, compiled for you; `main.tsx` is the entry and ends in mount(<App />) from \"@bowmark/ui\".",
+            "type": "object"
+          },
           "html": {
             "description": "Your own page: a whole HTML document with inline <style> and <script>. It gets a `bowmark` global (see the tool description) and nothing else — no fetch, no CDN.",
             "type": "string"
@@ -479,9 +488,9 @@
         "idempotentHint": false,
         "openWorldHint": true,
         "readOnlyHint": false,
-        "title": "Publish a page (jig) to the store"
+        "title": "Publish a page (jig) so others can get it"
       },
-      "description": "Publish the user's jig (name it by `jigId` or your jig's `jigSlug`) as a listing others can get: it snapshots the page and state AS THEY ARE NOW into version N+1, and later edits stay private until you publish again. Call with `dryRun: true` first and show the user what would ship: every function the page calls (tagged read / write / pay), its sites, and the `defaultState` a copy starts with — blank anything personal with `defaultState`. A first publish needs the user's public `handle` (the @name in bowmark.ai/jigs/@<handle>/<slug>, permanent; ask them, or claim it earlier with `jig_set_handle`). `visibility: \"unlisted\"` is reachable by link only; `\"public\"` also appears in search. Returns the store URL. To unlist a published jig or change its title, tagline or description, call again with the new values and `detailsOnly: true`: no new version is written.",
+      "description": "Publish the user's jig (name it by `jigId` or your jig's `jigSlug`) as a listing others can get: it snapshots the page and state AS THEY ARE NOW into version N+1, and later edits stay private until you publish again. Call with `dryRun: true` first and show the user what would ship: every function the page calls (tagged read / write / pay), its sites, and the `defaultState` a copy starts with — blank anything personal with `defaultState`. A first publish needs the user's public `handle` (the @name in bowmark.ai/jigs/@<handle>/<slug>, permanent; ask them, or claim it earlier with `jig_set_handle`). `visibility: \"unlisted\"` is reachable by link only; `\"public\"` also appears in search. Returns the jig URL. To unlist a published jig or change its title, tagline or description, call again with the new values and `detailsOnly: true`: no new version is written.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -534,7 +543,7 @@
             "type": "string"
           },
           "screenshots": {
-            "description": "Up to 8 screenshots (png/jpeg/webp ≤ 5 MB) or a short clip (mp4/webm ≤ 20 MB) for the store page, each a `url` or `base64` — give exactly one. YOU capture them (a screenshot of the page with sample data, never the user's private data); Bowmark never captures the user's live jig.",
+            "description": "Up to 8 screenshots (png/jpeg/webp ≤ 5 MB) or a short clip (mp4/webm ≤ 20 MB) for the jig page, each a `url` or `base64` — give exactly one. YOU capture them (a screenshot of the page with sample data, never the user's private data); Bowmark never captures the user's live jig.",
             "items": {
               "additionalProperties": false,
               "properties": {
@@ -584,7 +593,7 @@
         "type": "object"
       },
       "name": "jig_publish",
-      "title": "Publish a page (jig) to the store"
+      "title": "Publish a page (jig) so others can get it"
     },
     {
       "_meta": {
@@ -644,7 +653,7 @@
         "readOnlyHint": false,
         "title": "Get a published page (jig) into this account"
       },
-      "description": "Copy someone's published jig into THIS user's account, from its current version. The copy is the user's own: it runs as them with their logins, never the author's, and can call only the functions its listing lists. Name it by `listing`: its id, `@handle/slug`, or its store URL (from `jig_search`). If the user already has a copy you get that one back with `alreadyHave: true`; pass `another: true` only when they want a second. Returns `jigId`, `slug`, `viewUrl` and `sitesNeedingLogin`: give the user each `signInUrl` (their own login, one-time link) and call `wait_for_sign_in` with its `ref`. Then open it with `jig_open({ jigId })`.",
+      "description": "Copy someone's published jig into THIS user's account, from its current version. The copy is the user's own: it runs as them with their logins, never the author's, and can call only the functions its listing lists. Name it by `listing`: its id, `@handle/slug`, or its jig URL (from `jig_search`). If the user already has a copy you get that one back with `alreadyHave: true`; pass `another: true` only when they want a second. Returns `jigId`, `slug`, `viewUrl` and `sitesNeedingLogin`: give the user each `signInUrl` (their own login, one-time link) and call `wait_for_sign_in` with its `ref`. Then open it with `jig_open({ jigId })`.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -656,7 +665,7 @@
             "type": "boolean"
           },
           "listing": {
-            "description": "The listing id, `@handle/slug`, or the store URL bowmark.ai/jigs/@handle/slug.",
+            "description": "The listing id, `@handle/slug`, or the jig URL bowmark.ai/jigs/@handle/slug.",
             "maxLength": 300,
             "type": "string"
           }
@@ -677,7 +686,7 @@
         "readOnlyHint": false,
         "title": "Steer an open page (jig)"
       },
-      "description": "Change a page you opened with `jig_open`: merge `state` into its state (a key set to null is removed), replace its `html` or `title`, or change part of the html with `edits` ([{ find, replace }], each find exactly once) instead of resending the whole page. The open page updates itself within a few seconds — do not call `jig_open` again. Use this whenever the user asks, in chat, for the page to show something different.",
+      "description": "Change a page you opened with `jig_open`: merge `state` into its state (a key set to null is removed), replace its `html` or `title`, or change part of the html with `edits` ([{ find, replace }], each find exactly once) instead of resending the whole page. On a project, `files` writes files ({ path: text }, null deletes one) and an edit's `path` picks its file. The open page updates itself within a few seconds — do not call `jig_open` again. Use this whenever the user asks, in chat, for the page to show something different.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -685,11 +694,15 @@
         "additionalProperties": false,
         "properties": {
           "edits": {
-            "description": "Find/replace on the current html, applied in order.",
+            "description": "Find/replace on a file (default index.html), applied in order.",
             "items": {
               "additionalProperties": false,
               "properties": {
                 "find": {
+                  "type": "string"
+                },
+                "path": {
+                  "description": "The file; omitted means index.html.",
                   "type": "string"
                 },
                 "replace": {
@@ -705,6 +718,16 @@
             "maxItems": 50,
             "minItems": 1,
             "type": "array"
+          },
+          "files": {
+            "additionalProperties": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "description": "Write files of a project: { path: text }; a path set to null deletes it.",
+            "type": "object"
           },
           "html": {
             "type": "string"
@@ -985,6 +1008,37 @@
         "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": true,
+        "title": "Read a page's files (jig)"
+      },
+      "description": "List a jig's files with their byte sizes, or with `path` read one file's text. A page written as `html` is one file, index.html. Read before you edit a jig you did not just write.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "jigId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "jigId"
+        ],
+        "type": "object"
+      },
+      "name": "jig_read",
+      "title": "Read a page's files (jig)"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
         "title": "Look at a page (jig)"
       },
       "description": "See what an open jig is showing the user right now — the items on screen, which view they are on — plus what they just did on it (watched, hid, searched) and its current state. Call it before you curate: when the user says \"clear the slop\" or \"why is this here\", look first, then change the page with `jig_update`. It also says how fast the page last loaded and which calls failed (`perf`, `advice`): fix what `advice` names with `jig_update`.",
@@ -1109,7 +1163,7 @@
         "readOnlyHint": false,
         "title": "Call one Bowmark function and keep the session open for the next call"
       },
-      "description": "Runs ONE library function in a Bowmark session, so a flow that needs several calls in the SAME session can finish: a booking that texts the user a code, a cart filled over several steps, a form that waits on an answer from the user. `run` cannot do these, because every run starts fresh and nothing it held survives to the next run.\n\n`path` is the function as a script writes it after `bowmark.`, split on the dots: `[\"providers\",\"opentable\",\"startBooking\"]`. `args` are its arguments, in order. Look both up in `get_library` first. Omit `sessionId` on the first call: a session opens and its `sessionId` comes back. Pass that `sessionId` on every later call so it runs in the same session.\n\nThe answer is `{ sessionId, ok, status, result, logs, error?, code? }`. `status` is `ok`, `error` or `needs_user`. `needs_user` pauses only this call for a sign-in and the session stays open: give the user `meta.handoff.url`, then repeat the call. A session closes itself after a few idle minutes, so ask the user for anything you need (a texted code) right away and make the next call as soon as they answer. Call `session_close` when the task is done.",
+      "description": "Runs ONE library function in a Bowmark session, so a flow that needs several calls in the SAME session can finish: a booking that texts the user a code, a cart filled over several steps, a form that waits on an answer from the user. `run` cannot do these, because every run starts fresh and nothing it held survives to the next run.\n\n`path` is the function as a script writes it after `bowmark.`, split on the dots: `[\"providers\",\"opentable\",\"startBooking\"]`. `args` are its arguments, in order. Look both up in `get_library` first. Omit `sessionId` on the first call: a session opens and its `sessionId` comes back. Pass that `sessionId` on every later call so it runs in the same session. **A session runs one call at a time: never send parallel calls to the same `sessionId` with Promise.all.** Each call waits for the previous one. For parallel work, open separate sessions or use `run` instead.\n\nThe answer is `{ sessionId, ok, status, result, logs, error?, code? }`. `status` is `ok`, `error` or `needs_user`. `needs_user` pauses only this call for a sign-in and the session stays open: give the user `meta.handoff.url`, then repeat the call. A session closes itself after a few idle minutes, so ask the user for anything you need (a texted code) right away and make the next call as soon as they answer. Call `session_close` when the task is done.",
       "execution": {
         "taskSupport": "forbidden"
       },

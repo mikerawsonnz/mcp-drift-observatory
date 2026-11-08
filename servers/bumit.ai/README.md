@@ -6,14 +6,17 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://bumit.ai/mcp` | 1 | [`29b68f26b476`](d0fe06dca65feccd4008.json) | 2026-10-26 |
+| `https://bumit.ai/mcp` | 3 | [`d13b49291793`](d0fe06dca65feccd4008.json) | 2026-11-08 |
 
 ## Tools at `https://bumit.ai/mcp`
 
+- `get_company_profile`: `Retrieve the canonical Swiss commercial-register (Zefix) profile for one company by UID: legal name, legal form, register status, seat, can…`
+- `search_companies`: `Search the Swiss commercial register (Zefix) by company name and receive bounded, deduplicated candidate summaries (UID, legal name, legal…`
 - `verify_business`: `Verify a Swiss company using official commercial-register data (Zefix), SECO sanctions data, and FINMA authorisation data. Search by UID or…`
 
 ## Changes
 
+- 2026-11-08: [count changed, tool added](../../deltas/2026-11-08/d0fe06dca65feccd4008.json): `2 tool(s) added`
 - 2026-10-26: [description changed, schema changed](../../deltas/2026-10-26/d0fe06dca65feccd4008.json): `9 field(s) changed; signals: length_more_than_doubled`
 - 2026-10-23: [description changed](../../deltas/2026-10-23/d0fe06dca65feccd4008.json): `1 field(s) changed`
 

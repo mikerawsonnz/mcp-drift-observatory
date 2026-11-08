@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "c14fe88848d151b4f03264eabbc420739f3a4e23d736b067bd7191779330e166",
+  "full_hash": "b4a774c793ee091cf934cbe88712dc29712438a3a0408ac3cafbc24312bf45e2",
   "name": "ai.asms/asms",
-  "observed_at": "2026-10-30T02:04:25.646289Z",
+  "observed_at": "2026-11-08T02:02:27.784539Z",
   "sources": [
     "official"
   ],
-  "tool_count": 12,
+  "tool_count": 14,
   "tools": [
     {
       "annotations": {
@@ -277,7 +277,7 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
-      "description": "List the account's rented numbers with their country, period and end date. Ended rentals are left out unless `includeEnded` is true.",
+      "description": "List the account's rented numbers with their country, period, end date and whether auto-renew is on. Ended rentals are left out unless `includeEnded` is true.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -336,6 +336,72 @@
       },
       "name": "cancel_rental",
       "title": "Cancel a rental for a refund"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Keep a rented number for another period: the period is added to its current end, at today's price for that period in its country (see get_rental_offers). Possible from 2 hours after renting until 20 minutes before the end. Debits the wallet only if the renewal goes through. WARNING: this spends real wallet balance; confirm the number, period and price with the user first.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "number": {
+            "description": "The rented number, as rent_number or list_rentals gave it (\"+\", spaces and dashes are ignored).",
+            "type": "string"
+          },
+          "period": {
+            "description": "Rental period: \"oneDay\" (1 day), \"oneWeek\" (1 week), \"oneMonth\" (1 month), \"threeMonths\" (3 months), \"sixMonths\" (6 months), \"twelveMonths\" (12 months). Not every period is on sale in every country: check get_rental_offers.",
+            "enum": [
+              "oneDay",
+              "oneWeek",
+              "oneMonth",
+              "threeMonths",
+              "sixMonths",
+              "twelveMonths"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "number",
+          "period"
+        ],
+        "type": "object"
+      },
+      "name": "renew_rental",
+      "title": "Renew a rented number"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "With auto-renew on, the number is renewed for its rental period from the wallet a day before it ends (6 hours before for a one-day rental); if the balance is short then, the account is emailed and nothing is charged. Turning it on lets the wallet be charged later: confirm with the user first.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "autoRenew": {
+            "description": "true to turn auto-renew on, false to turn it off.",
+            "type": "boolean"
+          },
+          "number": {
+            "description": "The rented number, as rent_number or list_rentals gave it (\"+\", spaces and dashes are ignored).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "number",
+          "autoRenew"
+        ],
+        "type": "object"
+      },
+      "name": "set_rental_auto_renew",
+      "title": "Turn a rental's auto-renew on or off"
     }
   ],
   "url": "https://asms.ai/mcp"

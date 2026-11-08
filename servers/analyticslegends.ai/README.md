@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://analyticslegends.ai/mcp` | 23 | [`f01427876780`](44700875edd0c1c1f674.json) | 2026-11-07 |
+| `https://analyticslegends.ai/mcp` | 23 | [`75081d60966b`](44700875edd0c1c1f674.json) | 2026-11-08 |
 
 ## Tools at `https://analyticslegends.ai/mcp`
 
@@ -36,6 +36,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-08: [annotation changed, description changed, field changed, schema changed](../../deltas/2026-11-08/44700875edd0c1c1f674.json): `29 field(s) changed`
 - 2026-11-07: [count changed, tool added](../../deltas/2026-11-07/44700875edd0c1c1f674.json): `1 tool(s) added`
 - 2026-10-31: [description changed, schema changed](../../deltas/2026-10-31/44700875edd0c1c1f674.json): `12 field(s) changed`
 - 2026-10-28: [description changed](../../deltas/2026-10-28/44700875edd0c1c1f674.json): `9 field(s) changed`
@@ -55,7 +56,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - 2026-09-18: [description changed, schema changed](../../deltas/2026-09-18/44700875edd0c1c1f674.json): `68 field(s) changed`
 - 2026-09-09: [description changed](../../deltas/2026-09-09/44700875edd0c1c1f674.json): `2 field(s) changed`
 - 2026-09-08: [description changed, schema changed](../../deltas/2026-09-08/44700875edd0c1c1f674.json): `9 field(s) changed; signals: length_more_than_doubled`
-- 2026-09-05: [schema changed](../../deltas/2026-09-05/44700875edd0c1c1f674.json): `7 field(s) changed`
 
 ## Check it from your agent
 

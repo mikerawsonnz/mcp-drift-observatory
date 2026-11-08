@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "29b68f26b4764d69b3d6221d957430f774ed7ccbe34a1ec5954f5ca0e1a7ce85",
+  "full_hash": "d13b49291793820832ba384dafeabb581e84cd6b50ea83f027ca75d20f93b4dc",
   "name": "ai.bumit/verify-business",
-  "observed_at": "2026-10-26T02:04:20.348169Z",
+  "observed_at": "2026-11-08T02:02:37.582516Z",
   "sources": [
     "official"
   ],
-  "tool_count": 1,
+  "tool_count": 3,
   "tools": [
     {
       "annotations": {
@@ -75,6 +75,58 @@
       },
       "name": "verify_business",
       "title": "Verify Swiss business"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Search the Swiss commercial register (Zefix) by company name and receive bounded, deduplicated candidate summaries (UID, legal name, legal form, register status, seat, canton) with source attribution. Use this to find a company's UID before calling get_company_profile, or to review candidates after verify_business reports an ambiguous name. Discovery only: no candidate is selected automatically, results are not ranked or scored, and a name match is not a verification result. For direct one-call verification, use verify_business.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "description": "Search the Swiss commercial register (Zefix) by company name. Discovery only: returns bounded register candidates; nothing is selected, ranked or verified.",
+        "properties": {
+          "name": {
+            "description": "Company name to search for. Trimmed; 3–300 characters. Do not guess spellings; use the name as claimed.",
+            "maxLength": 300,
+            "minLength": 3,
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "search_companies",
+      "title": "Search Swiss companies"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Retrieve the canonical Swiss commercial-register (Zefix) profile for one company by UID: legal name, legal form, register status, seat, canton, registered address, purpose and official register links, with provenance, attribution and a freshness envelope (evidence age, freshness threshold, stale flag and source state). The UID is normalized and its check digit validated before any source request. FOUND means a register record was retrieved, not that the business passed verification. For sanctions, FINMA and full verification outcomes, use verify_business.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "description": "Retrieve the canonical Swiss commercial-register (Zefix) profile for one company by UID. Retrieval only: FOUND means a register record was retrieved, not that the business passed verification.",
+        "properties": {
+          "uid": {
+            "description": "Swiss UID (e.g. CHE-116.281.549). Formatting is normalized; the mod-11 check digit is validated before any source request.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "uid"
+        ],
+        "type": "object"
+      },
+      "name": "get_company_profile",
+      "title": "Get Swiss company profile"
     }
   ],
   "url": "https://bumit.ai/mcp"

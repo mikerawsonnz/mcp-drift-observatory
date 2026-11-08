@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://artemisgtm.ai/mcp` | 5 | [`057ac8fd4711`](05201622ddbc4614d3f7.json) | 2026-11-07 |
+| `https://artemisgtm.ai/mcp` | 5 | [`0cd2ae062b5b`](05201622ddbc4614d3f7.json) | 2026-11-08 |
 
 ## Tools at `https://artemisgtm.ai/mcp`
 
@@ -18,6 +18,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-08: [description changed](../../deltas/2026-11-08/05201622ddbc4614d3f7.json): `2 field(s) changed; signals: url_introduced`
 - 2026-11-07: [description changed](../../deltas/2026-11-07/05201622ddbc4614d3f7.json): `1 field(s) changed; signals: url_introduced`
 - 2026-10-25: [tool added, tool removed](../../deltas/2026-10-25/05201622ddbc4614d3f7.json): `5 tool(s) added; 5 tool(s) removed`
 

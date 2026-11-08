@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://asms.ai/mcp` | 12 | [`c14fe88848d1`](4e29eb0cd32d68164c8a.json) | 2026-10-30 |
+| `https://asms.ai/mcp` | 14 | [`b4a774c793ee`](4e29eb0cd32d68164c8a.json) | 2026-11-08 |
 
 ## Tools at `https://asms.ai/mcp`
 
@@ -18,14 +18,16 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_pricing`: `Get the retail price per OTP activation for a service in a country. Omit 'service' to list prices for every available service.`
 - `get_rental_offers`: `List the rental periods and prices for a country (1 day to 12 months). A rented number is yours for the whole period and receives every SMS…`
 - `list_active_orders`: `List recent OTP orders for the account (awaiting a code or already received).`
-- `list_rentals`: `List the account's rented numbers with their country, period and end date. Ended rentals are left out unless 'includeEnded' is true.`
+- `list_rentals`: `List the account's rented numbers with their country, period, end date and whether auto-renew is on. Ended rentals are left out unless 'inc…`
 - `poll_sms`: `Check for the SMS / OTP code on an order. Returns the code once it has arrived, otherwise an empty result: poll again after a few seconds.…`
 - `read_rental_sms`: `Read the SMS a rented number has received during this rental, newest first. Poll again every few seconds while waiting for a message.`
+- `renew_rental`: `Keep a rented number for another period: the period is added to its current end, at today's price for that period in its country (see get_r…`
 - `rent_number`: `Rent a phone number in a country for a period (get the periods and prices from get_rental_offers first). Debits the wallet and returns the…`
+- `set_rental_auto_renew`: `With auto-renew on, the number is renewed for its rental period from the wallet a day before it ends (6 hours before for a one-day rental);…`
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-08: [count changed, description changed, tool added](../../deltas/2026-11-08/4e29eb0cd32d68164c8a.json): `2 tool(s) added; 1 field(s) changed`
 
 ## Check it from your agent
 

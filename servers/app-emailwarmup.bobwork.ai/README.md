@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://app-emailwarmup.bobwork.ai/mcp` | 46 | [`8815102e9c2f`](05c4b5d497c7d086d782.json) | 2026-11-04 |
+| `https://app-emailwarmup.bobwork.ai/mcp` | 46 | [`2d1d5f4e91ba`](05c4b5d497c7d086d782.json) | 2026-11-08 |
 
 ## Tools at `https://app-emailwarmup.bobwork.ai/mcp`
 
@@ -26,7 +26,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `delete_dns_record`: `Delete a DNS record by id (from list_dns_records). Deleting MX, SPF, DKIM or DMARC stops the mailboxes working.`
 - `delete_workspace`: `Delete a client workspace. Its mailboxes are NOT deleted: they move back to My mailboxes and keep warming. The client's report link stops w…`
 - `domain_health`: `SPF, DKIM selector, DMARC policy and MX for every domain you have connected.`
-- `get_account`: `Your account: email, credit balance, free mailbox allowance (10, or 20 for accounts created before 27 October 2026, plus referral bonus), p…`
+- `get_account`: `Your account: email, credit balance, free mailbox allowance (3 on new accounts; older accounts keep 10 or 20; plus referral bonus), paid ex…`
 - `get_billing_status`: `Payment status after you gave the user a checkout link: credit balance, whether the extra-mailbox subscription is active, mailboxes vs the…`
 - `get_campaign`: `One campaign: its emails, mailboxes, stats and time left.`
 - `get_credits`: `Prepaid credit balance, prices and recent charges (Outbound emails, AI drafts).`
@@ -59,6 +59,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-08: [description changed](../../deltas/2026-11-08/05c4b5d497c7d086d782.json): `1 field(s) changed`
 - 2026-11-04: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-04/05c4b5d497c7d086d782.json): `1 tool(s) added; 3 field(s) changed`
 
 ## Check it from your agent

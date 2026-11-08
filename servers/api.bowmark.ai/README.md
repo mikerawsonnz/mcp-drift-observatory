@@ -6,8 +6,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.bowmark.ai/mcp` | 34 | [`08182b48cd00`](5f2d24be930573ed8878.json) | 2026-11-07 |
-| `https://api.bowmark.ai/mcp/registry` | 34 | [`08182b48cd00`](e742a173e323c903336e.json) | 2026-11-07 |
+| `https://api.bowmark.ai/mcp` | 35 | [`a6605af9fe7e`](5f2d24be930573ed8878.json) | 2026-11-08 |
+| `https://api.bowmark.ai/mcp/registry` | 35 | [`a6605af9fe7e`](e742a173e323c903336e.json) | 2026-11-08 |
 
 ## Tools at `https://api.bowmark.ai/mcp`
 
@@ -21,10 +21,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `jig_get`: `Copy someone's published jig into THIS user's account, from its current version. The copy is the user's own: it runs as them with their log…`
 - `jig_list`: `The jigs this user has, newest change first: id, slug, title, the built-in it started from, and when it last changed. A copy of someone's p…`
 - `jig_look`: `See what an open jig is showing the user right now — the items on screen, which view they are on — plus what they just did on it (watched,…`
-- `jig_open`: `Make the user a "jig": their own copy of a website, running through Bowmark, that you curate as they talk to you. Asked for "a jig of YouTu…`
+- `jig_open`: `Make the user a "jig": their own copy of a website, that you curate as they talk. Asked for "a jig of YouTube", build a page that LOOKS lik…`
 - `jig_perf`: `Used by an open jig to report how fast it loaded. You do not need to call this.`
 - `jig_publish`: `Publish the user's jig (name it by 'jigId' or your jig's 'jigSlug') as a listing others can get: it snapshots the page and state AS THEY AR…`
 - `jig_pull_update`: `For a jig the user got from someone's listing ('jig_list' shows 'updateAvailable'): the three pages a merge needs. 'base' is the version th…`
+- `jig_read`: `List a jig's files with their byte sizes, or with 'path' read one file's text. A page written as 'html' is one file, index.html. Read befor…`
 - `jig_search`: `Search the public jigs other people published: "is there a jig for my Amazon orders?". Call it BEFORE building a page from scratch. Leave '…`
 - `jig_seen`: `Used by an open jig to report what it shows. You do not need to call this.`
 - `jig_set_handle`: `Claim the user's public handle: the @name in the links to pages they publish, bowmark.ai/jigs/@<handle>/<slug>. It is PUBLIC and PERMANENT:…`
@@ -58,10 +59,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `jig_get`: `Copy someone's published jig into THIS user's account, from its current version. The copy is the user's own: it runs as them with their log…`
 - `jig_list`: `The jigs this user has, newest change first: id, slug, title, the built-in it started from, and when it last changed. A copy of someone's p…`
 - `jig_look`: `See what an open jig is showing the user right now — the items on screen, which view they are on — plus what they just did on it (watched,…`
-- `jig_open`: `Make the user a "jig": their own copy of a website, running through Bowmark, that you curate as they talk to you. Asked for "a jig of YouTu…`
+- `jig_open`: `Make the user a "jig": their own copy of a website, that you curate as they talk. Asked for "a jig of YouTube", build a page that LOOKS lik…`
 - `jig_perf`: `Used by an open jig to report how fast it loaded. You do not need to call this.`
 - `jig_publish`: `Publish the user's jig (name it by 'jigId' or your jig's 'jigSlug') as a listing others can get: it snapshots the page and state AS THEY AR…`
 - `jig_pull_update`: `For a jig the user got from someone's listing ('jig_list' shows 'updateAvailable'): the three pages a merge needs. 'base' is the version th…`
+- `jig_read`: `List a jig's files with their byte sizes, or with 'path' read one file's text. A page written as 'html' is one file, index.html. Read befor…`
 - `jig_search`: `Search the public jigs other people published: "is there a jig for my Amazon orders?". Call it BEFORE building a page from scratch. Leave '…`
 - `jig_seen`: `Used by an open jig to report what it shows. You do not need to call this.`
 - `jig_set_handle`: `Claim the user's public handle: the @name in the links to pages they publish, bowmark.ai/jigs/@<handle>/<slug>. It is PUBLIC and PERMANENT:…`
@@ -85,6 +87,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-08: [annotation changed, count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-08/e742a173e323c903336e.json): `1 tool(s) added; 22 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**
+- 2026-11-08: [annotation changed, count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-08/5f2d24be930573ed8878.json): `1 tool(s) added; 22 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**
 - 2026-11-07: [annotation changed, count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-07/5f2d24be930573ed8878.json): `1 tool(s) added; 51 field(s) changed`
 - 2026-11-07: [annotation changed, count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-07/e742a173e323c903336e.json): `1 tool(s) added; 51 field(s) changed`
 - 2026-11-06: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-06/e742a173e323c903336e.json): `7 tool(s) added; 10 field(s) changed; signals: imperative_language_introduced` **(notable)**
@@ -103,8 +107,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - 2026-10-30: [annotation changed, description changed](../../deltas/2026-10-30/e742a173e323c903336e.json): `18 field(s) changed`
 - 2026-10-29: [count changed, tool added](../../deltas/2026-10-29/5f2d24be930573ed8878.json): `7 tool(s) added; signals: imperative_language_introduced` **(notable)**
 - 2026-10-29: [count changed, tool added](../../deltas/2026-10-29/e742a173e323c903336e.json): `7 tool(s) added; signals: imperative_language_introduced` **(notable)**
-- 2026-10-27: [schema changed](../../deltas/2026-10-27/e742a173e323c903336e.json): `2 field(s) changed`
-- 2026-10-27: [schema changed](../../deltas/2026-10-27/5f2d24be930573ed8878.json): `2 field(s) changed`
 
 ## Check it from your agent
 

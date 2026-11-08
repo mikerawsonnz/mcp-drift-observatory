@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "0ce5e0e7e983ba9909a0fefb626127f49c9e689badcac55f4539e4140fd0adbe",
+  "full_hash": "b0e0754fa889bed9388c5a2b3a931965cf03e9fdd2c52a6b711dbbc8341e42b5",
   "name": "ai.betslipdoctor/mcp",
-  "observed_at": "2026-11-07T02:03:30.714870Z",
+  "observed_at": "2026-11-08T02:02:31.102216Z",
   "sources": [
     "official"
   ],
-  "tool_count": 92,
+  "tool_count": 94,
   "tools": [
     {
       "_meta": {
@@ -2133,7 +2133,7 @@
         "readOnlyHint": true,
         "title": "Saved Grade jobs and reports"
       },
-      "description": "Read the saved Grade jobs and reports behind list_grade_jobs, get_grade_job, get_grade_progress, get_grade_report and get_grade_evidence. This combined tool requires version bsd-agent-grade-v1 and action list, job, progress, report or evidence; the individual tools omit version and action.",
+      "description": "Read the saved Grade jobs and reports behind list_grade_jobs, get_grade_job, get_grade_progress, get_grade_groups, get_grade_report, get_grade_evidence and get_grade_catalog. This combined tool requires version bsd-agent-grade-v1 and action list, job, progress, groups, report, evidence or catalog; the individual tools omit version and action.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -2142,8 +2142,10 @@
               "list",
               "job",
               "progress",
+              "groups",
               "report",
-              "evidence"
+              "evidence",
+              "catalog"
             ],
             "type": "string"
           },
@@ -2216,7 +2218,7 @@
         "additionalProperties": false,
         "properties": {
           "category": {
-            "description": "Current app History read (the app route body). Context takes only original recordId and recordKind; other categories require request. Advice also requires the original record references; every advice entry carries its Grade letter (letter, A-F or null) and the result adds a text line.",
+            "description": "Current app History read (the app route body). report_advice takes reportId and reads its state and digest without recording a display. Context takes original recordId and recordKind; advice also requires the original record references and returns Grade letters.",
             "enum": [
               "summary",
               "records",
@@ -2225,6 +2227,7 @@
               "context",
               "placement_context",
               "units_summary",
+              "report_advice",
               "chart",
               "record",
               "record_doctor_decisions",
@@ -2283,6 +2286,11 @@
               "import",
               "manual"
             ],
+            "type": "string"
+          },
+          "reportId": {
+            "description": "Owned report ID for report_advice.",
+            "format": "uuid",
             "type": "string"
           },
           "request": {
@@ -2671,6 +2679,1890 @@
         "type": "object"
       },
       "name": "get_history_summary",
+      "outputSchema": {
+        "$defs": {
+          "s0": {
+            "properties": {
+              "amounts": {},
+              "book": {},
+              "currency": {},
+              "currencyAnnotation": {},
+              "duplicateLink": {},
+              "id": {},
+              "incomplete": {},
+              "intent": {},
+              "legs": {},
+              "limitations": {},
+              "linkedManualCount": {},
+              "oddsAmerican": {},
+              "original": {},
+              "outcome": {},
+              "placement": {},
+              "recordKind": {},
+              "revision": {},
+              "settlementSource": {},
+              "sourceDigest": {},
+              "status": {},
+              "ticketId": {},
+              "timeline": {},
+              "title": {},
+              "version": {}
+            },
+            "required": [
+              "version",
+              "id",
+              "revision",
+              "recordKind",
+              "settlementSource",
+              "placement",
+              "currencyAnnotation",
+              "duplicateLink",
+              "linkedManualCount",
+              "ticketId",
+              "sourceDigest",
+              "title",
+              "book",
+              "intent",
+              "currency",
+              "status",
+              "outcome",
+              "timeline",
+              "amounts",
+              "oddsAmerican",
+              "legs",
+              "incomplete",
+              "limitations"
+            ],
+            "type": "object"
+          },
+          "s1": {
+            "properties": {
+              "record": {},
+              "report": {},
+              "state": {},
+              "version": {}
+            },
+            "required": [
+              "version",
+              "record",
+              "state",
+              "report"
+            ],
+            "type": "object"
+          }
+        },
+        "anyOf": [
+          {
+            "anyOf": [
+              {
+                "additionalProperties": {},
+                "properties": {
+                  "adviceBasis": {
+                    "enum": [
+                      "current_response",
+                      "recorded_before_placement"
+                    ],
+                    "type": "string"
+                  },
+                  "adviceFilter": {
+                    "enum": [
+                      "all",
+                      "unknown",
+                      "unseen",
+                      "viewed",
+                      "followed",
+                      "modified",
+                      "rejected"
+                    ],
+                    "type": "string"
+                  },
+                  "asOf": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "generation": {
+                    "pattern": "^\\d{1,19}$",
+                    "type": "string"
+                  },
+                  "groups": {
+                    "items": {},
+                    "maxItems": 600,
+                    "type": "array"
+                  },
+                  "limitations": {
+                    "items": {},
+                    "maxItems": 10,
+                    "type": "array"
+                  },
+                  "record": {
+                    "properties": {
+                      "basis": {},
+                      "losses": {},
+                      "pushes": {},
+                      "settled": {},
+                      "units": {},
+                      "unresolved": {},
+                      "wins": {}
+                    },
+                    "required": [
+                      "basis",
+                      "wins",
+                      "losses",
+                      "pushes",
+                      "settled",
+                      "unresolved",
+                      "units"
+                    ],
+                    "type": "object"
+                  },
+                  "timezone": {
+                    "type": "string"
+                  },
+                  "undated": {
+                    "properties": {
+                      "basis": {},
+                      "open": {},
+                      "settled": {}
+                    },
+                    "required": [
+                      "open",
+                      "settled",
+                      "basis"
+                    ],
+                    "type": "object"
+                  },
+                  "version": {
+                    "const": "bsd-history-summary-v1",
+                    "type": "string"
+                  },
+                  "window": {
+                    "properties": {
+                      "basis": {},
+                      "from": {},
+                      "to": {}
+                    },
+                    "required": [
+                      "from",
+                      "to",
+                      "basis"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "version",
+                  "adviceFilter",
+                  "adviceBasis",
+                  "generation",
+                  "asOf",
+                  "timezone",
+                  "window",
+                  "groups",
+                  "undated",
+                  "limitations"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": {},
+                "properties": {
+                  "adviceBasis": {
+                    "enum": [
+                      "current_response",
+                      "recorded_before_placement"
+                    ],
+                    "type": "string"
+                  },
+                  "adviceFilter": {
+                    "enum": [
+                      "all",
+                      "unknown",
+                      "unseen",
+                      "viewed",
+                      "followed",
+                      "modified",
+                      "rejected"
+                    ],
+                    "type": "string"
+                  },
+                  "asOf": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "generation": {
+                    "pattern": "^\\d{1,19}$",
+                    "type": "string"
+                  },
+                  "items": {
+                    "items": {},
+                    "maxItems": 50,
+                    "type": "array"
+                  },
+                  "limitations": {
+                    "items": {},
+                    "maxItems": 8,
+                    "type": "array"
+                  },
+                  "next": {
+                    "anyOf": [
+                      {
+                        "maxLength": 2000,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "pickemEntries": {
+                    "items": {},
+                    "maxItems": 50,
+                    "type": "array"
+                  },
+                  "timezone": {
+                    "maxLength": 100,
+                    "type": "string"
+                  },
+                  "version": {
+                    "const": "bsd-history-list-v1",
+                    "type": "string"
+                  },
+                  "window": {
+                    "properties": {
+                      "basis": {},
+                      "from": {},
+                      "to": {}
+                    },
+                    "required": [
+                      "from",
+                      "to",
+                      "basis"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "version",
+                  "adviceFilter",
+                  "adviceBasis",
+                  "generation",
+                  "asOf",
+                  "timezone",
+                  "window",
+                  "items",
+                  "next",
+                  "limitations"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": {},
+                "properties": {
+                  "asOf": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "generation": {
+                    "pattern": "^\\d{1,19}$",
+                    "type": "string"
+                  },
+                  "items": {
+                    "items": {},
+                    "maxItems": 10,
+                    "type": "array"
+                  },
+                  "limitations": {
+                    "items": {},
+                    "maxItems": 6,
+                    "type": "array"
+                  },
+                  "rollup": {
+                    "properties": {
+                      "bets": {},
+                      "currencies": {},
+                      "lost": {},
+                      "net": {},
+                      "open": {},
+                      "other": {},
+                      "push": {},
+                      "won": {}
+                    },
+                    "required": [
+                      "bets",
+                      "won",
+                      "lost",
+                      "push",
+                      "open",
+                      "other",
+                      "net",
+                      "currencies"
+                    ],
+                    "type": "object"
+                  },
+                  "timezone": {
+                    "maxLength": 100,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "version": {
+                    "const": "bsd-history-after-advice-v1",
+                    "type": "string"
+                  },
+                  "window": {
+                    "properties": {
+                      "basis": {},
+                      "from": {},
+                      "to": {}
+                    },
+                    "required": [
+                      "from",
+                      "to",
+                      "basis"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "version",
+                  "generation",
+                  "asOf",
+                  "timezone",
+                  "window",
+                  "rollup",
+                  "items",
+                  "limitations"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": {},
+                "properties": {
+                  "generation": {
+                    "pattern": "^\\d{1,19}$",
+                    "type": "string"
+                  },
+                  "items": {
+                    "items": {},
+                    "maxItems": 25,
+                    "type": "array"
+                  },
+                  "limitations": {
+                    "items": {},
+                    "maxItems": 8,
+                    "type": "array"
+                  },
+                  "next": {
+                    "anyOf": [
+                      {
+                        "maxLength": 1500,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "record": {
+                    "properties": {
+                      "id": {},
+                      "kind": {},
+                      "placedAt": {},
+                      "placementSource": {},
+                      "revision": {},
+                      "sourceDigest": {}
+                    },
+                    "required": [
+                      "id",
+                      "kind",
+                      "revision",
+                      "sourceDigest",
+                      "placedAt",
+                      "placementSource"
+                    ],
+                    "type": "object"
+                  },
+                  "summary": {
+                    "properties": {
+                      "firstDisplayAcknowledgementsBeforePlacement": {},
+                      "laterResponseCorrections": {},
+                      "reportedStateBeforePlacement": {},
+                      "reportsAvailableAtOrAfterPlacement": {},
+                      "reportsAvailableBeforePlacement": {},
+                      "reportsWithUnknownPlacementTime": {},
+                      "responsesRecordedBeforePlacement": {},
+                      "totalReports": {}
+                    },
+                    "required": [
+                      "totalReports",
+                      "reportsAvailableBeforePlacement",
+                      "reportsAvailableAtOrAfterPlacement",
+                      "reportsWithUnknownPlacementTime",
+                      "firstDisplayAcknowledgementsBeforePlacement",
+                      "responsesRecordedBeforePlacement",
+                      "laterResponseCorrections",
+                      "reportedStateBeforePlacement"
+                    ],
+                    "type": "object"
+                  },
+                  "version": {
+                    "const": "bsd-history-advice-v1",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "version",
+                  "generation",
+                  "record",
+                  "summary",
+                  "items",
+                  "next",
+                  "limitations"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": {},
+                "properties": {
+                  "adherence": {
+                    "properties": {
+                      "basis": {},
+                      "reason": {},
+                      "record": {},
+                      "sources": {},
+                      "state": {},
+                      "version": {}
+                    },
+                    "required": [
+                      "version",
+                      "record",
+                      "state",
+                      "basis",
+                      "sources",
+                      "reason"
+                    ],
+                    "type": "object"
+                  },
+                  "doctorAdvice": {
+                    "properties": {
+                      "generation": {},
+                      "items": {},
+                      "limitations": {},
+                      "next": {},
+                      "record": {},
+                      "version": {}
+                    },
+                    "required": [
+                      "version",
+                      "generation",
+                      "record",
+                      "items",
+                      "next",
+                      "limitations"
+                    ],
+                    "type": "object"
+                  },
+                  "generation": {
+                    "pattern": "^\\d{1,19}$",
+                    "type": "string"
+                  },
+                  "grade": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/$defs/s1"
+                      },
+                      {
+                        "$ref": "#/$defs/s1"
+                      },
+                      {
+                        "properties": {
+                          "reason": {},
+                          "record": {},
+                          "report": {},
+                          "state": {},
+                          "version": {}
+                        },
+                        "required": [
+                          "version",
+                          "record",
+                          "state",
+                          "reason",
+                          "report"
+                        ],
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "gradeAdvice": {
+                    "properties": {
+                      "generation": {},
+                      "items": {},
+                      "limitations": {},
+                      "next": {},
+                      "record": {},
+                      "summary": {},
+                      "version": {}
+                    },
+                    "required": [
+                      "version",
+                      "generation",
+                      "record",
+                      "summary",
+                      "items",
+                      "next",
+                      "limitations"
+                    ],
+                    "type": "object"
+                  },
+                  "record": {
+                    "$ref": "#/$defs/s0"
+                  },
+                  "unitSetting": {
+                    "properties": {
+                      "basis": {},
+                      "source": {},
+                      "unitMinor": {}
+                    },
+                    "required": [
+                      "basis",
+                      "source",
+                      "unitMinor"
+                    ],
+                    "type": "object"
+                  },
+                  "units": {
+                    "properties": {
+                      "basis": {},
+                      "knownRecords": {},
+                      "missingRecords": {},
+                      "reason": {},
+                      "state": {},
+                      "value": {},
+                      "version": {}
+                    },
+                    "required": [
+                      "version",
+                      "basis",
+                      "knownRecords",
+                      "missingRecords",
+                      "state",
+                      "reason",
+                      "value"
+                    ],
+                    "type": "object"
+                  },
+                  "version": {
+                    "const": "bsd-history-record-context-v1",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "version",
+                  "generation",
+                  "record",
+                  "grade",
+                  "adherence",
+                  "unitSetting",
+                  "units",
+                  "gradeAdvice",
+                  "doctorAdvice"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": {},
+                "properties": {
+                  "context": {
+                    "properties": {
+                      "adherence": {},
+                      "doctorAdvice": {},
+                      "generation": {},
+                      "grade": {},
+                      "gradeAdvice": {},
+                      "record": {},
+                      "unitSetting": {},
+                      "units": {},
+                      "version": {}
+                    },
+                    "required": [
+                      "version",
+                      "generation",
+                      "record",
+                      "grade",
+                      "adherence",
+                      "unitSetting",
+                      "units",
+                      "gradeAdvice",
+                      "doctorAdvice"
+                    ],
+                    "type": "object"
+                  },
+                  "placementUnits": {
+                    "properties": {
+                      "basis": {},
+                      "netUnits": {},
+                      "placedAt": {},
+                      "reason": {},
+                      "recordId": {},
+                      "recordKind": {},
+                      "stakeUnits": {},
+                      "state": {},
+                      "unitEffectiveAt": {},
+                      "version": {}
+                    },
+                    "required": [
+                      "version",
+                      "recordKind",
+                      "recordId",
+                      "basis",
+                      "placedAt",
+                      "unitEffectiveAt",
+                      "stakeUnits",
+                      "netUnits",
+                      "state",
+                      "reason"
+                    ],
+                    "type": "object"
+                  },
+                  "version": {
+                    "const": "bsd-history-placement-context-v2",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "version",
+                  "context",
+                  "placementUnits"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": {},
+                "properties": {
+                  "groups": {
+                    "items": {},
+                    "maxItems": 600,
+                    "type": "array"
+                  },
+                  "summary": {
+                    "properties": {
+                      "adviceBasis": {},
+                      "adviceFilter": {},
+                      "asOf": {},
+                      "generation": {},
+                      "groups": {},
+                      "limitations": {},
+                      "record": {},
+                      "timezone": {},
+                      "undated": {},
+                      "version": {},
+                      "window": {}
+                    },
+                    "required": [
+                      "version",
+                      "adviceFilter",
+                      "adviceBasis",
+                      "generation",
+                      "asOf",
+                      "timezone",
+                      "window",
+                      "groups",
+                      "undated",
+                      "limitations"
+                    ],
+                    "type": "object"
+                  },
+                  "unitSetting": {
+                    "properties": {
+                      "basis": {},
+                      "source": {},
+                      "unitMinor": {}
+                    },
+                    "required": [
+                      "basis",
+                      "source",
+                      "unitMinor"
+                    ],
+                    "type": "object"
+                  },
+                  "version": {
+                    "const": "bsd-history-units-summary-v1",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "version",
+                  "summary",
+                  "unitSetting",
+                  "groups"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": {},
+                "properties": {
+                  "asOf": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "bucketDays": {
+                    "anyOf": [
+                      {
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "filters": {
+                    "properties": {
+                      "advice": {},
+                      "adviceBasis": {},
+                      "bookId": {},
+                      "currency": {},
+                      "graded": {},
+                      "includePickemEntries": {},
+                      "league": {},
+                      "range": {},
+                      "recordKind": {},
+                      "result": {},
+                      "search": {},
+                      "source": {},
+                      "sport": {}
+                    },
+                    "required": [
+                      "range",
+                      "includePickemEntries",
+                      "recordKind",
+                      "advice",
+                      "adviceBasis",
+                      "result",
+                      "graded",
+                      "search",
+                      "currency",
+                      "source"
+                    ],
+                    "type": "object"
+                  },
+                  "generation": {
+                    "pattern": "^\\d{1,19}$",
+                    "type": "string"
+                  },
+                  "limitations": {
+                    "items": {},
+                    "maxItems": 8,
+                    "type": "array"
+                  },
+                  "minorUnits": {
+                    "maximum": 4,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "reconstruction": {
+                    "const": "current_recorded_results",
+                    "type": "string"
+                  },
+                  "series": {
+                    "items": {},
+                    "maxItems": 10,
+                    "type": "array"
+                  },
+                  "source": {
+                    "enum": [
+                      "sportsbook_record",
+                      "provider_autograde",
+                      "self_reported"
+                    ],
+                    "type": "string"
+                  },
+                  "timezone": {
+                    "type": "string"
+                  },
+                  "undated": {
+                    "properties": {
+                      "basis": {},
+                      "knownNetMinor": {},
+                      "knownResults": {},
+                      "missingResults": {},
+                      "records": {}
+                    },
+                    "required": [
+                      "records",
+                      "knownResults",
+                      "missingResults",
+                      "knownNetMinor",
+                      "basis"
+                    ],
+                    "type": "object"
+                  },
+                  "version": {
+                    "const": "bsd-history-chart-v1",
+                    "type": "string"
+                  },
+                  "window": {
+                    "properties": {
+                      "basis": {},
+                      "from": {},
+                      "to": {}
+                    },
+                    "required": [
+                      "from",
+                      "to",
+                      "basis"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "version",
+                  "generation",
+                  "asOf",
+                  "timezone",
+                  "currency",
+                  "minorUnits",
+                  "source",
+                  "filters",
+                  "window",
+                  "reconstruction",
+                  "bucketDays",
+                  "series",
+                  "undated",
+                  "limitations"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": {},
+                "properties": {
+                  "amounts": {
+                    "properties": {
+                      "cashReturnMinor": {},
+                      "cashRiskMinor": {},
+                      "contractedProfitMinor": {},
+                      "realizedProfitMinor": {},
+                      "stakeMinor": {}
+                    },
+                    "required": [
+                      "stakeMinor",
+                      "cashRiskMinor",
+                      "contractedProfitMinor",
+                      "realizedProfitMinor",
+                      "cashReturnMinor"
+                    ],
+                    "type": "object"
+                  },
+                  "book": {
+                    "properties": {
+                      "abbr": {},
+                      "id": {},
+                      "name": {}
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "abbr"
+                    ],
+                    "type": "object"
+                  },
+                  "currency": {
+                    "properties": {
+                      "code": {},
+                      "minorUnits": {},
+                      "source": {}
+                    },
+                    "required": [
+                      "code",
+                      "minorUnits",
+                      "source"
+                    ],
+                    "type": "object"
+                  },
+                  "currencyAnnotation": {
+                    "anyOf": [
+                      {
+                        "properties": {
+                          "confirmedAt": {},
+                          "currency": {},
+                          "importRevision": {},
+                          "recordId": {},
+                          "revision": {},
+                          "sourceDigest": {},
+                          "state": {}
+                        },
+                        "required": [
+                          "recordId",
+                          "importRevision",
+                          "sourceDigest",
+                          "currency",
+                          "revision",
+                          "confirmedAt",
+                          "state"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "duplicateLink": {
+                    "anyOf": [
+                      {
+                        "properties": {
+                          "confirmedAt": {},
+                          "importDigest": {},
+                          "importRecordId": {},
+                          "importRevision": {},
+                          "manualChangedSinceConfirmation": {},
+                          "manualRecordId": {},
+                          "manualRevision": {},
+                          "revision": {},
+                          "source": {}
+                        },
+                        "required": [
+                          "manualRecordId",
+                          "manualRevision",
+                          "revision",
+                          "importRecordId",
+                          "importRevision",
+                          "importDigest",
+                          "source",
+                          "confirmedAt",
+                          "manualChangedSinceConfirmation"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "incomplete": {
+                    "type": "boolean"
+                  },
+                  "intent": {
+                    "enum": [
+                      "singles",
+                      "parlay"
+                    ],
+                    "type": "string"
+                  },
+                  "legs": {
+                    "items": {},
+                    "maxItems": 100,
+                    "type": "array"
+                  },
+                  "limitations": {
+                    "items": {},
+                    "maxItems": 12,
+                    "type": "array"
+                  },
+                  "linkedManualCount": {
+                    "default": 0,
+                    "maximum": 100,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "oddsAmerican": {
+                    "anyOf": [
+                      {
+                        "maximum": 1000000,
+                        "minimum": -1000000,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "original": {
+                    "properties": {
+                      "bookReference": {},
+                      "special": {},
+                      "subtype": {},
+                      "type": {}
+                    },
+                    "required": [
+                      "bookReference",
+                      "type",
+                      "subtype",
+                      "special"
+                    ],
+                    "type": "object"
+                  },
+                  "outcome": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "win",
+                          "loss",
+                          "push",
+                          "void",
+                          "cashout",
+                          "halfwin",
+                          "halfloss"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "placement": {
+                    "enum": [
+                      "provider_record",
+                      "self_reported"
+                    ],
+                    "type": "string"
+                  },
+                  "recordKind": {
+                    "enum": [
+                      "import",
+                      "manual"
+                    ],
+                    "type": "string"
+                  },
+                  "revision": {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  },
+                  "settlementSource": {
+                    "enum": [
+                      "sportsbook_record",
+                      "provider_autograde",
+                      "self_reported"
+                    ],
+                    "type": "string"
+                  },
+                  "sourceDigest": {
+                    "pattern": "^[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "status": {
+                    "enum": [
+                      "open",
+                      "settled"
+                    ],
+                    "type": "string"
+                  },
+                  "ticketId": {
+                    "anyOf": [
+                      {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "timeline": {
+                    "properties": {
+                      "firstRecordedAt": {},
+                      "observedAt": {},
+                      "placedAt": {},
+                      "settledAt": {},
+                      "settledDate": {}
+                    },
+                    "required": [
+                      "placedAt",
+                      "settledAt",
+                      "settledDate",
+                      "firstRecordedAt",
+                      "observedAt"
+                    ],
+                    "type": "object"
+                  },
+                  "title": {
+                    "maxLength": 500,
+                    "type": "string"
+                  },
+                  "version": {
+                    "const": "bsd-history-record-v1",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "version",
+                  "id",
+                  "revision",
+                  "recordKind",
+                  "settlementSource",
+                  "placement",
+                  "currencyAnnotation",
+                  "duplicateLink",
+                  "linkedManualCount",
+                  "ticketId",
+                  "sourceDigest",
+                  "title",
+                  "book",
+                  "intent",
+                  "currency",
+                  "status",
+                  "outcome",
+                  "timeline",
+                  "amounts",
+                  "oddsAmerican",
+                  "legs",
+                  "incomplete",
+                  "limitations"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": {},
+                "properties": {
+                  "generation": {
+                    "pattern": "^\\d{1,19}$",
+                    "type": "string"
+                  },
+                  "items": {
+                    "items": {},
+                    "maxItems": 25,
+                    "type": "array"
+                  },
+                  "limitations": {
+                    "items": {},
+                    "maxItems": 5,
+                    "type": "array"
+                  },
+                  "next": {
+                    "anyOf": [
+                      {
+                        "maxLength": 1500,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "record": {
+                    "properties": {
+                      "id": {},
+                      "kind": {},
+                      "placedAt": {},
+                      "revision": {},
+                      "sourceDigest": {}
+                    },
+                    "required": [
+                      "id",
+                      "kind",
+                      "revision",
+                      "sourceDigest",
+                      "placedAt"
+                    ],
+                    "type": "object"
+                  },
+                  "version": {
+                    "const": "bsd-history-doctor-decisions-v1",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "version",
+                  "generation",
+                  "record",
+                  "items",
+                  "next",
+                  "limitations"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": {},
+                "properties": {
+                  "items": {
+                    "items": {
+                      "additionalProperties": {},
+                      "properties": {
+                        "bookCode": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "originalScore": {
+                          "anyOf": [
+                            {
+                              "additionalProperties": {},
+                              "properties": {
+                                "meaning": {
+                                  "type": "string"
+                                },
+                                "rank": {
+                                  "type": "string"
+                                },
+                                "score": {
+                                  "type": "number"
+                                }
+                              },
+                              "required": [
+                                "rank",
+                                "score",
+                                "meaning"
+                              ],
+                              "type": "object"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "savedAt": {
+                          "type": "string"
+                        },
+                        "storedBlobDigest": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "unavailableReason": {
+                          "anyOf": [
+                            {
+                              "const": "original_format_needs_reader",
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "storedBlobDigest",
+                        "title",
+                        "savedAt",
+                        "originalScore",
+                        "bookCode",
+                        "unavailableReason"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "next": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": {},
+                        "properties": {
+                          "id": {},
+                          "updatedAt": {}
+                        },
+                        "required": [
+                          "updatedAt",
+                          "id"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "source": {
+                    "const": "saved_legacy_app_reports",
+                    "type": "string"
+                  },
+                  "version": {
+                    "const": "bsd-legacy-report-list-v1",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "version",
+                  "items",
+                  "next",
+                  "source"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": {},
+                "properties": {
+                  "bookCode": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "canRegradeWithoutConfirmation": {
+                    "const": false,
+                    "type": "boolean"
+                  },
+                  "combinedOdds": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "confirmedPlacement": {
+                    "const": false,
+                    "type": "boolean"
+                  },
+                  "currency": {
+                    "type": "null"
+                  },
+                  "explanation": {
+                    "additionalProperties": {},
+                    "properties": {
+                      "evidence": {},
+                      "verdict": {},
+                      "whyThisRank": {}
+                    },
+                    "required": [
+                      "verdict",
+                      "whyThisRank",
+                      "evidence"
+                    ],
+                    "type": "object"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "legs": {
+                    "items": {},
+                    "type": "array"
+                  },
+                  "limitations": {
+                    "items": {},
+                    "type": "array"
+                  },
+                  "originalDepth": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "originalReferences": {
+                    "additionalProperties": {},
+                    "properties": {
+                      "analysisId": {},
+                      "betId": {},
+                      "jobId": {},
+                      "reportId": {},
+                      "ticketId": {},
+                      "ticketRevision": {}
+                    },
+                    "required": [
+                      "analysisId",
+                      "jobId",
+                      "reportId",
+                      "ticketId",
+                      "betId",
+                      "ticketRevision"
+                    ],
+                    "type": "object"
+                  },
+                  "originalResponse": {
+                    "additionalProperties": {},
+                    "properties": {},
+                    "type": "object"
+                  },
+                  "originalScore": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": {},
+                        "properties": {
+                          "meaning": {},
+                          "rank": {},
+                          "score": {}
+                        },
+                        "required": [
+                          "rank",
+                          "score",
+                          "meaning"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "originalStake": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "responseDigest": {
+                    "type": "string"
+                  },
+                  "savedAt": {
+                    "type": "string"
+                  },
+                  "slipText": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "const": "saved_legacy_app_report",
+                    "type": "string"
+                  },
+                  "sourceDigest": {
+                    "type": "string"
+                  },
+                  "storedBlobDigest": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "const": "bsd-legacy-report-view-v1",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "version",
+                  "id",
+                  "savedAt",
+                  "source",
+                  "sourceDigest",
+                  "responseDigest",
+                  "storedBlobDigest",
+                  "title",
+                  "slipText",
+                  "legs",
+                  "originalScore",
+                  "originalDepth",
+                  "bookCode",
+                  "combinedOdds",
+                  "originalStake",
+                  "currency",
+                  "explanation",
+                  "originalResponse",
+                  "originalReferences",
+                  "canRegradeWithoutConfirmation",
+                  "confirmedPlacement",
+                  "limitations"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": {},
+                "properties": {
+                  "generation": {
+                    "type": "string"
+                  },
+                  "items": {
+                    "items": {
+                      "additionalProperties": {},
+                      "properties": {
+                        "item": {},
+                        "latestDoctor": {},
+                        "match": {},
+                        "metadata": {
+                          "properties": {
+                            "bookmarked": {
+                              "type": "boolean"
+                            },
+                            "notes": {
+                              "maxLength": 4000,
+                              "type": "string"
+                            },
+                            "record": {
+                              "properties": {
+                                "id": {},
+                                "kind": {}
+                              },
+                              "required": [
+                                "kind",
+                                "id"
+                              ],
+                              "type": "object"
+                            },
+                            "revision": {
+                              "maximum": 9007199254740991,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "tags": {
+                              "items": {},
+                              "maxItems": 20,
+                              "type": "array"
+                            },
+                            "updatedAt": {
+                              "anyOf": [
+                                {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "notes",
+                            "tags",
+                            "bookmarked",
+                            "record",
+                            "revision",
+                            "updatedAt"
+                          ],
+                          "type": "object"
+                        },
+                        "origin": {},
+                        "reasons": {}
+                      },
+                      "required": [
+                        "item",
+                        "origin",
+                        "metadata",
+                        "latestDoctor",
+                        "match",
+                        "reasons"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "next": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "total": {
+                    "type": "number"
+                  },
+                  "version": {
+                    "const": "bsd-history-recall-page-v1",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "version",
+                  "generation",
+                  "items",
+                  "total",
+                  "next"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": {},
+                "properties": {
+                  "generation": {
+                    "type": "string"
+                  },
+                  "records": {
+                    "type": "number"
+                  },
+                  "revisit": {
+                    "items": {},
+                    "type": "array"
+                  },
+                  "version": {
+                    "const": "bsd-history-recall-week-v1",
+                    "type": "string"
+                  },
+                  "weekStart": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "version",
+                  "generation",
+                  "weekStart",
+                  "records",
+                  "revisit"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": {},
+                "properties": {
+                  "events": {
+                    "items": {},
+                    "type": "array"
+                  },
+                  "generation": {
+                    "type": "string"
+                  },
+                  "metadata": {
+                    "properties": {
+                      "bookmarked": {},
+                      "notes": {},
+                      "record": {},
+                      "revision": {},
+                      "tags": {},
+                      "updatedAt": {}
+                    },
+                    "required": [
+                      "notes",
+                      "tags",
+                      "bookmarked",
+                      "record",
+                      "revision",
+                      "updatedAt"
+                    ],
+                    "type": "object"
+                  },
+                  "origin": {
+                    "enum": [
+                      "original",
+                      "tail",
+                      "fade",
+                      "unknown"
+                    ],
+                    "type": "string"
+                  },
+                  "record": {
+                    "$ref": "#/$defs/s0"
+                  },
+                  "version": {
+                    "const": "bsd-history-recall-detail-v1",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "version",
+                  "generation",
+                  "record",
+                  "metadata",
+                  "origin",
+                  "events"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": {},
+                "properties": {
+                  "currentCash": {
+                    "anyOf": [
+                      {
+                        "properties": {
+                          "amountMinor": {},
+                          "currency": {},
+                          "minorUnits": {},
+                          "source": {},
+                          "state": {}
+                        },
+                        "required": [
+                          "state",
+                          "amountMinor",
+                          "currency",
+                          "minorUnits",
+                          "source"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "properties": {
+                          "reason": {},
+                          "state": {}
+                        },
+                        "required": [
+                          "state",
+                          "reason"
+                        ],
+                        "type": "object"
+                      }
+                    ]
+                  },
+                  "items": {
+                    "items": {},
+                    "maxItems": 50,
+                    "type": "array"
+                  },
+                  "page": {
+                    "properties": {
+                      "adviceBasis": {},
+                      "adviceFilter": {},
+                      "asOf": {},
+                      "generation": {},
+                      "items": {},
+                      "limitations": {},
+                      "next": {},
+                      "pickemEntries": {},
+                      "timezone": {},
+                      "version": {},
+                      "window": {}
+                    },
+                    "required": [
+                      "version",
+                      "adviceFilter",
+                      "adviceBasis",
+                      "generation",
+                      "asOf",
+                      "timezone",
+                      "window",
+                      "items",
+                      "next",
+                      "limitations"
+                    ],
+                    "type": "object"
+                  },
+                  "ticket": {
+                    "properties": {
+                      "id": {},
+                      "inputDigest": {}
+                    },
+                    "required": [
+                      "id",
+                      "inputDigest"
+                    ],
+                    "type": "object"
+                  },
+                  "version": {
+                    "const": "bsd-grade-history-comparison-v1",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "version",
+                  "ticket",
+                  "page",
+                  "currentCash",
+                  "items"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": {},
+                "properties": {
+                  "generation": {
+                    "pattern": "^\\d{1,19}$",
+                    "type": "string"
+                  },
+                  "items": {
+                    "items": {},
+                    "maxItems": 25,
+                    "type": "array"
+                  },
+                  "version": {
+                    "const": "bsd-history-doctor-overview-v1",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "version",
+                  "generation",
+                  "items"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": {},
+                "properties": {
+                  "currentImportRevision": {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  },
+                  "generation": {
+                    "pattern": "^\\d{1,19}$",
+                    "type": "string"
+                  },
+                  "importRecordId": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "items": {
+                    "items": {},
+                    "maxItems": 100,
+                    "type": "array"
+                  },
+                  "version": {
+                    "const": "bsd-history-overlap-list-v1",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "version",
+                  "importRecordId",
+                  "currentImportRevision",
+                  "generation",
+                  "items"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": {},
+                "properties": {
+                  "items": {
+                    "items": {},
+                    "type": "array"
+                  },
+                  "next": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": {},
+                        "properties": {
+                          "createdAt": {},
+                          "id": {}
+                        },
+                        "required": [
+                          "createdAt",
+                          "id"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "version": {
+                    "not": {}
+                  }
+                },
+                "required": [
+                  "items",
+                  "next"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "error": {
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "error"
+            ],
+            "type": "object"
+          }
+        ],
+        "type": "object"
+      },
       "securitySchemes": [
         {
           "scopes": [
@@ -2699,7 +4591,7 @@
         "readOnlyHint": true,
         "title": "Price-shop a slip"
       },
-      "description": "Compare books on a saved slip, exactly the app's Compare books (POST tickets/compare-books): each leg's current price at up to 5 books (books: book ids; default the slip's own book, DraftKings and FanDuel), the best price for the bettor and how much the slip's own price gives up (lineShop). comparison is the app answer unchanged. Save the slip first (track_slip, ticket_actions save_live, scan_slip). Needs Pro or Elite, as the app (other plans: 402 comparison_plan_required). Never places a wager.",
+      "description": "Compare books on a saved slip, exactly the app's Compare books (POST tickets/compare-books): each leg's current price at up to 5 books (books: book ids; default the slip's own book, DraftKings and FanDuel), the best price for the bettor and how much the slip's own price gives up (lineShop). comparison is the app answer unchanged. Save the slip first (track_slip, ticket_actions save_live, scan_slip). Every paid plan, as the app; a free account gets { locked: true, betterPriceExists } only (no book or price). Never places a wager.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -2752,7 +4644,7 @@
         "readOnlyHint": false,
         "title": "Ask the Doctor"
       },
-      "description": "Read or change a Doctor conversation with version bsd-agent-doctor-v1 and an action; the individual Doctor tools omit version and action. Show a quote and get the customer’s yes before starting a reply; remember or forget a note only when they explicitly ask. Read the saved result before relaying an answer. A response style affects that reply only.",
+      "description": "Read or change a Doctor conversation with version bsd-agent-doctor-v1 and an action; the individual Doctor tools omit version and action. For quote send {version: \"bsd-agent-doctor-v1\", action: \"quote\", commandKey, threadId, sequence, text}: commandKey is a new 16–120 character letters/digits/underscore/hyphen key, reused on retry; threadId is the owned thread UUID; sequence is its current integer sequence (read action conversation); text is the question. Optional responseStyle applies only to this reply. Show the quote and get the customer’s yes, then start with {version: \"bsd-agent-doctor-v1\", action: \"start\", commandKey: a new key, quoteId: the quote id}. Remember or forget a note only when explicitly asked. Read the saved result before relaying an answer.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -2953,7 +4845,7 @@
         "readOnlyHint": true,
         "title": "Read Tail"
       },
-      "description": "Read Tail with version bsd-agent-tail-v1 and an action. The individual tools get_doctor_picks, get_doctor_parlays, get_league_order, get_tail_feed, tail_hot, tail_my_posts and get_tail_post omit version and action. More Tail reads on their app routes: timeline: GET tail/timeline params {limit, cursor}; timeline_post: GET tail/timeline/posts/{postId}; own_profile: GET tail/profile; profiles: GET tail/profiles params {prefix, limit, cursor}; profile: GET tail/profiles/{profileId}; profile_record: GET tail/profiles/{profileId}/record; profile_record_v2: GET tail/profiles/{profileId}/record-v2; profile_connections: GET tail/profiles/{profileId}/connections params {direction followers|following, limit, cursor}; relations: GET tail/relations params {kind follow|mute|block, limit, cursor}; search: POST tail/search params {query, category people|posts, limit, cursor}; lists: GET tail/lists params {limit, cursor}; list: GET tail/lists/{listId}; list_members: GET tail/lists/{listId}/members params {limit, cursor}; replies: GET tail/posts/{postId}/replies params {limit, cursor}; reply: GET tail/replies/{replyId}; moments: GET tail/moments params as the app; top: GET tail/top params as the app; top_v2: GET tail/top-v2 params {limit 1-50}; repost_state: GET tail/posts/{postId}/repost; post_grade: GET tail/posts/{postId}/grade; post_analysis: GET tail/posts/{postId}/analysis.",
+      "description": "Read Tail with version bsd-agent-tail-v1 and an action. The individual tools get_doctor_picks, get_doctor_parlays, get_league_order, get_tail_feed, tail_hot, tail_my_posts and get_tail_post omit version and action. More Tail reads on their app routes: vip_feed: GET vip/feed params {sellerId (required), cursor, limit 1-25}; subscriber feed for this account; vip_state: GET vip/state this account’s VIP subscriptions and seller state; community: GET community/tail params {limit, cursor, search, profile}; showcase: GET community/tail/showcase; showcase_posts: GET community/tail/showcase/posts params {ids}; verified_cappers: GET tail/verified-cappers; timeline: GET tail/timeline params {limit, cursor}; timeline_post: GET tail/timeline/posts/{postId}; own_profile: GET tail/profile; profiles: GET tail/profiles params {prefix, limit, cursor}; profile: GET tail/profiles/{profileId}; profile_record: GET tail/profiles/{profileId}/record; profile_record_v2: GET tail/profiles/{profileId}/record-v2 Public record: lead with netUnits when known, then win percentage and W-L-P; unknown units remain unavailable; profile_connections: GET tail/profiles/{profileId}/connections params {direction followers|following, limit, cursor}; relations: GET tail/relations params {kind follow|mute|block, limit, cursor}; search: POST tail/search params {query, category people|posts, limit, cursor}; lists: GET tail/lists params {limit, cursor}; list: GET tail/lists/{listId}; list_members: GET tail/lists/{listId}/members params {limit, cursor}; replies: GET tail/posts/{postId}/replies params {limit, cursor}; reply: GET tail/replies/{replyId}; moments: GET tail/moments params as the app; top: GET tail/top params as the app; top_v2: GET tail/top-v2 params {limit 1-50}; repost_state: GET tail/posts/{postId}/repost; post_grade: GET tail/posts/{postId}/grade; post_analysis: GET tail/posts/{postId}/analysis.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -2965,6 +4857,12 @@
               "doctor_parlays",
               "hot",
               "my_posts",
+              "vip_feed",
+              "vip_state",
+              "community",
+              "showcase",
+              "showcase_posts",
+              "verified_cappers",
               "timeline",
               "timeline_post",
               "own_profile",
@@ -3048,7 +4946,7 @@
                 "boolean"
               ]
             },
-            "description": "The app query (or tail/search body) for timeline, profiles, profile_connections, relations, search, lists, list_members, replies, moments, top, top_v2.",
+            "description": "The app query (or tail/search body) for vip_feed (sellerId required, cursor, limit 1-25), community, showcase_posts, timeline, profiles, profile_connections, relations, search, lists, list_members, replies, moments, top, top_v2.",
             "type": "object"
           },
           "postId": {
@@ -5406,6 +7304,85 @@
         "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": true,
+        "title": "Read Grade catalog"
+      },
+      "description": "Read this account’s Grade research options and available capabilities, including in-play eligibility when enabled. Does not start a Grade.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "get_grade_catalog",
+      "securitySchemes": [
+        {
+          "scopes": [
+            "reports.read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Read Grade catalog"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "reports.read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Read Grade groups"
+      },
+      "description": "Read the owned Grade job’s group scores as they become available. Status is pending, partial or final; partial scores can change and are not a saved final report. Does not start work.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "jobId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "jobId"
+        ],
+        "type": "object"
+      },
+      "name": "get_grade_groups",
+      "securitySchemes": [
+        {
+          "scopes": [
+            "reports.read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Read Grade groups"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "reports.read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
         "title": "Read saved Grade report"
       },
       "description": "Return the verified saved report for a completed Grade this account owns, by jobId. Returns unavailable until the saved report is readable; never grades again. headline carries the saved coarse letter and, for newer Grades, letterFine; show letterFine when present, otherwise letter. rockySummary carries each leg’s modeled win chance against its break-even and its EV, the chance all legs win, confidence, top risks and the NG reasons (chances and EV as fractions), and view: Research and Price, each a level (Strong, OK or Weak, or null when it couldn’t be checked) with a plain reason; what moved the Grade, by name; on Grades saved before 2026-11-05, the cap line when a better price capped the letter; and the checks that couldn’t run. The same breakdown the app shows.",
@@ -5564,6 +7541,42 @@
               },
               "price": {
                 "$ref": "#/$defs/s2"
+              },
+              "priceCompare": {
+                "properties": {
+                  "best": {
+                    "maxLength": 8,
+                    "minLength": 2,
+                    "type": "string"
+                  },
+                  "book": {
+                    "anyOf": [
+                      {
+                        "maxLength": 40,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "mine": {
+                    "maxLength": 8,
+                    "minLength": 2,
+                    "type": "string"
+                  },
+                  "mineIsBest": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "mine",
+                  "best",
+                  "book",
+                  "mineIsBest"
+                ],
+                "type": "object"
               },
               "research": {
                 "$ref": "#/$defs/s2"
@@ -5940,7 +7953,7 @@
         "readOnlyHint": true,
         "title": "Read bettor profile"
       },
-      "description": "Read this authenticated account’s bettor model, optionally filtered by topic: confirmed notes and revisions, separately attributed Honcho inferred context, source IDs when supplied, generation, recall state and as-of. Unavailable inference stays unavailable. Memory and AI consent apply; recalled statements never establish bet outcomes or change Grade math.",
+      "description": "Read this authenticated account’s bettor model, optionally filtered by topic: confirmed notes and revisions, separately attributed Honcho inferred context, source IDs when supplied, generation, recall state and as-of. Unavailable inference stays unavailable. Memory and AI consent apply; recalled statements never establish bet outcomes or change Grade math. For a public Tail record use tail_read profile_record_v2 (or get_capper_record when available), leading with net units.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -5954,6 +7967,180 @@
         "type": "object"
       },
       "name": "get_bettor_profile",
+      "outputSchema": {
+        "anyOf": [
+          {
+            "additionalProperties": {},
+            "properties": {
+              "asOf": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "confirmed": {
+                "items": {
+                  "properties": {
+                    "category": {
+                      "enum": [
+                        "preference",
+                        "goal",
+                        "constraint",
+                        "context"
+                      ],
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "expiresAt": {
+                      "anyOf": [
+                        {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "revision": {
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991,
+                      "type": "integer"
+                    },
+                    "source": {
+                      "const": "user_confirmed",
+                      "type": "string"
+                    },
+                    "text": {
+                      "maxLength": 1000,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "category",
+                    "text",
+                    "revision",
+                    "expiresAt",
+                    "createdAt",
+                    "updatedAt",
+                    "source"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 50,
+                "type": "array"
+              },
+              "generation": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "inferred": {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "attribution": {
+                        "const": "Honcho inferred context; provider supplies no source IDs",
+                        "type": "string"
+                      },
+                      "source": {
+                        "const": "honcho_inferred",
+                        "type": "string"
+                      },
+                      "sourceIds": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "maxItems": 100,
+                        "type": "array"
+                      },
+                      "text": {
+                        "maxLength": 4096,
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "source",
+                      "text",
+                      "sourceIds",
+                      "attribution"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "ownerId": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "recall": {
+                "enum": [
+                  "ready",
+                  "disabled",
+                  "unavailable",
+                  "not_configured",
+                  "retired"
+                ],
+                "type": "string"
+              },
+              "version": {
+                "const": "bsd-bettor-profile-v1",
+                "type": "string"
+              }
+            },
+            "required": [
+              "ownerId",
+              "generation",
+              "confirmed",
+              "inferred",
+              "recall",
+              "version",
+              "asOf"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "error": {
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "error"
+            ],
+            "type": "object"
+          }
+        ],
+        "type": "object"
+      },
       "securitySchemes": [
         {
           "scopes": [
@@ -6087,6 +8274,87 @@
         "type": "object"
       },
       "name": "remember_doctor_note",
+      "outputSchema": {
+        "anyOf": [
+          {
+            "additionalProperties": {},
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "generation": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "removed": {
+                "type": "boolean"
+              },
+              "revision": {
+                "anyOf": [
+                  {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "savedConversationCopies": {
+                "const": "retained_until_conversation_deletion",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "revision",
+              "generation",
+              "enabled",
+              "removed",
+              "savedConversationCopies"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "error": {
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "error"
+            ],
+            "type": "object"
+          }
+        ],
+        "type": "object"
+      },
       "securitySchemes": [
         {
           "scopes": [
@@ -6176,7 +8444,7 @@
         "readOnlyHint": false,
         "title": "Quote Doctor reply"
       },
-      "description": "Persist an app consult quote for text in the owned threadId at its current sequence, with optional responseStyle learning/technical/roast for this reply. Omit for the account default. Returns the allowance quote without starting a reply. Show the quote before requesting a start. Reuse its commandKey on every retry.",
+      "description": "Send commandKey (a new 16–120 character letters/digits/underscore/hyphen key), owned threadId UUID, current integer sequence from get_doctor_conversation, and text. Optional responseStyle learning/technical/roast applies to this reply; omit for the account default. Returns the allowance quote without starting a reply. Show the quote before requesting a start. Reuse its commandKey on every retry.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -6488,6 +8756,255 @@
         "type": "object"
       },
       "name": "get_league_order",
+      "outputSchema": {
+        "anyOf": [
+          {
+            "additionalProperties": {},
+            "properties": {
+              "asOf": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "handleShareAsOf": {
+                "type": "string"
+              },
+              "leagues": {
+                "items": {
+                  "properties": {
+                    "featured": {
+                      "type": "boolean"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "inSeason": {
+                      "type": "boolean"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "phase": {
+                      "enum": [
+                        "off",
+                        "pre",
+                        "regular",
+                        "opening",
+                        "playoffs",
+                        "finals",
+                        "event",
+                        "idle"
+                      ],
+                      "type": "string"
+                    },
+                    "rank": {
+                      "maximum": 9007199254740991,
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "weight": {
+                      "minimum": 0,
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "label",
+                    "rank",
+                    "weight",
+                    "phase",
+                    "inSeason",
+                    "featured"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 60,
+                "type": "array"
+              },
+              "slate": {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "defaultLeague": {
+                        "anyOf": [
+                          {
+                            "properties": {
+                              "key": {
+                                "maxLength": 40,
+                                "type": "string"
+                              },
+                              "label": {
+                                "maxLength": 20,
+                                "type": "string"
+                              },
+                              "leagueId": {
+                                "anyOf": [
+                                  {
+                                    "maxLength": 128,
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "sportId": {
+                                "maxLength": 128,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "key",
+                              "label",
+                              "leagueId",
+                              "sportId"
+                            ],
+                            "type": "object"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "expiresAt": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "featuredGame": {
+                        "anyOf": [
+                          {
+                            "properties": {
+                              "eventId": {
+                                "maxLength": 128,
+                                "type": "string"
+                              },
+                              "inPlay": {
+                                "type": "boolean"
+                              },
+                              "leagueId": {
+                                "anyOf": [
+                                  {
+                                    "maxLength": 128,
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "marketCount": {
+                                "anyOf": [
+                                  {
+                                    "maximum": 100000,
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "moreMarkets": {
+                                "type": "boolean"
+                              },
+                              "name": {
+                                "maxLength": 200,
+                                "type": "string"
+                              },
+                              "startTime": {
+                                "format": "date-time",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "eventId",
+                              "name",
+                              "leagueId",
+                              "startTime",
+                              "inPlay",
+                              "marketCount",
+                              "moreMarkets"
+                            ],
+                            "type": "object"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "observedAt": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "version": {
+                        "const": "bsd-home-slate-v1",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "version",
+                      "observedAt",
+                      "expiresAt",
+                      "defaultLeague",
+                      "featuredGame"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "source": {
+                "const": "espn_scoreboards+handle_table",
+                "type": "string"
+              },
+              "version": {
+                "const": "bsd-league-order-v1",
+                "type": "string"
+              },
+              "weekOf": {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "version",
+              "asOf",
+              "weekOf",
+              "handleShareAsOf",
+              "source",
+              "leagues",
+              "slate"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "error": {
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "error"
+            ],
+            "type": "object"
+          }
+        ],
+        "type": "object"
+      },
       "securitySchemes": [
         {
           "scopes": [
@@ -6533,6 +9050,189 @@
         "type": "object"
       },
       "name": "get_doctor_picks",
+      "outputSchema": {
+        "anyOf": [
+          {
+            "additionalProperties": {},
+            "properties": {
+              "asOf": {
+                "type": "string"
+              },
+              "items": {
+                "items": {
+                  "additionalProperties": {},
+                  "properties": {
+                    "expiresAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "key": {
+                      "type": "string"
+                    },
+                    "post": {
+                      "additionalProperties": {},
+                      "properties": {
+                        "author": {
+                          "additionalProperties": {},
+                          "properties": {
+                            "displayName": {
+                              "type": "string"
+                            },
+                            "handle": {
+                              "type": "string"
+                            },
+                            "id": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "handle",
+                            "displayName"
+                          ],
+                          "type": "object"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "kind": {
+                          "type": "string"
+                        },
+                        "revision": {
+                          "type": "number"
+                        },
+                        "state": {
+                          "type": "string"
+                        },
+                        "text": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        },
+                        "version": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "version",
+                        "id",
+                        "author",
+                        "text",
+                        "kind",
+                        "state",
+                        "revision",
+                        "createdAt",
+                        "updatedAt"
+                      ],
+                      "type": "object"
+                    },
+                    "preview": {
+                      "additionalProperties": {},
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "version": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "version",
+                        "id"
+                      ],
+                      "type": "object"
+                    },
+                    "result": {
+                      "anyOf": [
+                        {
+                          "enum": [
+                            "WON",
+                            "LOST",
+                            "PUSH"
+                          ],
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "settledAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "state": {
+                      "enum": [
+                        "current",
+                        "pending",
+                        "settled"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "state",
+                    "result",
+                    "settledAt",
+                    "expiresAt",
+                    "preview"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "locked": {
+                "type": "boolean"
+              },
+              "version": {
+                "const": "bsd-live-doctor-picks-v1",
+                "type": "string"
+              }
+            },
+            "required": [
+              "version",
+              "locked",
+              "asOf",
+              "items"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "error": {
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "error"
+            ],
+            "type": "object"
+          }
+        ],
+        "type": "object"
+      },
       "securitySchemes": [
         {
           "scopes": [
@@ -7053,6 +9753,184 @@
         "type": "object"
       },
       "name": "tail_hot",
+      "outputSchema": {
+        "$defs": {
+          "s0": {
+            "additionalProperties": {},
+            "properties": {
+              "author": {
+                "$ref": "#/$defs/s1"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "revision": {
+                "type": "number"
+              },
+              "state": {
+                "type": "string"
+              },
+              "text": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              },
+              "version": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "version",
+              "id",
+              "author",
+              "text",
+              "kind",
+              "state",
+              "revision",
+              "createdAt",
+              "updatedAt"
+            ],
+            "type": "object"
+          },
+          "s1": {
+            "additionalProperties": {},
+            "properties": {
+              "displayName": {
+                "type": "string"
+              },
+              "handle": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "handle",
+              "displayName"
+            ],
+            "type": "object"
+          }
+        },
+        "anyOf": [
+          {
+            "additionalProperties": {},
+            "properties": {
+              "asOf": {
+                "type": "string"
+              },
+              "gradeFamily": {
+                "type": "string"
+              },
+              "items": {
+                "items": {
+                  "additionalProperties": {},
+                  "properties": {
+                    "hot": {
+                      "additionalProperties": {},
+                      "properties": {
+                        "fire": {
+                          "type": "number"
+                        },
+                        "score": {
+                          "type": "number"
+                        },
+                        "tails": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "fire",
+                        "tails",
+                        "score"
+                      ],
+                      "type": "object"
+                    },
+                    "kind": {
+                      "const": "graded_post",
+                      "type": "string"
+                    },
+                    "post": {
+                      "$ref": "#/$defs/s0"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "post",
+                    "hot"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/s0"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "ranking": {
+                "type": "string"
+              },
+              "version": {
+                "const": "bsd-tail-hot-v1",
+                "type": "string"
+              },
+              "window": {
+                "const": "24h",
+                "type": "string"
+              }
+            },
+            "required": [
+              "version",
+              "window",
+              "gradeFamily",
+              "ranking",
+              "asOf",
+              "pinned",
+              "items"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "error": {
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "error"
+            ],
+            "type": "object"
+          }
+        ],
+        "type": "object"
+      },
       "securitySchemes": [
         {
           "scopes": [
@@ -9348,7 +12226,7 @@
         "readOnlyHint": true,
         "title": "Get a plan upgrade link"
       },
-      "description": "Return the betslipdoctor.ai link (linkUrl) where the customer upgrades, the same page the website uses. plan is the plan they want (starter, pro or elite; default the next plan up), interval month or year (default month). The customer opens the link, signs in with this same account and confirms there; this tool never charges, never starts a payment and never changes the plan. A plan already billed by card gets the account page link, where Manage subscription switches it.",
+      "description": "Return the betslipdoctor.ai link (linkUrl) where the customer upgrades or manages a card subscription. plan is the plan they want (starter, pro or elite; default the next plan up), interval month or year (default month). Card subscribers at any tier get the account page link. The customer opens the link, signs in with this same account and makes changes there; this tool never charges, starts a payment or changes the plan.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
@@ -10325,7 +13203,7 @@
         "readOnlyHint": false,
         "title": "Account settings"
       },
-      "description": "Read and change this account through its signed-in product routes. Change AI and model-training privacy settings in the app. Sportsbook actions follow the app's plan permissions. Bug-report actions use server reports, separate from reports held only on a device; those routes must be enabled. preferences: GET account; set_preferences: POST account/preferences {roastLevel?, morningRounds?, unitMinor?, bankrollMinor?, oddsFormat?, gradeDepthDefault?}; use set_timezone for timezone; favorite_teams: GET account/favorite-teams Saved priority team IDs, separate from Settings sports preferences; set_favorite_teams: POST account/favorite-teams {favoriteTeamIds: string[]}; replaces the saved priority list; sports_preferences: GET account/onboarding-preferences Settings leagues and teams; set_sports_preferences: POST account/onboarding-preferences {selections, mode, expectedRevision, confirmed: true}; read current selections and revision first; merge keeps existing selections, replace replaces the entire list; send only after the owner confirms; use onboarding_preferences catalog and teams for current source IDs; set_timezone: POST account/timezone {timezone}; quota: GET account/quota; book_balances: GET sportsbooks/balances; set_book_currency: POST sportsbooks/currency {accountId, identityDigest, expectedRevision, currency: supported uppercase three-letter code with two decimal places | null, confirmation: ACCOUNT_CURRENCY}; send only after the owner confirms; seen_books: GET sportsbooks/seen; bug_report: POST bug-reports {area, whatHappened, whatExpected?, app?}; bug_reports: GET bug-reports; bug_rewards: GET bug-reports/rewards. Confirm the requested change with the customer before a write. A valid write is sent without a separate MCP preview unless the action says otherwise.",
+      "description": "Read and change this account through its signed-in product routes. Change AI and model-training privacy settings in the app. Sportsbook actions follow the app's plan permissions. Bug-report actions use server reports, separate from reports held only on a device; those routes must be enabled. preferences: GET account; set_preferences: POST account/preferences {roastLevel?, morningRounds?, unitMinor?, bankrollMinor?, oddsFormat?, gradeDepthDefault?}; use set_timezone for timezone; favorite_teams: GET account/favorite-teams Saved priority team IDs, separate from Settings sports preferences; set_favorite_teams: POST account/favorite-teams {favoriteTeamIds: string[]}; replaces the saved priority list; sports_preferences: GET account/onboarding-preferences Settings leagues and teams; set_sports_preferences: POST account/onboarding-preferences {selections, mode, expectedRevision, confirmed: true}; read current selections and revision first; merge keeps existing selections, replace replaces the entire list; send only after the owner confirms; use onboarding_preferences catalog and teams for current source IDs; set_timezone: POST account/timezone {timezone}; quota: GET account/quota; research_balance: GET units/balance Research units balance and usage; book_balances: GET sportsbooks/balances; set_book_currency: POST sportsbooks/currency {accountId, identityDigest, expectedRevision, currency: supported uppercase three-letter code with two decimal places | null, confirmation: ACCOUNT_CURRENCY}; send only after the owner confirms; seen_books: GET sportsbooks/seen; bug_report: POST bug-reports {area, whatHappened, whatExpected?, app?}; bug_reports: GET bug-reports; bug_rewards: GET bug-reports/rewards. Confirm the requested change with the customer before a write. A valid write is sent without a separate MCP preview unless the action says otherwise.",
       "inputSchema": {
         "additionalProperties": false,
         "allOf": [
@@ -10398,6 +13276,7 @@
               "set_sports_preferences",
               "set_timezone",
               "quota",
+              "research_balance",
               "book_balances",
               "set_book_currency",
               "seen_books",
@@ -10463,12 +13342,131 @@
         "readOnlyHint": false,
         "title": "History: record a bet, notes, links"
       },
-      "description": "Write this account's History as the app does. Record a bet only when the customer says they placed it. save_manual: POST history/manual {id?, expectedRevision?, confirmation PLACED, input {ticketId, placedAt, status, outcome, ...}}; set_currency: POST history/currency app body; save_link: POST history/links app body (link an import to a manual record); recall_save: POST history/recall/organization app body (notes, tags, bookmark). Confirm the requested change with the customer before a write. A valid write is sent without a separate MCP preview unless the action says otherwise.",
+      "description": "Write this account's History as the app does. Record a bet only when the customer says they placed it. report_advice_response: POST history/advice/response {reportId, reportDigest, expectedRevision, confirmation: SAVE_RESPONSE, input: {exposure, decision, claimedViewedAt, claimedDecisionAt, modifiedTicketId}}; read report_advice first, show the exact response to the customer and send only after their explicit confirmation; reuse commandKey on retry; save_manual: POST history/manual {id?, expectedRevision?, confirmation PLACED, input {ticketId, placedAt, status, outcome, ...}}; set_currency: POST history/currency app body; save_link: POST history/links app body (link an import to a manual record); recall_save: POST history/recall/organization app body (notes, tags, bookmark). Confirm the requested change with the customer before a write. A valid write is sent without a separate MCP preview unless the action says otherwise.",
       "inputSchema": {
         "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "report_advice_response"
+                }
+              },
+              "required": [
+                "action"
+              ]
+            },
+            "then": {
+              "properties": {
+                "body": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "additionalProperties": false,
+                  "properties": {
+                    "confirmation": {
+                      "const": "SAVE_RESPONSE",
+                      "type": "string"
+                    },
+                    "expectedRevision": {
+                      "maximum": 999999999,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "input": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "claimedDecisionAt": {
+                          "anyOf": [
+                            {
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "claimedViewedAt": {
+                          "anyOf": [
+                            {
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "decision": {
+                          "enum": [
+                            "unknown",
+                            "followed",
+                            "modified",
+                            "rejected"
+                          ],
+                          "type": "string"
+                        },
+                        "exposure": {
+                          "enum": [
+                            "unknown",
+                            "unseen",
+                            "viewed"
+                          ],
+                          "type": "string"
+                        },
+                        "modifiedTicketId": {
+                          "anyOf": [
+                            {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "exposure",
+                        "decision",
+                        "claimedViewedAt",
+                        "claimedDecisionAt",
+                        "modifiedTicketId"
+                      ],
+                      "type": "object"
+                    },
+                    "reportDigest": {
+                      "pattern": "^[a-f0-9]{64}$",
+                      "type": "string"
+                    },
+                    "reportId": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "reportId",
+                    "reportDigest",
+                    "expectedRevision",
+                    "confirmation",
+                    "input"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "commandKey",
+                "body"
+              ]
+            }
+          }
+        ],
         "properties": {
           "action": {
             "enum": [
+              "report_advice_response",
               "save_manual",
               "set_currency",
               "save_link",
@@ -10650,6 +13648,370 @@
         "type": "object"
       },
       "name": "get_betting_leaks",
+      "outputSchema": {
+        "$defs": {
+          "s0": {
+            "properties": {
+              "denominator": {
+                "type": "string"
+              },
+              "numerator": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "numerator",
+              "denominator"
+            ],
+            "type": "object"
+          }
+        },
+        "anyOf": [
+          {
+            "additionalProperties": {},
+            "properties": {
+              "asOf": {
+                "type": "string"
+              },
+              "coverage": {
+                "properties": {
+                  "completeConnectedHistory": {
+                    "const": false,
+                    "type": "boolean"
+                  },
+                  "duplicatePolicy": {
+                    "const": "linked_manual_excluded_unlinked_manual_excluded_conflicting_imports_excluded",
+                    "type": "string"
+                  },
+                  "eligibleTickets": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "exclusions": {
+                    "additionalProperties": {
+                      "maximum": 9007199254740991,
+                      "minimum": -9007199254740991,
+                      "type": "integer"
+                    },
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  },
+                  "scannedRecords": {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  "source": {
+                    "const": "available_owned_sportsbook_cash_tickets",
+                    "type": "string"
+                  },
+                  "timeWindowBasis": {
+                    "const": "placement_in_bettor_timezone",
+                    "type": "string"
+                  },
+                  "unitBasis": {
+                    "const": "immutable_placement_unit",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "scannedRecords",
+                  "eligibleTickets",
+                  "exclusions",
+                  "source",
+                  "completeConnectedHistory",
+                  "duplicatePolicy",
+                  "unitBasis",
+                  "timeWindowBasis"
+                ],
+                "type": "object"
+              },
+              "generation": {
+                "type": "string"
+              },
+              "leaks": {
+                "items": {
+                  "properties": {
+                    "L": {
+                      "maximum": 9007199254740991,
+                      "minimum": -9007199254740991,
+                      "type": "integer"
+                    },
+                    "P": {
+                      "maximum": 9007199254740991,
+                      "minimum": -9007199254740991,
+                      "type": "integer"
+                    },
+                    "V": {
+                      "maximum": 9007199254740991,
+                      "minimum": -9007199254740991,
+                      "type": "integer"
+                    },
+                    "W": {
+                      "maximum": 9007199254740991,
+                      "minimum": -9007199254740991,
+                      "type": "integer"
+                    },
+                    "comparison": {
+                      "properties": {
+                        "L": {
+                          "maximum": 9007199254740991,
+                          "minimum": -9007199254740991,
+                          "type": "integer"
+                        },
+                        "P": {
+                          "maximum": 9007199254740991,
+                          "minimum": -9007199254740991,
+                          "type": "integer"
+                        },
+                        "V": {
+                          "maximum": 9007199254740991,
+                          "minimum": -9007199254740991,
+                          "type": "integer"
+                        },
+                        "W": {
+                          "maximum": 9007199254740991,
+                          "minimum": -9007199254740991,
+                          "type": "integer"
+                        },
+                        "n": {
+                          "maximum": 9007199254740991,
+                          "minimum": -9007199254740991,
+                          "type": "integer"
+                        },
+                        "netUnits": {
+                          "$ref": "#/$defs/s0"
+                        },
+                        "roi": {
+                          "$ref": "#/$defs/s0"
+                        },
+                        "stakedUnits": {
+                          "$ref": "#/$defs/s0"
+                        },
+                        "ticketIds": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "n",
+                        "W",
+                        "L",
+                        "P",
+                        "V",
+                        "ticketIds",
+                        "netUnits",
+                        "stakedUnits",
+                        "roi"
+                      ],
+                      "type": "object"
+                    },
+                    "family": {
+                      "enum": [
+                        "player_props",
+                        "team_under",
+                        "sunday_night",
+                        "four_plus",
+                        "market_singles"
+                      ],
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "n": {
+                      "maximum": 9007199254740991,
+                      "minimum": -9007199254740991,
+                      "type": "integer"
+                    },
+                    "netUnits": {
+                      "$ref": "#/$defs/s0"
+                    },
+                    "roi": {
+                      "$ref": "#/$defs/s0"
+                    },
+                    "sentence": {
+                      "type": "string"
+                    },
+                    "stakedUnits": {
+                      "$ref": "#/$defs/s0"
+                    },
+                    "thresholds": {
+                      "anyOf": [
+                        {
+                          "properties": {
+                            "lossRate": {
+                              "type": "string"
+                            },
+                            "n": {
+                              "type": "number"
+                            },
+                            "netUnits": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "n",
+                            "lossRate",
+                            "netUnits"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "properties": {
+                            "n": {
+                              "type": "number"
+                            },
+                            "netUnits": {
+                              "type": "string"
+                            },
+                            "roi": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "n",
+                            "netUnits"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "properties": {
+                            "lossPerUnitRatio": {
+                              "type": "number"
+                            },
+                            "nEach": {
+                              "type": "number"
+                            },
+                            "negativeRoiBoth": {
+                              "type": "boolean"
+                            },
+                            "stakedUnitsEach": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "nEach",
+                            "stakedUnitsEach",
+                            "negativeRoiBoth",
+                            "lossPerUnitRatio"
+                          ],
+                          "type": "object"
+                        }
+                      ]
+                    },
+                    "ticketIds": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "n",
+                    "W",
+                    "L",
+                    "P",
+                    "V",
+                    "ticketIds",
+                    "netUnits",
+                    "stakedUnits",
+                    "roi",
+                    "id",
+                    "family",
+                    "sentence",
+                    "thresholds"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "period": {
+                "properties": {
+                  "basis": {
+                    "const": "actual_settlement_time",
+                    "type": "string"
+                  },
+                  "from": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "to": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "from",
+                  "to",
+                  "basis"
+                ],
+                "type": "object"
+              },
+              "range": {
+                "enum": [
+                  "1w",
+                  "1m",
+                  "3m",
+                  "1y",
+                  "ytd",
+                  "all"
+                ],
+                "type": "string"
+              },
+              "timezone": {
+                "type": "string"
+              },
+              "version": {
+                "const": "bsd-betting-leaks-v1",
+                "type": "string"
+              }
+            },
+            "required": [
+              "version",
+              "range",
+              "generation",
+              "asOf",
+              "timezone",
+              "period",
+              "coverage",
+              "leaks"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "error": {
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "error"
+            ],
+            "type": "object"
+          }
+        ],
+        "type": "object"
+      },
       "securitySchemes": [
         {
           "scopes": [
@@ -12280,6 +15642,115 @@
         "type": "object"
       },
       "name": "match_ticket_legs",
+      "outputSchema": {
+        "anyOf": [
+          {
+            "additionalProperties": {},
+            "properties": {
+              "defaultJurisdiction": {
+                "type": "string"
+              },
+              "legs": {
+                "items": {
+                  "properties": {
+                    "index": {
+                      "maximum": 9007199254740991,
+                      "minimum": -9007199254740991,
+                      "type": "integer"
+                    },
+                    "match": {
+                      "properties": {
+                        "eventId": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "market": {},
+                        "marketId": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "status": {
+                          "enum": [
+                            "matched",
+                            "event_only",
+                            "ambiguous",
+                            "unmatched"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "eventId",
+                        "marketId",
+                        "market"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "index",
+                    "match"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "matchedLegs": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "totalLegs": {
+                "maximum": 9007199254740991,
+                "minimum": -9007199254740991,
+                "type": "integer"
+              },
+              "version": {
+                "const": "bsd-ticket-leg-match-v1",
+                "type": "string"
+              }
+            },
+            "required": [
+              "version",
+              "legs",
+              "totalLegs",
+              "matchedLegs",
+              "defaultJurisdiction"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "error": {
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "error"
+            ],
+            "type": "object"
+          }
+        ],
+        "type": "object"
+      },
       "securitySchemes": [
         {
           "scopes": [
@@ -12598,15 +16069,27 @@
         "readOnlyHint": false,
         "title": "Let the Doctor fix a graded slip"
       },
-      "description": "The app’s Fix it on an owned saved Grade jobId whose get_grade_report says fixable.offered: the Doctor reprices, swaps or drops weak legs at the slip’s own sportsbook and returns the app’s estimate (state fixed | best_reachable | no_moves, steps per leg, blockers, fixedTicket saved unplaced). after is the Doctor’s estimate, never a saved Grade: re-grade with regradeQuote to confirm. A Grade with no fix answers fix_not_offered with its reason. Paid plans, under the daily fix cap; costs no Grade. Keep commandKey (16-120 characters) stable; a replay returns the same estimate. Never places a wager or moves money.",
+      "description": "The app’s Fix it on an owned saved Grade jobId whose get_grade_report says fixable.offered: the Doctor reprices, swaps or drops weak legs at the slip’s own sportsbook and returns the app’s estimate (state fixed | best_reachable | no_moves, steps per leg, blockers, fixedTicket saved unplaced). after is the Doctor’s estimate, never a saved Grade: re-grade with regradeQuote to confirm. A Grade with no fix answers fix_not_offered with its reason. Paid plans, under the daily fix cap; costs no Grade. Keep commandKey (16-120 characters) stable; a replay returns the same estimate. To start the quoted re-grade after the customer confirms, call with action confirm_regrade, original jobId, fixId, confirmed true and a new commandKey; this spends a Grade. Never places a wager or moves money.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
         "properties": {
+          "action": {
+            "const": "confirm_regrade",
+            "type": "string"
+          },
           "commandKey": {
             "maxLength": 120,
             "minLength": 16,
             "pattern": "^[a-zA-Z0-9_-]+$",
+            "type": "string"
+          },
+          "confirmed": {
+            "const": true,
+            "type": "boolean"
+          },
+          "fixId": {
+            "format": "uuid",
             "type": "string"
           },
           "jobId": {
@@ -12633,33 +16116,6 @@
       "outputSchema": {
         "$defs": {
           "s0": {
-            "properties": {
-              "id": {
-                "maxLength": 200,
-                "minLength": 1,
-                "pattern": "^[a-zA-Z0-9_.:@/-]+$",
-                "type": "string"
-              },
-              "label": {
-                "anyOf": [
-                  {
-                    "maxLength": 80,
-                    "minLength": 1,
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              }
-            },
-            "required": [
-              "id",
-              "label"
-            ],
-            "type": "object"
-          },
-          "s1": {
             "properties": {
               "letter": {
                 "enum": [
@@ -12694,526 +16150,202 @@
             "type": "object"
           }
         },
-        "properties": {
-          "after": {
-            "anyOf": [
-              {
-                "properties": {
-                  "basis": {
-                    "const": "doctor_estimate",
-                    "type": "string"
-                  },
-                  "factors": {
-                    "items": {
-                      "properties": {
-                        "id": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "id"
-                      ],
-                      "type": "object"
-                    },
-                    "type": "array"
-                  },
-                  "letter": {
-                    "enum": [
-                      "A+",
-                      "A",
-                      "A-",
-                      "B+",
-                      "B",
-                      "B-",
-                      "C+",
-                      "C",
-                      "C-",
-                      "D+",
-                      "D",
-                      "D-",
-                      "F+",
-                      "F",
-                      "F-"
-                    ],
-                    "type": "string"
-                  },
-                  "research": {},
-                  "score": {
-                    "maximum": 100,
-                    "minimum": 0,
-                    "type": "integer"
-                  }
-                },
-                "required": [
-                  "basis",
-                  "score",
-                  "letter",
-                  "factors",
-                  "research"
-                ],
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "before": {
-            "$ref": "#/$defs/s1"
-          },
-          "blockers": {
-            "items": {
-              "properties": {
-                "code": {
-                  "enum": [
-                    "prices_below_fair",
-                    "unit_not_set",
-                    "no_doctor_pick",
-                    "doctor_pick_not_at_book",
-                    "research_light",
-                    "legs_removed_in_play",
-                    "nothing_better",
-                    "games_started",
-                    "line_moved"
-                  ],
-                  "type": "string"
-                },
-                "selectionId": {
-                  "maxLength": 200,
-                  "minLength": 1,
-                  "pattern": "^[a-zA-Z0-9_.:@/-]+$",
-                  "type": "string"
-                }
-              },
-              "required": [
-                "code"
-              ],
-              "type": "object"
-            },
-            "maxItems": 10,
-            "type": "array"
-          },
-          "book": {
-            "$ref": "#/$defs/s0"
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "estimateDigest": {
-            "pattern": "^[a-f0-9]{64}$",
-            "type": "string"
-          },
-          "expiresAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "fixId": {
-            "format": "uuid",
-            "type": "string"
-          },
-          "fixedTicket": {
-            "anyOf": [
-              {
-                "properties": {
-                  "createdAt": {
-                    "format": "date-time",
-                    "type": "string"
-                  },
-                  "id": {
-                    "format": "uuid",
-                    "type": "string"
-                  },
-                  "input": {
+        "anyOf": [
+          {
+            "properties": {
+              "after": {
+                "anyOf": [
+                  {
                     "properties": {
-                      "acceptedReturnMinor": {
-                        "anyOf": [
-                          {
-                            "maximum": 1000000000000,
-                            "minimum": 0,
-                            "type": "integer"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ]
-                      },
-                      "bookId": {
-                        "maxLength": 200,
-                        "minLength": 1,
-                        "pattern": "^[a-zA-Z0-9_.:@/-]+$",
+                      "basis": {
+                        "const": "doctor_estimate",
                         "type": "string"
                       },
-                      "bookLabel": {
-                        "maxLength": 80,
-                        "minLength": 1,
-                        "type": "string"
-                      },
-                      "clientRevision": {
-                        "maximum": 1000000000,
-                        "minimum": 0,
-                        "type": "integer"
-                      },
-                      "clientSlipId": {
-                        "maxLength": 200,
-                        "minLength": 1,
-                        "pattern": "^[a-zA-Z0-9_.:@/-]+$",
-                        "type": "string"
-                      },
-                      "confirmation": {
-                        "const": "exact_fields_confirmed",
-                        "type": "string"
-                      },
-                      "currency": {
-                        "pattern": "^[A-Z]{3}$",
-                        "type": "string"
-                      },
-                      "groups": {
-                        "items": {
-                          "properties": {
-                            "label": {},
-                            "legIndexes": {},
-                            "oddsAmerican": {}
-                          },
-                          "required": [
-                            "legIndexes",
-                            "oddsAmerican"
-                          ],
-                          "type": "object"
-                        },
-                        "maxItems": 12,
-                        "minItems": 1,
+                      "factors": {
+                        "items": {},
                         "type": "array"
                       },
-                      "intent": {
+                      "letter": {
                         "enum": [
-                          "singles",
-                          "parlay"
+                          "A+",
+                          "A",
+                          "A-",
+                          "B+",
+                          "B",
+                          "B-",
+                          "C+",
+                          "C",
+                          "C-",
+                          "D+",
+                          "D",
+                          "D-",
+                          "F+",
+                          "F",
+                          "F-"
                         ],
                         "type": "string"
                       },
-                      "offeredReturnMinor": {
-                        "anyOf": [
-                          {
-                            "maximum": 1000000000000,
-                            "minimum": 0,
-                            "type": "integer"
-                          },
-                          {
-                            "type": "null"
-                          }
-                        ]
-                      },
-                      "parentTicketId": {
-                        "format": "uuid",
-                        "type": "string"
-                      },
-                      "selections": {
-                        "items": {
-                          "properties": {
-                            "bookId": {},
-                            "entityId": {},
-                            "eventId": {},
-                            "future": {},
-                            "id": {},
-                            "jurisdiction": {},
-                            "label": {},
-                            "league": {},
-                            "line": {},
-                            "market": {},
-                            "observedAt": {},
-                            "oddsAmerican": {},
-                            "period": {},
-                            "provider": {},
-                            "quoteVersion": {},
-                            "side": {},
-                            "sport": {},
-                            "startsAt": {}
-                          },
-                          "required": [
-                            "id",
-                            "eventId",
-                            "entityId",
-                            "provider",
-                            "sport",
-                            "league",
-                            "market",
-                            "period",
-                            "side",
-                            "line",
-                            "label",
-                            "startsAt",
-                            "bookId",
-                            "jurisdiction",
-                            "oddsAmerican",
-                            "observedAt",
-                            "quoteVersion"
-                          ],
-                          "type": "object"
-                        },
-                        "maxItems": 25,
-                        "minItems": 1,
-                        "type": "array"
-                      },
-                      "settlementTerms": {
-                        "properties": {
-                          "cashParlay": {
-                            "const": "normal_win_loss",
-                            "type": "string"
-                          },
-                          "cashSingle": {
-                            "const": "win_loss_refund",
-                            "type": "string"
-                          },
-                          "pushes": {
-                            "enum": [
-                              "refund",
-                              "reprice",
-                              "lose",
-                              "unknown"
-                            ],
-                            "type": "string"
-                          },
-                          "reference": {
-                            "anyOf": [
-                              {
-                                "maxLength": 500,
-                                "minLength": 1,
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
-                          },
-                          "source": {
-                            "enum": [
-                              "provider",
-                              "book_document",
-                              "user_reported",
-                              "unknown"
-                            ],
-                            "type": "string"
-                          },
-                          "version": {
-                            "anyOf": [
-                              {
-                                "maxLength": 200,
-                                "minLength": 1,
-                                "pattern": "^[a-zA-Z0-9_.:@/-]+$",
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
-                          },
-                          "voids": {
-                            "enum": [
-                              "refund",
-                              "reprice",
-                              "unknown"
-                            ],
-                            "type": "string"
-                          }
-                        },
-                        "required": [
-                          "source",
-                          "reference",
-                          "version",
-                          "pushes",
-                          "voids"
-                        ],
-                        "type": "object"
-                      },
-                      "source": {
-                        "enum": [
-                          "manual",
-                          "ocr",
-                          "provider"
-                        ],
-                        "type": "string"
-                      },
-                      "stakeMinor": {
-                        "maximum": 1000000000000,
+                      "research": {},
+                      "score": {
+                        "maximum": 100,
                         "minimum": 0,
                         "type": "integer"
                       }
                     },
                     "required": [
-                      "clientSlipId",
-                      "clientRevision",
-                      "source",
-                      "intent",
-                      "bookId",
-                      "currency",
-                      "stakeMinor",
-                      "selections",
-                      "confirmation",
-                      "offeredReturnMinor",
-                      "acceptedReturnMinor",
-                      "settlementTerms"
+                      "basis",
+                      "score",
+                      "letter",
+                      "factors",
+                      "research"
                     ],
                     "type": "object"
-                  },
-                  "inputDigest": {
-                    "pattern": "^[a-f0-9]{64}$",
-                    "type": "string"
-                  },
-                  "ownerId": {
-                    "format": "uuid",
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "id",
-                  "ownerId",
-                  "input",
-                  "inputDigest",
-                  "createdAt"
-                ],
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "gradeVersion": {
-            "pattern": "^bsd-complete-grade-v[0-9]+$",
-            "type": "string"
-          },
-          "jobId": {
-            "format": "uuid",
-            "type": "string"
-          },
-          "payout": {
-            "properties": {
-              "afterMinor": {
-                "anyOf": [
-                  {
-                    "maximum": 9007199254740991,
-                    "minimum": 0,
-                    "type": "integer"
                   },
                   {
                     "type": "null"
                   }
                 ]
               },
-              "beforeMinor": {
-                "maximum": 9007199254740991,
-                "minimum": 0,
-                "type": "integer"
+              "before": {
+                "$ref": "#/$defs/s0"
               },
-              "currency": {
-                "pattern": "^[A-Z]{3}$",
-                "type": "string"
+              "blockers": {
+                "items": {
+                  "properties": {
+                    "code": {},
+                    "selectionId": {}
+                  },
+                  "required": [
+                    "code"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 10,
+                "type": "array"
               },
-              "stakeMinor": {
-                "maximum": 9007199254740991,
-                "minimum": 0,
-                "type": "integer"
-              }
-            },
-            "required": [
-              "beforeMinor",
-              "afterMinor",
-              "stakeMinor",
-              "currency"
-            ],
-            "type": "object"
-          },
-          "placeable": {
-            "type": "boolean"
-          },
-          "pricesAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "regradeQuote": {
-            "anyOf": [
-              {
+              "book": {
                 "properties": {
-                  "baseJobId": {
-                    "format": "uuid",
-                    "type": "string"
-                  },
-                  "baseTicketId": {
-                    "format": "uuid",
-                    "type": "string"
-                  },
-                  "before": {
-                    "$ref": "#/$defs/s1"
-                  },
-                  "book": {
-                    "$ref": "#/$defs/s0"
-                  },
-                  "createdAt": {
-                    "format": "date-time",
-                    "type": "string"
-                  },
-                  "depth": {
-                    "enum": [
-                      "fast",
-                      "smart",
-                      "deep",
-                      "elite"
-                    ],
-                    "type": "string"
-                  },
-                  "expiresAt": {
-                    "format": "date-time",
-                    "type": "string"
-                  },
-                  "explanation": {
-                    "maxLength": 500,
+                  "id": {
+                    "maxLength": 200,
                     "minLength": 1,
+                    "pattern": "^[a-zA-Z0-9_.:@/-]+$",
                     "type": "string"
                   },
-                  "funding": {
-                    "properties": {
-                      "kind": {
-                        "enum": [
-                          "units",
-                          "plan",
-                          "free",
-                          "weekly"
-                        ],
+                  "label": {
+                    "anyOf": [
+                      {
+                        "maxLength": 80,
+                        "minLength": 1,
                         "type": "string"
                       },
-                      "maximum": {
-                        "maximum": 1000000,
-                        "minimum": 1,
-                        "type": "integer"
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "label"
+                ],
+                "type": "object"
+              },
+              "createdAt": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "estimateDigest": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "expiresAt": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "fixId": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "fixedTicket": {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "createdAt": {
+                        "format": "date-time",
+                        "type": "string"
                       },
-                      "unit": {
-                        "enum": [
-                          "credit",
-                          "grade"
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "input": {
+                        "properties": {
+                          "acceptedReturnMinor": {},
+                          "bookId": {},
+                          "bookLabel": {},
+                          "clientRevision": {},
+                          "clientSlipId": {},
+                          "confirmation": {},
+                          "currency": {},
+                          "groups": {},
+                          "intent": {},
+                          "offeredReturnMinor": {},
+                          "parentTicketId": {},
+                          "selections": {},
+                          "settlementTerms": {},
+                          "source": {},
+                          "stakeMinor": {}
+                        },
+                        "required": [
+                          "clientSlipId",
+                          "clientRevision",
+                          "source",
+                          "intent",
+                          "bookId",
+                          "currency",
+                          "stakeMinor",
+                          "selections",
+                          "confirmation",
+                          "offeredReturnMinor",
+                          "acceptedReturnMinor",
+                          "settlementTerms"
                         ],
+                        "type": "object"
+                      },
+                      "inputDigest": {
+                        "pattern": "^[a-f0-9]{64}$",
+                        "type": "string"
+                      },
+                      "ownerId": {
+                        "format": "uuid",
                         "type": "string"
                       }
                     },
                     "required": [
-                      "kind",
-                      "unit",
-                      "maximum"
+                      "id",
+                      "ownerId",
+                      "input",
+                      "inputDigest",
+                      "createdAt"
                     ],
                     "type": "object"
                   },
-                  "gradeVersion": {
-                    "pattern": "^bsd-complete-grade-v[0-9]+$",
-                    "type": "string"
-                  },
-                  "id": {
-                    "format": "uuid",
-                    "type": "string"
-                  },
-                  "target": {
-                    "$ref": "#/$defs/s1"
-                  },
-                  "unitsLeft": {
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "gradeVersion": {
+                "pattern": "^bsd-complete-grade-v[0-9]+$",
+                "type": "string"
+              },
+              "jobId": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "payout": {
+                "properties": {
+                  "afterMinor": {
                     "anyOf": [
                       {
                         "maximum": 9007199254740991,
@@ -13225,8 +16357,550 @@
                       }
                     ]
                   },
+                  "beforeMinor": {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "currency": {
+                    "pattern": "^[A-Z]{3}$",
+                    "type": "string"
+                  },
+                  "stakeMinor": {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "beforeMinor",
+                  "afterMinor",
+                  "stakeMinor",
+                  "currency"
+                ],
+                "type": "object"
+              },
+              "placeable": {
+                "type": "boolean"
+              },
+              "pricesAt": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "regradeQuote": {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "baseJobId": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "baseTicketId": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "before": {
+                        "properties": {
+                          "letter": {},
+                          "score": {}
+                        },
+                        "required": [
+                          "score",
+                          "letter"
+                        ],
+                        "type": "object"
+                      },
+                      "book": {
+                        "properties": {
+                          "id": {},
+                          "label": {}
+                        },
+                        "required": [
+                          "id",
+                          "label"
+                        ],
+                        "type": "object"
+                      },
+                      "createdAt": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "depth": {
+                        "enum": [
+                          "fast",
+                          "smart",
+                          "deep",
+                          "elite"
+                        ],
+                        "type": "string"
+                      },
+                      "expiresAt": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "explanation": {
+                        "maxLength": 500,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "funding": {
+                        "properties": {
+                          "kind": {},
+                          "maximum": {},
+                          "unit": {}
+                        },
+                        "required": [
+                          "kind",
+                          "unit",
+                          "maximum"
+                        ],
+                        "type": "object"
+                      },
+                      "gradeVersion": {
+                        "pattern": "^bsd-complete-grade-v[0-9]+$",
+                        "type": "string"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "served": {
+                        "properties": {
+                          "after": {},
+                          "before": {},
+                          "estimate": {},
+                          "model": {},
+                          "target": {}
+                        },
+                        "required": [
+                          "model",
+                          "before",
+                          "target",
+                          "after"
+                        ],
+                        "type": "object"
+                      },
+                      "target": {
+                        "properties": {
+                          "letter": {},
+                          "score": {}
+                        },
+                        "required": [
+                          "score",
+                          "letter"
+                        ],
+                        "type": "object"
+                      },
+                      "unitsLeft": {
+                        "anyOf": [
+                          {
+                            "maximum": 9007199254740991,
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "version": {
+                        "const": "bsd-doctor-fix-quote-v1",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "version",
+                      "id",
+                      "baseJobId",
+                      "baseTicketId",
+                      "depth",
+                      "gradeVersion",
+                      "book",
+                      "before",
+                      "target",
+                      "funding",
+                      "unitsLeft",
+                      "createdAt",
+                      "expiresAt",
+                      "explanation"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "regradeUnavailable": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "units_exhausted",
+                      "plan_grades_used",
+                      "weekly_allowance_used"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "served": {
+                "properties": {
+                  "after": {
+                    "anyOf": [
+                      {
+                        "properties": {
+                          "letter": {},
+                          "score": {}
+                        },
+                        "required": [
+                          "score",
+                          "letter"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "before": {
+                    "properties": {
+                      "letter": {},
+                      "score": {}
+                    },
+                    "required": [
+                      "score",
+                      "letter"
+                    ],
+                    "type": "object"
+                  },
+                  "estimate": {
+                    "anyOf": [
+                      {
+                        "properties": {
+                          "letter": {},
+                          "score": {}
+                        },
+                        "required": [
+                          "score",
+                          "letter"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "model": {
+                    "const": "rocky",
+                    "type": "string"
+                  },
+                  "target": {
+                    "properties": {
+                      "letter": {},
+                      "score": {}
+                    },
+                    "required": [
+                      "score",
+                      "letter"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "model",
+                  "before",
+                  "target",
+                  "after"
+                ],
+                "type": "object"
+              },
+              "state": {
+                "enum": [
+                  "fixed",
+                  "best_reachable",
+                  "no_moves"
+                ],
+                "type": "string"
+              },
+              "steps": {
+                "items": {
+                  "properties": {
+                    "fairOdds": {},
+                    "into": {},
+                    "kind": {},
+                    "label": {},
+                    "odds": {},
+                    "reason": {},
+                    "savedOdds": {},
+                    "selectionId": {},
+                    "stake": {},
+                    "withLabel": {},
+                    "withSelectionId": {}
+                  },
+                  "required": [
+                    "kind",
+                    "selectionId",
+                    "label",
+                    "reason",
+                    "savedOdds",
+                    "odds",
+                    "fairOdds"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 30,
+                "type": "array"
+              },
+              "target": {
+                "$ref": "#/$defs/s0"
+              },
+              "ticketDigest": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "ticketId": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "version": {
+                "const": "bsd-doctor-fix-estimate-v1",
+                "type": "string"
+              },
+              "work": {
+                "items": {
+                  "anyOf": [
+                    {
+                      "properties": {
+                        "available": {},
+                        "checked": {},
+                        "id": {}
+                      },
+                      "required": [
+                        "id",
+                        "checked",
+                        "available"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "properties": {
+                        "codes": {},
+                        "id": {}
+                      },
+                      "required": [
+                        "id",
+                        "codes"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "properties": {
+                        "id": {},
+                        "label": {},
+                        "letter": {},
+                        "tried": {},
+                        "used": {}
+                      },
+                      "required": [
+                        "id",
+                        "tried",
+                        "used",
+                        "label",
+                        "letter"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "properties": {
+                        "id": {}
+                      },
+                      "required": [
+                        "id"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                },
+                "maxItems": 4,
+                "type": "array"
+              }
+            },
+            "required": [
+              "version",
+              "fixId",
+              "jobId",
+              "ticketId",
+              "ticketDigest",
+              "state",
+              "gradeVersion",
+              "book",
+              "before",
+              "target",
+              "after",
+              "steps",
+              "blockers",
+              "work",
+              "fixedTicket",
+              "payout",
+              "placeable",
+              "regradeQuote",
+              "regradeUnavailable",
+              "pricesAt",
+              "expiresAt",
+              "createdAt",
+              "estimateDigest"
+            ],
+            "type": "object"
+          },
+          {
+            "properties": {
+              "fix": {
+                "properties": {
+                  "baseJobId": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "baseTicketId": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "completedAt": {
+                    "anyOf": [
+                      {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "createdAt": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "decision": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "followed",
+                          "skipped"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "failureCode": {
+                    "anyOf": [
+                      {
+                        "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "jobId": {
+                    "anyOf": [
+                      {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "result": {
+                    "properties": {
+                      "after": {},
+                      "before": {},
+                      "blockers": {},
+                      "book": {},
+                      "charge": {},
+                      "doctor": {},
+                      "estimate": {},
+                      "fixDigest": {},
+                      "fixId": {},
+                      "outcome": {},
+                      "payout": {},
+                      "pricesAt": {},
+                      "reuse": {},
+                      "served": {},
+                      "stake": {},
+                      "steps": {},
+                      "target": {},
+                      "unitsCharged": {},
+                      "version": {}
+                    },
+                    "required": [
+                      "version",
+                      "fixId",
+                      "outcome",
+                      "target",
+                      "before",
+                      "after",
+                      "steps",
+                      "blockers",
+                      "reuse",
+                      "payout",
+                      "stake",
+                      "pricesAt",
+                      "book",
+                      "doctor",
+                      "unitsCharged",
+                      "charge",
+                      "fixDigest"
+                    ],
+                    "type": "object"
+                  },
+                  "startedAt": {
+                    "anyOf": [
+                      {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "state": {
+                    "enum": [
+                      "quoted",
+                      "planning",
+                      "grading",
+                      "done",
+                      "failed"
+                    ],
+                    "type": "string"
+                  },
+                  "ticketId": {
+                    "anyOf": [
+                      {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
                   "version": {
-                    "const": "bsd-doctor-fix-quote-v1",
+                    "const": "bsd-doctor-fix-state-v1",
                     "type": "string"
                   }
                 },
@@ -13235,421 +16909,157 @@
                   "id",
                   "baseJobId",
                   "baseTicketId",
-                  "depth",
-                  "gradeVersion",
-                  "book",
-                  "before",
-                  "target",
-                  "funding",
-                  "unitsLeft",
+                  "jobId",
+                  "ticketId",
+                  "state",
+                  "failureCode",
+                  "decision",
                   "createdAt",
-                  "expiresAt",
-                  "explanation"
+                  "startedAt",
+                  "completedAt"
                 ],
                 "type": "object"
               },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "regradeUnavailable": {
-            "anyOf": [
-              {
-                "enum": [
-                  "units_exhausted",
-                  "plan_grades_used",
-                  "weekly_allowance_used"
-                ],
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "state": {
-            "enum": [
-              "fixed",
-              "best_reachable",
-              "no_moves"
-            ],
-            "type": "string"
-          },
-          "steps": {
-            "items": {
-              "properties": {
-                "fairOdds": {
-                  "anyOf": [
-                    {
-                      "maximum": 1000000,
-                      "minimum": -1000000,
-                      "type": "integer"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "into": {
-                  "properties": {
-                    "doctorPick": {
-                      "properties": {
-                        "gradedAt": {},
-                        "letter": {},
-                        "score": {},
-                        "source": {}
+              "job": {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "createdAt": {
+                        "format": "date-time",
+                        "type": "string"
                       },
-                      "required": [
-                        "source",
-                        "letter",
-                        "score",
-                        "gradedAt"
-                      ],
-                      "type": "object"
-                    },
-                    "fairOdds": {
-                      "anyOf": [
-                        {
-                          "maximum": 1000000,
-                          "minimum": -1000000,
-                          "type": "integer"
+                      "deadlineAt": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "eventSequence": {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "failureCode": {
+                        "anyOf": [
+                          {
+                            "maxLength": 200,
+                            "minLength": 1,
+                            "pattern": "^[a-zA-Z0-9_.:@/-]+$",
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "ownerId": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "queue": {
+                        "properties": {
+                          "ahead": {},
+                          "capacity": {},
+                          "estimatedWaitSeconds": {},
+                          "position": {}
                         },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    },
-                    "label": {
-                      "maxLength": 300,
-                      "minLength": 1,
-                      "type": "string"
-                    },
-                    "odds": {
-                      "maximum": 1000000,
-                      "minimum": -1000000,
-                      "type": "integer"
-                    },
-                    "reason": {
-                      "enum": [
-                        "better_than_fair",
-                        "fair_price",
-                        "below_fair"
-                      ],
-                      "type": "string"
-                    },
-                    "selectionId": {
-                      "maxLength": 200,
-                      "minLength": 1,
-                      "pattern": "^[a-zA-Z0-9_.:@/-]+$",
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "selectionId",
-                    "label",
-                    "odds",
-                    "fairOdds",
-                    "reason",
-                    "doctorPick"
-                  ],
-                  "type": "object"
-                },
-                "kind": {
-                  "enum": [
-                    "kept",
-                    "repriced",
-                    "dropped",
-                    "swapped",
-                    "removed",
-                    "stake"
-                  ],
-                  "type": "string"
-                },
-                "label": {
-                  "anyOf": [
-                    {
-                      "maxLength": 300,
-                      "minLength": 1,
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "odds": {
-                  "anyOf": [
-                    {
-                      "maximum": 1000000,
-                      "minimum": -1000000,
-                      "type": "integer"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "reason": {
-                  "enum": [
-                    "near_fair",
-                    "best_price",
-                    "kept",
-                    "better_price_now",
-                    "same_game",
-                    "price_below_fair",
-                    "not_at_book",
-                    "line_moved",
-                    "weakest",
-                    "in_play",
-                    "stake_to_unit"
-                  ],
-                  "type": "string"
-                },
-                "savedOdds": {
-                  "anyOf": [
-                    {
-                      "maximum": 1000000,
-                      "minimum": -1000000,
-                      "type": "integer"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "selectionId": {
-                  "anyOf": [
-                    {
-                      "maxLength": 200,
-                      "minLength": 1,
-                      "pattern": "^[a-zA-Z0-9_.:@/-]+$",
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "stake": {
-                  "properties": {
-                    "fromMinor": {
-                      "maximum": 9007199254740991,
-                      "minimum": 0,
-                      "type": "integer"
-                    },
-                    "toMinor": {
-                      "maximum": 9007199254740991,
-                      "minimum": 0,
-                      "type": "integer"
-                    }
-                  },
-                  "required": [
-                    "fromMinor",
-                    "toMinor"
-                  ],
-                  "type": "object"
-                },
-                "withLabel": {
-                  "maxLength": 300,
-                  "minLength": 1,
-                  "type": "string"
-                },
-                "withSelectionId": {
-                  "maxLength": 200,
-                  "minLength": 1,
-                  "pattern": "^[a-zA-Z0-9_.:@/-]+$",
-                  "type": "string"
-                }
-              },
-              "required": [
-                "kind",
-                "selectionId",
-                "label",
-                "reason",
-                "savedOdds",
-                "odds",
-                "fairOdds"
-              ],
-              "type": "object"
-            },
-            "maxItems": 30,
-            "type": "array"
-          },
-          "target": {
-            "$ref": "#/$defs/s1"
-          },
-          "ticketDigest": {
-            "pattern": "^[a-f0-9]{64}$",
-            "type": "string"
-          },
-          "ticketId": {
-            "format": "uuid",
-            "type": "string"
-          },
-          "version": {
-            "const": "bsd-doctor-fix-estimate-v1",
-            "type": "string"
-          },
-          "work": {
-            "items": {
-              "anyOf": [
-                {
-                  "properties": {
-                    "available": {
-                      "maximum": 25,
-                      "minimum": 0,
-                      "type": "integer"
-                    },
-                    "checked": {
-                      "maximum": 25,
-                      "minimum": 0,
-                      "type": "integer"
-                    },
-                    "id": {
-                      "const": "prices",
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "checked",
-                    "available"
-                  ],
-                  "type": "object"
-                },
-                {
-                  "properties": {
-                    "codes": {
-                      "items": {
+                        "required": [
+                          "position",
+                          "ahead",
+                          "estimatedWaitSeconds",
+                          "capacity"
+                        ],
+                        "type": "object"
+                      },
+                      "quoteId": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "refundNotice": {
+                        "properties": {
+                          "message": {},
+                          "units": {}
+                        },
+                        "required": [
+                          "units",
+                          "message"
+                        ],
+                        "type": "object"
+                      },
+                      "result": {
+                        "anyOf": [
+                          {
+                            "properties": {
+                              "data": {},
+                              "stage": {},
+                              "status": {},
+                              "version": {}
+                            },
+                            "required": [
+                              "version",
+                              "stage",
+                              "status",
+                              "data"
+                            ],
+                            "type": "object"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "state": {
                         "enum": [
-                          "same_game",
-                          "price_below_fair",
-                          "not_at_book",
-                          "line_moved",
-                          "weakest",
-                          "in_play",
-                          "stake_to_unit"
+                          "queued",
+                          "running",
+                          "succeeded",
+                          "inconclusive",
+                          "failed",
+                          "cancelled",
+                          "timed_out"
                         ],
                         "type": "string"
                       },
-                      "maxItems": 2,
-                      "type": "array"
+                      "terminalAt": {
+                        "anyOf": [
+                          {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
                     },
-                    "id": {
-                      "const": "weak_spots",
-                      "type": "string"
-                    }
+                    "required": [
+                      "id",
+                      "ownerId",
+                      "quoteId",
+                      "state",
+                      "createdAt",
+                      "deadlineAt",
+                      "terminalAt",
+                      "result",
+                      "failureCode",
+                      "eventSequence"
+                    ],
+                    "type": "object"
                   },
-                  "required": [
-                    "id",
-                    "codes"
-                  ],
-                  "type": "object"
-                },
-                {
-                  "properties": {
-                    "id": {
-                      "const": "doctor_pick",
-                      "type": "string"
-                    },
-                    "label": {
-                      "anyOf": [
-                        {
-                          "maxLength": 300,
-                          "minLength": 1,
-                          "type": "string"
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    },
-                    "letter": {
-                      "anyOf": [
-                        {
-                          "enum": [
-                            "A+",
-                            "A",
-                            "A-",
-                            "B+",
-                            "B",
-                            "B-",
-                            "C+",
-                            "C",
-                            "C-",
-                            "D+",
-                            "D",
-                            "D-",
-                            "F+",
-                            "F",
-                            "F-"
-                          ],
-                          "type": "string"
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    },
-                    "tried": {
-                      "type": "boolean"
-                    },
-                    "used": {
-                      "type": "boolean"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "tried",
-                    "used",
-                    "label",
-                    "letter"
-                  ],
-                  "type": "object"
-                },
-                {
-                  "properties": {
-                    "id": {
-                      "const": "scored",
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "id"
-                  ],
-                  "type": "object"
-                }
-              ]
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
             },
-            "maxItems": 4,
-            "type": "array"
+            "required": [
+              "fix",
+              "job"
+            ],
+            "type": "object"
           }
-        },
-        "required": [
-          "version",
-          "fixId",
-          "jobId",
-          "ticketId",
-          "ticketDigest",
-          "state",
-          "gradeVersion",
-          "book",
-          "before",
-          "target",
-          "after",
-          "steps",
-          "blockers",
-          "work",
-          "fixedTicket",
-          "payout",
-          "placeable",
-          "regradeQuote",
-          "regradeUnavailable",
-          "pricesAt",
-          "expiresAt",
-          "createdAt",
-          "estimateDigest"
         ],
         "type": "object"
       },
