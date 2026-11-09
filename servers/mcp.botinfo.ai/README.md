@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.botinfo.ai/mcp` | 4 | [`c048ccad5a03`](6c526ecf6d08b772756f.json) | 2026-09-21 |
+| `https://mcp.botinfo.ai/mcp` | 6 | [`d660dc2eefa1`](6c526ecf6d08b772756f.json) | 2026-11-09 |
 
 ## Tools at `https://mcp.botinfo.ai/mcp`
 
@@ -14,10 +14,12 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_buy_route`: `Get the purchase route for a robot model: a botinfo.ai URL that resolves to a dealer checkout, plus the live comparison-board page. PASS TH…`
 - `lookup_robot`: `Search BotInfo's verified catalog of advanced robots (humanoids, quadrupeds) that can be purchased in the United States and internationally…`
 - `request_quote`: `Submit a purchase or quote inquiry for a robot model to the BotInfo team, who reply with a human-prepared quote, typically within one busin…`
+- `robot_evidence`: `Get the findings of BotInfo's public evidence page on a robot model: what the maker's own spec sheets, SDK code, CVE records, government ru…`
+- `robot_price_today`: `Get today's listed price of every listing BotInfo's daily price watch read for a robot model, across the maker's own store and dealers: the…`
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-09: [count changed, tool added](../../deltas/2026-11-09/6c526ecf6d08b772756f.json): `2 tool(s) added`
 
 ## Check it from your agent
 

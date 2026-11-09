@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "a6605af9fe7e77e87992e03e4e9125e055e434f418682f5f6962daecf5d733a2",
+  "full_hash": "d28b8f34b16a2bb884fbe64000a914fac2fbe7e9946e493b26ea9919e64752e2",
   "name": "ai.bowmark/bowmark",
-  "observed_at": "2026-11-08T02:02:33.728253Z",
+  "observed_at": "2026-11-09T02:02:44.035774Z",
   "sources": [
     "official"
   ],
@@ -88,7 +88,7 @@
         "readOnlyHint": false,
         "title": "Do the task on the live websites and return the result"
       },
-      "description": "**Executes the task on the real websites** and returns the result. Call `get_library` FIRST, then start with `run({ script })` — never add `runId`.\n\nTHE SCRIPT is a plain async JavaScript body, not a wrapping function. `bowmark` is a ready global: `await bowmark.<capability>.<fn>(...)`, or one site via `await bowmark.providers.<provider>.<fn>(...)`. `return` what you want back; `log(...)` for progress. Built-ins plus `URL`/`URLSearchParams` exist; `fetch`, `import`, `setTimeout` and a filesystem do not — `bowmark` is the only I/O.\n\nMIND THE CLOCK. Your client times a tool call out at around 55 seconds, and one capability call already spends 30-55 seconds, so default to ONE per script. Need several? Run them together in `Promise.allSettled` (a dropped leg still comes back as `partial`), never one after another, and never `await` inside a `for` loop. Keep the result under ~25,000 characters.\n\nCHECK `status` BEFORE `ok` — `ok` | `error` | `partial` | `needs_user` | `running`:\n• `running`: it is still going. Call `run({ runId })` to wait for the SAME run; never resend the script.\n• `partial`: `result` is real but narrower than asked, usually the site's doing; `incomplete` names what did not answer. Tell your user — never call it complete. `incomplete.failures[].fixable: true` means your argument was wrong: fix it and rerun.\n• `needs_user`: a site needs your user signed in; not a failure. Give them `meta.handoff.url`, name the sites, then call `wait_for_sign_in` with `meta.handoff.ref`. On `done`, send the SAME script unchanged.\n• `error`: there is no result; `error` says why.\n\nSaving files, one exit IP, saved secrets, `warnings`, `emptyHanded`, and the billed `browser_agent`/`delegate` fallbacks: `get_library({ query: \"run guide\" })`.",
+      "description": "**Executes the task on live websites** and returns the result. Call `get_library` FIRST, then `run({ script })`. The same script can run from your app: POST `https://api.bowmark.ai/v1/run` with your API key; see `bowmark.ai/docs/http-api`.\n\nTHE SCRIPT is a plain async JavaScript body, not a wrapping function. `bowmark` is a ready global: `await bowmark.<capability>.<fn>(...)`, or one site via `await bowmark.providers.<provider>.<fn>(...)`. `return` what you want back; `log(...)` for progress. Built-ins plus `URL`/`URLSearchParams` exist; `fetch`, `import`, `setTimeout` and a filesystem do not — `bowmark` is the only I/O.\n\nMIND THE CLOCK. Your client times out around 55 seconds; calls may take 30-55 seconds; default to ONE per script. Several? Use `Promise.allSettled` together (a dropped leg still returns `partial`), never one after another or inside a `for` loop. Keep under ~25,000 chars.\n\nCHECK `status` BEFORE `ok` — `ok` | `error` | `partial` | `needs_user` | `running`:\n• `running`: it is still going. Call `run({ runId })` to wait for the SAME run; never resend the script.\n• `partial`: `result` is real but narrower than asked, usually the site's doing; `incomplete` names what did not answer. Tell your user — never call it complete. `incomplete.failures[].fixable: true` means your argument was wrong: fix it and rerun.\n• `needs_user`: a site needs your user signed in; not a failure. Give them `meta.handoff.url`, name the sites, then call `wait_for_sign_in` with `meta.handoff.ref`. On `done`, send the SAME script unchanged.\n• `error`: there is no result; `error` says why.\n\nSaving files, one exit IP, saved secrets, `warnings`, `emptyHanded`, and the billed `browser_agent`/`delegate` fallbacks: `get_library({ query: \"run guide\" })`.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -299,16 +299,59 @@
         "additionalProperties": false,
         "properties": {
           "runId": {
+            "description": "The run to draw: the `runId` that `run` returned.",
             "format": "uuid",
             "type": "string"
           },
           "script": {
+            "description": "Or the script text the run was started with, when the view has no `runId` yet.",
             "type": "string"
           }
         },
         "type": "object"
       },
       "name": "run_view",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "continuation": {
+            "description": "Set on a collect call's view.",
+            "type": "boolean"
+          },
+          "done": {
+            "description": "True once the run has finished.",
+            "type": "boolean"
+          },
+          "found": {
+            "description": "False when no run matches the id or script.",
+            "type": "boolean"
+          },
+          "message": {
+            "description": "Why the call failed, when `ok` is false.",
+            "type": "string"
+          },
+          "model": {
+            "description": "The graph of calls the view draws."
+          },
+          "ok": {
+            "description": "False on an error.",
+            "type": "boolean"
+          },
+          "runId": {
+            "description": "The run being drawn.",
+            "type": "string"
+          },
+          "status": {
+            "description": "The run's status: running, ok, error, paused…",
+            "type": "string"
+          },
+          "url": {
+            "description": "The run's page on the Bowmark dashboard.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "title": "Run view"
     },
     {
@@ -343,7 +386,7 @@
         "readOnlyHint": false,
         "title": "Open a page for the user (jig)"
       },
-      "description": "Make the user a \"jig\": their own copy of a website, that you curate as they talk. Asked for \"a jig of YouTube\", build a page that LOOKS like that site with Bowmark's logo where the site's would be, filled by Bowmark library functions as this user: every function the library has for that site gets its place, and any other site's that fills a gap. Then keep curating: `jig_update` changes state or html, live.\n\nGive the user the link that comes back; that tab is the app. Start from a built-in (`template`) when one fits, else write `files` (React, compiled for you; `jig_read` reads them) or `html` — call `get_library({ query: \"jig guide\" })` FIRST for the component kit and layout classes. Reopen one with `jig_open({ jigId })`, never rebuild it. Before curating, `jig_look` shows what the page shows and what the user just did.\n\nInside the page, one global, `window.bowmark`: `bowmark.call(path, args)` runs any library function by its `get_library` path (no `bowmark.` prefix), metered for this user; `bowmark.batch([...])` runs up to 8 together. `bowmark.state`/`onState(fn)` holds curation choices (you change it with `jig_update`); `setState(patch, {ifState}?)` saves a click. `show({ view, items })` tells `jig_look` what is on screen. Also `tellModel`, `say`, `open`, `download`, `theme`, `img`, `section`: see the guide. Views: `location.hash`.\n\nFAST AND FAILURE-PROOF by default: paint a skeleton at once; fill the screen with ONE `bowmark.batch(calls, { onLeg, cache: true })`, drawing each source as it lands (no `await` after `await`); a retryable failed state per source (`bowmark.section`); `bowmark.img(url, px)`, lazy below the fold. `jig_look` reports load speed: fix what its `advice` names.\n\nNo `fetch`, no external script/style/font. A call needing sign-in pauses behind a banner. No chat box in the page: the user talks to you.\n\nTHE SITE'S LAYOUT, NONE OF ITS DARK PATTERNS: `get_library({ query: \"jig layout <host>\" })` gives its regions and what to strip. Kit colors, never the site's; no invented title.",
+      "description": "Make the user a \"jig\": their own copy of a website, that you curate as they talk. Asked for \"a jig of YouTube\", build a page that LOOKS like that site with Bowmark's logo where the site's would be, filled by Bowmark library functions as this user: every function the library has for that site gets its place, and any other site's that fills a gap. Then keep curating: `jig_update` changes state or html, live.\n\nGive the user the link that comes back; that tab is the app. Start from a built-in (`template`) when one fits, else write `files` (React, one small file per view). `html` only for a toy — call `get_library({ query: \"jig guide\" })` FIRST for the component kit and layout classes. Reopen one with `jig_open({ jigId })`, never rebuild it. Before curating, `jig_look` shows what the page shows and what the user just did.\n\nInside the page, one global, `window.bowmark`: `bowmark.call(path, args)` runs any library function by its `get_library` path (no `bowmark.` prefix), metered for this user; `bowmark.batch([...])` runs up to 8 together. `bowmark.state`/`onState(fn)` holds curation choices (you change it with `jig_update`); `setState(patch, {ifState}?)` saves a click. `show({ view, items })` tells `jig_look` what is on screen. Also `tellModel`, `say`, `open`, `download`, `theme`, `img`, `section`: see the guide. Views: `location.hash`.\n\nFAST AND FAILURE-PROOF by default: paint a skeleton at once; fill the screen with ONE `bowmark.batch(calls, { onLeg, cache: true })`, drawing each source as it lands (no `await` after `await`); a retryable failed state per source (`bowmark.section`); `bowmark.img(url, px)`, lazy below the fold. `jig_look` reports load speed: fix what its `advice` names.\n\nNo `fetch`, no external script/style/font. A call needing sign-in pauses behind a banner. No chat box in the page: the user talks to you.\n\nTHE SITE'S LAYOUT, NONE OF ITS DARK PATTERNS: `get_library({ query: \"jig layout <host>\" })` gives its regions and what to strip. Kit colors, never the site's; no invented title.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -354,11 +397,11 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "A project instead of `html`: { path: text }, e.g. index.html, main.tsx, App.tsx. React/JSX, compiled for you; `main.tsx` is the entry and ends in mount(<App />) from \"@bowmark/ui\".",
+            "description": "THE DEFAULT for any real page: a project, { path: text }, e.g. index.html, main.tsx, App.tsx. React/JSX, compiled for you; `main.tsx` is the entry and ends in mount(<App />) from \"@bowmark/ui\".",
             "type": "object"
           },
           "html": {
-            "description": "Your own page: a whole HTML document with inline <style> and <script>. It gets a `bowmark` global (see the tool description) and nothing else — no fetch, no CDN.",
+            "description": "Legacy, for a one-screen toy only: prefer `files` (React, one file per view). A whole HTML document with inline <style> and <script>. It gets a `bowmark` global (see the tool description) and nothing else — no fetch, no CDN.",
             "type": "string"
           },
           "jigId": {
@@ -380,7 +423,9 @@
             "description": "Start from a built-in jig instead of writing `html`.",
             "enum": [
               "youtube-feed",
-              "amazon-search"
+              "amazon-search",
+              "combined-dms",
+              "leads"
             ],
             "type": "string"
           },
@@ -393,6 +438,67 @@
         "type": "object"
       },
       "name": "jig_open",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "files": {
+            "description": "The jig's source files and their sizes in bytes.",
+            "items": {
+              "additionalProperties": true,
+              "properties": {
+                "bytes": {
+                  "type": "number"
+                },
+                "path": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "html": {
+            "description": "The page body (single-file pages).",
+            "type": "string"
+          },
+          "jigId": {
+            "description": "The jig's id — pass it to every other `jig_*` tool.",
+            "type": "string"
+          },
+          "message": {
+            "description": "Why the call failed, when `ok` is false.",
+            "type": "string"
+          },
+          "notes": {
+            "description": "Advice about the page just written — fix what it names with `jig_update`."
+          },
+          "ok": {
+            "description": "True when the change was applied; false on an error.",
+            "type": "boolean"
+          },
+          "state": {
+            "description": "The page's current state — the JSON object `jig_update({ state })` changes."
+          },
+          "title": {
+            "description": "The page's title (fenced text when the jig is a copy of someone else's)."
+          },
+          "untrusted": {
+            "description": "Present when this jig is a copy of someone else's: who wrote it, and how to treat its text."
+          },
+          "updateAvailable": {
+            "description": "Set when the published jig this copy came from has a newer version."
+          },
+          "url": {
+            "description": "The link to give the user: their tab is the live page.",
+            "type": "string"
+          },
+          "version": {
+            "description": "The jig's version; it goes up by one on every change.",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
       "title": "Open a page for the user (jig)"
     },
     {
@@ -424,6 +530,68 @@
         "type": "object"
       },
       "name": "jig_list",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "jigs": {
+            "description": "Every jig this account owns.",
+            "items": {
+              "additionalProperties": true,
+              "properties": {
+                "forkedFrom": {
+                  "description": "The published listing it was copied from."
+                },
+                "jigId": {
+                  "description": "The jig's id — pass it to every other `jig_*` tool.",
+                  "type": "string"
+                },
+                "slug": {
+                  "description": "The jig's short name in its URL.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "template": {
+                  "description": "The built-in it started from, if any.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "title": {
+                  "description": "The page's title (fenced text when the jig is a copy of someone else's)."
+                },
+                "untrusted": {
+                  "description": "Present when this jig is a copy of someone else's: who wrote it, and how to treat its text."
+                },
+                "updateAvailable": {
+                  "description": "Whether that listing has a newer version."
+                },
+                "updatedAt": {
+                  "description": "When it last changed (ISO 8601).",
+                  "type": "string"
+                },
+                "version": {
+                  "description": "The jig's version; it goes up by one on every change.",
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "message": {
+            "description": "Why the call failed, when `ok` is false.",
+            "type": "string"
+          },
+          "ok": {
+            "description": "False on an error.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
       "title": "List the user's pages (jigs)"
     },
     {
@@ -468,6 +636,26 @@
         "type": "object"
       },
       "name": "jig_search",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "message": {
+            "description": "Why the call failed, when `ok` is false.",
+            "type": "string"
+          },
+          "next": {
+            "description": "Pass it back to read the next page, when there is one."
+          },
+          "ok": {
+            "description": "False on an error.",
+            "type": "boolean"
+          },
+          "results": {
+            "description": "Published jigs matching the query."
+          }
+        },
+        "type": "object"
+      },
       "title": "Search published pages (jigs)"
     },
     {
@@ -593,6 +781,29 @@
         "type": "object"
       },
       "name": "jig_publish",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "listingId": {
+            "description": "The published listing's id."
+          },
+          "message": {
+            "description": "Why the call failed, when `ok` is false.",
+            "type": "string"
+          },
+          "ok": {
+            "description": "True when the jig was published.",
+            "type": "boolean"
+          },
+          "url": {
+            "description": "Where anyone can open it."
+          },
+          "versionNo": {
+            "description": "The listing version this publish made."
+          }
+        },
+        "type": "object"
+      },
       "title": "Publish a page (jig) so others can get it"
     },
     {
@@ -631,6 +842,23 @@
         "type": "object"
       },
       "name": "jig_set_handle",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "handle": {
+            "description": "The account's public handle, the @name in a jig link."
+          },
+          "message": {
+            "description": "Why the call failed, when `ok` is false.",
+            "type": "string"
+          },
+          "ok": {
+            "description": "True when the handle was set.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
       "title": "Claim the user's public handle (permanent)"
     },
     {
@@ -676,6 +904,36 @@
         "type": "object"
       },
       "name": "jig_get",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "jigId": {
+            "description": "The jig's id — pass it to every other `jig_*` tool.",
+            "type": "string"
+          },
+          "message": {
+            "description": "Why the call failed, when `ok` is false.",
+            "type": "string"
+          },
+          "ok": {
+            "description": "True when the copy was made.",
+            "type": "boolean"
+          },
+          "pendingFunctions": {
+            "description": "Functions the page calls that the user must approve first."
+          },
+          "slug": {
+            "description": "The copy's short name in its URL."
+          },
+          "untrusted": {
+            "description": "Present when this jig is a copy of someone else's: who wrote it, and how to treat its text."
+          },
+          "url": {
+            "description": "The link to give the user."
+          }
+        },
+        "type": "object"
+      },
       "title": "Get a published page (jig) into this account"
     },
     {
@@ -730,9 +988,11 @@
             "type": "object"
           },
           "html": {
+            "description": "Replace the whole page body (a single-file page).",
             "type": "string"
           },
           "jigId": {
+            "description": "The jig's id, as `jig_open` or `jig_list` returned it.",
             "format": "uuid",
             "type": "string"
           },
@@ -745,6 +1005,10 @@
             "description": "Start from {} instead of merging.",
             "type": "boolean"
           },
+          "reset": {
+            "description": "Reset jig: true sends nothing else. State goes back to the page's default and every stored row is deleted. The html and link stay. Only when the user asks.",
+            "type": "boolean"
+          },
           "slug": {
             "description": "Rename the jig's link, the <slug> in bowmark.ai/jig/@<handle>/<slug>. The old link keeps working and redirects.",
             "maxLength": 60,
@@ -752,9 +1016,11 @@
           },
           "state": {
             "additionalProperties": {},
+            "description": "Keys to change in the page's state, merged into what is there.",
             "type": "object"
           },
           "title": {
+            "description": "A new title for the page.",
             "maxLength": 120,
             "type": "string"
           }
@@ -765,6 +1031,67 @@
         "type": "object"
       },
       "name": "jig_update",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "files": {
+            "description": "The jig's source files and their sizes in bytes.",
+            "items": {
+              "additionalProperties": true,
+              "properties": {
+                "bytes": {
+                  "type": "number"
+                },
+                "path": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "html": {
+            "description": "The page body (single-file pages).",
+            "type": "string"
+          },
+          "jigId": {
+            "description": "The jig's id — pass it to every other `jig_*` tool.",
+            "type": "string"
+          },
+          "message": {
+            "description": "Why the call failed, when `ok` is false.",
+            "type": "string"
+          },
+          "notes": {
+            "description": "Advice about the page just written — fix what it names with `jig_update`."
+          },
+          "ok": {
+            "description": "True when the change was applied; false on an error.",
+            "type": "boolean"
+          },
+          "state": {
+            "description": "The page's current state — the JSON object `jig_update({ state })` changes."
+          },
+          "title": {
+            "description": "The page's title (fenced text when the jig is a copy of someone else's)."
+          },
+          "untrusted": {
+            "description": "Present when this jig is a copy of someone else's: who wrote it, and how to treat its text."
+          },
+          "updateAvailable": {
+            "description": "Set when the published jig this copy came from has a newer version."
+          },
+          "url": {
+            "description": "The link to give the user: their tab is the live page.",
+            "type": "string"
+          },
+          "version": {
+            "description": "The jig's version; it goes up by one on every change.",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
       "title": "Steer an open page (jig)"
     },
     {
@@ -804,6 +1131,48 @@
         "type": "object"
       },
       "name": "jig_pull_update",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "base": {
+            "description": "The page as it was at `baseVersion`."
+          },
+          "baseVersion": {
+            "description": "The listing version this copy is based on."
+          },
+          "edited": {
+            "description": "True when the user changed their copy, so merge."
+          },
+          "files": {
+            "description": "For a project: per path, what changed and the three texts."
+          },
+          "jigId": {
+            "description": "The jig's id — pass it to every other `jig_*` tool.",
+            "type": "string"
+          },
+          "message": {
+            "description": "Why the call failed, when `ok` is false.",
+            "type": "string"
+          },
+          "mine": {
+            "description": "The user's current page."
+          },
+          "ok": {
+            "description": "False on an error.",
+            "type": "boolean"
+          },
+          "theirs": {
+            "description": "The page at `theirsVersion`."
+          },
+          "theirsVersion": {
+            "description": "The newer listing version — `mergedFrom`."
+          },
+          "untrusted": {
+            "description": "Present when this jig is a copy of someone else's: who wrote it, and how to treat its text."
+          }
+        },
+        "type": "object"
+      },
       "title": "Get an update for a copied page (jig)"
     },
     {
@@ -839,13 +1208,16 @@
         "additionalProperties": false,
         "properties": {
           "cache": {
+            "description": "True on first open, to also get the page's saved results.",
             "type": "boolean"
           },
           "jigId": {
+            "description": "The jig's id, as `jig_open` or `jig_list` returned it.",
             "format": "uuid",
             "type": "string"
           },
           "since": {
+            "description": "The version the page already has; the body and state come back only when newer.",
             "type": "integer"
           }
         },
@@ -855,6 +1227,47 @@
         "type": "object"
       },
       "name": "jig_view",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "cache": {
+            "description": "The page's saved results, when `cache` was asked for."
+          },
+          "dataRevs": {
+            "description": "Revisions of the jig's stored records."
+          },
+          "html": {
+            "description": "The page body, when it changed since `since`.",
+            "type": "string"
+          },
+          "jigId": {
+            "description": "The jig's id — pass it to every other `jig_*` tool.",
+            "type": "string"
+          },
+          "message": {
+            "description": "Why the call failed, when `ok` is false.",
+            "type": "string"
+          },
+          "ok": {
+            "description": "False on an error.",
+            "type": "boolean"
+          },
+          "state": {
+            "description": "The page's current state — the JSON object `jig_update({ state })` changes."
+          },
+          "title": {
+            "description": "The page's title (fenced text when the jig is a copy of someone else's)."
+          },
+          "untrusted": {
+            "description": "Present when this jig is a copy of someone else's: who wrote it, and how to treat its text."
+          },
+          "version": {
+            "description": "The jig's version; it goes up by one on every change.",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
       "title": "Jig view"
     },
     {
@@ -890,13 +1303,17 @@
         "additionalProperties": false,
         "properties": {
           "jigId": {
+            "description": "The jig's id, as `jig_open` or `jig_list` returned it.",
             "format": "uuid",
             "type": "string"
           },
           "key": {
+            "description": "Which call this result belongs to, as the page names it.",
             "type": "string"
           },
-          "value": {}
+          "value": {
+            "description": "The call's result, saved for the next time the page opens."
+          }
         },
         "required": [
           "jigId",
@@ -905,6 +1322,28 @@
         "type": "object"
       },
       "name": "jig_cache",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "message": {
+            "description": "Why the call failed, when `ok` is false.",
+            "type": "string"
+          },
+          "ok": {
+            "description": "False on an error.",
+            "type": "boolean"
+          },
+          "stored": {
+            "description": "True when the result was saved.",
+            "type": "boolean"
+          },
+          "truncated": {
+            "description": "True when it was cut to fit the cache.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
       "title": "Jig cache"
     },
     {
@@ -940,13 +1379,17 @@
         "additionalProperties": false,
         "properties": {
           "event": {
+            "description": "What the user just did on the page, e.g. watched, hid or searched.",
             "type": "string"
           },
           "jigId": {
+            "description": "The jig's id, as `jig_open` or `jig_list` returned it.",
             "format": "uuid",
             "type": "string"
           },
-          "snapshot": {}
+          "snapshot": {
+            "description": "What the page shows right now: its items and the view it is on."
+          }
         },
         "required": [
           "jigId"
@@ -954,6 +1397,20 @@
         "type": "object"
       },
       "name": "jig_seen",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "message": {
+            "description": "Why the call failed, when `ok` is false.",
+            "type": "string"
+          },
+          "ok": {
+            "description": "True when the report was recorded.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
       "title": "Jig seen"
     },
     {
@@ -989,10 +1446,13 @@
         "additionalProperties": false,
         "properties": {
           "jigId": {
+            "description": "The jig's id, as `jig_open` or `jig_list` returned it.",
             "format": "uuid",
             "type": "string"
           },
-          "report": {}
+          "report": {
+            "description": "How long this open took to load, and which calls failed and why."
+          }
         },
         "required": [
           "jigId"
@@ -1000,6 +1460,20 @@
         "type": "object"
       },
       "name": "jig_perf",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "message": {
+            "description": "Why the call failed, when `ok` is false.",
+            "type": "string"
+          },
+          "ok": {
+            "description": "True when the report was recorded.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
       "title": "Jig perf"
     },
     {
@@ -1031,6 +1505,35 @@
         "type": "object"
       },
       "name": "jig_read",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "bytes": {
+            "description": "Its size in bytes.",
+            "type": "number"
+          },
+          "files": {
+            "description": "Without `path`: every file and its size in bytes."
+          },
+          "message": {
+            "description": "Why the call failed, when `ok` is false.",
+            "type": "string"
+          },
+          "ok": {
+            "description": "False on an error.",
+            "type": "boolean"
+          },
+          "path": {
+            "description": "With `path`: the file read.",
+            "type": "string"
+          },
+          "text": {
+            "description": "Its text (fenced when the jig is someone else's).",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "title": "Read a page's files (jig)"
     },
     {
@@ -1049,6 +1552,7 @@
         "additionalProperties": false,
         "properties": {
           "jigId": {
+            "description": "The jig's id, as `jig_open` or `jig_list` returned it.",
             "format": "uuid",
             "type": "string"
           }
@@ -1059,6 +1563,61 @@
         "type": "object"
       },
       "name": "jig_look",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "advice": {
+            "description": "What to fix with `jig_update`."
+          },
+          "controls": {
+            "description": "The state keys a built-in page reads."
+          },
+          "jigId": {
+            "description": "The jig's id — pass it to every other `jig_*` tool.",
+            "type": "string"
+          },
+          "message": {
+            "description": "Why the call failed, when `ok` is false.",
+            "type": "string"
+          },
+          "ok": {
+            "description": "False on an error.",
+            "type": "boolean"
+          },
+          "opened": {
+            "description": "Whether anyone has opened the page yet."
+          },
+          "perf": {
+            "description": "How fast the page last loaded and which calls failed."
+          },
+          "recentActions": {
+            "description": "What the user just did on the page."
+          },
+          "reportedAt": {
+            "description": "When the page last reported."
+          },
+          "showing": {
+            "description": "What the page reported it shows right now."
+          },
+          "state": {
+            "description": "The page's current state — the JSON object `jig_update({ state })` changes."
+          },
+          "storage": {
+            "description": "The jig's stored records, summarised."
+          },
+          "title": {
+            "description": "The page's title (fenced text when the jig is a copy of someone else's)."
+          },
+          "untrusted": {
+            "description": "Present when this jig is a copy of someone else's: who wrote it, and how to treat its text."
+          },
+          "version": {
+            "description": "The jig's version; it goes up by one on every change.",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
       "title": "Look at a page (jig)"
     },
     {
@@ -1094,11 +1653,15 @@
         "additionalProperties": false,
         "properties": {
           "calls": {
+            "description": "The library calls one page action makes; they run in parallel.",
             "items": {
               "additionalProperties": false,
               "properties": {
-                "args": {},
+                "args": {
+                  "description": "The argument object it takes."
+                },
                 "fn": {
+                  "description": "A library function path, e.g. \"providers.youtube.search\".",
                   "type": "string"
                 }
               },
@@ -1110,6 +1673,7 @@
             "type": "array"
           },
           "cancel": {
+            "description": "The `ref`s of actions to stop.",
             "items": {
               "pattern": "^[A-Za-z0-9_-]{16,64}$",
               "type": "string"
@@ -1118,18 +1682,22 @@
             "type": "array"
           },
           "jigId": {
+            "description": "The jig's id, as `jig_open` or `jig_list` returned it.",
             "format": "uuid",
             "type": "string"
           },
           "ref": {
+            "description": "The page's own name for this action, so it can be cancelled.",
             "pattern": "^[A-Za-z0-9_-]{16,64}$",
             "type": "string"
           },
           "runId": {
+            "description": "Collect a call still running: the `runId` an earlier answer returned.",
             "format": "uuid",
             "type": "string"
           },
           "timeoutMs": {
+            "description": "How long to wait for the answer before returning a `runId` to collect.",
             "maximum": 600000,
             "minimum": 0,
             "type": "integer"
@@ -1141,6 +1709,34 @@
         "type": "object"
       },
       "name": "jig_call",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "error": {
+            "description": "What went wrong, when it did."
+          },
+          "message": {
+            "description": "Why the call failed, when `ok` is false.",
+            "type": "string"
+          },
+          "ok": {
+            "description": "True when the call completed without an error.",
+            "type": "boolean"
+          },
+          "result": {
+            "description": "What the call returned."
+          },
+          "runId": {
+            "description": "The run's id; pass it back to resume or collect it.",
+            "type": "string"
+          },
+          "status": {
+            "description": "How the call ended: `ok`, `partial`, `error`, `paused`…",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "title": "Jig call"
     },
     {
@@ -1195,6 +1791,42 @@
         "type": "object"
       },
       "name": "session_call",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "error": {
+            "description": "What went wrong, when it did."
+          },
+          "expiresAt": {
+            "description": "When an idle session ends (ISO 8601).",
+            "type": "string"
+          },
+          "message": {
+            "description": "Why the call failed, when `ok` is false.",
+            "type": "string"
+          },
+          "ok": {
+            "description": "True when the call completed without an error.",
+            "type": "boolean"
+          },
+          "result": {
+            "description": "What the call returned."
+          },
+          "runId": {
+            "description": "The run's id; pass it back to resume or collect it.",
+            "type": "string"
+          },
+          "sessionId": {
+            "description": "Pass it to the next `session_call` and to `session_close`.",
+            "type": "string"
+          },
+          "status": {
+            "description": "How the call ended: `ok`, `partial`, `error`, `paused`…",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "title": "Call one Bowmark function and keep the session open for the next call"
     },
     {
@@ -1236,6 +1868,27 @@
         "type": "object"
       },
       "name": "session_close",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "error": {
+            "description": "What went wrong, when it did."
+          },
+          "message": {
+            "description": "Why the call failed, when `ok` is false.",
+            "type": "string"
+          },
+          "ok": {
+            "description": "True when the session was closed.",
+            "type": "boolean"
+          },
+          "status": {
+            "description": "How the close ended.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "title": "End a Bowmark session"
     },
     {
@@ -1430,6 +2083,46 @@
         "type": "object"
       },
       "name": "llm_poll",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "instructions": {
+            "description": "How to answer them.",
+            "type": "string"
+          },
+          "jobs": {
+            "description": "The jobs claimed for you to answer.",
+            "items": {
+              "additionalProperties": true,
+              "properties": {
+                "inputSchema": {
+                  "description": "That tool's argument schema."
+                },
+                "jobId": {
+                  "description": "Pass it to `llm_answer`.",
+                  "type": "string"
+                },
+                "leaseSeconds": {
+                  "description": "How long the job is held for you.",
+                  "type": "number"
+                },
+                "prompt": {
+                  "description": "What to answer."
+                },
+                "system": {
+                  "description": "The system prompt for the job."
+                },
+                "toolName": {
+                  "description": "The tool the answer must be shaped as, if any."
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "title": "Serve Bowmark pages' AI calls"
     },
     {
@@ -1473,6 +2166,19 @@
         "type": "object"
       },
       "name": "llm_answer",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "description": "True when it was accepted.",
+            "type": "boolean"
+          },
+          "reason": {
+            "description": "Why it was refused, when it was."
+          }
+        },
+        "type": "object"
+      },
       "title": "Answer a Bowmark page's AI call"
     },
     {
@@ -1504,6 +2210,19 @@
         "type": "object"
       },
       "name": "llm_detach",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "ok": {
+            "description": "True when it was accepted.",
+            "type": "boolean"
+          },
+          "reason": {
+            "description": "Why it was refused, when it was."
+          }
+        },
+        "type": "object"
+      },
       "title": "Stop serving Bowmark pages' AI calls"
     },
     {
@@ -1646,6 +2365,51 @@
         "type": "object"
       },
       "name": "list_secrets",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "secrets": {
+            "description": "This account's stored secrets — names and status, never values.",
+            "items": {
+              "additionalProperties": true,
+              "properties": {
+                "expiresAt": {
+                  "description": "When it expires (ISO 8601).",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "hosts": {
+                  "description": "The sites it may be sent to."
+                },
+                "lastUsedAt": {
+                  "description": "When a run last used it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "name": {
+                  "description": "Use it by this name in a script.",
+                  "type": "string"
+                },
+                "status": {
+                  "description": "`set`, or `pending` until the user types it.",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "password, apiKey, totpSeed, cookie…",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "title": "See which of the user's logins Bowmark already holds"
     },
     {
@@ -1707,6 +2471,28 @@
         "type": "object"
       },
       "name": "request_secret",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "name": {
+            "description": "The secret's name.",
+            "type": "string"
+          },
+          "status": {
+            "description": "`set` when it already exists, else `pending`.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Its type.",
+            "type": "string"
+          },
+          "url": {
+            "description": "The link the user opens to type the value.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "title": "Ask the user to set a login Bowmark will need"
     },
     {
@@ -1747,6 +2533,20 @@
         "type": "object"
       },
       "name": "get_secret_link",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "name": {
+            "description": "The secret's name.",
+            "type": "string"
+          },
+          "viewUrl": {
+            "description": "The link where the user can see or change it.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "title": "Get the user a link to one of their own stored logins"
     },
     {
@@ -1778,6 +2578,77 @@
         "type": "object"
       },
       "name": "list_connections",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "connections": {
+            "description": "This account's saved site logins.",
+            "items": {
+              "additionalProperties": true,
+              "properties": {
+                "account": {
+                  "description": "Which account on that site."
+                },
+                "createdAt": {
+                  "description": "When it was added (ISO 8601).",
+                  "type": "string"
+                },
+                "expiresAt": {
+                  "description": "When it expires (ISO 8601).",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "The login's id — `connection` in a run, `delete_connection`'s `id`.",
+                  "type": "string"
+                },
+                "isDefault": {
+                  "description": "The login a run uses when it names none.",
+                  "type": "boolean"
+                },
+                "lastCheckedAt": {
+                  "description": "When it was last validated.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "lastUsedAt": {
+                  "description": "When a run last used it.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "method": {
+                  "description": "How it was signed in."
+                },
+                "provider": {
+                  "description": "The site it signs in to.",
+                  "type": "string"
+                },
+                "scopes": {
+                  "description": "What it was granted."
+                },
+                "status": {
+                  "description": "active, expired, logged_out…",
+                  "type": "string"
+                },
+                "usable": {
+                  "description": "Whether a run can use it now.",
+                  "type": "boolean"
+                },
+                "via": {
+                  "description": "`link` when the user's own Chrome serves it.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "title": "See which sites Bowmark is already signed in to"
     },
     {
@@ -1822,6 +2693,48 @@
         "type": "object"
       },
       "name": "add_connection",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "ambiguous": {
+            "description": "The sites a name could mean — ask the user which."
+          },
+          "anotherLogin": {
+            "description": "True when this adds a second login on that site.",
+            "type": "boolean"
+          },
+          "connection": {
+            "description": "The saved login this link refreshes, if one was named."
+          },
+          "expiresAt": {
+            "description": "When the link expires."
+          },
+          "ref": {
+            "description": "Pass it to `wait_for_sign_in` to hear the sign-in finish.",
+            "type": "string"
+          },
+          "signInSupported": {
+            "description": "False when Bowmark cannot sign in to that site.",
+            "type": "boolean"
+          },
+          "site": {
+            "description": "The site the link signs in to.",
+            "type": "string"
+          },
+          "sites": {
+            "description": "Every site Bowmark can sign in to."
+          },
+          "title": {
+            "description": "Its name.",
+            "type": "string"
+          },
+          "url": {
+            "description": "The single-use sign-in link to give the user.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "title": "Get the user a link to sign Bowmark in to a site"
     },
     {
@@ -1867,6 +2780,45 @@
         "type": "object"
       },
       "name": "wait_for_sign_in",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "expiresAt": {
+            "description": "When the link expires.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "message": {
+            "description": "What to do next, in one paragraph.",
+            "type": "string"
+          },
+          "ref": {
+            "description": "The sign-in being waited on.",
+            "type": "string"
+          },
+          "remaining": {
+            "description": "Sites not signed in yet.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "sites": {
+            "description": "Sites the link covers.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "state": {
+            "description": "pending, done, cancelled, expired or unknown.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "title": "Wait for the user to finish signing in"
     },
     {
@@ -1918,6 +2870,23 @@
         "type": "object"
       },
       "name": "lease_ip",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "error": {
+            "description": "Why it failed, when it did."
+          },
+          "message": {
+            "description": "What happened, in words.",
+            "type": "string"
+          },
+          "status": {
+            "description": "The HTTP status of the lease: below 400 succeeded.",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
       "title": "Get the user a dedicated IP for sites that need one"
     },
     {
@@ -1958,6 +2927,31 @@
         "type": "object"
       },
       "name": "delete_connection",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "account": {
+            "description": "Which account on that site."
+          },
+          "confirmUrl": {
+            "description": "The link where the user confirms it.",
+            "type": "string"
+          },
+          "connection": {
+            "description": "The login's id.",
+            "type": "string"
+          },
+          "deleted": {
+            "description": "Always false: the user confirms the delete.",
+            "type": "boolean"
+          },
+          "provider": {
+            "description": "The site it signs in to.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "title": "Ask the user to confirm deleting a saved login"
     },
     {
@@ -1998,6 +2992,28 @@
         "type": "object"
       },
       "name": "logout_connection",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "loggedOut": {
+            "description": "The id of the login signed out."
+          },
+          "provider": {
+            "description": "The site it was signed in to.",
+            "type": "string"
+          },
+          "siteError": {
+            "description": "Why the site-side sign-out failed, when it did."
+          },
+          "siteLogout": {
+            "description": "`unsupported` when the site offers no way to end it."
+          },
+          "siteSignedOut": {
+            "description": "True when the site confirmed the session ended."
+          }
+        },
+        "type": "object"
+      },
       "title": "Sign one of the user's saved logins out"
     }
   ],

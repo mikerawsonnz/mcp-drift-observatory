@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://agentsindex.ai/mcp` | 12 | [`9c3cf6a1103c`](ae90c62287403cba0474.json) | 2026-11-06 |
+| `https://agentsindex.ai/mcp` | 12 | [`e0c85b841395`](ae90c62287403cba0474.json) | 2026-11-09 |
 
 ## Tools at `https://agentsindex.ai/mcp`
 
@@ -21,10 +21,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `search_listings`: `Full-text search over AgentsIndex's Published tools. Returns compact records (name, slug, tagline, url). Fetch depth with get_listing.`
 - `send_lead`: `Send a buyer-intent enquiry (lead) to a tool or a whole category on AgentsIndex. Keyless. Requires consent:true, a real name, a permanent (…`
 - `submit_listing`: `Submit a tool to AgentsIndex: the url alone; we write its name and description from its own pages. Requires an existing signed-in account w…`
-- `subscribe_newsletter`: `Subscribe an email to the AgentsIndex digest of new and freshly re-verified tools. Provide an email; returns { ok }. The address is on the…`
+- `subscribe_newsletter`: `Subscribe an email to the AgentsIndex digest of new and freshly re-verified tools. Provide an email; returns { ok }. The address gets one m…`
 
 ## Changes
 
+- 2026-11-09: [description changed](../../deltas/2026-11-09/ae90c62287403cba0474.json): `1 field(s) changed`
 - 2026-11-06: [description changed](../../deltas/2026-11-06/ae90c62287403cba0474.json): `1 field(s) changed`
 - 2026-11-03: [description changed](../../deltas/2026-11-03/ae90c62287403cba0474.json): `1 field(s) changed`
 - 2026-11-01: [description changed](../../deltas/2026-11-01/ae90c62287403cba0474.json): `1 field(s) changed`

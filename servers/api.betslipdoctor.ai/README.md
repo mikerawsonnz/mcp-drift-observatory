@@ -6,12 +6,13 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.betslipdoctor.ai/api/mcp` | 94 | [`b0e0754fa889`](f29327f2a9147dd897c0.json) | 2026-11-08 |
+| `https://api.betslipdoctor.ai/api/mcp` | 96 | [`74f87c627eba`](f29327f2a9147dd897c0.json) | 2026-11-09 |
 
 ## Tools at `https://api.betslipdoctor.ai/api/mcp`
 
 - `account_settings`: `Read and change this account through its signed-in product routes. Change AI and model-training privacy settings in the app. Sportsbook act…`
-- `add_doctor_parlay_to_slip`: `Put one of the Doctor’s posted parlays (key from get_doctor_parlays) on this account’s slip in one step, with a unique commandKey. Checks e…`
+- `add_doctor_parlay_to_slip`: `Put one of the Doctor’s posted parlays (key from get_doctor_parlays) or the Home hero pick (get_league_order slate.doctorHero.key: a single…`
+- `add_funds`: `Return a link to add funds to the pay-as-you-go balance. The customer signs in and confirms there; this tool never charges.`
 - `cancel_doctor_reply`: `Cancel an owned Doctor jobId under the app cancellation and reservation rules. Cannot undo a reply or provider work already completed. Reus…`
 - `cancel_grade`: `Cancel an owned Grade jobId through the app service. Stops eligible work and releases its remaining reservation under the existing app rule…`
 - `check_slip`: `The app slip’s rule for this conversation’s slip. Send legs (ids plus the oddsAmerican, line, observedAt and startsAt they were added with)…`
@@ -27,6 +28,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `fix_grade_leg`: `The app’s Fix it on an owned saved Grade jobId whose get_grade_report says fixable.offered: the Doctor reprices, swaps or drops weak legs a…`
 - `forget_doctor_note`: `Remove the exact owned note only after the customer explicitly asks to forget it. Requires current id/expectedRevision and confirmation for…`
 - `get_betting_leaks`: `Read deterministic patterns from this account’s settled betting history, with coverage, sample sizes, thresholds and source ticket IDs.`
+- `get_bettor_history`: `Read a visible bettor profile’s settled History in units.`
 - `get_bettor_profile`: `Read this authenticated account’s bettor model, optionally filtered by topic: confirmed notes and revisions, separately attributed Honcho i…`
 - `get_box_score`: `Read the in-play or final score and box score for one game (eventId from search_markets or the board), the same read as the app’s Live game…`
 - `get_doctor_conversation`: `Read the owned threadId, saved user messages, Doctor answers and jobs; optional before pages older messages. Does not generate a new answer.`
@@ -68,12 +70,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `open_doctor_conversation`: `Persist an app Doctor thread, optionally attached to an owned ticket, report or history item. Does not start a reply or spend a consult all…`
 - `prepare_sportsbook_handoff`: `Prepare the existing app’s fresh, vetted direct sportsbook link for an owned saved ticket. Choose the same sportsbook as the saved ticket a…`
 - `preview_tail_post`: `Compute the exact app sharing preview and binding from an owned saved Grade report or Doctor exchange draft. Does not publish. Show the ret…`
-- `preview_tail_slip`: `Show current supported prices for tailing or fading one visible public post at the customer’s chosen bookId and jurisdiction. Use original…`
-- `price_shop_slip`: `Compare books on a saved slip, exactly the app's Compare books (POST tickets/compare-books): each leg's current price at up to 5 books (boo…`
-- and 34 more in [f29327f2a9147dd897c0.json](f29327f2a9147dd897c0.json)
+- and 36 more in [f29327f2a9147dd897c0.json](f29327f2a9147dd897c0.json)
 
 ## Changes
 
+- 2026-11-09: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-09/f29327f2a9147dd897c0.json): `2 tool(s) added; 118 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-08: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-08/f29327f2a9147dd897c0.json): `2 tool(s) added; 2370 field(s) changed; signals: length_more_than_doubled, url_introduced`
 - 2026-11-07: [description changed, schema changed](../../deltas/2026-11-07/f29327f2a9147dd897c0.json): `661 field(s) changed; signals: length_more_than_doubled, url_introduced`
 - 2026-11-06: [annotation changed, description changed, field changed, schema changed](../../deltas/2026-11-06/f29327f2a9147dd897c0.json): `2136 field(s) changed; signals: length_more_than_doubled`
@@ -93,7 +94,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - 2026-10-13: [schema changed](../../deltas/2026-10-13/f29327f2a9147dd897c0.json): `20 field(s) changed`
 - 2026-10-11: [annotation changed, description changed, schema changed](../../deltas/2026-10-11/f29327f2a9147dd897c0.json): `62 field(s) changed`
 - 2026-10-10: [count changed, tool added](../../deltas/2026-10-10/f29327f2a9147dd897c0.json): `11 tool(s) added`
-- 2026-10-09: [field changed](../../deltas/2026-10-09/f29327f2a9147dd897c0.json): `6 field(s) changed`
 
 ## Check it from your agent
 

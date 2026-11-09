@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "9abd48353218fd0476b380f465eaea79c6364e5d61dd9af801c3550f87267176",
+  "full_hash": "31f5276c370e4295dfa732df7ecfbf7243fb1bc6716b57205336ae4392fcfa32",
   "name": "ai.annsa/annsa",
-  "observed_at": "2026-11-06T02:02:18.706631Z",
+  "observed_at": "2026-11-09T02:02:38.073529Z",
   "sources": [
     "official"
   ],
@@ -14,31 +14,33 @@
         "readOnlyHint": true,
         "title": "Priorities"
       },
-      "description": "List ranked priorities. Filter by stage, bet, person or topic, or get one by number. `weekly` and `view` return summaries. A read. [production · app.annsa.ai · tools 8efe806f]",
+      "description": "Your ranked to-do list. Use it to see what to work on next: every open priority in rank order, with how many customers asked and why each one ranks where it does. Ask for one priority by its number to get just that row. For the full plan behind a priority, read annsa.spec. It doesn't search what customers said; that's annsa.ask.",
       "inputSchema": {
         "properties": {
           "bet": {
-            "description": "A bet id, or 'unplaced' for the proposal inbox",
+            "description": "Only priorities on this bet, by id. unplaced lists the ones no bet has yet.",
             "type": "string"
           },
           "include": {
-            "description": "Long lists, comma separated: agents, to_verify, in_build, unrated_filings or all.",
+            "description": "Extra lists to include, comma separated: agents, to_verify, in_build, unrated_filings or all.",
             "type": "string"
           },
           "include_parked": {
+            "description": "Include parked priorities too.",
             "type": "boolean"
           },
           "label": {
+            "description": "What to call this session, up to 60 characters. Shown as who did it.",
             "maxLength": 60,
             "type": "string"
           },
           "limit": {
             "default": 5,
-            "description": "Max 100",
+            "description": "How many to return. Defaults to 5, max 100.",
             "type": "number"
           },
           "mine": {
-            "description": "Only the priorities you hold; the reply carries `needs_me`.",
+            "description": "Only the priorities you're working on. The reply also counts what needs you.",
             "type": "boolean"
           },
           "offset": {
@@ -47,10 +49,11 @@
             "type": "number"
           },
           "person": {
+            "description": "A person's email. With picked, whose picked list.",
             "type": "string"
           },
           "picked": {
-            "description": "A person's picked list; `person` says whose",
+            "description": "Only the priorities a person picked; person says whose.",
             "type": "boolean"
           },
           "priority_id": {
@@ -63,8 +66,7 @@
             "type": "integer"
           },
           "rank_by": {
-            "default": "volume",
-            "description": "retention is unhappy customers, delight is praise, feature is new-feature asks.",
+            "description": "Leave it out for the board's order, the same as the app. Or rank by volume, urgency, revenue, retention (unhappy customers), delight (praise) or feature (new-feature asks).",
             "enum": [
               "volume",
               "urgency",
@@ -76,16 +78,17 @@
             "type": "string"
           },
           "release_number": {
+            "description": "Only the priorities in this release.",
             "minimum": 1,
             "type": "integer"
           },
           "segment": {
             "default": "all",
-            "description": "enterprise or smb",
+            "description": "Customer size: all (default), enterprise or smb.",
             "type": "string"
           },
           "stage": {
-            "description": "Default: the ranked active priorities (open, ready, building).",
+            "description": "open, ready, building, shipped, shared or closed. Leave it out for the ranked active priorities: open, ready and building.",
             "enum": [
               "open",
               "ready",
@@ -97,10 +100,11 @@
             "type": "string"
           },
           "topic": {
-            "description": "Matches a priority's wording and its feedback",
+            "description": "A word or phrase to search for in priorities and their feedback.",
             "type": "string"
           },
           "type": {
+            "description": "Only this kind: bug, feature, improvement, praise or question.",
             "enum": [
               "bug",
               "feature",
@@ -111,15 +115,16 @@
             "type": "string"
           },
           "view": {
-            "description": "radar, brief or a saved view",
+            "description": "A saved view by name, or radar (what's rising, shipped and quiet) or brief.",
             "type": "string"
           },
           "weekly": {
+            "description": "A summary of the week instead of the list: what's rising, what shipped, what went quiet.",
             "type": "boolean"
           },
           "window": {
             "default": "7d",
-            "description": "How far back the radar looks.",
+            "description": "How far back the radar looks: 7d, 14d or 30d. Defaults to 7d.",
             "enum": [
               "7d",
               "14d",
@@ -130,7 +135,24 @@
         },
         "type": "object"
       },
-      "name": "annsa_priorities"
+      "name": "annsa_priorities",
+      "outputSchema": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "record": {
+            "type": "object"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "who": {
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
     },
     {
       "annotations": {
@@ -138,14 +160,15 @@
         "readOnlyHint": true,
         "title": "Spec"
       },
-      "description": "Read a priority's spec: Problem, What to build, Done When, open asks and principle titles. `include_evidence` adds Evidence and direction and Files to touch; `investigate` adds analysis; `batch` exports specs. A read. [production · app.annsa.ai · tools 8efe806f]",
+      "description": "The plan for one priority. Use it before starting work: it gives you the Problem, What to build, and the Done When lines you'll have to prove. The reply carries build_id, the spec id (build_…) that verify and ship take as spec_id. Add include_evidence to see Evidence and direction, Files to touch and the customer quotes behind it. It doesn't list or rank priorities; that's annsa.priorities.",
       "inputSchema": {
         "properties": {
           "batch": {
+            "description": "Export many specs at once, filtered by spec_ids, stage or since.",
             "type": "boolean"
           },
           "format": {
-            "description": "With batch: list is one line each; full is the whole spec.",
+            "description": "With batch: list (one line each, the default) or full (the whole spec).",
             "enum": [
               "list",
               "full"
@@ -153,7 +176,7 @@
             "type": "string"
           },
           "include": {
-            "description": "repo_rules adds the repo's agent files.",
+            "description": "One extra: repo_rules (the repo's agent files), decision (the Decision text), memory (related memory) or verification (the verify receipts).",
             "enum": [
               "repo_rules",
               "decision",
@@ -163,11 +186,11 @@
             "type": "string"
           },
           "include_direction": {
-            "description": "Direction first screens",
+            "description": "Add the opening of each Direction page that applies.",
             "type": "boolean"
           },
           "include_evidence": {
-            "description": "Adds Evidence and direction, Files to touch and the quotes",
+            "description": "Add the Evidence and direction and Files to touch sections, and the customer quotes.",
             "type": "boolean"
           },
           "include_feedback": {
@@ -182,22 +205,25 @@
           },
           "include_memory": {
             "default": true,
+            "description": "Add related answers and what earlier work learned.",
             "type": "boolean"
           },
           "include_principles": {
-            "description": "The rules in full",
+            "description": "Add the full text of the principles that apply.",
             "type": "boolean"
           },
           "investigate": {
+            "description": "Add an analysis of the problem from the feedback and history.",
             "type": "boolean"
           },
           "label": {
+            "description": "What to call this session, up to 60 characters. Shown as who did it.",
             "maxLength": 60,
             "type": "string"
           },
           "limit": {
             "default": 10,
-            "description": "Max 50",
+            "description": "With batch: how many specs. Defaults to 10, max 50.",
             "type": "number"
           },
           "priority_id": {
@@ -209,8 +235,17 @@
             "minimum": 1,
             "type": "integer"
           },
+          "reached": {
+            "description": "With batch: only specs that reached staging, main or prod, newest first.",
+            "enum": [
+              "staging",
+              "main",
+              "prod"
+            ],
+            "type": "string"
+          },
           "since": {
-            "description": "ISO date or 'last month'",
+            "description": "A date like 2026-11-06, or 'last month'.",
             "type": "string"
           },
           "spec_id": {
@@ -225,7 +260,7 @@
             "type": "array"
           },
           "stage": {
-            "description": "With batch: only specs at this stage.",
+            "description": "With batch: only specs at this stage: open, ready, building, shipped, shared or closed.",
             "enum": [
               "open",
               "ready",
@@ -237,6 +272,7 @@
             "type": "string"
           },
           "status": {
+            "description": "With batch: the spec's status: open, ready, building, shipped, shared, closed or done. Not the board stage; that's stage.",
             "enum": [
               "open",
               "ready",
@@ -249,12 +285,30 @@
             "type": "string"
           },
           "until": {
+            "description": "A date like 2026-11-06. With since, the window.",
             "type": "string"
           }
         },
         "type": "object"
       },
-      "name": "annsa_spec"
+      "name": "annsa_spec",
+      "outputSchema": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "record": {
+            "type": "object"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "who": {
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
     },
     {
       "annotations": {
@@ -262,10 +316,11 @@
         "readOnlyHint": true,
         "title": "Ask"
       },
-      "description": "Find what customers said, what's on the board, or how Annsa works. `about` picks the source: feedback (default), annsa (the docs, or a skill with `skill`), surveys, customer, transcript, accounts or templates. A read. [production · app.annsa.ai · tools 8efe806f]",
+      "description": "Ask Annsa a question in plain words. Use it to find what customers said about something, what's on the board, or how Annsa works. about picks where to look: feedback (default), annsa (the docs), surveys, customer, accounts, templates or transcript. You get an answer with the quotes and priorities it came from. Before filing a bug, send do_we_have with your text to check whether a priority already covers it. It doesn't list the ranked work; that's annsa.priorities.",
       "inputSchema": {
         "properties": {
           "about": {
+            "description": "Where to look: feedback (default), annsa (the docs), surveys, customer, accounts, templates or transcript.",
             "enum": [
               "feedback",
               "annsa",
@@ -278,11 +333,11 @@
             "type": "string"
           },
           "account": {
-            "description": "Narrows `customer` to one company",
+            "description": "With customer: which company, if the name matches more than one.",
             "type": "string"
           },
           "customer": {
-            "description": "With about='customer': a name, email or id",
+            "description": "With about=customer: their name, email or id.",
             "type": "string"
           },
           "days": {
@@ -290,11 +345,11 @@
             "type": "integer"
           },
           "do_we_have": {
-            "description": "The text you are about to file; returns the nearest priorities",
+            "description": "The text you're about to file. Returns the nearest priorities, each judged same, possibly or different.",
             "type": "string"
           },
           "from": {
-            "description": "With do_we_have: a customer's words or an agent's finding",
+            "description": "With do_we_have: customer (a customer's words) or agent (an agent's finding).",
             "enum": [
               "customer",
               "agent"
@@ -302,7 +357,7 @@
             "type": "string"
           },
           "have_version": {
-            "description": "The version of your saved copy of the file",
+            "description": "With skill: the version of the copy you already have, so you only get it if it changed.",
             "type": "string"
           },
           "include_archived": {
@@ -310,6 +365,7 @@
             "type": "boolean"
           },
           "page": {
+            "description": "For a long transcript: which page, starting at 1.",
             "minimum": 1,
             "type": "integer"
           },
@@ -318,10 +374,11 @@
             "type": "string"
           },
           "question": {
+            "description": "What you want to know, in a sentence.",
             "type": "string"
           },
           "skill": {
-            "description": "Returns a skill file instead of an answer; no question needed",
+            "description": "Returns a skill file instead of an answer: working, spec-skill, decisions or welcome. No question needed.",
             "enum": [
               "working",
               "spec-skill",
@@ -331,14 +388,31 @@
             "type": "string"
           },
           "transcript": {
-            "description": "t12 or its id; long ones come in pages",
+            "description": "With about=transcript: which call, like t12 or its id. Long ones come in pages.",
             "type": "string"
           }
         },
         "required": [],
         "type": "object"
       },
-      "name": "annsa_ask"
+      "name": "annsa_ask",
+      "outputSchema": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "record": {
+            "type": "object"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "who": {
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
     },
     {
       "annotations": {
@@ -348,11 +422,11 @@
         "readOnlyHint": false,
         "title": "Work"
       },
-      "description": "Do the work on a priority, and settle routine asks with undo. [production · app.annsa.ai · tools 8efe806f]",
+      "description": "Do the work on a priority. Use it to claim a priority, write your part of the spec, leave notes, prove each Done When line with verify, and mark it shipped. claim gives you a spec_id for write, verify and ship, and a holder_key for write and ship. Ship only records that it shipped; it doesn't deploy anything. If you need a person to decide something, use escalate. It doesn't move, merge or re-rank priorities; that's annsa.board.",
       "inputSchema": {
         "properties": {
           "action": {
-            "description": "ship: Records completion and deploys nothing; retract undoes it. claim: Claims the priority, starts a short spec and returns holder_key. note: Appends a note; a correction is a new note with supersedes. dispatch: Posts @claude on the priority's linked GitHub issue; the person stays assigned. unclaim: Puts the work down; nothing is marked shipped. close: Closes a priority in one call, claim or PR and all; it stays under Closed. write: Replaces one spec section as a new version; text for a section that is not yours is recorded as an update. verify: Records how a line was checked, by proof kind. No ship gate. escalate: Raises a three-line ask in a person's Needs you; decides nothing. Needs `checked`: a fact you can check is not asked. One open ask per priority; the same topic updates it. resolve: Answers a routine ask the way your principles already decide it; returns use_id for undo. undo: Puts back your own resolve by use_id.",
+            "description": "ship: Mark the priority shipped. It only records it; nothing deploys. retract undoes it. claim: Take a priority to work on. Starts a spec if there isn't one and gives you spec_id and holder_key. note: Leave a note on the spec about what you did or found. To correct an earlier note, send a new one with supersedes. handoff: Pass the work to another agent or a person, with a note for them. dispatch: Post @claude on the priority's GitHub issue so Claude picks it up there. The person stays assigned. A person's action. unclaim: Unclaim a priority so another agent can pick it up. close: Close the priority in one call, even if it's claimed or has a PR. It stays under Closed with your reason. write: Replace one section of the spec with new text. If the section belongs to someone else, your text is saved as a proposed change for them. verify: Record how you checked one Done When line, by proof kind: a test id for (proof: test), a URL for staging or prod. It doesn't block ship. escalate: Ask a person to decide something; it lands in their Needs you. Send topic, ask, trigger, principle and checked. One open ask per priority; the same topic updates it. resolve: Settle a routine question, like 'is this a duplicate of #N?', the way your principles already decide it. Each outcome fits one kind of question. Returns use_id so you can undo. undo: Reverse your own resolve, by use_id.",
             "enum": [
               "ship",
               "claim",
@@ -370,25 +444,27 @@
             "type": "string"
           },
           "ask": {
+            "description": "For escalate: the question you want the person to answer, in one line.",
             "type": "string"
           },
           "assigned_to": {
-            "description": "An agent client or a member's email; empty unassigns",
+            "description": "Who gets it: an agent (like claude-code or codex) or a person's email. Empty unassigns.",
             "type": "string"
           },
           "checked": {
-            "description": "What you checked before asking, as \"what — result\".",
+            "description": "For escalate: what you checked before asking, as 'what — result'.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "done_when_index": {
-            "description": "Which Done When line, counting from 1 as annsa.spec does.",
+            "description": "For verify: which Done When line, counting from 1 as annsa.spec lists them.",
             "minimum": 1,
             "type": "integer"
           },
           "feedback_ids": {
+            "description": "For resolve: the rows the ask is about.",
             "items": {
               "type": "string"
             },
@@ -399,6 +475,7 @@
             "type": "string"
           },
           "how": {
+            "description": "For verify: how you checked the line: test, staging, prod or manual.",
             "enum": [
               "test",
               "staging",
@@ -408,37 +485,45 @@
             "type": "string"
           },
           "include_memory": {
-            "description": "claim: adds related_answers, learned",
+            "description": "For claim: add related answers and what earlier work learned.",
             "type": "boolean"
           },
           "include_principles": {
-            "description": "claim: the rules in full",
+            "description": "For claim: add the full text of the principles that apply.",
             "type": "boolean"
           },
           "into": {
+            "description": "For resolve move_row: the priority the row moves to.",
             "type": "string"
           },
           "label": {
+            "description": "What to call this session, up to 60 characters. Shown as who did it.",
             "maxLength": 60,
             "type": "string"
           },
           "learned": {
+            "description": "For ship or escalate: what the next agent should know.",
             "maxLength": 10000,
             "type": "string"
           },
+          "model": {
+            "description": "For claim and ship: the model the agent runs on, like claude-opus-5-5. Shown beside its name.",
+            "type": "string"
+          },
           "next_action": {
-            "description": "What should happen next on this priority.",
+            "description": "For note or handoff: what should happen next on this priority.",
             "maxLength": 400,
             "type": "string"
           },
           "options": {
-            "description": "Short labels, for a decision",
+            "description": "For escalate: the choices, as short labels.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "outcome": {
+            "description": "For resolve: keep_both (a merge ask), close_settled, dismiss_came_back or move_row (a stray row). Each fits one kind of ask.",
             "enum": [
               "keep_both",
               "close_settled",
@@ -448,11 +533,11 @@
             "type": "string"
           },
           "pr_url": {
-            "description": "GitHub PR URL; body has 'Annsa-Spec: <spec id>'",
+            "description": "The GitHub PR link. Its body carries 'Annsa-Spec: <spec id>'.",
             "type": "string"
           },
           "principle": {
-            "description": "The rule that would settle this class next time",
+            "description": "For escalate: the rule that would let an agent settle this kind of question next time.",
             "type": "string"
           },
           "priority_id": {
@@ -465,7 +550,7 @@
             "type": "integer"
           },
           "purpose": {
-            "description": "For escalate: decision picks between options, help needs a person's hand, gap is something missing, update is just telling.",
+            "description": "For escalate: decision (pick between options), help (needs a person's hand), gap (something missing) or update (just telling).",
             "enum": [
               "decision",
               "help",
@@ -475,13 +560,13 @@
             "type": "string"
           },
           "quiet_minutes": {
-            "description": "On a note: how long you expect to be quiet, in minutes.",
+            "description": "For note: how long you expect to be quiet, in minutes.",
             "maximum": 240,
             "minimum": 1,
             "type": "integer"
           },
           "reason": {
-            "description": "Required for takeover, release, retract, correct and an agent's severity",
+            "description": "Why, in a line. Needed for takeover, close, unclaim, handoff, and a park or retract request.",
             "type": "string"
           },
           "recommend": {
@@ -489,7 +574,7 @@
             "type": "string"
           },
           "request": {
-            "description": "Needs reason; a person decides.",
+            "description": "For escalate: park or retract, to ask the person for one. Needs reason.",
             "enum": [
               "park",
               "retract"
@@ -497,39 +582,39 @@
             "type": "string"
           },
           "ruled_out": {
-            "description": "One 'label — why' per entry",
+            "description": "Options you ruled out, one per entry as 'option — why'.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "same_as_priority_number": {
-            "description": "Proposes a merge for a person to answer",
+            "description": "For escalate: the priority this looks like a duplicate of; a person decides the merge.",
             "minimum": 1,
             "type": "integer"
           },
           "section": {
-            "description": "The spec section: the_problem, evidence_and_direction, what_to_build, files_to_touch or done_when. On a note: build, how_it_works or spec.",
+            "description": "For write: the_problem, evidence_and_direction, what_to_build, files_to_touch or done_when. For note: build, how_it_works or spec.",
             "type": "string"
           },
           "security": {
-            "description": "True for a security question",
+            "description": "For escalate: true if this is a security question.",
             "type": "boolean"
           },
           "ships": {
-            "description": "True when the ask is \"ship this PR\"; needs pr_url.",
+            "description": "For escalate: true when the ask is 'ship this PR'. Needs pr_url.",
             "type": "boolean"
           },
           "spec_id": {
-            "description": "The spec id from claim or annsa.spec (build_…). Required for verify.",
+            "description": "The spec id from claim, or build_id from annsa.spec. Required for verify.",
             "type": "string"
           },
           "supersedes": {
-            "description": "The note or principle this replaces.",
+            "description": "For note: the note this replaces. For principle: the principle this replaces.",
             "type": "string"
           },
           "takeover": {
-            "description": "Another session of your own client counts as someone else; needs a reason",
+            "description": "Claim or unclaim work someone else holds. Needs reason. Another session of your own counts as someone else.",
             "type": "boolean"
           },
           "text": {
@@ -537,10 +622,11 @@
             "type": "string"
           },
           "topic": {
+            "description": "For escalate: what the ask is about, in a few words.",
             "type": "string"
           },
           "trigger": {
-            "description": "Anything else is settled, not raised.",
+            "description": "For escalate: why this needs a person: scope, customers, principle or options. Anything else is settled, not raised.",
             "enum": [
               "scope",
               "customers",
@@ -550,10 +636,11 @@
             "type": "string"
           },
           "use_id": {
+            "description": "For undo: the id resolve gave you.",
             "type": "string"
           },
           "verdict": {
-            "description": "On a shipped priority: still_broken or fixed. On release, false_positive does NOT close the row.",
+            "description": "For unclaim: false_positive marks the finding wrong. still_broken and fixed belong to annsa.file submit.",
             "enum": [
               "false_positive",
               "still_broken",
@@ -562,7 +649,7 @@
             "type": "string"
           },
           "where": {
-            "description": "A test id (path::test) or a URL that shows the check.",
+            "description": "For verify: a test id (path::test) or a URL that shows the check.",
             "maxLength": 500,
             "type": "string"
           }
@@ -572,7 +659,24 @@
         ],
         "type": "object"
       },
-      "name": "annsa_work"
+      "name": "annsa_work",
+      "outputSchema": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "record": {
+            "type": "object"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "who": {
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
     },
     {
       "annotations": {
@@ -582,11 +686,11 @@
         "readOnlyHint": false,
         "title": "File"
       },
-      "description": "Add feedback, a finding, a priority, a transcript, a page or a template. [production · app.annsa.ai · tools 8efe806f]",
+      "description": "Add something new to the board. Use it to file what a customer said, a bug or finding you found, or an idea. It attaches to the matching priority if there is one; add stand_alone to make a new priority instead. The reply tells you which priority it landed on. It doesn't change rows that already exist; that's annsa.board. To tell the Annsa team about Annsa itself, use report.",
       "inputSchema": {
         "properties": {
           "action": {
-            "description": "submit: Adds one feedback row; an agent's is a finding. With priority_number it attaches there; with stand_alone it proposes a new priority. report: Tell the Annsa team about a bug, gap or idea in Annsa. Needs `text`; `title` names the tool and action. The Annsa team reads it, so keep your customers' data out. add_page: Makes a page from a template, private to you; returns its link. add_template: Saves a template (title, text, when_to_use), private to you; {blanks} are its fields. connect_goal: Answer the welcome's optional question: what the person wants from Annsa, up to 300 characters. Goes to the Annsa team, not your board. import_direction: Two steps: preview a strategy doc's lines, then add the ones you pick as ideas. add_priority: Adds a priority from a title and detail, with no customer words.",
+            "description": "submit: File what a customer said or what you found. With priority_number it attaches to that priority; with stand_alone it starts a new one. report: Tell the Annsa team about a bug, gap or idea in Annsa itself. Send text; title names the tool and action. Keep your customers' data out of it. add_page: Make a page from a template, private to you. Returns the link. add_template: Save a template with a title, text and when to use it. {blanks} in the text become its fields. connect_goal: Answer the welcome's optional question about what you want from Annsa, up to 300 characters. Goes to the Annsa team, not your board. add_transcript: Add a call transcript as customer feedback. What the customer asked for is filed from it. A person's action. import_direction: Import a strategy doc in two steps. First preview its lines, then add the ones you pick as ideas. A person's action. add_priority: Add a priority from a title and detail, with no customer words.",
             "enum": [
               "submit",
               "report",
@@ -600,7 +704,7 @@
             "type": "string"
           },
           "adjudicated": {
-            "description": "Raw scanner output is refused unless someone checked it",
+            "description": "True if a person checked this scanner finding; raw scanner output is refused.",
             "type": "boolean"
           },
           "bet": {
@@ -608,7 +712,7 @@
             "type": "string"
           },
           "call_type": {
-            "description": "For add_transcript (default other).",
+            "description": "For add_transcript: interview, sales_call, support or other (the default).",
             "enum": [
               "interview",
               "sales_call",
@@ -618,37 +722,40 @@
             "type": "string"
           },
           "customer_email": {
+            "description": "Their email, if you have it.",
             "type": "string"
           },
           "customer_name": {
+            "description": "The customer who said it.",
             "type": "string"
           },
           "detail": {
-            "description": "The longer words of the row, up to 20000 characters",
+            "description": "For add_priority: the longer words of the row, up to 20000 characters.",
             "maxLength": 20000,
             "type": "string"
           },
           "doc_id": {
-            "description": "The Direction page to save into; leave it out for a new page.",
+            "description": "Which Direction page. Leave it out for a new page, or the Overview.",
             "type": "string"
           },
           "doc_title": {
-            "description": "The page's title (kept if you send none).",
+            "description": "The page's title. Kept if you send none.",
             "type": "string"
           },
           "document_text": {
-            "description": "At least 50 characters",
+            "description": "For import_direction: the document, at least 50 characters.",
             "type": "string"
           },
           "feedback": {
-            "description": "The words, verbatim",
+            "description": "For submit: what was said, word for word.",
             "type": "string"
           },
           "fields": {
+            "description": "For add_page: a value for each {blank} in the template.",
             "type": "object"
           },
           "from": {
-            "description": "Who said it",
+            "description": "Who said it: customer, team, agent, idea or roadmap.",
             "enum": [
               "customer",
               "team",
@@ -659,24 +766,28 @@
             "type": "string"
           },
           "insist": {
-            "description": "Files it without the check for a matching priority.",
+            "description": "For submit and add_priority: file it even if a matching priority exists.",
             "type": "boolean"
           },
           "label": {
+            "description": "What to call this session, up to 60 characters. Shown as who did it.",
             "maxLength": 60,
             "type": "string"
           },
           "line": {
+            "description": "For submit from a scanner: the line number.",
             "type": "integer"
           },
           "origin_ref": {
-            "description": "Where it came from, like a ticket or file:line; the same one again adds to the same row.",
+            "description": "Where it came from, like a ticket or file:line. The same one again adds to the same row.",
             "type": "string"
           },
           "parent": {
+            "description": "The priority this one sits under. For bet op=place: the bet.",
             "type": "string"
           },
           "path": {
+            "description": "For submit from a scanner: the file.",
             "type": "string"
           },
           "priority_id": {
@@ -689,43 +800,44 @@
             "type": "integer"
           },
           "proposal_id": {
-            "description": "For import_direction: the id phase 1 returned, to land phase 2",
+            "description": "For import_direction: the id the preview returned, to add the lines you picked.",
             "type": "string"
           },
           "reason": {
-            "description": "Required for takeover, release, retract, correct and an agent's severity",
+            "description": "For add_priority: why you're filing it, in a line.",
             "type": "string"
           },
           "reference": {
-            "description": "A followable link (PR, URL, log line); findings need one",
+            "description": "A link someone can follow: a PR, URL or log line. A finding needs one.",
             "type": "string"
           },
           "revenue_band": {
-            "description": "An amount ('499') or a tier word",
+            "description": "What the customer pays: an amount like 499, or a tier word.",
             "type": "string"
           },
           "root_cause": {
-            "description": "When ___, ___ can't ___ because ___; sent on the submit. Max 300 characters",
+            "description": "The cause in one line, shaped 'When ___, ___ can't ___ because ___'. Up to 300 characters.",
             "type": "string"
           },
           "rule": {
+            "description": "For submit from a scanner: the rule that fired.",
             "type": "string"
           },
           "selection": {
-            "description": "Titles to land in phase 2; omitted lands all",
+            "description": "For import_direction: which lines to add, by title. Leave it out to add all.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "severity": {
-            "description": "0 broken, 1 poor, 2 could be better, 3 minor. From an agent: a proposal until a person types the P.",
+            "description": "0 broken, 1 poor, 2 could be better, 3 minor. From an agent it's a proposal until a person sets it.",
             "maximum": 3,
             "minimum": 0,
             "type": "integer"
           },
           "severity_reason": {
-            "description": "Why this P; sent on the submit with severity",
+            "description": "Why this severity, in a line.",
             "type": "string"
           },
           "sku": {
@@ -734,28 +846,31 @@
           },
           "source": {
             "default": "mcp",
-            "description": "Where the feedback came from, like intercom.",
+            "description": "Where the feedback came from, like intercom. Defaults to mcp.",
             "type": "string"
           },
           "stand_alone": {
-            "description": "Makes a new priority from this row; not with priority_number.",
+            "description": "For submit: start a new priority from this row. Not with priority_number.",
             "type": "boolean"
           },
           "template": {
+            "description": "For add_page: the template's key, from annsa.ask about=templates.",
             "type": "string"
           },
           "text": {
+            "description": "For report, add_template, connect_goal and add_transcript: the words. submit takes feedback.",
             "type": "string"
           },
           "theme": {
-            "description": "One of the workspace's themes",
+            "description": "The group it belongs to, one of the workspace's themes.",
             "type": "string"
           },
           "title": {
+            "description": "For add_priority, add_page, add_template or report: the title.",
             "type": "string"
           },
           "type": {
-            "description": "What kind of row it is.",
+            "description": "Which kind: bug, feature, improvement, praise or question.",
             "enum": [
               "bug",
               "feature",
@@ -766,7 +881,7 @@
             "type": "string"
           },
           "verdict": {
-            "description": "On a shipped priority: still_broken or fixed. On release, false_positive does NOT close the row.",
+            "description": "For submit on a shipped priority: still_broken or fixed. false_positive doesn't close the row.",
             "enum": [
               "false_positive",
               "still_broken",
@@ -775,10 +890,11 @@
             "type": "string"
           },
           "when_to_use": {
+            "description": "For add_template: when an agent should pick this template.",
             "type": "string"
           },
           "with_spec": {
-            "description": "Also writes a ready spec and returns its spec_id.",
+            "description": "For submit and add_priority: also write a ready spec and return its spec_id.",
             "type": "boolean"
           }
         },
@@ -787,7 +903,24 @@
         ],
         "type": "object"
       },
-      "name": "annsa_file"
+      "name": "annsa_file",
+      "outputSchema": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "record": {
+            "type": "object"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "who": {
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
     },
     {
       "annotations": {
@@ -797,11 +930,11 @@
         "readOnlyHint": false,
         "title": "Decide"
       },
-      "description": "Record a person's decisions. Agents may list or propose principles. [production · app.annsa.ai · tools 8efe806f]",
+      "description": "Record what a person decided. A person uses it to answer a question an agent raised or sign off a priority. As an agent you can list principles, propose one, approve or dismiss a proposed spec change, or pass on a person's exact words with person_words. To ask a person something, use annsa.work escalate instead.",
       "inputSchema": {
         "properties": {
           "action": {
-            "description": "approve: Writes another writer's proposed section text. dismiss: Keeps the current section text. answer: Records a person's answer, typed or relayed with person_words; an option that names an act runs it. direct: A person steers the agent holding a priority; it reads the words on its next reply, once. choose: Records a person's pick on a Needs you question: one option, or neither. sign: Records a person's decision. principle: Decision memory; propose applies at once.",
+            "description": "approve: Accept another writer's proposed section text, by update_id. dismiss: Turn down a proposed section text; the current text stays. answer: Record a person's answer to the open ask on a priority. An agent passes on the person's exact words with person_words. Picking an option labelled Merge, Ship it, Park it or Retract the ship runs it; free text is only recorded. ask_back: A person asks the agent a question back on a priority. A person's action. direct: A person gives the agent holding a priority a direction; the agent reads it on its next reply. A person's action. choose: Record a person's pick on a Needs you question (send disagreement_id). One option, or neither. A person's action. sign: Record a person's decision on a priority (do_this, do_nothing, park or dismiss), with because. A person's action. principle: Your decision memory. Agents can list principles or propose one; a person writes, retires or reactivates them. A proposal applies at once.",
             "enum": [
               "approve",
               "dismiss",
@@ -815,18 +948,23 @@
             "type": "string"
           },
           "answer": {
+            "description": "For choose: the option picked, or neither. For principle: the answer behind the rule.",
             "type": "string"
           },
           "answered_by": {
+            "description": "The person who decided, when you're passing on their words.",
             "type": "string"
           },
           "area": {
+            "description": "For scope=area: the part of the product the rule covers.",
             "type": "string"
           },
           "because": {
+            "description": "For sign: why, in a sentence.",
             "type": "string"
           },
           "decision": {
+            "description": "For sign: do_this, do_nothing, park or dismiss.",
             "enum": [
               "do_this",
               "do_nothing",
@@ -836,36 +974,38 @@
             "type": "string"
           },
           "decision_until": {
-            "description": "YYYY-MM-DD",
+            "description": "For sign: when this decision expires, like 2026-12-31.",
             "type": "string"
           },
           "disagreement_id": {
-            "description": "The id of the Needs you question being answered, from the Needs you list.",
+            "description": "For choose: the id of the Needs you question, from the Needs you list.",
             "type": "string"
           },
           "falsifier_due": {
-            "description": "YYYY-MM-DD: when to check wrong_if",
+            "description": "For sign: when to check wrong_if, like 2026-12-31.",
             "type": "string"
           },
           "label": {
+            "description": "What to call this session, up to 60 characters. Shown as who did it.",
             "maxLength": 60,
             "type": "string"
           },
           "may_decide": {
-            "description": "Needs answered_by",
+            "description": "For sign: what the agent may decide on its own from here. Needs answered_by.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "must_come_back": {
+            "description": "For sign: what the agent has to bring back to a person.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "op": {
-            "description": "For action 'principle': 'propose' (an agent's), 'write', 'retire', 'activate' (a person's), 'list'.",
+            "description": "For principle: 'list', 'propose' (an agent's), or 'write', 'retire' and 'activate' (a person's).",
             "enum": [
               "propose",
               "write",
@@ -876,23 +1016,24 @@
             "type": "string"
           },
           "option": {
+            "description": "For answer: the option's label.",
             "type": "string"
           },
           "person": {
-            "description": "Email or user id of the member whose words they are",
+            "description": "The email or user id of the person whose words they are.",
             "type": "string"
           },
           "person_words": {
-            "description": "The person's exact words, not a summary; recorded as their quote",
+            "description": "The person's exact words, not a summary. Recorded as their quote.",
             "maxLength": 2000,
             "type": "string"
           },
           "principle": {
-            "description": "The rule that would settle this class next time",
+            "description": "For principle: the rule, in a sentence.",
             "type": "string"
           },
           "principle_id": {
-            "description": "The principle to retire or activate, from principle op=list.",
+            "description": "For principle retire or activate: which one, from principle op=list.",
             "type": "string"
           },
           "priority_id": {
@@ -905,18 +1046,18 @@
             "type": "integer"
           },
           "review_condition": {
-            "description": "When to look at this decision again, in a sentence.",
+            "description": "For sign: when to look at this decision again, in a sentence.",
             "type": "string"
           },
           "ruled_out": {
-            "description": "One 'label — why' per entry",
+            "description": "Options you ruled out, one per entry as 'option — why'.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "scope": {
-            "description": "area needs `area`; area or company also writes a principle",
+            "description": "How far the decision reaches: priority, area (needs area) or company. area or company also writes a principle.",
             "enum": [
               "priority",
               "area",
@@ -925,34 +1066,38 @@
             "type": "string"
           },
           "supersedes": {
-            "description": "The note or principle this replaces.",
+            "description": "For principle: the principle this replaces.",
             "type": "string"
           },
           "take": {
-            "description": "For do_this: the option you chose, in a few words (up to 200 characters).",
+            "description": "For sign with do_this: the option you chose, in a few words.",
             "type": "string"
           },
           "text": {
+            "description": "For direct or ask_back: the words.",
             "type": "string"
           },
           "title": {
+            "description": "For principle: the rule's title.",
             "type": "string"
           },
           "topic": {
+            "description": "For principle: what the rule is about.",
             "type": "string"
           },
           "update_id": {
-            "description": "The proposed change to approve or dismiss, from annsa.spec's updates.",
+            "description": "For approve or dismiss: the proposed change, from annsa.spec's updates.",
             "type": "string"
           },
           "while_waiting": {
-            "description": "What the agent may keep doing until the answer comes.",
+            "description": "For sign: what the agent may keep doing until the answer comes.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "wrong_if": {
+            "description": "For sign: what would show the decision was wrong.",
             "type": "string"
           }
         },
@@ -961,7 +1106,24 @@
         ],
         "type": "object"
       },
-      "name": "annsa_decide"
+      "name": "annsa_decide",
+      "outputSchema": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "record": {
+            "type": "object"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "who": {
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
     },
     {
       "annotations": {
@@ -971,11 +1133,11 @@
         "readOnlyHint": false,
         "title": "Board"
       },
-      "description": "Arrange the board. Some actions are a person's only. [production · app.annsa.ai · tools 8efe806f]",
+      "description": "Tidy the board. Use it to change a priority's stage or severity, merge duplicates, move priorities between groups, fix a title, place priorities on a bet, or cut a release. A merge retires the duplicate numbers for good. Some actions, like park and assign, are for people only. It doesn't do the work on a priority; that's annsa.work.",
       "inputSchema": {
         "properties": {
           "action": {
-            "description": "set_stage: Sets the planning stage. correct: Fixes a title, detail or ruled-out entry, keeping the old version. retract: Unfiles feedback and marks a ship not shipped. regroup: Moves priorities between groups; the reply carries the undo. merge: Folds duplicates into `into`; their numbers are retired. Refuses shipped priorities. bet: Manages bets and places priorities on them. cut: Closes a release and writes its changelog. pick: Sets a person's short list. approve_findings: Lets through agent findings held back by the daily limit; the owner's. view: Saves a board view; an agent's is a suggestion.",
+            "description": "set_stage: Move a priority to open, ready or closed. assign: Set who a spec is assigned to. A person's action. correct: Fix a title, detail or ruled-out entry. The old wording is kept. park: Take a priority off the list, with a reason, until someone unparks it. A person's action. unpark: Put a parked priority back on the list. retract: Unfile feedback, or mark a shipped priority as not shipped. A person's action; without confirm it only shows the plan. regroup: Move priorities between groups; the reply carries the undo. merge: Fold duplicate priorities into one. Their numbers are retired for good. Shipped priorities can't be merged. bet: List, create, update, delete or reorder bets, or place priorities on one. op says which. direction: Read, list, update or comment on a Direction page. op says which. set_severity: Set a priority's severity, P0 to P3. From an agent it's a proposal and needs a reason; a person's typed severity wins. cut: Close a release and write its changelog. op=publish marks its rows Shared. pick: Set a person's short list of priorities, in order. approve_findings: Let through agent findings held back by the daily limit. The owner's action. view: Save a board view. An agent's is a suggestion until a person keeps or dismisses it.",
             "enum": [
               "set_stage",
               "assign",
@@ -996,21 +1158,23 @@
             "type": "string"
           },
           "aim_pct": {
-            "description": "How much of your effort this bet should get, 0 to 100.",
+            "description": "For a bet: how much of your effort it should get, 0 to 100.",
             "type": "number"
           },
           "allow_shared": {
-            "description": "Retract is refused once customers were told, unless true",
+            "description": "For retract: true to retract even after customers were told.",
             "type": "boolean"
           },
           "assigned_to": {
-            "description": "An agent client or a member's email; empty unassigns",
+            "description": "Who gets it: an agent (like claude-code or codex) or a person's email. Empty unassigns.",
             "type": "string"
           },
           "at": {
+            "description": "For cut: the release date.",
             "type": "string"
           },
           "bet_id": {
+            "description": "For bet update, delete or place: which bet.",
             "type": "string"
           },
           "bet_ids": {
@@ -1021,11 +1185,11 @@
             "type": "array"
           },
           "bucket": {
-            "description": "The group this bet counts toward, like Product or GTM.",
+            "description": "For a bet: the group it counts toward, like Product or GTM.",
             "type": "string"
           },
           "channel": {
-            "description": "For cut op=publish.",
+            "description": "For cut op=publish: changelog or marketing.",
             "enum": [
               "changelog",
               "marketing"
@@ -1033,18 +1197,19 @@
             "type": "string"
           },
           "comment": {
+            "description": "For direction op=comment: your words.",
             "type": "string"
           },
           "confirm": {
-            "description": "Without it retract only shows the plan",
+            "description": "For retract: true to do it. Without it the reply only shows what would change.",
             "type": "boolean"
           },
           "corrected": {
-            "description": "What it should say now.",
+            "description": "For correct: what it should say now.",
             "type": "string"
           },
           "correction_type": {
-            "description": "'category' is a person's; the old wording is kept",
+            "description": "For correct: 'title', 'detail', 'ruled_out' or 'category'. 'category' is a person's; the old wording is kept.",
             "enum": [
               "category",
               "title",
@@ -1062,23 +1227,26 @@
             "type": "string"
           },
           "document_id": {
+            "description": "For direction approve or dismiss: which page.",
             "type": "string"
           },
           "document_text": {
-            "description": "At least 50 characters",
+            "description": "For direction update: the page text, at least 50 characters.",
             "type": "string"
           },
           "duplicates": {
+            "description": "For merge: the priorities being folded into `into`.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "evidence": {
+            "description": "For direction op=update: the evidence behind the change.",
             "type": "string"
           },
           "expected_stage": {
-            "description": "Only change it if the stage is still this.",
+            "description": "For set_stage: only change it if the stage is still this: open, ready or closed.",
             "enum": [
               "open",
               "ready",
@@ -1087,16 +1255,18 @@
             "type": "string"
           },
           "feedback_ids": {
+            "description": "For retract: the feedback rows to unfile.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "into": {
+            "description": "For merge: the priority that stays.",
             "type": "string"
           },
           "items": {
-            "description": "For regroup: the new area for each priority.",
+            "description": "For regroup: the new group for each priority.",
             "items": {
               "properties": {
                 "priority_id": {
@@ -1115,10 +1285,12 @@
             "type": "array"
           },
           "label": {
+            "description": "What to call this session, up to 60 characters. Shown as who did it.",
             "maxLength": 60,
             "type": "string"
           },
           "metric_label": {
+            "description": "For a new bet: what the measure is called.",
             "type": "string"
           },
           "metric_query": {
@@ -1130,11 +1302,11 @@
             "type": "string"
           },
           "metric_value": {
-            "description": "For a written bet: the number now (a person's).",
+            "description": "For a written bet: the number now. A person's.",
             "type": "number"
           },
           "op": {
-            "description": "For action 'bet': 'list', 'create' (title + metric_label; last for agents), 'update' (bet_id), 'delete', 'reorder', 'place' (priority_ids). For action 'direction': 'get', 'list', 'update' (document_text + reason), 'comment' (thread_id replies), 'approve' and 'dismiss' (document_id + reason; a person's). For action 'cut': publish takes release_number, channel and the live annsa.ai url; it marks the release's rows Shared and sends nothing. For action 'view': 'keep' and 'dismiss' are a person's.",
+            "description": "For bet: 'list', 'create' (title and metric_label; agents last), 'update' (bet_id), 'delete', 'reorder' (bet_ids) or 'place' (priority_ids). For direction: 'get', 'list', 'update' (document_text and reason), 'comment' (thread_id), or 'approve' and 'dismiss' (document_id and reason; a person's). For cut: 'publish', with release_number, channel and the live annsa.ai url. It marks the release's rows Shared and sends nothing. For view: 'list', 'create', 'update', 'delete', or 'keep' and 'dismiss' (a person's).",
             "enum": [
               "list",
               "create",
@@ -1152,26 +1324,27 @@
             "type": "string"
           },
           "original": {
-            "description": "For a category fix, the old category; for a ruled-out fix, the entry being replaced.",
+            "description": "For correct: the old category, or the ruled-out entry being replaced.",
             "type": "string"
           },
           "owner_user_id": {
-            "description": "'none' clears the owner",
+            "description": "For bet update: the owner's user id; none clears it.",
             "type": "string"
           },
           "parent": {
+            "description": "The priority this one sits under. For bet op=place: the bet.",
             "type": "string"
           },
           "park_reason": {
-            "description": "Why it's parked (required, up to 500 characters).",
+            "description": "For park: why, up to 500 characters.",
             "type": "string"
           },
           "person": {
-            "description": "Email or user id of the member whose words they are",
+            "description": "The email or user id of the person whose words they are.",
             "type": "string"
           },
           "person_words": {
-            "description": "The person's exact words, not a summary; recorded as their quote",
+            "description": "The person's exact words, not a summary. Recorded as their quote.",
             "maxLength": 2000,
             "type": "string"
           },
@@ -1202,6 +1375,7 @@
             "type": "string"
           },
           "priority_ids": {
+            "description": "For bet op=place or direction: the priorities.",
             "items": {
               "type": "string"
             },
@@ -1213,10 +1387,12 @@
             "type": "integer"
           },
           "question": {
+            "description": "For view: the question the saved view answers.",
             "maxLength": 500,
             "type": "string"
           },
           "quote": {
+            "description": "For direction op=comment: the line you're replying to.",
             "type": "string"
           },
           "rank": {
@@ -1224,31 +1400,34 @@
             "type": "integer"
           },
           "reason": {
-            "description": "Required for takeover, release, retract, correct and an agent's severity",
+            "description": "Why, in a line. Needed for retract, correct, merge and an agent's severity.",
             "type": "string"
           },
           "recipe": {
-            "description": "annsa.priorities args",
+            "description": "For view: the annsa.priorities arguments the view runs.",
             "type": "object"
           },
           "release_number": {
+            "description": "For cut op=publish: which release.",
             "minimum": 1,
             "type": "integer"
           },
           "severity": {
-            "description": "0 broken, 1 poor, 2 could be better, 3 minor. From an agent: a proposal until a person types the P.",
+            "description": "0 broken, 1 poor, 2 could be better, 3 minor. From an agent it's a proposal until a person sets it.",
             "maximum": 3,
             "minimum": 0,
             "type": "integer"
           },
           "since": {
+            "description": "For cut: the start of the window the release covers.",
             "type": "string"
           },
           "spec_id": {
-            "description": "The spec id from claim or annsa.spec (build_…).",
+            "description": "For assign and retract: the spec id.",
             "type": "string"
           },
           "stage": {
+            "description": "For set_stage: open, ready or closed.",
             "enum": [
               "open",
               "ready",
@@ -1257,23 +1436,27 @@
             "type": "string"
           },
           "thread_id": {
+            "description": "For direction op=comment: the thread to reply in.",
             "type": "string"
           },
           "title": {
+            "description": "For bet or view: its title.",
             "type": "string"
           },
           "until": {
+            "description": "For cut: the end of that window.",
             "type": "string"
           },
           "url": {
+            "description": "For cut op=publish: the live changelog link.",
             "type": "string"
           },
           "view_id": {
-            "description": "The saved view to update or delete, from view op=list.",
+            "description": "For view update or delete: which view, from view op=list.",
             "type": "string"
           },
           "why_now": {
-            "description": "Why this bet matters now, in a line.",
+            "description": "For a bet: why it matters now, in a line.",
             "type": "string"
           }
         },
@@ -1282,7 +1465,24 @@
         ],
         "type": "object"
       },
-      "name": "annsa_board"
+      "name": "annsa_board",
+      "outputSchema": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "record": {
+            "type": "object"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "who": {
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
     },
     {
       "annotations": {
@@ -1292,18 +1492,18 @@
         "readOnlyHint": false,
         "title": "Share"
       },
-      "description": "Tell the customers who asked that their priority shipped, by email or the widget. Needs a person's sign-in. [production · app.annsa.ai · tools 8efe806f]",
+      "description": "Tell customers their request shipped. Use it after a priority ships to email or notify everyone who asked for it. Emails can't be unsent, so only a signed-in person can run it. The reply says who was told. It doesn't mark anything shipped; that's annsa.work ship.",
       "inputSchema": {
         "properties": {
           "action": {
-            "description": "share: Emails or notifies the customers who asked that it shipped. An email cannot be unsent.",
+            "description": "share: Email or notify the customers who asked that it shipped. An email cannot be unsent.",
             "enum": [
               "share"
             ],
             "type": "string"
           },
           "channel": {
-            "description": "Who to tell: widget is in the app; both is the default; skip tells nobody.",
+            "description": "Who to tell: email, widget (in the app), both (the default) or skip (nobody).",
             "enum": [
               "email",
               "widget",
@@ -1313,15 +1513,16 @@
             "type": "string"
           },
           "label": {
+            "description": "What to call this session, up to 60 characters. Shown as who did it.",
             "maxLength": 60,
             "type": "string"
           },
           "message": {
-            "description": "Your own words, instead of the default note.",
+            "description": "For share: your own words, instead of the default note.",
             "type": "string"
           },
           "spec_id": {
-            "description": "The spec id from claim or annsa.spec (build_…).",
+            "description": "The shipped spec, by id.",
             "type": "string"
           }
         },
@@ -1330,7 +1531,24 @@
         ],
         "type": "object"
       },
-      "name": "annsa_share"
+      "name": "annsa_share",
+      "outputSchema": {
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "record": {
+            "type": "object"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "who": {
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
     }
   ],
   "url": "https://app.annsa.ai/mcp"

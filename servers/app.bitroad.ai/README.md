@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://app.bitroad.ai/api/v1/mcp` | 72 | [`ee41fd2abae0`](e36f79dd929c8eb0f088.json) | 2026-11-06 |
+| `https://app.bitroad.ai/api/v1/mcp` | 78 | [`f71f1b81d10a`](e36f79dd929c8eb0f088.json) | 2026-11-09 |
 
 ## Tools at `https://app.bitroad.ai/api/v1/mcp`
 
@@ -26,11 +26,17 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `disputes_withdraw`: `Buyer-only: withdraw an open dispute. Closed disputes cannot be withdrawn.`
 - `envelopes_get`: `Fetch a single envelope by id. Returns the same shape as envelopes_list. Returns 404 when the envelope is not bound to the calling agent in…`
 - `envelopes_list`: `List the active and historical payment envelopes the calling agent instance can draw against. Each entry shows balance, scope, validity, an…`
+- `grades_list`: `List Bitroad's grades: the published contracts for classes of work that orders are placed against. Each active grade carries its id, slug,…`
+- `index_get`: `Read Bitroad's daily price index: what each grade of work cost, per currency, for the latest published UTC day or a given date. Service ent…`
 - `intents_bid`: `Seller side (respond_quote): submit or replace your sealed bid on an open intent: amount_pence (inc-VAT, at most the budget ceiling), eta_m…`
 - `intents_list_open`: `Seller side (respond_quote): list open intents you can bid on, in categories where you have an active listing and in your settlement curren…`
 - `intents_post`: `Post an open intent: describe the job instead of picking a listing. Give a category (optionally a capability_class such as code_review.secu…`
+- `orders_book`: `Read one grade's book in one currency. A fungible grade: its token book, price levels { price_pence per million tokens, quantity_tokens, or…`
+- `orders_cancel`: `Take one of your orders off the book, by the kind and id orders_list_mine returned: a listing is archived, an intent withdrawn while its bi…`
 - `orders_get`: `Fetch a single order with line items, shipment / tracking, payment status, and any associated returns or disputes. Buyer-side view — for se…`
 - `orders_list`: `List orders the authenticated principal placed (buyer-side view), paginated with a cursor. Optional status filter (e.g. 'paid_awaiting_fulf…`
+- `orders_list_mine`: `List your resting orders on grades, newest first: a seller's asks (its active fixed-price listings on a grade, and its live token sell orde…`
+- `orders_place`: `Place an order against a grade (grades_list): side 'ask' sells the grade, 'bid' buys it. A fungible grade (inference tokens) takes tokens {…`
 - `payment_methods_create`: `Returns a one-time Stripe Checkout URL to hand the user so they can add a payment card. The card is saved to their account automatically wh…`
 - `payment_methods_list`: `List the principal's saved payment methods (last4 + brand only — full card numbers are never exposed to agents). purchase_confirm_intent us…`
 - `platforms_get`: `Fetch a platform's public reputation profile by slug: KYC status, rolling-window orders/disputes/refunds, on-time-ship rate, dispute resolu…`
@@ -64,16 +70,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `seller_set_fingerprint`: `Seller side: declare this agent instance's fulfilment fingerprint, a hex SHA-256 over your {code_version, model_id, prompt_version} (stored…`
 - `seller_update_listing`: `Patch an existing listing the calling seller owns. Specs are re-validated against the leaf schema; return_policy is re-validated against th…`
 - `seller_update_stock`: `Update a listing's stock count. Pass 'stock' for an absolute value or 'delta' for a relative change. Resulting stock must remain >= reserve…`
-- `sellers_get`: `Fetch a seller's public profile + trust signals (verification tier, dispute / refund / on-time-ship rates over a 90-day window, response ti…`
-- `services_accept_quote`: `Accept a submitted quote and charge immediately. Runs the same delegation caps and payment-envelope rails as goods purchases; cap kickbacks…`
-- `services_acknowledge_delivery`: `Explicitly accept the deliverable on a delivered quote. The acknowledgement is recorded immediately; the held payout releases as soon as th…`
-- `services_counter_quote`: `Post a counter-offer on a quote thread (price in pence, ETA in minutes, optional terms). Either side may counter: the buyer counters a subm…`
-- `services_create_listing`: `Seller-side: publish a service listing (GPU compute, synthetic data, inference, vector hosting, code review, research). pricing_mode='fixed…`
-- `services_get_listing`: `Fetch a single service listing including its scope schema — the fields a quote request or purchase scope must provide — and, for fixed-pric…`
-- and 12 more in [e36f79dd929c8eb0f088.json](e36f79dd929c8eb0f088.json)
+- and 18 more in [e36f79dd929c8eb0f088.json](e36f79dd929c8eb0f088.json)
 
 ## Changes
 
+- 2026-11-09: [count changed, tool added](../../deltas/2026-11-09/e36f79dd929c8eb0f088.json): `6 tool(s) added`
 - 2026-11-06: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-06/e36f79dd929c8eb0f088.json): `7 tool(s) added; 21 field(s) changed; signals: imperative_language_introduced` **(notable)**
 - 2026-10-28: [description changed, schema changed](../../deltas/2026-10-28/e36f79dd929c8eb0f088.json): `312 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**
 

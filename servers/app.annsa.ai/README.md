@@ -6,21 +6,22 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://app.annsa.ai/mcp` | 8 | [`9abd48353218`](59d41e60a9e6430b00b0.json) | 2026-11-06 |
+| `https://app.annsa.ai/mcp` | 8 | [`31f5276c370e`](59d41e60a9e6430b00b0.json) | 2026-11-09 |
 
 ## Tools at `https://app.annsa.ai/mcp`
 
-- `annsa_ask`: `Find what customers said, what's on the board, or how Annsa works. 'about' picks the source: feedback (default), annsa (the docs, or a skil…`
-- `annsa_board`: `Arrange the board. Some actions are a person's only. [production · app.annsa.ai · tools 8efe806f]`
-- `annsa_decide`: `Record a person's decisions. Agents may list or propose principles. [production · app.annsa.ai · tools 8efe806f]`
-- `annsa_file`: `Add feedback, a finding, a priority, a transcript, a page or a template. [production · app.annsa.ai · tools 8efe806f]`
-- `annsa_priorities`: `List ranked priorities. Filter by stage, bet, person or topic, or get one by number. 'weekly' and 'view' return summaries. A read. [product…`
-- `annsa_share`: `Tell the customers who asked that their priority shipped, by email or the widget. Needs a person's sign-in. [production · app.annsa.ai · to…`
-- `annsa_spec`: `Read a priority's spec: Problem, What to build, Done When, open asks and principle titles. 'include_evidence' adds Evidence and direction a…`
-- `annsa_work`: `Do the work on a priority, and settle routine asks with undo. [production · app.annsa.ai · tools 8efe806f]`
+- `annsa_ask`: `Ask Annsa a question in plain words. Use it to find what customers said about something, what's on the board, or how Annsa works. about pic…`
+- `annsa_board`: `Tidy the board. Use it to change a priority's stage or severity, merge duplicates, move priorities between groups, fix a title, place prior…`
+- `annsa_decide`: `Record what a person decided. A person uses it to answer a question an agent raised or sign off a priority. As an agent you can list princi…`
+- `annsa_file`: `Add something new to the board. Use it to file what a customer said, a bug or finding you found, or an idea. It attaches to the matching pr…`
+- `annsa_priorities`: `Your ranked to-do list. Use it to see what to work on next: every open priority in rank order, with how many customers asked and why each o…`
+- `annsa_share`: `Tell customers their request shipped. Use it after a priority ships to email or notify everyone who asked for it. Emails can't be unsent, s…`
+- `annsa_spec`: `The plan for one priority. Use it before starting work: it gives you the Problem, What to build, and the Done When lines you'll have to pro…`
+- `annsa_work`: `Do the work on a priority. Use it to claim a priority, write your part of the spec, leave notes, prove each Done When line with verify, and…`
 
 ## Changes
 
+- 2026-11-09: [description changed, schema changed](../../deltas/2026-11-09/59d41e60a9e6430b00b0.json): `248 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**
 - 2026-11-06: [description changed, schema changed](../../deltas/2026-11-06/59d41e60a9e6430b00b0.json): `72 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**
 - 2026-11-05: [description changed, schema changed](../../deltas/2026-11-05/59d41e60a9e6430b00b0.json): `107 field(s) changed; signals: imperative_language_introduced` **(notable)**
 - 2026-11-04: [description changed, schema changed](../../deltas/2026-11-04/59d41e60a9e6430b00b0.json): `9 field(s) changed`

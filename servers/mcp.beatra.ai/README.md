@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.beatra.ai/mcp` | 33 | [`8de1e4e74461`](4f93d616eb97e76f800a.json) | 2026-11-07 |
+| `https://mcp.beatra.ai/mcp` | 34 | [`f1893d8b7cdf`](4f93d616eb97e76f800a.json) | 2026-11-09 |
 
 ## Tools at `https://mcp.beatra.ai/mcp`
 
@@ -23,6 +23,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `beatra.social.execute`: `Look up public social data and create a task. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly o…`
 - `beatra.social.tools.get`: `Read one public social data tool, including its arguments, schema_hash, and credit price. This call is not billable.`
 - `beatra.social.tools.search`: `Search public social data tools by platform, keyword, or capability_family. This call is not billable.`
+- `beatra.speech.prepare_script`: `Use before beatra.speech.synthesize to make speech sound natural and human. Beatra's AI Director reads the text and the user's optional ins…`
 - `beatra.speech.synthesize`: `Synthesize speech using a Beatra voice ID. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly once…`
 - `beatra.speech.validate`: `Check a speech request before paying for it: parse the markup, list warnings, count weighted characters, and return the credit price. This…`
 - `beatra.tasks.cancel`: `Cancel a task created by this MCP connection. In-flight work is canceled only when the remote stop is confirmed; a 409 means continue polli…`
@@ -46,6 +47,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-09: [count changed, schema changed, tool added](../../deltas/2026-11-09/4f93d616eb97e76f800a.json): `1 tool(s) added; 3 field(s) changed`
 - 2026-11-07: [description changed, schema changed](../../deltas/2026-11-07/4f93d616eb97e76f800a.json): `72 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**
 - 2026-11-04: [schema changed](../../deltas/2026-11-04/4f93d616eb97e76f800a.json): `7 field(s) changed`
 - 2026-10-31: [count changed, description changed, schema changed, tool added](../../deltas/2026-10-31/4f93d616eb97e76f800a.json): `1 tool(s) added; 163 field(s) changed; signals: length_more_than_doubled`

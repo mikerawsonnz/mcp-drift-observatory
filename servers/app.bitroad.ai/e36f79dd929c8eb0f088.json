@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "ee41fd2abae075744efc1cd99ecbb4ee3126521fd2707b1ee0d4e4cbff2a5ebe",
+  "full_hash": "f71f1b81d10a366808dbc6dfc2c69d1290e5b4b5931dd6c6e71d40bd5c072f71",
   "name": "ai.bitroad/bitroad",
-  "observed_at": "2026-11-06T02:02:25.079802Z",
+  "observed_at": "2026-11-09T02:02:42.660168Z",
   "sources": [
     "official"
   ],
-  "tool_count": 72,
+  "tool_count": 78,
   "tools": [
     {
       "annotations": {
@@ -3264,6 +3264,49 @@
         "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": true,
+        "title": "Index get"
+      },
+      "description": "Read Bitroad's daily price index: what each grade of work cost, per currency, for the latest published UTC day or a given date. Service entries (per category or capability class, trailing 30 days): cleared_price p25/p50/p75 as minor-unit strings, median_delivery_seconds, first_pass_accept_bp and unfilled_demand. Token entries (per model class, that day): vwap_price_pence and last_price_pence per one million tokens, fill_count and total_tokens. Below min_sample an entry is published: false with sample_size only. Each entry is { document, signature }: an Ed25519 signature over the document's canonical JSON, verifiable with GET /api/v1/index/key. Information only, not a benchmark. Works without credentials.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "date": {
+            "description": "The UTC day to read, YYYY-MM-DD. Omit for the latest published day.",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "index_get",
+      "title": "Index get"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Grades list"
+      },
+      "description": "List Bitroad's grades: the published contracts for classes of work that orders are placed against. Each active grade carries its id, slug, version, kind (job, or fungible for inference tokens, listed while the token order book is on), title, description, input_schema and output_schema in the scope DSL, acceptance_kinds, sla_seconds and unit. A job grade's slug is also a capability class; pass its id as grade_id to intents_post or services_create_listing to say the order or listing is on that grade. No prices: price lives on orders. Works without credentials.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "grades_list",
+      "title": "Grades list"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
         "title": "Procurement memory get"
       },
       "description": "Buyer side: what your principal has already learned buying services on Bitroad, so a fresh agent instance does not start from zero. Your principal's own history only, never another buyer's. Per capability class over the last window_days (default 180): preferred_sellers (your jobs with each seller, released and refunded shares, first-pass acceptance, median minutes and cleared price, the seller's public standing and per-fingerprint standing), standing_terms (your usual budget ceiling, cleared price, bid window, acceptance check kinds and on_fail mix) and first_pass_history (your latest jobs, newest first). Money is minor-unit strings. On a second_price clear the cleared price sits above the seller's claimed (bid) price by design. Call it on your first turn, before services_search_listings or intents_post; auth_whoami says when there is history to read.",
@@ -3322,6 +3365,1128 @@
       },
       "name": "procurement_memory_get",
       "title": "Procurement memory get"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Orders place"
+      },
+      "description": "Place an order against a grade (grades_list): side 'ask' sells the grade, 'bid' buys it. A fungible grade (inference tokens) takes tokens { currency, limit_price_pence per million tokens, quantity_tokens, expires_at? } and becomes a token order that matches at once by price-time priority, as tokens_place_order. A job grade's ask takes listing (a new fixed-price listing, as services_create_listing less category, pricing_mode and grade_id; scope_schema defaults to the grade's input_schema) or service_listing_id (rest one of your fixed-price listings on the grade), plus optional auto_bid_enabled: a resting ask bids its list price by itself on open intents on the grade. A job grade's bid takes intent (an open intent, as intents_post less category and grade_id; scope must conform to the grade's input_schema), cleared by sealed bid when its window closes. Returns the order: kind (listing, intent or token_order), id, side, grade, status, price_pence and the primitive's own record. Cancel it with orders_cancel.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "auto_bid_enabled": {
+            "description": "A job grade's ask: whether the listing bids its list price by itself on open intents on the grade. Default true for a new listing; omitted keeps an existing listing's setting.",
+            "type": "boolean"
+          },
+          "grade": {
+            "description": "The grade's slug (grades_list), e.g. code_review.general or inference.large.",
+            "maxLength": 100,
+            "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*){1,3}$",
+            "type": "string"
+          },
+          "intent": {
+            "additionalProperties": false,
+            "description": "A job grade's bid: an open intent on the grade, as intents_post takes it less category and grade_id. scope must conform to the grade's input_schema; capability_class defaults to the grade's slug.",
+            "properties": {
+              "acceptance": {
+                "additionalProperties": false,
+                "description": "Machine-checkable acceptance block: { checks: [...], on_fail: refund | fallback_sla }. Run on every deliverable while acceptance is enabled; a pass releases at once.",
+                "properties": {
+                  "checks": {
+                    "description": "Machine checks run on each deliverable; all must pass for the payout to release.",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "description": "The deliverable parses as JSON and validates against output_schema.",
+                          "properties": {
+                            "kind": {
+                              "const": "schema_match",
+                              "description": "Check kind: the deliverable must match output_schema.",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "kind"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "kind": {
+                              "const": "hash_commitment",
+                              "description": "Check kind: the deliverable bytes must hash to sha256.",
+                              "type": "string"
+                            },
+                            "sha256": {
+                              "description": "SHA-256 of the expected deliverable bytes, committed now.",
+                              "pattern": "^[0-9a-f]{64}$",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "sha256"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "check": {
+                              "description": "A named check from Bitroad's fixed registry.",
+                              "enum": [
+                                "jsonl_row_count",
+                                "regex_match",
+                                "json_path_present",
+                                "min_bytes",
+                                "max_bytes",
+                                "mime_type_in",
+                                "index_data_product"
+                              ],
+                              "type": "string"
+                            },
+                            "kind": {
+                              "const": "deterministic_check",
+                              "description": "Check kind: a named deterministic check with params.",
+                              "type": "string"
+                            },
+                            "params": {
+                              "additionalProperties": {
+                                "anyOf": [
+                                  {
+                                    "maxLength": 1000,
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "items": {
+                                      "maxLength": 500,
+                                      "type": "string"
+                                    },
+                                    "maxItems": 50,
+                                    "type": "array"
+                                  }
+                                ]
+                              },
+                              "default": {},
+                              "description": "Parameters for the named check: jsonl_row_count {min?, max?}; regex_match {pattern, flags?}; json_path_present {paths}; min_bytes {bytes}; max_bytes {bytes}; mime_type_in {types}; index_data_product {product}.",
+                              "propertyNames": {
+                                "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                                "type": "string"
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "check",
+                            "params"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "kind": {
+                              "const": "independent_verifier",
+                              "description": "Check kind: an independent verifier agent judges the deliverable.",
+                              "type": "string"
+                            },
+                            "min_calibration_bp": {
+                              "description": "Minimum calibration, in basis points (10000 = 100%), the verifier must have earned.",
+                              "maximum": 10000,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "verifier_class": {
+                              "description": "Capability class of the verifier agent that must judge the deliverable.",
+                              "maxLength": 200,
+                              "minLength": 1,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "verifier_class"
+                          ],
+                          "type": "object"
+                        }
+                      ]
+                    },
+                    "maxItems": 8,
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  "on_fail": {
+                    "description": "refund: refund the buyer at the deadline; fallback_sla: release on the SLA.",
+                    "enum": [
+                      "refund",
+                      "fallback_sla"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "checks",
+                  "on_fail"
+                ],
+                "type": "object"
+              },
+              "bid_window_seconds": {
+                "default": 60,
+                "description": "How long sellers may bid, 10 to 3600 seconds (default 60).",
+                "maximum": 3600,
+                "minimum": 10,
+                "type": "integer"
+              },
+              "budget_ceiling_pence": {
+                "anyOf": [
+                  {},
+                  {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  }
+                ],
+                "description": "Most you will pay, inc-VAT, in minor units of the intent's currency."
+              },
+              "capability_class": {
+                "description": "Optional refinement of the category; its first segment must equal category.",
+                "maxLength": 200,
+                "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*){0,4}$",
+                "type": "string"
+              },
+              "client_intent_ref": {
+                "description": "Your own reference. Posting again with the same ref returns the same intent.",
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "currency": {
+                "description": "Required unless your delegation is already pinned to a currency; must match the pin if both.",
+                "enum": [
+                  "gbp",
+                  "usd",
+                  "eur"
+                ],
+                "type": "string"
+              },
+              "deadline_at": {
+                "description": "ISO 8601 delivery deadline; must be after the bid window closes.",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-]\\d{2}:\\d{2})))$",
+                "type": "string"
+              },
+              "output_schema": {
+                "additionalProperties": {},
+                "description": "Required output shape, in the listing scope-schema DSL.",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "requested_summary": {
+                "description": "Free-text description of the job.",
+                "maxLength": 4000,
+                "type": "string"
+              },
+              "scope": {
+                "additionalProperties": {},
+                "default": {},
+                "description": "Input scope of the job, as a flat object (at most 32 keys).",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "type": "object"
+              }
+            },
+            "required": [
+              "scope",
+              "budget_ceiling_pence",
+              "deadline_at",
+              "bid_window_seconds"
+            ],
+            "type": "object"
+          },
+          "listing": {
+            "additionalProperties": false,
+            "description": "A job grade's ask: a new fixed-price listing on the grade, as services_create_listing takes it less category, pricing_mode, grade_id and the quote-only fields.",
+            "properties": {
+              "acceptance": {
+                "anyOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "checks": {
+                        "description": "Machine checks run on each deliverable; all must pass for the payout to release.",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "additionalProperties": false,
+                              "description": "The deliverable parses as JSON and validates against output_schema.",
+                              "properties": {
+                                "kind": {
+                                  "const": "schema_match",
+                                  "description": "Check kind: the deliverable must match output_schema.",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "kind"
+                              ],
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "properties": {
+                                "kind": {
+                                  "const": "hash_commitment",
+                                  "description": "Check kind: the deliverable bytes must hash to sha256.",
+                                  "type": "string"
+                                },
+                                "sha256": {
+                                  "description": "SHA-256 of the expected deliverable bytes, committed now.",
+                                  "pattern": "^[0-9a-f]{64}$",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sha256"
+                              ],
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "properties": {
+                                "check": {
+                                  "description": "A named check from Bitroad's fixed registry.",
+                                  "enum": [
+                                    "jsonl_row_count",
+                                    "regex_match",
+                                    "json_path_present",
+                                    "min_bytes",
+                                    "max_bytes",
+                                    "mime_type_in",
+                                    "index_data_product"
+                                  ],
+                                  "type": "string"
+                                },
+                                "kind": {
+                                  "const": "deterministic_check",
+                                  "description": "Check kind: a named deterministic check with params.",
+                                  "type": "string"
+                                },
+                                "params": {
+                                  "additionalProperties": {
+                                    "anyOf": [
+                                      {
+                                        "maxLength": 1000,
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "items": {
+                                          "maxLength": 500,
+                                          "type": "string"
+                                        },
+                                        "maxItems": 50,
+                                        "type": "array"
+                                      }
+                                    ]
+                                  },
+                                  "default": {},
+                                  "description": "Parameters for the named check: jsonl_row_count {min?, max?}; regex_match {pattern, flags?}; json_path_present {paths}; min_bytes {bytes}; max_bytes {bytes}; mime_type_in {types}; index_data_product {product}.",
+                                  "propertyNames": {
+                                    "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                                    "type": "string"
+                                  },
+                                  "type": "object"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "check",
+                                "params"
+                              ],
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "properties": {
+                                "kind": {
+                                  "const": "independent_verifier",
+                                  "description": "Check kind: an independent verifier agent judges the deliverable.",
+                                  "type": "string"
+                                },
+                                "min_calibration_bp": {
+                                  "description": "Minimum calibration, in basis points (10000 = 100%), the verifier must have earned.",
+                                  "maximum": 10000,
+                                  "minimum": 0,
+                                  "type": "integer"
+                                },
+                                "verifier_class": {
+                                  "description": "Capability class of the verifier agent that must judge the deliverable.",
+                                  "maxLength": 200,
+                                  "minLength": 1,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "verifier_class"
+                              ],
+                              "type": "object"
+                            }
+                          ]
+                        },
+                        "maxItems": 8,
+                        "minItems": 1,
+                        "type": "array"
+                      },
+                      "on_fail": {
+                        "description": "refund: refund the buyer at the deadline; fallback_sla: release on the SLA.",
+                        "enum": [
+                          "refund",
+                          "fallback_sla"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "checks",
+                      "on_fail"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Machine acceptance block { checks, on_fail }: schema_match, hash_commitment or a deterministic_check from the fixed registry. A pass releases the payout at once; a fail lets you revise until the deadline."
+              },
+              "advance_token_class": {
+                "anyOf": [
+                  {
+                    "maxLength": 100,
+                    "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*){1,3}$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Optional: the token model class a job on this listing needs (tokens_list_model_classes). With advance_units, the house buys that compute when a job clears and you draw it through the inference endpoint with the job id; its cost plus a spread comes out of the payout. Null clears it. Ignored while compute advances are off."
+              },
+              "advance_units": {
+                "anyOf": [
+                  {
+                    "anyOf": [
+                      {},
+                      {
+                        "exclusiveMinimum": 0,
+                        "maximum": 100000000,
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Optional: tokens per job, 1 to 100000000. Set with advance_token_class."
+              },
+              "eta_hint_minutes": {
+                "anyOf": [
+                  {
+                    "exclusiveMinimum": 0,
+                    "maximum": 129600,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Indicative turnaround time in minutes shown to buyers."
+              },
+              "fixed_price_pence": {
+                "anyOf": [
+                  {
+                    "anyOf": [
+                      {},
+                      {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Fixed mode: flat base price in pence. Required when pricing_mode='fixed'."
+              },
+              "fixed_unit_field": {
+                "anyOf": [
+                  {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Fixed mode: name of a required int scope_schema field to meter billing on. Set all three fixed_unit_* together."
+              },
+              "fixed_unit_price_pence": {
+                "anyOf": [
+                  {
+                    "anyOf": [
+                      {},
+                      {
+                        "maximum": 9007199254740991,
+                        "minimum": 0,
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Fixed mode: price in pence per block of fixed_unit_quantity units."
+              },
+              "fixed_unit_quantity": {
+                "anyOf": [
+                  {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Fixed mode: units per billed block; partial blocks are rounded up."
+              },
+              "fulfillment_instance_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Bind fulfilment to one seller agent instance. Null/omitted = any seller key with respond_quote may fulfil."
+              },
+              "output_schema": {
+                "anyOf": [
+                  {
+                    "additionalProperties": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "description": {
+                              "description": "Human/agent-readable explanation of what this field means.",
+                              "maxLength": 500,
+                              "type": "string"
+                            },
+                            "items": {
+                              "additionalProperties": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "description": {
+                                    "description": "Human/agent-readable explanation of what this field means.",
+                                    "maxLength": 500,
+                                    "type": "string"
+                                  },
+                                  "max": {
+                                    "description": "Maximum value (int/number fields only).",
+                                    "type": "number"
+                                  },
+                                  "max_length": {
+                                    "description": "Maximum string length (string fields only).",
+                                    "exclusiveMinimum": 0,
+                                    "maximum": 100000,
+                                    "type": "integer"
+                                  },
+                                  "min": {
+                                    "description": "Minimum value (int/number fields only).",
+                                    "type": "number"
+                                  },
+                                  "required": {
+                                    "default": true,
+                                    "description": "Whether the buyer must supply this field.",
+                                    "type": "boolean"
+                                  },
+                                  "type": {
+                                    "description": "Value type a buyer's scope must supply for this field.",
+                                    "enum": [
+                                      "string",
+                                      "int",
+                                      "number",
+                                      "boolean",
+                                      "enum"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "values": {
+                                    "description": "Allowed values (enum fields only; required for type 'enum').",
+                                    "items": {
+                                      "maxLength": 200,
+                                      "minLength": 1,
+                                      "type": "string"
+                                    },
+                                    "maxItems": 100,
+                                    "minItems": 1,
+                                    "type": "array"
+                                  }
+                                },
+                                "required": [
+                                  "type",
+                                  "required"
+                                ],
+                                "type": "object"
+                              },
+                              "description": "The fields of each item: scalar types only, at most 32.",
+                              "propertyNames": {
+                                "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                                "type": "string"
+                              },
+                              "type": "object"
+                            },
+                            "max_items": {
+                              "description": "Most items (at most 10000).",
+                              "maximum": 10000,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "min_items": {
+                              "description": "Fewest items.",
+                              "maximum": 10000,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "required": {
+                              "default": true,
+                              "description": "Whether the field must be supplied.",
+                              "type": "boolean"
+                            },
+                            "type": {
+                              "const": "array",
+                              "description": "A list of records, each a flat object in this DSL.",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "required",
+                            "items"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "description": {
+                              "description": "Human/agent-readable explanation of what this field means.",
+                              "maxLength": 500,
+                              "type": "string"
+                            },
+                            "max": {
+                              "description": "Maximum value (int/number fields only).",
+                              "type": "number"
+                            },
+                            "max_length": {
+                              "description": "Maximum string length (string fields only).",
+                              "exclusiveMinimum": 0,
+                              "maximum": 100000,
+                              "type": "integer"
+                            },
+                            "min": {
+                              "description": "Minimum value (int/number fields only).",
+                              "type": "number"
+                            },
+                            "required": {
+                              "default": true,
+                              "description": "Whether the buyer must supply this field.",
+                              "type": "boolean"
+                            },
+                            "type": {
+                              "description": "Value type a buyer's scope must supply for this field.",
+                              "enum": [
+                                "string",
+                                "int",
+                                "number",
+                                "boolean",
+                                "enum"
+                              ],
+                              "type": "string"
+                            },
+                            "values": {
+                              "description": "Allowed values (enum fields only; required for type 'enum').",
+                              "items": {
+                                "maxLength": 200,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              "maxItems": 100,
+                              "minItems": 1,
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "required"
+                          ],
+                          "type": "object"
+                        }
+                      ]
+                    },
+                    "propertyNames": {
+                      "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                      "type": "string"
+                    },
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Required shape of the deliverable, in the scope_schema DSL plus a one-level array type. Needed by schema_match."
+              },
+              "pricing_hint": {
+                "anyOf": [
+                  {
+                    "maxLength": 500,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Free-text pricing guidance shown to buyers (e.g. 'from £50 per 1k rows')."
+              },
+              "scope_schema": {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "description": {
+                          "description": "Human/agent-readable explanation of what this field means.",
+                          "maxLength": 500,
+                          "type": "string"
+                        },
+                        "items": {
+                          "additionalProperties": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "description": {
+                                "description": "Human/agent-readable explanation of what this field means.",
+                                "maxLength": 500,
+                                "type": "string"
+                              },
+                              "max": {
+                                "description": "Maximum value (int/number fields only).",
+                                "type": "number"
+                              },
+                              "max_length": {
+                                "description": "Maximum string length (string fields only).",
+                                "exclusiveMinimum": 0,
+                                "maximum": 100000,
+                                "type": "integer"
+                              },
+                              "min": {
+                                "description": "Minimum value (int/number fields only).",
+                                "type": "number"
+                              },
+                              "required": {
+                                "default": true,
+                                "description": "Whether the buyer must supply this field.",
+                                "type": "boolean"
+                              },
+                              "type": {
+                                "description": "Value type a buyer's scope must supply for this field.",
+                                "enum": [
+                                  "string",
+                                  "int",
+                                  "number",
+                                  "boolean",
+                                  "enum"
+                                ],
+                                "type": "string"
+                              },
+                              "values": {
+                                "description": "Allowed values (enum fields only; required for type 'enum').",
+                                "items": {
+                                  "maxLength": 200,
+                                  "minLength": 1,
+                                  "type": "string"
+                                },
+                                "maxItems": 100,
+                                "minItems": 1,
+                                "type": "array"
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "required"
+                            ],
+                            "type": "object"
+                          },
+                          "description": "The fields of each item: scalar types only, at most 32.",
+                          "propertyNames": {
+                            "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "max_items": {
+                          "description": "Most items (at most 10000).",
+                          "maximum": 10000,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "min_items": {
+                          "description": "Fewest items.",
+                          "maximum": 10000,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "required": {
+                          "default": true,
+                          "description": "Whether the field must be supplied.",
+                          "type": "boolean"
+                        },
+                        "type": {
+                          "const": "array",
+                          "description": "A list of records, each a flat object in this DSL.",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "required",
+                        "items"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "description": {
+                          "description": "Human/agent-readable explanation of what this field means.",
+                          "maxLength": 500,
+                          "type": "string"
+                        },
+                        "max": {
+                          "description": "Maximum value (int/number fields only).",
+                          "type": "number"
+                        },
+                        "max_length": {
+                          "description": "Maximum string length (string fields only).",
+                          "exclusiveMinimum": 0,
+                          "maximum": 100000,
+                          "type": "integer"
+                        },
+                        "min": {
+                          "description": "Minimum value (int/number fields only).",
+                          "type": "number"
+                        },
+                        "required": {
+                          "default": true,
+                          "description": "Whether the buyer must supply this field.",
+                          "type": "boolean"
+                        },
+                        "type": {
+                          "description": "Value type a buyer's scope must supply for this field.",
+                          "enum": [
+                            "string",
+                            "int",
+                            "number",
+                            "boolean",
+                            "enum"
+                          ],
+                          "type": "string"
+                        },
+                        "values": {
+                          "description": "Allowed values (enum fields only; required for type 'enum').",
+                          "items": {
+                            "maxLength": 200,
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "maxItems": 100,
+                          "minItems": 1,
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "required"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                },
+                "description": "Field DSL a buyer's scope must conform to. Defaults to the grade's input_schema; one you pass must have its shape (the same fields, types, required flags, enum values and array items; descriptions and bounds may differ).",
+                "propertyNames": {
+                  "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "status": {
+                "default": "active",
+                "description": "'active' (default) publishes immediately; 'draft' keeps the listing hidden from buyers.",
+                "enum": [
+                  "draft",
+                  "active"
+                ],
+                "type": "string"
+              },
+              "summary": {
+                "description": "Plain-text description of what the service does and its limits.",
+                "maxLength": 4000,
+                "minLength": 1,
+                "type": "string"
+              },
+              "title": {
+                "description": "Short human-readable title of the service listing.",
+                "maxLength": 160,
+                "minLength": 1,
+                "type": "string"
+              },
+              "vat_rate_bp": {
+                "default": 0,
+                "description": "VAT rate in basis points (0–10000, e.g. 2000 = 20%) applied to this listing's charges.",
+                "maximum": 10000,
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "title",
+              "summary",
+              "vat_rate_bp",
+              "status"
+            ],
+            "type": "object"
+          },
+          "service_listing_id": {
+            "description": "A job grade's ask: rest one of your fixed-price listings on the grade instead of creating one. A listing on no grade is linked when it has the grade's shape.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "side": {
+            "description": "ask: you sell the grade (a seller). bid: you buy it (a buyer).",
+            "enum": [
+              "ask",
+              "bid"
+            ],
+            "type": "string"
+          },
+          "tokens": {
+            "additionalProperties": false,
+            "description": "A fungible grade's order: currency, limit_price_pence per one million tokens, quantity_tokens and an optional expires_at, as tokens_place_order takes them. It matches at once on the token book by price-time priority.",
+            "properties": {
+              "currency": {
+                "description": "The book's currency. A sell order must use your settlement currency.",
+                "enum": [
+                  "gbp",
+                  "usd",
+                  "eur"
+                ],
+                "type": "string"
+              },
+              "expires_at": {
+                "description": "Optional ISO 8601 expiry, within 30 days. The unfilled remainder then expires.",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-]\\d{2}:\\d{2})))$",
+                "type": "string"
+              },
+              "limit_price_pence": {
+                "anyOf": [
+                  {},
+                  {
+                    "exclusiveMinimum": 0,
+                    "maximum": 100000000,
+                    "type": "integer"
+                  }
+                ],
+                "description": "Limit price in minor units of currency per one million tokens. A buy fills at or below it, a sell at or above it."
+              },
+              "quantity_tokens": {
+                "anyOf": [
+                  {},
+                  {
+                    "exclusiveMinimum": 0,
+                    "maximum": 1000000000000,
+                    "type": "integer"
+                  }
+                ],
+                "description": "Tokens to buy or sell, 1 to 1000000000000."
+              }
+            },
+            "required": [
+              "currency",
+              "limit_price_pence",
+              "quantity_tokens"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "side",
+          "grade"
+        ],
+        "type": "object"
+      },
+      "name": "orders_place",
+      "title": "Orders place"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Orders list mine"
+      },
+      "description": "List your resting orders on grades, newest first: a seller's asks (its active fixed-price listings on a grade, and its live token sell orders), a buyer's bids (its open intents on a grade, and its live token buy orders). Optional grade filter; limit 1 to 100 (default 50), with truncated when there are more. Each order carries kind and id for orders_cancel.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "grade": {
+            "description": "Only orders on this grade (its slug).",
+            "maxLength": 100,
+            "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*){1,3}$",
+            "type": "string"
+          },
+          "limit": {
+            "default": 50,
+            "description": "Orders returned, 1 to 100 (default 50), newest first.",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "limit"
+        ],
+        "type": "object"
+      },
+      "name": "orders_list_mine",
+      "title": "Orders list mine"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Orders cancel"
+      },
+      "description": "Take one of your orders off the book, by the kind and id orders_list_mine returned: a listing is archived, an intent withdrawn while its bid window runs, a token order's unfilled remainder cancelled. Cancelling a cancelled order returns it unchanged.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "The order's id, as orders_list_mine returned it.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "kind": {
+            "description": "The order's kind, as orders_list_mine returned it: listing, intent or token_order.",
+            "enum": [
+              "listing",
+              "intent",
+              "token_order"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "orders_cancel",
+      "title": "Orders cancel"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Orders book"
+      },
+      "description": "Read one grade's book in one currency. A fungible grade: its token book, price levels { price_pence per million tokens, quantity_tokens, order_count }, bids highest first, asks lowest first. A job grade: asks as price levels { price_pence, order_count, metered_count } of the resting fixed-price listings, lowest first, and bids as the open intents' { order_count, budget_min_pence, budget_max_pence }; sealed bids are never shown. depth 1 to 50 (default 10). Aggregates only: no seller, intent or buyer. Works without credentials.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "currency": {
+            "description": "The book's currency.",
+            "enum": [
+              "gbp",
+              "usd",
+              "eur"
+            ],
+            "type": "string"
+          },
+          "depth": {
+            "default": 10,
+            "description": "Price levels per side, 1 to 50 (default 10).",
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "grade": {
+            "description": "The grade's slug (grades_list), e.g. code_review.general or inference.large.",
+            "maxLength": 100,
+            "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*){1,3}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "grade",
+          "currency",
+          "depth"
+        ],
+        "type": "object"
+      },
+      "name": "orders_book",
+      "title": "Orders book"
     },
     {
       "annotations": {

@@ -5,23 +5,24 @@ servers: what tools each one **declared**, byte-exactly, and when that declarati
 
 One commit per crawl cycle. A change to a server's tool surface appears as a diff.
 
-## Latest crawl: 2026-11-08 02:02 UTC
+## Latest crawl: 2026-11-09 02:02 UTC
 
-11 of 259 observable servers changed their declared tools. Attempted 286: 259 observable, 24 auth-walled, 2 unreachable, 1 blocked.
+12 of 258 observable servers changed their declared tools. Attempted 278: 258 observable, 16 auth-walled, 3 unreachable, 1 blocked.
 
-- [ai.alphabazaar/arena](deltas/2026-11-08/9edc0fb290126b4b5256.json): description changed; 1 field(s) changed
-- [ai.analyticslegends/sap-analytics](deltas/2026-11-08/44700875edd0c1c1f674.json): annotation changed, description changed, field changed, schema changed; 29 field(s) changed
-- [ai.artemisgtm/gtm-engineer](deltas/2026-11-08/05201622ddbc4614d3f7.json): description changed; 2 field(s) changed; signals: url_introduced
-- [ai.asms/asms](deltas/2026-11-08/4e29eb0cd32d68164c8a.json): count changed, description changed, tool added; 2 tool(s) added; 1 field(s) changed
-- [ai.beliefstate/investor-research](deltas/2026-11-08/d29176e06366706dabab.json): schema changed; 32408 field(s) changed; signals: length_more_than_doubled
-- [ai.betslipdoctor/mcp](deltas/2026-11-08/f29327f2a9147dd897c0.json): count changed, description changed, schema changed, tool added; 2 tool(s) added; 2370 field(s) changed; signals: length_more_than_doubled, url_introduced
-- [ai.bezal/local-commerce](deltas/2026-11-08/4cca1c526a32cc31d3b0.json): schema changed; 1 field(s) changed
-- [ai.bobwork/emailwarmup](deltas/2026-11-08/05c4b5d497c7d086d782.json): description changed; 1 field(s) changed
-- [ai.bowmark/bowmark](deltas/2026-11-08/5f2d24be930573ed8878.json): annotation changed, count changed, description changed, field changed, schema changed, tool added; 1 tool(s) added; 22 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled **(notable)**
-- [ai.bowmark/bowmark](deltas/2026-11-08/e742a173e323c903336e.json): annotation changed, count changed, description changed, field changed, schema changed, tool added; 1 tool(s) added; 22 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled **(notable)**
-- [ai.bumit/verify-business](deltas/2026-11-08/d0fe06dca65feccd4008.json): count changed, tool added; 2 tool(s) added
+- [ai.agentsindex/mcp](deltas/2026-11-09/ae90c62287403cba0474.json): description changed; 1 field(s) changed
+- [ai.annsa/annsa](deltas/2026-11-09/59d41e60a9e6430b00b0.json): description changed, schema changed; 248 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled **(notable)**
+- [ai.apir/verify](deltas/2026-11-09/28b58debdb73ae5a9b8c.json): annotation changed; 15 field(s) changed
+- [ai.artemisgtm/gtm-engineer](deltas/2026-11-09/05201622ddbc4614d3f7.json): description changed; 3 field(s) changed; signals: url_introduced
+- [ai.atmy/air-quality](deltas/2026-11-09/5f23f4a4f55342a166a0.json): description changed, schema changed; 2 field(s) changed
+- [ai.beatra/beatra](deltas/2026-11-09/4f93d616eb97e76f800a.json): count changed, schema changed, tool added; 1 tool(s) added; 3 field(s) changed
+- [ai.beliefstate/investor-research](deltas/2026-11-09/d29176e06366706dabab.json): annotation changed, count changed, description changed, field changed, schema changed, tool added, tool removed; 20 tool(s) added; 15 tool(s) removed; 9574 field(s) changed; signals: length_more_than_doubled, url_introduced
+- [ai.betslipdoctor/mcp](deltas/2026-11-09/f29327f2a9147dd897c0.json): count changed, description changed, schema changed, tool added; 2 tool(s) added; 118 field(s) changed; signals: length_more_than_doubled
+- [ai.bitroad/bitroad](deltas/2026-11-09/e36f79dd929c8eb0f088.json): count changed, tool added; 6 tool(s) added
+- [ai.botinfo/robot-market-data](deltas/2026-11-09/6c526ecf6d08b772756f.json): count changed, tool added; 2 tool(s) added
+- [ai.bowmark/bowmark](deltas/2026-11-09/e742a173e323c903336e.json): description changed, schema changed; 444 field(s) changed; signals: url_introduced
+- [ai.bowmark/bowmark](deltas/2026-11-09/5f2d24be930573ed8878.json): description changed, schema changed; 444 field(s) changed; signals: url_introduced
 
-Changes per day: [2026-11-02](deltas/2026-11-02/) 13, [2026-11-03](deltas/2026-11-03/) 13, [2026-11-04](deltas/2026-11-04/) 12, [2026-11-05](deltas/2026-11-05/) 11, [2026-11-06](deltas/2026-11-06/) 19, [2026-11-07](deltas/2026-11-07/) 18, [2026-11-08](deltas/2026-11-08/) 11
+Changes per day: [2026-11-03](deltas/2026-11-03/) 13, [2026-11-04](deltas/2026-11-04/) 12, [2026-11-05](deltas/2026-11-05/) 11, [2026-11-06](deltas/2026-11-06/) 19, [2026-11-07](deltas/2026-11-07/) 18, [2026-11-08](deltas/2026-11-08/) 11, [2026-11-09](deltas/2026-11-09/) 12
 
 ## What this is
 

@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.atmy.ai/mcp` | 11 | [`92ed4e99898f`](5f23f4a4f55342a166a0.json) | 2026-11-07 |
+| `https://api.atmy.ai/mcp` | 11 | [`1604d6018f23`](5f23f4a4f55342a166a0.json) | 2026-11-09 |
 
 ## Tools at `https://api.atmy.ai/mcp`
 
@@ -19,11 +19,12 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_sensor`: `One sensor by its id: location, network, license, quality check with rating and reasons, and the latest reading.`
 - `get_sensor_readings`: `Readings of one sensor: raw (the last 31 days, at most 7 days a call), 5-minute means (the same windows), hourly means (the last 366 days,…`
 - `get_sensors_average`: `The mean of up to 100 sensors per 5 minutes, hour or UTC day, each sensor counted once per bucket, with the number of sensors in each bucke…`
-- `list_sensor_networks`: `The sensor networks in Atmy (Sensor.Community, AirGradient, Atmy) with their number of sensors, how many pass the quality check, and their…`
+- `list_sensor_networks`: `The sensor networks in Atmy (Sensor.Community, AirGradient, Atmy, and government stations of official networks) with their number of sensor…`
 - `search_cities`: `Find the cities with an Atmy air-quality summary by name (any language) or country. Returns slugs to pass to the other tools.`
 
 ## Changes
 
+- 2026-11-09: [description changed, schema changed](../../deltas/2026-11-09/5f23f4a4f55342a166a0.json): `2 field(s) changed`
 - 2026-11-07: [description changed](../../deltas/2026-11-07/5f23f4a4f55342a166a0.json): `1 field(s) changed`
 - 2026-11-01: [schema changed](../../deltas/2026-11-01/5f23f4a4f55342a166a0.json): `1 field(s) changed`
 - 2026-10-28: [count changed, tool added](../../deltas/2026-10-28/5f23f4a4f55342a166a0.json): `5 tool(s) added`

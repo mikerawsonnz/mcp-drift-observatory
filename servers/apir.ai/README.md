@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://apir.ai/api/mcp` | 3 | [`ac0e6a75b7f4`](28b58debdb73ae5a9b8c.json) | 2026-10-31 |
+| `https://apir.ai/api/mcp` | 3 | [`7340e3b3b3bf`](28b58debdb73ae5a9b8c.json) | 2026-11-09 |
 
 ## Tools at `https://apir.ai/api/mcp`
 
@@ -16,6 +16,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-09: [annotation changed](../../deltas/2026-11-09/28b58debdb73ae5a9b8c.json): `15 field(s) changed`
 - 2026-10-31: [description changed](../../deltas/2026-10-31/28b58debdb73ae5a9b8c.json): `1 field(s) changed`
 
 ## Check it from your agent

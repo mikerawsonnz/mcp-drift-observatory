@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "8de1e4e7446105ddcc9b3aba2dbf3b0a9a5ed5c2012c90485f63f9d85e1aeb22",
+  "full_hash": "f1893d8b7cdffbb1510b36035744826989f275af4c50a30716167202cf491d0c",
   "name": "ai.beatra/beatra",
-  "observed_at": "2026-11-07T02:03:31.352574Z",
+  "observed_at": "2026-11-09T02:02:41.133532Z",
   "sources": [
     "official"
   ],
-  "tool_count": 33,
+  "tool_count": 34,
   "tools": [
     {
       "annotations": {
@@ -9556,6 +9556,452 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
+      "description": "Use before beatra.speech.synthesize to make speech sound natural and human. Beatra's AI Director reads the text and the user's optional instructions, then returns a script that is ready to synthesize, written in Beatra speech markup for the target voice and model: emotion, performance, sound effects, pauses and pronunciation. It never changes the words. Without voice or model it recommends one, with alternatives, each with a name, a preview link and a reason. Call beatra.speech.synthesize with each returned script's synthesis object as the arguments, unchanged, plus your own client_request_id; a script whose synthesis is null cannot be synthesized as is (read warnings). To try another voice within two days, call again with the same arguments, changing only voice (and model if needed): the earlier reading is reused and not charged again. This asynchronous task consumes Beatra credits: successful completion is charged afterward from actual tokens; nothing is charged when the result has directed false or reuses an earlier reading. To start, the balance must cover Beatra's estimate for the text (per 1,000 characters, counting at least 1,000) plus that of any other AI Director task in progress, also when an earlier reading is reused; an insufficient_balance refusal states the amount needed. An account runs at most 2 AI Director tasks at a time. Submit exactly once, then poll with beatra.tasks.get. Reuse client_request_id only for an identical retry.",
+      "inputSchema": {
+        "$defs": {
+          "SpeechScriptContext": {
+            "description": "Text around the input. It only helps the director read the tone.",
+            "properties": {
+              "after": {
+                "anyOf": [
+                  {
+                    "maxLength": 2000,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Text after the input, up to 2,000 characters.",
+                "title": "After"
+              },
+              "before": {
+                "anyOf": [
+                  {
+                    "maxLength": 2000,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Text before the input, up to 2,000 characters.",
+                "title": "Before"
+              }
+            },
+            "title": "SpeechScriptContext",
+            "type": "object"
+          }
+        },
+        "description": "Text for the AI Director, optional instructions, and the voice and model to direct for.",
+        "properties": {
+          "client_request_id": {
+            "description": "Stable retry identity for this billable operation. Reuse only for the exact same generation arguments.",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Client Request Id",
+            "type": "string"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/SpeechScriptContext"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional, advanced: the text around the input when a long text is directed in parts, used only to understand the tone. It is not annotated, read aloud or returned. The end of before is also suggested as previous_text when the target model supports it."
+          },
+          "input": {
+            "description": "Text to perform, in any supported language, 1 to 50,000 characters. It may already contain Beatra speech markup such as {pause 0.5} or {pron 行 hang2}; the AI Director keeps it and only adds to it. The words themselves are never changed.",
+            "maxLength": 50000,
+            "minLength": 1,
+            "title": "Input",
+            "type": "string"
+          },
+          "instructions": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional requirements in natural language, in any language, up to 2,000 characters, for example \"a bit suspenseful, whisper the last line\". Without them the AI Director performs the text by its meaning.",
+            "title": "Instructions"
+          },
+          "language": {
+            "default": "auto",
+            "description": "Language of the input as a BCP-47 tag. Usually omit it (auto, the default): the language is detected. Send it only when the user names the language or a dialect the text cannot show, such as Cantonese (yue).",
+            "maxLength": 32,
+            "minLength": 2,
+            "title": "Language",
+            "type": "string"
+          },
+          "model": {
+            "default": "auto",
+            "description": "Omit unless the user requests a model. Same values as model in beatra.speech.synthesize; auto or omitted: resolved from the voice, or recommended together with the voice.",
+            "enum": [
+              "auto",
+              "minimax-speech-2.8-hd",
+              "minimax-speech-2.8-turbo",
+              "doubao-seed-tts-2.0",
+              "elevenlabs-v4-turbo",
+              "elevenlabs-v4"
+            ],
+            "title": "Model",
+            "type": "string"
+          },
+          "voice": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional voice to perform for: a voice_id from beatra.voices.list, a preset or one of your own cloned voices. Same meaning as voice in beatra.speech.synthesize. Omit it to let the AI Director recommend a voice.",
+            "title": "Voice"
+          }
+        },
+        "required": [
+          "input",
+          "client_request_id"
+        ],
+        "title": "McpSpeechScriptInput",
+        "type": "object"
+      },
+      "name": "beatra.speech.prepare_script",
+      "outputSchema": {
+        "$defs": {
+          "ArtifactLink": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Artifact Id"
+              },
+              "media_type": {
+                "title": "Media Type",
+                "type": "string"
+              },
+              "mime_type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Mime Type"
+              },
+              "path": {
+                "title": "Path",
+                "type": "string"
+              },
+              "url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Url"
+              }
+            },
+            "required": [
+              "media_type",
+              "path"
+            ],
+            "title": "ArtifactLink",
+            "type": "object"
+          },
+          "TaskError": {
+            "properties": {
+              "code": {
+                "description": "Stable machine-readable public error code.",
+                "title": "Code",
+                "type": "string"
+              },
+              "details": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Provider-neutral expected, received, supported, or candidate failure facts.",
+                "title": "Details"
+              },
+              "message": {
+                "description": "Human-readable safe failure reason.",
+                "title": "Message",
+                "type": "string"
+              },
+              "param": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "JSON Pointer to the relevant request or output field.",
+                "title": "Param"
+              },
+              "request_id": {
+                "description": "Request trace identifier for support and correlation.",
+                "title": "Request Id",
+                "type": "string"
+              },
+              "retryable": {
+                "description": "Whether the same logical request may succeed when retried unchanged.",
+                "title": "Retryable",
+                "type": "boolean"
+              },
+              "type": {
+                "description": "Stable public error family.",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "type",
+              "message",
+              "retryable",
+              "request_id"
+            ],
+            "title": "TaskError",
+            "type": "object"
+          },
+          "ToolError": {
+            "additionalProperties": true,
+            "description": "Stable MCP tool-error envelope embedded in structuredContent.\n\nSame branching vocabulary as the REST error envelope: `code` is a registry\nerror code (plus the OAuth-standard `insufficient_scope`), `retryable`\ntells the agent whether an identical retry can succeed, `param` is a JSON\nPointer to the offending argument, and `details` carries correction facts.",
+            "properties": {
+              "code": {
+                "title": "Code",
+                "type": "string"
+              },
+              "details": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Details"
+              },
+              "jsonrpc_code": {
+                "title": "Jsonrpc Code",
+                "type": "integer"
+              },
+              "message": {
+                "title": "Message",
+                "type": "string"
+              },
+              "param": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Param"
+              },
+              "retryable": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Retryable"
+              },
+              "type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Type"
+              }
+            },
+            "required": [
+              "code",
+              "jsonrpc_code",
+              "message"
+            ],
+            "title": "ToolError",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "artifacts": {
+            "items": {
+              "$ref": "#/$defs/ArtifactLink"
+            },
+            "title": "Artifacts",
+            "type": "array"
+          },
+          "billing": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Billing"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ToolError"
+              },
+              {
+                "$ref": "#/$defs/TaskError"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Error"
+          },
+          "resolved_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Resolved Model"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "task": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Task"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Task Id"
+          },
+          "terminal": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Terminal"
+          },
+          "usage": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Usage"
+          }
+        },
+        "title": "TaskToolOutput",
+        "type": "object"
+      },
+      "title": "Prepare Speech Script"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
       "description": "Synthesize speech using a Beatra voice ID. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry. The input accepts speech markup. Read the vocabulary and limits from the model card returned by beatra.models.list. beatra.speech.validate checks the input before you submit and does not charge credits.",
       "inputSchema": {
         "properties": {
@@ -17563,7 +18009,10 @@
                 "type": "string"
               },
               {
-                "const": "social_data_fetch",
+                "enum": [
+                  "social_data_fetch",
+                  "speech_script"
+                ],
                 "type": "string"
               },
               {
