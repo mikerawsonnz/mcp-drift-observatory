@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "f71f1b81d10a366808dbc6dfc2c69d1290e5b4b5931dd6c6e71d40bd5c072f71",
+  "full_hash": "401586f81280c435fbb5341ebd752b1ba08a3a07f5697e17d5cc63ba61fcec50",
   "name": "ai.bitroad/bitroad",
-  "observed_at": "2026-11-09T02:02:42.660168Z",
+  "observed_at": "2026-11-10T02:04:40.988564Z",
   "sources": [
     "official"
   ],
-  "tool_count": 78,
+  "tool_count": 91,
   "tools": [
     {
       "annotations": {
@@ -510,6 +510,100 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Settlement list cycles"
+      },
+      "description": "List the buyer's settlement cycles (the tab): each cycle's status (open, closed, capturing, captured, settled, …), exposure limit, authorised, accrued and captured amounts in minor units, and capture_due_at, the end of the review window. funding is card_hold or prepaid; a prepaid cycle's remaining_pence is its unspent balance. Filter by status or currency; paginate with cursor. Sub-threshold fixed-price purchases accrue here and are captured in one charge per cycle.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "currency": {
+            "description": "Only cycles in this currency.",
+            "enum": [
+              "gbp",
+              "usd",
+              "eur"
+            ],
+            "type": "string"
+          },
+          "cursor": {
+            "description": "The next_cursor from the previous page.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "page_size": {
+            "default": 20,
+            "description": "Cycles per page, 1 to 100 (default 20).",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "description": "Only cycles in this status.",
+            "enum": [
+              "authorising",
+              "auth_failed",
+              "open",
+              "closed",
+              "capturing",
+              "captured",
+              "capture_failed",
+              "cancelled",
+              "settled"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "page_size"
+        ],
+        "type": "object"
+      },
+      "name": "settlement_list_cycles",
+      "title": "Settlement list cycles"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Settlement contest job"
+      },
+      "description": "Contest one job on the buyer's tab before its settlement cycle captures. The job's whole charge comes off the tab, the quote moves to 'refunded' and the seller is told; this is a reversal, not a dispute, and needs no admin. Allowed while the cycle is 'open' or 'closed' and the quote is paid, in_progress, delivered or released. After capture it refuses with contest_window_closed: file a dispute with disputes_file instead.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "description": "Why the job is contested; the seller sees it.",
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          },
+          "service_quote_id": {
+            "description": "UUID of the tab job's quote thread.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service_quote_id",
+          "reason"
+        ],
+        "type": "object"
+      },
+      "name": "settlement_contest_job",
+      "title": "Settlement contest job"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
         "readOnlyHint": false,
         "title": "Intents post"
       },
@@ -874,6 +968,84 @@
       },
       "name": "intents_bid",
       "title": "Intents bid"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Venues authorise"
+      },
+      "description": "Buyer side: let an external venue (another marketplace that matched you with a seller) send Bitroad jobs that charge you. Bitroad holds each charge in escrow, runs the job's acceptance check and pays the seller, as for any service job. cap_pence bounds what the venue's live jobs may hold at once; each charge also runs under this agent's own delegation caps, as this agent. Returns authorisation_id: give it to the venue, which names you by it. Calling again replaces the cap and re-activates a revoked authorisation.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "cap_pence": {
+            "anyOf": [
+              {},
+              {
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991,
+                "type": "integer"
+              }
+            ],
+            "description": "The most the venue may have charged you at once across its live jobs, in minor units of currency. Re-authorising replaces the cap."
+          },
+          "currency": {
+            "description": "The currency of the cap; the venue's jobs must charge in it.",
+            "enum": [
+              "gbp",
+              "usd",
+              "eur"
+            ],
+            "type": "string"
+          },
+          "venue_slug": {
+            "description": "The venue's slug, as the venue gives it to you.",
+            "maxLength": 63,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "venue_slug",
+          "cap_pence",
+          "currency"
+        ],
+        "type": "object"
+      },
+      "name": "venues_authorise",
+      "title": "Venues authorise"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Venues revoke"
+      },
+      "description": "Buyer side: withdraw a venue's authorisation. The venue can send no new job that charges you; jobs already charged carry on to delivery and acceptance as usual. Repeating it is a no-op.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "venue_slug": {
+            "description": "The venue's slug.",
+            "maxLength": 63,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "venue_slug"
+        ],
+        "type": "object"
+      },
+      "name": "venues_revoke",
+      "title": "Venues revoke"
     },
     {
       "annotations": {
@@ -1932,6 +2104,264 @@
       },
       "name": "services_list_my_sales",
       "title": "Services list my sales"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Verifications list open"
+      },
+      "description": "Seller side: list open verification jobs you may take as an independent verifier. A job whose acceptance block carries independent_verifier opens one once its deliverable passes every machine check. Lists only jobs that are not your store's, whose buyer does not own your store, in your settlement currency, and whose min_calibration_bp your standing_bp meets (your share of finished jobs released with no dispute the buyer won; null until your calibration reaches the minimum sample). Each carries the job's scope, output schema, verifier_class, the fee_pence it pays from the job's escrow (0 on a revision whose fee another verifier holds) and the claim deadline. The deliverable shows only after you claim.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "default": 50,
+            "description": "Most verifications to return.",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "limit"
+        ],
+        "type": "object"
+      },
+      "name": "verifications_list_open",
+      "title": "Verifications list open"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Verifications claim"
+      },
+      "description": "Seller side: claim an open verification. One verifier per verification; your repeat returns it. Returns the deliverable to judge and a decide_deadline_at (24 hours). Refused with verifier_not_independent on your own store's job, verifier_calibration_too_low below the band, verification_superseded after a revision, and verification_not_open or verification_expired otherwise.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "verification_id": {
+            "description": "UUID of the open verification to claim.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "verification_id"
+        ],
+        "type": "object"
+      },
+      "name": "verifications_claim",
+      "title": "Verifications claim"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Verifications submit verdict"
+      },
+      "description": "Seller side: submit your verdict on a verification you claimed, pass or fail, with a plain-text reason the buyer and the fulfiller see. pass releases the job as a passed check; fail is a failed check (the fulfiller may revise until the deadline, and a dispute on the job goes to Bitroad's admin queue). The fee is paid to you once the job releases, and the verification is recorded in your calibration. Your repeat with the same verdict returns it; a different one is refused.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "description": "Why, in plain text. The buyer and the fulfiller see it on the deliverable.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "verdict": {
+            "description": "pass: the deliverable meets the job's terms; fail: it does not.",
+            "enum": [
+              "pass",
+              "fail"
+            ],
+            "type": "string"
+          },
+          "verification_id": {
+            "description": "UUID of the verification you claimed.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "verification_id",
+          "verdict",
+          "reason"
+        ],
+        "type": "object"
+      },
+      "name": "verifications_submit_verdict",
+      "title": "Verifications submit verdict"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Factoring quote"
+      },
+      "description": "Seller side: quote what the house would pay now for one of your delivered jobs' pending credit. Returns face_pence (the credit), discount_bps and discount_pence (base 2%, plus 0 to 3% by your calibration band, plus 0.1% a day to the job's release_sla_at, between 2% and 10%, rounded up) and paid_pence. Only a job charged to the platform (a seller whose Connect account was not ready at charge), delivered, not disputed, with no open verification, panel case or chargeback, and only for a payable seller whose owner is a business or a Stripe-verified individual and whose standing reaches the first calibration band. Refused with factoring_not_eligible and a reason otherwise.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "service_quote_id": {
+            "description": "UUID of your delivered job whose pending credit you would sell.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service_quote_id"
+        ],
+        "type": "object"
+      },
+      "name": "factoring_quote",
+      "title": "Factoring quote"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Factoring sell"
+      },
+      "description": "Seller side: sell one delivered job's pending credit to the house at the factoring_quote price. paid_pence is transferred to your Connect account on the next worker run; the job's release then pays the house, and the house bears a refund. One sale per job: a repeat returns it. Refused with factoring_not_eligible, or factoring_ceiling_reached past the per-seller or the house's outstanding limit.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "service_quote_id": {
+            "description": "UUID of your delivered job whose pending credit you would sell.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service_quote_id"
+        ],
+        "type": "object"
+      },
+      "name": "factoring_sell",
+      "title": "Factoring sell"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Panel list open"
+      },
+      "description": "Member panel: list open dispute cases you may sit on. A case is a service dispute the acceptance engine and any verifier could not settle; a quorum of 3 members decides it by majority, release (the seller is paid) or refund (the buyer is refunded in full). Lists nothing (member: false) until you qualify to sit, and never a job you bought, fulfilled or verified. Each case is blind to the parties: the job's scope, output schema and acceptance block, the deliverable, the buyer's reason and the seller's response, with no ids, names or stores. Each carries its deadline and the fee_pence it pays, split across the counted votes.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "default": 50,
+            "description": "Most cases to return.",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "limit"
+        ],
+        "type": "object"
+      },
+      "name": "panel_list_open",
+      "title": "Panel list open"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Panel get case"
+      },
+      "description": "Member panel: read one case blind to the parties, with your own vote once cast. Visible to a member who may sit on it while it is open, and to its panelists after.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "case_id": {
+            "description": "UUID of the panel case.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "case_id"
+        ],
+        "type": "object"
+      },
+      "name": "panel_get_case",
+      "title": "Panel get case"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Panel vote"
+      },
+      "description": "Member panel: vote release or refund on an open case, with a plain-text reason. The first 3 eligible votes count and the majority decides; the decision is applied to the dispute at once, recorded in your calibration (agreeing with the majority counts for you) and your fee share is recorded as owed to you. Your repeat with the same vote returns the case; a different one is refused (panel_vote_cast). Refused with panelist_not_eligible, panel_case_not_open or panel_case_expired otherwise.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "case_id": {
+            "description": "UUID of the open panel case to vote on.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
+            "type": "string"
+          },
+          "reason": {
+            "description": "Why, in plain text. Recorded on the case.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "vote": {
+            "description": "release: the deliverable meets the job's terms and the seller is paid; refund: it does not and the buyer is refunded.",
+            "enum": [
+              "release",
+              "refund"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "case_id",
+          "vote",
+          "reason"
+        ],
+        "type": "object"
+      },
+      "name": "panel_vote",
+      "title": "Panel vote"
     },
     {
       "annotations": {
@@ -3282,6 +3712,24 @@
       },
       "name": "index_get",
       "title": "Index get"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Default fund get"
+      },
+      "description": "Read the public statement of Bitroad's member loss-absorption fund: per currency (gbp, usd, eur), balance_minor, contributions_minor (net of contributions reversed with a refunded fee), draws_minor and draw_count, plus contribution_rate_bps (the share of each cleared job's platform fee credited to the fund) and as_of. The fund absorbs a loss after the seller's pending credit and bond and before Bitroad. It is a discretionary pool funded from Bitroad's fees and no promise of cover; the statement field says so word for word. Works without credentials.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "default_fund_get",
+      "title": "Default fund get"
     },
     {
       "annotations": {

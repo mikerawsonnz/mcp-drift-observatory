@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://app.bitroad.ai/api/v1/mcp` | 78 | [`f71f1b81d10a`](e36f79dd929c8eb0f088.json) | 2026-11-09 |
+| `https://app.bitroad.ai/api/v1/mcp` | 91 | [`401586f81280`](e36f79dd929c8eb0f088.json) | 2026-11-10 |
 
 ## Tools at `https://app.bitroad.ai/api/v1/mcp`
 
@@ -18,6 +18,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `catalog_get_product`: `Fetch a single product by id. Returns full description, structured spec values, seller id, live stock, and any restricted-goods flags. Pref…`
 - `catalog_list_categories`: `List the product catalog's category taxonomy. Optionally pass 'slug' to scope to a subtree (e.g. 'electronics'). Each leaf carries its JSON…`
 - `catalog_search_products`: `Search the product catalog (physical goods) by free-text query, optional category, or seller. Returns a paginated list of summaries with pe…`
+- `default_fund_get`: `Read the public statement of Bitroad's member loss-absorption fund: per currency (gbp, usd, eur), balance_minor, contributions_minor (net o…`
 - `disputes_add_evidence`: `Attach an evidence item to an open dispute. The body is base64-encoded; per-item cap is 25 MB and per-dispute cap is 200 MB. Either the fil…`
 - `disputes_file`: `File a dispute on a goods order (order_id; reasons: not_as_described, defective, not_received, fraud_unauthorized_charge, duplicate_charge,…`
 - `disputes_get`: `Fetch one dispute by id with the full evidence trail and timeline. Buyer-side or seller-side caller — returns 404 if the dispute doesn't be…`
@@ -26,6 +27,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `disputes_withdraw`: `Buyer-only: withdraw an open dispute. Closed disputes cannot be withdrawn.`
 - `envelopes_get`: `Fetch a single envelope by id. Returns the same shape as envelopes_list. Returns 404 when the envelope is not bound to the calling agent in…`
 - `envelopes_list`: `List the active and historical payment envelopes the calling agent instance can draw against. Each entry shows balance, scope, validity, an…`
+- `factoring_quote`: `Seller side: quote what the house would pay now for one of your delivered jobs' pending credit. Returns face_pence (the credit), discount_b…`
+- `factoring_sell`: `Seller side: sell one delivered job's pending credit to the house at the factoring_quote price. paid_pence is transferred to your Connect a…`
 - `grades_list`: `List Bitroad's grades: the published contracts for classes of work that orders are placed against. Each active grade carries its id, slug,…`
 - `index_get`: `Read Bitroad's daily price index: what each grade of work cost, per currency, for the latest published UTC day or a given date. Service ent…`
 - `intents_bid`: `Seller side (respond_quote): submit or replace your sealed bid on an open intent: amount_pence (inc-VAT, at most the budget ceiling), eta_m…`
@@ -37,6 +40,9 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `orders_list`: `List orders the authenticated principal placed (buyer-side view), paginated with a cursor. Optional status filter (e.g. 'paid_awaiting_fulf…`
 - `orders_list_mine`: `List your resting orders on grades, newest first: a seller's asks (its active fixed-price listings on a grade, and its live token sell orde…`
 - `orders_place`: `Place an order against a grade (grades_list): side 'ask' sells the grade, 'bid' buys it. A fungible grade (inference tokens) takes tokens {…`
+- `panel_get_case`: `Member panel: read one case blind to the parties, with your own vote once cast. Visible to a member who may sit on it while it is open, and…`
+- `panel_list_open`: `Member panel: list open dispute cases you may sit on. A case is a service dispute the acceptance engine and any verifier could not settle;…`
+- `panel_vote`: `Member panel: vote release or refund on an open case, with a plain-text reason. The first 3 eligible votes count and the majority decides;…`
 - `payment_methods_create`: `Returns a one-time Stripe Checkout URL to hand the user so they can add a payment card. The card is saved to their account automatically wh…`
 - `payment_methods_list`: `List the principal's saved payment methods (last4 + brand only — full card numbers are never exposed to agents). purchase_confirm_intent us…`
 - `platforms_get`: `Fetch a platform's public reputation profile by slug: KYC status, rolling-window orders/disputes/refunds, on-time-ship rate, dispute resolu…`
@@ -64,16 +70,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `seller_list_reviews`: `List reviews left on this seller's orders, paginated. Filter by 'responded: false' to find reviews that still need a seller response. A rev…`
 - `seller_mark_delivered`: `Declare a shipped order as delivered (no carrier confirmation is wired). Only valid from shipped; already-delivered is a no-op success. Not…`
 - `seller_mark_shipped`: `Mark an order as shipped with a tracking number. Idempotent on (order_id, tracking_number) — same pair is a no-op success. Enqueues carrier…`
-- `seller_onboarding_status`: `Read-only Stripe Connect onboarding status. Stripe Express onboarding itself is human-on-session; agents wait on this read until charges_en…`
-- `seller_reject_return`: `Reject a return after inspection. inspection_notes is required. Refuses if the return has already refunded.`
-- `seller_respond_to_review`: `Post the seller's response to a review. One response per review; subsequent attempts return already_responded.`
-- `seller_set_fingerprint`: `Seller side: declare this agent instance's fulfilment fingerprint, a hex SHA-256 over your {code_version, model_id, prompt_version} (stored…`
-- `seller_update_listing`: `Patch an existing listing the calling seller owns. Specs are re-validated against the leaf schema; return_policy is re-validated against th…`
-- `seller_update_stock`: `Update a listing's stock count. Pass 'stock' for an absolute value or 'delta' for a relative change. Resulting stock must remain >= reserve…`
-- and 18 more in [e36f79dd929c8eb0f088.json](e36f79dd929c8eb0f088.json)
+- and 31 more in [e36f79dd929c8eb0f088.json](e36f79dd929c8eb0f088.json)
 
 ## Changes
 
+- 2026-11-10: [count changed, tool added](../../deltas/2026-11-10/e36f79dd929c8eb0f088.json): `13 tool(s) added`
 - 2026-11-09: [count changed, tool added](../../deltas/2026-11-09/e36f79dd929c8eb0f088.json): `6 tool(s) added`
 - 2026-11-06: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-06/e36f79dd929c8eb0f088.json): `7 tool(s) added; 21 field(s) changed; signals: imperative_language_introduced` **(notable)**
 - 2026-10-28: [description changed, schema changed](../../deltas/2026-10-28/e36f79dd929c8eb0f088.json): `312 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**

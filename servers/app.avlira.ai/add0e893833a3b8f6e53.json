@@ -1,0 +1,967 @@
+{
+  "canon_version": "1",
+  "full_hash": "4cfe02e9ef72bf45f8fdcd5de774c3e602e256daf176c346ddc8ad7a1673238e",
+  "name": "ai.avlira/back-office",
+  "observed_at": "2026-11-10T02:04:38.330172Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 28,
+  "tools": [
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "About Avlira"
+      },
+      "description": "What Avlira Back Office is, what it costs, and how to start. Call this first when someone asks about Avlira.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "about_avlira"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Create workspace"
+      },
+      "description": "Create a new private Avlira Back Office workspace for a brokerage (Free plan: up to 10 agents, forever, no card). Returns the workspace URL, a one-time owner sign-in link, the workspace MCP URL to connect, and an owner AI key shown once. Ask the user for the brokerage name, their name and email first. Creates real data: call it once, not repeatedly.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_count": {
+            "description": "Roughly how many agents (optional)",
+            "type": "integer"
+          },
+          "brokerage_name": {
+            "description": "Brokerage / company name, 2-80 characters",
+            "type": "string"
+          },
+          "owner_email": {
+            "description": "The owner's email address",
+            "type": "string"
+          },
+          "owner_name": {
+            "description": "The owner's full name",
+            "type": "string"
+          },
+          "state": {
+            "description": "US state (optional)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "brokerage_name",
+          "owner_name",
+          "owner_email"
+        ],
+        "type": "object"
+      },
+      "name": "create_workspace"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Commission calculator"
+      },
+      "description": "Free commission calculator: what a real-estate agent and brokerage each get from a closed deal, to the cent. Give the sale price and commission percent (or the gross commission in dollars) and optionally the split (like 70/30, agent first), an annual cap, how much of the cap is already paid, a per-deal fee and a referral percent.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "cap_cents": {
+            "description": "Annual cap on the brokerage's share, in cents (0 or omitted = no cap)",
+            "type": "integer"
+          },
+          "cap_paid_so_far_cents": {
+            "description": "Brokerage share already paid toward the cap this year, in cents",
+            "type": "integer"
+          },
+          "commission_pct": {
+            "description": "Total commission as a percent of the price, e.g. 3",
+            "type": "number"
+          },
+          "gci": {
+            "description": "Gross commission income in dollars (instead of sale_price + commission_pct)",
+            "type": "number"
+          },
+          "per_deal_fee": {
+            "description": "Flat fee the brokerage charges per deal, in cents",
+            "type": "integer"
+          },
+          "referral_pct": {
+            "description": "Referral fee paid out of the gross commission, as a percent",
+            "type": "number"
+          },
+          "sale_price": {
+            "description": "Sale price in dollars",
+            "type": "number"
+          },
+          "split": {
+            "description": "Agent/brokerage split such as 70/30 (agent first). Default 100/0",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "commission_calculator"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Florida license lookup"
+      },
+      "description": "Look up a Florida real-estate licensee in the public DBPR weekly file: by license number (exact) or by name (up to 10 matches). Returns only public fields: name, license number, rank, status, expiry, employer name.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "license_number": {
+            "description": "e.g. SL3611207 or 3611207",
+            "type": "string"
+          },
+          "name": {
+            "description": "Part or all of the name, e.g. 'Santos Maria'",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "florida_license_lookup"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get started"
+      },
+      "description": "A plain-English script for setting up a brokerage with a non-technical owner: what to ask, in what order. Call this right after about_avlira, before create_workspace.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_started"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Today"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Today's picture: pay-day status, dues, deals waiting for approval, onboarding and other items needing attention.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key"
+        ],
+        "type": "object"
+      },
+      "name": "today"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List Agents"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Every agent on the roster with plan and status.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key"
+        ],
+        "type": "object"
+      },
+      "name": "list_agents"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Add Agent"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Add one agent to the roster (no message is sent to them).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "description": "Email (strongly recommended)",
+            "type": "string"
+          },
+          "join_date": {
+            "description": "YYYY-MM-DD (default today)",
+            "type": "string"
+          },
+          "mobile": {
+            "description": "Mobile number",
+            "type": "string"
+          },
+          "name": {
+            "description": "Full name",
+            "type": "string"
+          },
+          "plan": {
+            "description": "Plan id or name from list_plans (default: the first plan)",
+            "type": "string"
+          },
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key",
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "add_agent"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List Plans"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) The commission plans agents can be on.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key"
+        ],
+        "type": "object"
+      },
+      "name": "list_plans"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Create Plan"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Create a commission plan: a flat monthly fee (flat_dues) and/or a split with an annual cap (split_cap).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_split_percent": {
+            "description": "Agent's share before the cap, e.g. 80",
+            "type": "number"
+          },
+          "annual_cap_usd": {
+            "description": "Company-dollar cap per year",
+            "type": "number"
+          },
+          "eo_fee_usd": {
+            "description": "E&O fee per deal",
+            "type": "number"
+          },
+          "kind": {
+            "description": "flat_dues or split_cap",
+            "type": "string"
+          },
+          "monthly_dues_usd": {
+            "description": "Monthly fee in dollars",
+            "type": "number"
+          },
+          "name": {
+            "description": "Plan name",
+            "type": "string"
+          },
+          "post_cap_transaction_fee_usd": {
+            "description": "Fee per deal once capped",
+            "type": "number"
+          },
+          "transaction_fee_usd": {
+            "description": "Fee per deal",
+            "type": "number"
+          },
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key",
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "create_plan"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Record Deal"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Enter a closed or closing deal as PENDING. Nothing is paid; the owner approves it in the app or with approve_deal.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "address": {
+            "description": "Property address",
+            "type": "string"
+          },
+          "agent": {
+            "description": "Agent id, email or name",
+            "type": "string"
+          },
+          "close_date": {
+            "description": "Closing date YYYY-MM-DD",
+            "type": "string"
+          },
+          "commission_pct": {
+            "description": "Commission percent of price, e.g. 3 for 3%",
+            "type": "number"
+          },
+          "gci": {
+            "description": "Gross commission in dollars (instead of price + commission_pct)",
+            "type": "number"
+          },
+          "price": {
+            "description": "Sale price in dollars",
+            "type": "number"
+          },
+          "referral_payee": {
+            "description": "Who gets a referral fee (optional)",
+            "type": "string"
+          },
+          "referral_percent": {
+            "description": "Referral fee as a percent of the commission (optional)",
+            "type": "number"
+          },
+          "side": {
+            "description": "Which side the agent had: list (also seller, listing), buy (also buyer, selling-agent) or both (also dual). Any capitalisation",
+            "type": "string"
+          },
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key",
+          "agent",
+          "address",
+          "close_date"
+        ],
+        "type": "object"
+      },
+      "name": "record_deal"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Approve Deal"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Approve a pending deal (books it in the ledger and the agent's cap; pays nothing). Only when the owner asked.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "deal_id": {
+            "description": "The deal number from record_deal or today",
+            "type": "integer"
+          },
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key",
+          "deal_id"
+        ],
+        "type": "object"
+      },
+      "name": "approve_deal"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Commission Preview"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Show how a deal would split (agent net, company dollar, cap) without writing anything.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "address": {
+            "description": "Property address",
+            "type": "string"
+          },
+          "agent": {
+            "description": "Agent id, email or name",
+            "type": "string"
+          },
+          "close_date": {
+            "description": "Closing date YYYY-MM-DD",
+            "type": "string"
+          },
+          "commission_pct": {
+            "description": "Commission percent of price, e.g. 3 for 3%",
+            "type": "number"
+          },
+          "gci": {
+            "description": "Gross commission in dollars (instead of price + commission_pct)",
+            "type": "number"
+          },
+          "price": {
+            "description": "Sale price in dollars",
+            "type": "number"
+          },
+          "referral_payee": {
+            "description": "Who gets a referral fee (optional)",
+            "type": "string"
+          },
+          "referral_percent": {
+            "description": "Referral fee as a percent of the commission (optional)",
+            "type": "number"
+          },
+          "side": {
+            "description": "Which side the agent had: list (also seller, listing), buy (also buyer, selling-agent) or both (also dual). Any capitalisation",
+            "type": "string"
+          },
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key",
+          "agent",
+          "close_date"
+        ],
+        "type": "object"
+      },
+      "name": "commission_preview"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Import Roster Csv"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Import agents from a roster CSV (columns: Name, Email, Plan, Join Date; Phone and License optional). ALWAYS run with dry_run=true first and show the owner the result; only then call with dry_run=false.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "csv_text": {
+            "description": "The CSV text",
+            "type": "string"
+          },
+          "default_plan": {
+            "description": "Plan id for rows with no Plan column",
+            "type": "string"
+          },
+          "dry_run": {
+            "description": "true (default) checks only; false imports",
+            "type": "boolean"
+          },
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key",
+          "csv_text"
+        ],
+        "type": "object"
+      },
+      "name": "import_roster_csv"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Unpaid Dues"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Who has not paid this month's dues, and why.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "month": {
+            "description": "YYYY-MM (default this month)",
+            "type": "string"
+          },
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key"
+        ],
+        "type": "object"
+      },
+      "name": "unpaid_dues"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Workspace Settings"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Read-only: the brokerage's name, URLs, plan, owners and counts.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key"
+        ],
+        "type": "object"
+      },
+      "name": "workspace_settings"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Branding"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Read how the back office looks now (display name, colors, tagline, logo) and what the plan allows to change.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key"
+        ],
+        "type": "object"
+      },
+      "name": "get_branding"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Update Branding"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Change how the back office looks. Confirm colors with the owner in plain words first. Colors must be #RRGGBB and readable (too-light colors are refused with a suggestion). Free: display name, colors, tagline. Pro: logo_url (https png/svg/webp, 512 KB), login_message.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "accent_color": {
+            "description": "Link and highlight color #RRGGBB",
+            "type": "string"
+          },
+          "display_name": {
+            "description": "Name shown in headers and titles, 2-60 characters",
+            "type": "string"
+          },
+          "login_message": {
+            "description": "Message on the sign-in page, up to 280 characters (Pro)",
+            "type": "string"
+          },
+          "logo_url": {
+            "description": "https link to a PNG, SVG or WebP logo (Pro); empty string removes it",
+            "type": "string"
+          },
+          "primary_color": {
+            "description": "Button color #RRGGBB (white text must stay readable)",
+            "type": "string"
+          },
+          "tagline": {
+            "description": "Short line under the name, up to 100 characters",
+            "type": "string"
+          },
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key"
+        ],
+        "type": "object"
+      },
+      "name": "update_branding"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Reset Branding"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Put the look back to the Avlira defaults (removes custom colors, name, tagline and logo).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key"
+        ],
+        "type": "object"
+      },
+      "name": "reset_branding"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Help"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Tech support for using Avlira: answers from the built-in help for a question (sign-in trouble, plans, deals, dues, 1099s, connecting an AI, branding...). Try this FIRST when the owner is stuck.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "question": {
+            "description": "What the person is trying to do or what went wrong",
+            "type": "string"
+          },
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key",
+          "question"
+        ],
+        "type": "object"
+      },
+      "name": "get_help"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Diagnose"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) A plain-English health check of THIS back office: plan and limits, agents missing email or mobile, pending deals, unpaid dues, W-9s, email verification, connected AIs and the top 3 next actions. Try after get_help.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key"
+        ],
+        "type": "object"
+      },
+      "name": "diagnose"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Contact Avlira Support"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Send a support ticket to the people at Avlira. ONLY when get_help and diagnose did not solve it, a bug is suspected, money or data looks wrong, or the owner asks for a human. Never promise a response time.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "contact_email": {
+            "description": "Best email to reach the person (optional)",
+            "type": "string"
+          },
+          "details": {
+            "description": "What happened, what was tried, up to 4000 characters",
+            "type": "string"
+          },
+          "summary": {
+            "description": "One plain sentence, up to 200 characters",
+            "type": "string"
+          },
+          "urgency": {
+            "description": "normal (default) or urgent (money or data wrong, locked out)",
+            "type": "string"
+          },
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key",
+          "summary"
+        ],
+        "type": "object"
+      },
+      "name": "contact_avlira_support"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List Message Templates"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Read the wording used on Collect and pay-day reminders (friendly, followup, final, card_expired, no_card) and the onboarding invite text, with the merge fields.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key"
+        ],
+        "type": "object"
+      },
+      "name": "list_message_templates"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Update Message Template"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Reword a collection reminder or the onboarding invite. kind: friendly, followup, final (email), card_expired, no_card, onboarding_invite. Plain text, texts max 480 chars, keep {pay_link} where the default has it. Merge fields written like {first_name}: first_name amount month days_late pay_link card_last4 office_name brokerage sender_first (invite: url office_name). Show the owner the wording first.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "description": "The new wording, plain text with merge fields",
+            "type": "string"
+          },
+          "channel": {
+            "description": "text or email (final is email, the rest text)",
+            "type": "string"
+          },
+          "kind": {
+            "description": "friendly, followup, final, card_expired, no_card or onboarding_invite",
+            "type": "string"
+          },
+          "subject": {
+            "description": "Email subject (final only)",
+            "type": "string"
+          },
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key",
+          "kind",
+          "channel",
+          "body"
+        ],
+        "type": "object"
+      },
+      "name": "update_message_template"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Reset Message Template"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Put one reminder wording back to the Avlira default.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "description": "Which template",
+            "type": "string"
+          },
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key",
+          "kind"
+        ],
+        "type": "object"
+      },
+      "name": "reset_message_template"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Update Plan"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Change an existing commission plan (same fields as create_plan; only what you pass changes). Only FUTURE deals use the new terms; booked deals keep their numbers. remove_cap true = no cap.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_split_percent": {
+            "description": "Agent's share, e.g. 80",
+            "type": "number"
+          },
+          "annual_cap_usd": {
+            "description": "Company-dollar cap per year (0 = none)",
+            "type": "number"
+          },
+          "eo_fee_usd": {
+            "description": "E&O fee per deal",
+            "type": "number"
+          },
+          "kind": {
+            "description": "flat_dues or split_cap",
+            "type": "string"
+          },
+          "monthly_dues_usd": {
+            "description": "Monthly fee in dollars",
+            "type": "number"
+          },
+          "name": {
+            "description": "New name",
+            "type": "string"
+          },
+          "plan_id": {
+            "description": "Plan id or name from list_plans",
+            "type": "string"
+          },
+          "post_cap_transaction_fee_usd": {
+            "description": "Fee per deal once capped",
+            "type": "number"
+          },
+          "remove_cap": {
+            "description": "true = no cap on this plan",
+            "type": "boolean"
+          },
+          "transaction_fee_usd": {
+            "description": "Fee per deal",
+            "type": "number"
+          },
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key",
+          "plan_id"
+        ],
+        "type": "object"
+      },
+      "name": "update_plan"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Assign Plan"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Put agents on a plan from a date on (default today): one agent, a list of agents, or 'all'. Earlier deals are unchanged.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agents": {
+            "description": "['all'] for everyone, or a list of agent ids, emails or names",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "effective_from": {
+            "description": "YYYY-MM-DD (default today)",
+            "type": "string"
+          },
+          "plan_id": {
+            "description": "Plan id or name",
+            "type": "string"
+          },
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key",
+          "plan_id",
+          "agents"
+        ],
+        "type": "object"
+      },
+      "name": "assign_plan"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Archive Plan"
+      },
+      "description": "(Needs the workspace_key from create_workspace.) Retire a plan nobody uses any more. Refused (with the agent names) while agents are still on it.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "plan_id": {
+            "description": "Plan id or name",
+            "type": "string"
+          },
+          "workspace_key": {
+            "description": "The workspace_key returned by create_workspace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workspace_key",
+          "plan_id"
+        ],
+        "type": "object"
+      },
+      "name": "archive_plan"
+    }
+  ],
+  "url": "https://app.avlira.ai/mcp"
+}

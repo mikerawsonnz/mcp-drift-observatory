@@ -1,6 +1,8 @@
 # Observed MCP servers
 
-452 hosts whose MCP tool declarations we have observed. Each page lists the declared tools, every observed change, and an Atom feed of changes to that server.
+456 hosts whose MCP tool declarations we have observed. Each page lists the declared tools, every observed change, and an Atom feed of changes to that server.
+
+Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_alerts
 
 - [28in28.ai](28in28.ai/) (3 tools)
 - [4ai.ai](4ai.ai/) (10 tools)
@@ -42,10 +44,11 @@
 - [api.askmiles.ai](api.askmiles.ai/) (5 tools)
 - [api.assistable.ai](api.assistable.ai/) (16 tools)
 - [api.atako.ai](api.atako.ai/) (4 tools)
-- [api.athenahq.ai](api.athenahq.ai/) (126 tools)
+- [api.athenahq.ai](api.athenahq.ai/) (128 tools)
 - [api.atmy.ai](api.atmy.ai/) (11 tools)
 - [api.bareun.ai](api.bareun.ai/) (6 tools)
-- [api.betslipdoctor.ai](api.betslipdoctor.ai/) (96 tools)
+- [api.betslipdoctor.ai](api.betslipdoctor.ai/) (98 tools)
+- [api.bluerate.ai](api.bluerate.ai/) (3 tools)
 - [api.bowmark.ai](api.bowmark.ai/) (70 tools)
 - [api.bumblebox.ai](api.bumblebox.ai/) (17 tools)
 - [api.cactal.ai](api.cactal.ai/) (84 tools)
@@ -77,8 +80,9 @@
 - [app.annsa.ai](app.annsa.ai/) (8 tools)
 - [app.aqta.ai](app.aqta.ai/) (10 tools)
 - [app.augenix.ai](app.augenix.ai/) (3 tools)
+- [app.avlira.ai](app.avlira.ai/) (28 tools)
 - [app.bezal.ai](app.bezal.ai/) (9 tools)
-- [app.bitroad.ai](app.bitroad.ai/) (78 tools)
+- [app.bitroad.ai](app.bitroad.ai/) (91 tools)
 - [app.bugtape.ai](app.bugtape.ai/) (14 tools)
 - [app.cleartape.ai](app.cleartape.ai/) (11 tools)
 - [app.deepvalues.ai](app.deepvalues.ai/) (25 tools)
@@ -204,6 +208,7 @@
 - [elasticsearch-redis-stack-generator-elasticsea-588e3e.getvda.ai](elasticsearch-redis-stack-generator-elasticsea-588e3e.getvda.ai/) (2 tools)
 - [elasticsearch-redis-stack-generator.getvda.ai](elasticsearch-redis-stack-generator.getvda.ai/) (2 tools)
 - [emberverse.ai](emberverse.ai/) (36 tools)
+- [employerofrecord.ae](employerofrecord.ae/) (5 tools)
 - [entervista.ai](entervista.ai/) (14 tools)
 - [env.agentlookups.ai](env.agentlookups.ai/) (4 tools)
 - [eosl.ai](eosl.ai/) (5 tools)
@@ -362,6 +367,7 @@
 - [mizan.ac](mizan.ac/) (5 tools)
 - [mom.achromat.ai](mom.achromat.ai/) (1 tools)
 - [moonlings.ai](moonlings.ai/) (8 tools)
+- [mrk.ae](mrk.ae/) (22 tools)
 - [muffed.ai](muffed.ai/) (14 tools)
 - [myplot.ai](myplot.ai/) (2 tools)
 - [mysql-redis-compose-generator-adminer.getvda.ai](mysql-redis-compose-generator-adminer.getvda.ai/) (2 tools)
@@ -453,4 +459,4 @@
 - [www.foliora.ai](www.foliora.ai/) (12 tools)
 - [www.hood.ag](www.hood.ag/) (5 tools)
 - [x402-services-production.up.railway.app](x402-services-production.up.railway.app/) (159 tools)
-- [zoll.agency](zoll.agency/) (7 tools)
+- [zoll.agency](zoll.agency/) (8 tools)

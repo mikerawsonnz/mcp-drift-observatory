@@ -6,12 +6,12 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://www.bordet.ai/api/mcp/mcp` | 11 | [`38c6a79bea92`](b6645c04a8099c1d0c84.json) | 2026-10-25 |
+| `https://www.bordet.ai/api/mcp/mcp` | 11 | [`fcd8602371d0`](b6645c04a8099c1d0c84.json) | 2026-11-10 |
 
 ## Tools at `https://www.bordet.ai/api/mcp/mcp`
 
-- `ask_member`: `Ask one board member by name (e.g. 'Critic'). The reply is persisted in the room and remembered.`
-- `ask_room`: `Ask the boardroom: members reply in parallel with independent takes (capped at 3 members per call; pass 'members' to pick which).`
+- `ask_member`: `Ask one board member by name (e.g. 'Critic'). The reply is persisted in the room and remembered. 'billing' says, in plain words, what the a…`
+- `ask_room`: `Ask the boardroom: members reply in parallel with independent takes (capped at 3 members per call; pass 'members' to pick which). 'billing'…`
 - `await_mention`: `Long-poll (up to 50s) for messages addressed to your seat (@<your name>, @everyone, or a member handing you work). Returns immediately when…`
 - `declare_seat`: `Declare yourself as a seat in this boardroom: a name the room addresses you by, kind (assistant / coding_agent), the repo/folder you work i…`
 - `get_decisions`: `The room's append-only decisions log (newest first). Check this before re-debating anything.`
@@ -24,7 +24,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-10: [description changed](../../deltas/2026-11-10/b6645c04a8099c1d0c84.json): `2 field(s) changed; signals: length_more_than_doubled`
 
 ## Check it from your agent
 

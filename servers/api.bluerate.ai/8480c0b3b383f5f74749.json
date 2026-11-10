@@ -1,0 +1,133 @@
+{
+  "canon_version": "1",
+  "full_hash": "86968d8c3a94a6254560135f94d70155d95272a18ac3b0a88896ca7b8df1fed9",
+  "name": "ai.bluerate/loan-officers",
+  "observed_at": "2026-11-10T02:04:40.975983Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 3,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get a loan officer's profile"
+      },
+      "description": "Get one loan officer's bluerate.ai profile by NMLS ID: name, company, licensed states, loan types, languages, about text, up to 3 client reviews, FAQs and url, their bluerate profile link, where the user can request a callback. Use it after search_loan_officers, or when the user gives an NMLS ID. Give the user the url.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "nmls": {
+            "description": "The loan officer's NMLS ID, digits only, for example 123456. search_loan_officers returns it as nmls.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nmls"
+        ],
+        "type": "object"
+      },
+      "name": "get_loan_officer",
+      "title": "Get a loan officer's profile"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "title": "Request a call back from a loan officer"
+      },
+      "description": "Ask a loan officer listed on bluerate.ai to call the user back. Returns confirmationUrl, a one-time bluerate link valid for 24 hours: give it to the user. On that page the user enters their own phone number and email, agrees to be contacted, and submits; the loan officer then calls them. Do not ask the user for their phone number or email, and do not pass them: they are not accepted here. Pass the loan officer's nmls from search_loan_officers or get_loan_officer, and optionally the user's name, state and loan purpose to prefill the page.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "borrowerName": {
+            "description": "The user's name, if they gave it, to prefill the page. They can change it there.",
+            "type": "string"
+          },
+          "loanPurpose": {
+            "description": "What the loan is for.",
+            "enum": [
+              "purchase",
+              "refinance",
+              "cash_out"
+            ],
+            "type": "string"
+          },
+          "nmls": {
+            "description": "The loan officer's NMLS ID, digits only, as search_loan_officers or get_loan_officer returned it.",
+            "type": "string"
+          },
+          "state": {
+            "description": "The US state of the property, two-letter code, for example CA.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nmls"
+        ],
+        "type": "object"
+      },
+      "name": "request_callback",
+      "title": "Request a call back from a loan officer"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Find mortgage loan officers"
+      },
+      "description": "Find licensed US mortgage loan officers listed on bluerate.ai by state, optionally near a city or ZIP code, for a loan type (conventional, FHA, VA, USDA, jumbo, non-QM) or by a language they speak. Returns up to 10 loan officers, each with name, NMLS ID, company, office city, licensed states, loan types, languages, number of reviews and url, their bluerate profile link, where the user can read reviews and request a callback. Give the user the url for each loan officer you mention. Also returns total (how many match) and moreResultsUrl (the full list on bluerate). Results filter by state license, not office location; city and zip only put nearby offices first.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "city": {
+            "description": "City name, for example San Jose. Puts loan officers with an office there first; does not filter.",
+            "type": "string"
+          },
+          "language": {
+            "description": "A language the loan officer speaks, as a name (Spanish, Chinese) or a code (es, zh).",
+            "type": "string"
+          },
+          "limit": {
+            "description": "How many loan officers to return, 1 to 10. Default 10.",
+            "maximum": 10,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "loanType": {
+            "description": "Only loan officers who do this loan type in the state. Leave it out for every loan type.",
+            "enum": [
+              "conventional",
+              "fha",
+              "va",
+              "usda",
+              "jumbo",
+              "non_qm"
+            ],
+            "type": "string"
+          },
+          "state": {
+            "description": "US state as a two-letter code, for example CA or TX. Full names like California also work.",
+            "type": "string"
+          },
+          "zip": {
+            "description": "5-digit US ZIP code, for example 94105. Puts loan officers with an office there first; does not filter.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state"
+        ],
+        "type": "object"
+      },
+      "name": "search_loan_officers",
+      "title": "Find mortgage loan officers"
+    }
+  ],
+  "url": "https://api.bluerate.ai/mcp"
+}

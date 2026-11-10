@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.betslipdoctor.ai/api/mcp` | 96 | [`74f87c627eba`](f29327f2a9147dd897c0.json) | 2026-11-09 |
+| `https://api.betslipdoctor.ai/api/mcp` | 98 | [`4f939506aae2`](f29327f2a9147dd897c0.json) | 2026-11-10 |
 
 ## Tools at `https://api.betslipdoctor.ai/api/mcp`
 
@@ -14,6 +14,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `add_doctor_parlay_to_slip`: `Put one of the Doctor’s posted parlays (key from get_doctor_parlays) or the Home hero pick (get_league_order slate.doctorHero.key: a single…`
 - `add_funds`: `Return a link to add funds to the pay-as-you-go balance. The customer signs in and confirms there; this tool never charges.`
 - `cancel_doctor_reply`: `Cancel an owned Doctor jobId under the app cancellation and reservation rules. Cannot undo a reply or provider work already completed. Reus…`
+- `cancel_doctor_send`: `Stop an explicit pending send using its original sendKey commandKey, including before its job ID was received. Tombstones late starts and c…`
 - `cancel_grade`: `Cancel an owned Grade jobId through the app service. Stops eligible work and releases its remaining reservation under the existing app rule…`
 - `check_slip`: `The app slip’s rule for this conversation’s slip. Send legs (ids plus the oddsAmerican, line, observedAt and startsAt they were added with)…`
 - `connect_sportsbook`: `Return a 10-minute betslipdoctor.ai link (linkUrl, expiresAt) for the customer to open and finish connecting a sportsbook. The app checks t…`
@@ -32,8 +33,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_bettor_profile`: `Read this authenticated account’s bettor model, optionally filtered by topic: confirmed notes and revisions, separately attributed Honcho i…`
 - `get_box_score`: `Read the in-play or final score and box score for one game (eventId from search_markets or the board), the same read as the app’s Live game…`
 - `get_doctor_conversation`: `Read the owned threadId, saved user messages, Doctor answers and jobs; optional before pages older messages. Does not generate a new answer.`
-- `get_doctor_events`: `Read saved events for the owned Doctor jobId, optionally after a sequence. Never starts a consult.`
-- `get_doctor_job`: `Read the owned Doctor jobId, including its real saved answer when available. Never generates or restarts a reply.`
+- `get_doctor_events`: `Read saved events for the owned Doctor jobId, optionally after a sequence. While a reply is written, doctor_research_progress events say ho…`
+- `get_doctor_job`: `Read the owned Doctor jobId, including its real saved answer when available: paragraphs, the linked pages it cites (sources) and what it ch…`
 - `get_doctor_memory`: `Read this authenticated account’s confirmed notes, active status, current revisions and memory generation. Longer-term Honcho personalizati…`
 - `get_doctor_parlays`: `Read the Doctor’s posted parlays for one league (e.g. LGUE_nfl): 2-3 legs on different games, each B+ or better when posted. Upcoming first…`
 - `get_doctor_picks`: `Read today’s saved Doctor picks and recent settled WON/LOST/PUSH results. Each item carries league (first leg’s league id), sport (first le…`
@@ -69,11 +70,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `onboarding_preferences`: `Read the current league catalog and per-league team membership, or read/save your leagues and teams. Use original source-qualified IDs. Log…`
 - `open_doctor_conversation`: `Persist an app Doctor thread, optionally attached to an owned ticket, report or history item. Does not start a reply or spend a consult all…`
 - `prepare_sportsbook_handoff`: `Prepare the existing app’s fresh, vetted direct sportsbook link for an owned saved ticket. Choose the same sportsbook as the saved ticket a…`
-- `preview_tail_post`: `Compute the exact app sharing preview and binding from an owned saved Grade report or Doctor exchange draft. Does not publish. Show the ret…`
-- and 36 more in [f29327f2a9147dd897c0.json](f29327f2a9147dd897c0.json)
+- and 38 more in [f29327f2a9147dd897c0.json](f29327f2a9147dd897c0.json)
 
 ## Changes
 
+- 2026-11-10: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-10/f29327f2a9147dd897c0.json): `2 tool(s) added; 34 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-09: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-09/f29327f2a9147dd897c0.json): `2 tool(s) added; 118 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-08: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-08/f29327f2a9147dd897c0.json): `2 tool(s) added; 2370 field(s) changed; signals: length_more_than_doubled, url_introduced`
 - 2026-11-07: [description changed, schema changed](../../deltas/2026-11-07/f29327f2a9147dd897c0.json): `661 field(s) changed; signals: length_more_than_doubled, url_introduced`
@@ -93,7 +94,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - 2026-10-15: [annotation changed, description changed, field changed, schema changed](../../deltas/2026-10-15/f29327f2a9147dd897c0.json): `25 field(s) changed`
 - 2026-10-13: [schema changed](../../deltas/2026-10-13/f29327f2a9147dd897c0.json): `20 field(s) changed`
 - 2026-10-11: [annotation changed, description changed, schema changed](../../deltas/2026-10-11/f29327f2a9147dd897c0.json): `62 field(s) changed`
-- 2026-10-10: [count changed, tool added](../../deltas/2026-10-10/f29327f2a9147dd897c0.json): `11 tool(s) added`
 
 ## Check it from your agent
 

@@ -6,21 +6,22 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://zoll.agency/mcp` | 7 | [`5464b687cd35`](4a6b54c7b92fc67af28d.json) | 2026-10-25 |
+| `https://zoll.agency/mcp` | 8 | [`f4c1631edf0c`](4a6b54c7b92fc67af28d.json) | 2026-11-10 |
 
 ## Tools at `https://zoll.agency/mcp`
 
 - `ausfuhranmeldung_noetig`: `Der Satz der Vorprüfung von zoll.agency für Bestimmungsland, Warenwert und Gewicht der ganzen Lieferung, nach der Grenze von 1.000 EUR und…`
+- `einfuhr_weg_bestimmen`: `Der Einfuhr-Wegweiser von zoll.agency: Für eine Sendung aus einem Land außerhalb der EU, nach Empfänger (Firma oder privat), Versandweg (Po…`
 - `incoterms_waehlen`: `Ordnet Antworten zu Transportweg, Fracht, Gefahrübergang, Versicherung, Einfuhrabgaben und Abladen einer Klausel der Incoterms® 2020 zu, mi…`
 - `kumulierung_pruefen`: `Darf Vormaterial aus einem Partnerland der EU für den Ursprung der fertigen Ware zählen, wenn sie in ein bestimmtes Land verkauft wird? Nac…`
-- `leistungen_und_preise`: `Die Leistungen von zoll.agency mit einem Satz, dem Preis brutto und der Adresse der Seite, wie auf /leistungen.`
 - `praeferenznachweis_bestimmen`: `Welcher Präferenznachweis gilt für die Ausfuhr aus der EU in ein Land (EUR.1, A.TR, Erklärung zum Ursprung auf der Rechnung, REX), mit Wert…`
-- `ratgeber_suchen`: `Sucht in den Seiten von zoll.agency (Ratgeber, Themen, Werkzeuge, Leistungen) wie das Suchfeld der Seite und gibt höchstens 10 Treffer mit…`
+- `ratgeber_suchen`: `Sucht in den Seiten von zoll.agency zu Ausfuhr und Einfuhr (Ratgeber, Themen, Werkzeuge, Leistungen) wie das Suchfeld der Seite und gibt hö…`
+- `vorpruefung`: `Die Vorprüfung von zoll.agency mit den Angaben einer Handelsrechnung, die der Assistent aus der Rechnung übernimmt: Versender und Empfänger…`
 - `warennummer_suchen`: `Sucht mit Wörtern oder einer Nummer (2 bis 11 Ziffern) in der Kombinierten Nomenklatur und zeigt höchstens 10 Codes mit dem amtlichen Wortl…`
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-10: [count changed, description changed, tool added, tool removed](../../deltas/2026-11-10/4a6b54c7b92fc67af28d.json): `2 tool(s) added; 1 tool(s) removed; 3 field(s) changed; signals: length_more_than_doubled`
 
 ## Check it from your agent
 
