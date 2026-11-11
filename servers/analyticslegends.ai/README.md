@@ -6,36 +6,39 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://analyticslegends.ai/mcp` | 23 | [`bdf98b65c19b`](44700875edd0c1c1f674.json) | 2026-11-10 |
+| `https://analyticslegends.ai/mcp` | 25 | [`9dfe896b5b2f`](44700875edd0c1c1f674.json) | 2026-11-11 |
 
 ## Tools at `https://analyticslegends.ai/mcp`
 
-- `count_firms_by`: `Answer a COUNTING question about the published firm directory in one call: how many organisations per country, per REGION (the six-value ge…`
-- `find_academy_modules`: `Search the Analytics Legends Academy — the written training modules on SAP Datasphere, Business Data Cloud, SAP Analytics Cloud, BW/4HANA a…`
-- `find_answers`: `Start here when someone asks about an SAP AI & analytics PROBLEM rather than a term. Matches a natural question, in English, French or Germ…`
-- `find_opportunities`: `Search every SAP contract and permanent-role posting Analytics Legends publishes to an ANONYMOUS visitor. Only the SITE RADAR leg below is…`
-- `find_partner_candidates`: `Rank the LOCAL service providers of a target country or region — the firms a practice partners with, subcontracts to, or acquires to enter…`
-- `find_sap_clients`: `Search the SAP END-CUSTOMER corpus — the companies that RUN SAP, not the firms that sell services (those are search_firms). This is the pai…`
-- `get_academy_module`: `Read one Academy training module in full — body, learning objectives and summary, EN, FR and DE — the written course corpus the Consultant…`
-- `get_concept`: `Fetch one concept entry by slug: title, category, level, tags and the editor's summary. Written by a named human editor, not generated. 'le…`
-- `get_concept_card`: `The FULL encyclopaedia card for one concept — body, cheat sheet, glossary, pro tip, and the four analysis tables (decision table, peer comp…`
-- `get_day_rate_benchmark`: `The PUBLIC day-rate aggregate for SAP AI & analytics freelance work: min/max daily rate by country, specialisation and seniority — 'daily_r…`
-- `get_expansion_brief`: `The one-call brief a services practice reads before opening a subsidiary in another region: providers already there (by kind and by country…`
-- `get_firm`: `Fetch one organisation from the published directory by its database slug ('rows[].slug' from search_firms, verbatim). Returns the same publ…`
-- `get_firm_intel`: `The paid intelligence profile of a services firm — SAP practice size and partner level, delivery flags per product, typical day rate and se…`
-- `get_sap_client_profile`: `The full profile of one SAP end-customer — SAP footprint (products in use, modules known), analytics solutions, identity and evidence field…`
-- `get_study`: `Read one Analytics Legends study BODY — the paid text behind list_studies' metadata. Requires the API key of an MCP Pass or Firm account (t…`
-- `list_firm_kinds`: `Breakdown of the published firm directory by organisation kind, with a live row count per kind. Use this before search_firms to know what t…`
-- `list_freelance_platforms`: `The subset of the published directory where a consultant can CREATE A PROFILE — freelance marketplaces, job boards with candidate profiles,…`
-- `list_sap_modules`: `The canonical SAP module/product taxonomy Analytics Legends classifies against (codes and EN/FR labels by category). Use it to normalise a…`
-- `list_studies`: `List the Analytics Legends deep-research studies with their edition, as-of date, audience, word count and canonical URL. METADATA ONLY: stu…`
-- `query_knowledge_graph`: `The RELATIONS between the platform's teaching objects — which Academy module teaches which concept, which study covers which module, what a…`
-- `search_concepts`: `Search the SAP AI & analytics concept encyclopaedia — the vocabulary of the stack, written for practitioners. Returns slug, title, category…`
-- `search_firms`: `Search the published Analytics Legends directory of SAP AI & analytics service providers — placement agencies, Big-4 and ESN practices, SAP…`
-- `search_news`: `Search the Analytics Legends market-news corpus. It is watched FOR SAP AI & analytics (Datasphere, Business Data Cloud, SAC, BW/4HANA, Data…`
+- `count_firms_by`: `Count the firm directory by country, region, kind, module or sap_signal_band, with search_firms' filters, instead of paging search_firms to…`
+- `find_academy_modules`: `Search the Academy training catalogue (Datasphere, BDC, SAC, BW/4HANA, Databricks) by text, track or level. Rows are in the language asked.…`
+- `find_answers`: `Start here for an SAP AI & analytics PROBLEM, asked in EN, FR or DE (agents in production, Joule value, BW 7.5 cliff, BDC vs Datasphere vs…`
+- `find_opportunities`: `Search public SAP AI & analytics postings. Mostly PERMANENT roles: set employment_type for freelance questions. A posting listed in several…`
+- `find_partner_candidates`: `Rank local service providers of a country or region as partner or acquisition candidates; local_only (default) excludes foreign groups' sub…`
+- `find_sap_clients`: `Search the SAP END-CUSTOMER corpus (companies that run SAP); each row says its verification status. Paid: MCP Pass or Firm Pass key.`
+- `get_academy_module`: `Read one Academy module in full (body, objectives, summary) by id or slug from find_academy_modules; 'lang' picks one language. Paid: MCP P…`
+- `get_concept`: `One concept's metadata and editor's summary by slug from search_concepts (e.g. 'sap-business-data-cloud-bdc'). The card body, cheat sheet a…`
+- `get_concept_card`: `The full concept card: body, cheat sheet, glossary, pro tip and the four analysis tables, EN/FR/DE. Paid: MCP Pass or Firm Pass key.`
+- `get_day_rate_benchmark`: `Published SAP freelance day-rate aggregate by country, specialisation and seniority: min/max (median, p10, p90 when sourced) in the row's c…`
+- `get_expansion_brief`: `Brief for entering a region: providers there (local vs group), SAP end-customer counts by country and industry, live opportunities, brand f…`
+- `get_firm`: `One firm's public profile by its slug from search_firms (verbatim; some slugs are numeric). A brand name such as 'accenture' returns the li…`
+- `get_firm_intel`: `Intelligence profile of a services firm: SAP practice size, partner level, products delivered, typical day rate, notable clients. Search by…`
+- `get_sap_client_profile`: `One SAP end-customer's full profile (products in use, modules, analytics solutions, evidence) by id from find_sap_clients. Paid: MCP Pass o…`
+- `get_study`: `Read a study's text: without 'section' returns the section list and introduction, then pass a heading as 'section'. Slugs from list_studies…`
+- `list_firm_kinds`: `The organisation kinds of the firm directory with a live count each — the vocabulary of search_firms' 'kind'. Public, complete without a ke…`
+- `list_freelance_platforms`: `Platforms where an SAP consultant can create a profile (freelance marketplaces, job boards, expert networks), with signup URL, confidence g…`
+- `list_sap_modules`: `The SAP module/product taxonomy (codes such as DATASPHERE, BDC, SAC, BW4HANA with labels) that other tools filter on; use it to map loose w…`
+- `list_studies`: `List the deep-research studies: title, edition, as-of date, audience, word count, citation_url, one row per study in the language asked. Me…`
+- `query_knowledge_graph`: `Relations between concepts, Academy modules, studies and vendors: list nodes (node_type, query) or one node's edges (node_id). The only too…`
+- `request_introduction`: `ACTION: a brief's anonymised selection, or with candidate_ref an introduction request the consultant answers in the app. Paid: MCP Pass or…`
+- `search_concepts`: `Search the SAP AI & analytics concept encyclopaedia (the stack's vocabulary): slug, title, category, level, editor's summary. Full card: ge…`
+- `search_firms`: `Search SAP AI & analytics service providers (consultancies, Big-4, agencies, SAP partners, platforms). Returns slug, name, HQ, website, cla…`
+- `search_news`: `Search the curated SAP AI & analytics news corpus; defaults to SAP-specific items (scope 'sap'). Each item carries source_url (the publishe…`
+- `submit_brief`: `ACTION: deposit an SAP need as a private brief, matched every 6 h against consenting consultants; nothing is e-mailed. Paid: MCP Pass or Fi…`
 
 ## Changes
 
+- 2026-11-11: [annotation changed, count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-11/44700875edd0c1c1f674.json): `2 tool(s) added; 1131 field(s) changed`
 - 2026-11-10: [description changed, schema changed](../../deltas/2026-11-10/44700875edd0c1c1f674.json): `3 field(s) changed`
 - 2026-11-08: [annotation changed, description changed, field changed, schema changed](../../deltas/2026-11-08/44700875edd0c1c1f674.json): `29 field(s) changed`
 - 2026-11-07: [count changed, tool added](../../deltas/2026-11-07/44700875edd0c1c1f674.json): `1 tool(s) added`
@@ -55,7 +58,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - 2026-09-22: [description changed, schema changed](../../deltas/2026-09-22/44700875edd0c1c1f674.json): `3 field(s) changed`
 - 2026-09-20: [description changed](../../deltas/2026-09-20/44700875edd0c1c1f674.json): `3 field(s) changed; signals: length_more_than_doubled`
 - 2026-09-18: [description changed, schema changed](../../deltas/2026-09-18/44700875edd0c1c1f674.json): `68 field(s) changed`
-- 2026-09-09: [description changed](../../deltas/2026-09-09/44700875edd0c1c1f674.json): `2 field(s) changed`
 
 ## Check it from your agent
 

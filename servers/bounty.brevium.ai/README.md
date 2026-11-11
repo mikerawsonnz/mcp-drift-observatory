@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://bounty.brevium.ai/mcp` | 13 | [`a7f28bd36623`](afec8f21ecfee3276880.json) | 2026-10-25 |
+| `https://bounty.brevium.ai/mcp` | 13 | [`4fe531d494ea`](afec8f21ecfee3276880.json) | 2026-11-11 |
 
 ## Tools at `https://bounty.brevium.ai/mcp`
 
@@ -26,7 +26,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-11: [description changed, schema changed](../../deltas/2026-11-11/afec8f21ecfee3276880.json): `3 field(s) changed`
 
 ## Check it from your agent
 

@@ -1,69 +1,100 @@
 {
   "canon_version": "1",
-  "full_hash": "bdf98b65c19bf1f017b2cd31bf18512357470246f8a96acad328e5b53ccdfe08",
+  "full_hash": "9dfe896b5b2fb6b7452cb458d22293fcfc62bc84c0ba21c8645aee35e826e007",
   "name": "ai.analyticslegends/sap-analytics",
-  "observed_at": "2026-11-10T02:04:35.960355Z",
+  "observed_at": "2026-11-11T02:03:45.237260Z",
   "sources": [
     "official"
   ],
-  "tool_count": 23,
+  "tool_count": 25,
   "tools": [
     {
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "Search the SAP AI & analytics firm directory"
+        "readOnlyHint": true
       },
-      "description": "Search the published Analytics Legends directory of SAP AI & analytics service providers — placement agencies, Big-4 and ESN practices, SAP vendors, platforms and community groups — by country, region (EMEA · AMER · LATAM · APAC · AFRICA), kind, declared SAP module and free text. Returns name, HQ country/city, website, careers URL and a one-line editorial claim. SAP END-CUSTOMER companies are NOT in this directory: they are a separate paid dataset, excluded here by the `is_client` FLAG — not by the `client_enterprise` kind code. The two are different columns, and where a row's flag and its kind label disagree in the SSOT it is the flag that decides what this tool serves, so read the flag's meaning into the answer and not the label's. PAGINATED WITH A KEY (a free one is enough): the whole matched set is reachable — pass `_meta.next_cursor` back as `cursor` with the same filters until it is null. Without a key: first 10 rows only, no cursor. When `query` is set, rows are ordered by how well the NAME matches it (exact, then prefix, then substring), and rows matching only the description come last; without `query` the order is the directory's own quality ranking.",
+      "description": "Start here for an SAP AI & analytics PROBLEM, asked in EN, FR or DE (agents in production, Joule value, BW 7.5 cliff, BDC vs Datasphere vs Databricks…). Returns up to 3 tracked challenges: short answer, what shipped, what is announced, next steps, citation_url. Empty = not a tracked challenge; try search_concepts. Public.",
       "inputSchema": {
-        "additionalProperties": false,
+        "properties": {
+          "audience": {
+            "description": "Reorders matches, never adds one.",
+            "enum": [
+              "cio_architect",
+              "consultant",
+              "firm",
+              "recruiter"
+            ],
+            "type": "string"
+          },
+          "lang": {
+            "description": "Default: language of the question.",
+            "enum": [
+              "EN",
+              "FR",
+              "DE"
+            ],
+            "type": "string"
+          },
+          "question": {
+            "description": "As asked, in EN, FR or DE.",
+            "examples": [
+              "What happens to BW 7.5 after 2027?"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "type": "object"
+      },
+      "name": "find_answers",
+      "outputSchema": {
+        "required": [
+          "rows"
+        ],
+        "type": "object"
+      },
+      "title": "Find the answer to an SAP AI & analytics problem"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Search SAP AI & analytics service providers (consultancies, Big-4, agencies, SAP partners, platforms). Returns slug, name, HQ, website, claim, sap_signal_band; SAP end-customers are in find_sap_clients. Public.",
+      "inputSchema": {
         "properties": {
           "country": {
-            "description": "ISO-3166-1 alpha-2 country code, e.g. DE, FR, CH.",
-            "pattern": "^[A-Za-z]{2}$",
+            "description": "ISO alpha-2.",
+            "examples": [
+              "DE"
+            ],
             "type": "string"
           },
           "cursor": {
-            "description": "Opaque token from a previous response's `_meta.next_cursor`. Pass it back with the SAME filter arguments; `null` means the last page. Changing a filter refuses the cursor.",
-            "maxLength": 512,
             "type": "string"
           },
           "kind": {
-            "description": "Restrict to one organisation kind. This list is the vocabulary the corpus holds today, not a frontier — call list_firm_kinds for the live one. A malformed code is refused; a well-formed code the corpus does not hold returns no rows. Neither case is silently ignored, and neither widens the result.",
-            "enum": [
-              "agency_placement",
-              "professional_services_big4",
-              "professional_services_esn",
-              "vendor_sap",
-              "vendor_partner",
-              "platform_marketplace",
-              "community_group",
-              "training_institution",
-              "client_enterprise",
-              "other"
-            ],
+            "description": "Organisation kind (list_firm_kinds).",
             "type": "string"
           },
           "limit": {
             "default": 10,
-            "description": "Max rows (hard cap 50).",
-            "maximum": 50,
-            "minimum": 1,
             "type": "integer"
           },
           "module": {
-            "description": "Restrict to organisations with a DECLARED link to one SAP module/product code (UPPERCASE snake_case, e.g. DATASPHERE, BDC, SAC, BW4HANA, S4HANA, JOULE — case-insensitive on input). The declared links are structured data, far more selective than free text: `count_firms_by {by:\"module\"}` gives the live vocabulary with counts. A minority of the directory declares any module at all, so this filter finds the DECLARED specialists — absence from the result means no declared link, never that the firm does not work on the module.",
+            "description": "SAP module code; list: count_firms_by by=module.",
+            "examples": [
+              "DATASPHERE"
+            ],
             "type": "string"
           },
           "query": {
-            "description": "Free-text filter, case-insensitive. EVERY word must appear in the record (substring per word, any order), so a natural-language phrase narrows the answer instead of having to match verbatim.",
-            "maxLength": 200,
+            "description": "All words must match.",
             "type": "string"
           },
           "region": {
-            "description": "Region code of the HQ country — the platform's six-value geography: EMEA (Europe AND the Middle East), AMER (North America), LATAM, APAC, AFRICA (its own region, not folded into EMEA), GLOBAL (country unknown). Case-insensitive on input; anything else is refused.",
             "enum": [
               "EMEA",
               "AMER",
@@ -79,127 +110,8 @@
       },
       "name": "search_firms",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "claim": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "founded_year": {
-                  "type": [
-                    "integer",
-                    "null"
-                  ]
-                },
-                "hq_city": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "hq_country": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "jobs_url": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "kind": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "kind_label": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "last_verified_at": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "name": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "region": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "sap_signal_band": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "size_bracket": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "slug": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "website": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
@@ -207,18 +119,14 @@
     },
     {
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "Count the firm directory by country, region, kind, module or SAP signal"
+        "readOnlyHint": true
       },
-      "description": "Answer a COUNTING question about the published firm directory in one call: how many organisations per country, per REGION (the six-value geography), per kind, per declared SAP module, or per SAP signal band — with the same `country`/`kind`/`module`/`query` filters `search_firms` takes, so you can count a slice as easily as the whole. Use this instead of paging `search_firms` and tallying rows: the directory holds thousands of organisations, and reading them all to produce a table of counts costs hundreds of calls and megabytes of rows for numbers Postgres computes in one scan. Every bucket is a value the directory actually stores; `value: null` is a real bucket meaning the field is unknown for those rows, and it is served rather than hidden — a country table that silently drops the rows with no country adds up to less than the population and says nothing about it.",
+      "description": "Count the firm directory by country, region, kind, module or sap_signal_band, with search_firms' filters, instead of paging search_firms to tally. Rows: value, n; the tail folds into '(other)'. Public.",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {
           "by": {
-            "description": "Which facet to count on. Required — there is no default worth guessing.",
+            "description": "Which facet to count on.",
             "enum": [
               "country",
               "region",
@@ -229,25 +137,22 @@
             "type": "string"
           },
           "country": {
-            "description": "ISO-3166-1 alpha-2 country code, e.g. DE, FR, CH.",
-            "pattern": "^[A-Za-z]{2}$",
+            "description": "ISO alpha-2.",
             "type": "string"
           },
           "kind": {
-            "description": "Restrict to one organisation kind before counting, same vocabulary as search_firms. Combining it with `by:\"kind\"` is legal and returns that single bucket.",
+            "description": "Organisation kind (list_firm_kinds).",
             "type": "string"
           },
           "module": {
-            "description": "Restrict to organisations with a DECLARED link to one SAP module code before counting, same vocabulary as search_firms' `module`. Combining it with `by:\"module\"` is legal and returns that single bucket (plus the null bucket).",
+            "description": "SAP module code; list: count_firms_by by=module.",
             "type": "string"
           },
           "query": {
-            "description": "Free-text filter, case-insensitive. EVERY word must appear in the record (substring per word, any order), so a natural-language phrase narrows the answer instead of having to match verbatim.",
-            "maxLength": 200,
+            "description": "All words must match.",
             "type": "string"
           },
           "region": {
-            "description": "Region code of the HQ country — the platform's six-value geography: EMEA (Europe AND the Middle East), AMER (North America), LATAM, APAC, AFRICA (its own region, not folded into EMEA), GLOBAL (country unknown). Case-insensitive on input; anything else is refused.",
             "enum": [
               "EMEA",
               "AMER",
@@ -266,55 +171,8 @@
       },
       "name": "count_firms_by",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "n": {
-                  "type": [
-                    "integer",
-                    "null"
-                  ]
-                },
-                "value": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
@@ -322,18 +180,14 @@
     },
     {
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "Get one firm's published profile"
+        "readOnlyHint": true
       },
-      "description": "Fetch one organisation from the published directory by its database slug (`rows[].slug` from search_firms, verbatim). Returns the same public fields plus `partnerships_declared`, the count of partnerships this directory records for the firm — 0 on ~77 % of rows (re-measured 2026-09-30 on the published tranche: 77,1 %; it read ~97 % until the 2026-09-30 brand-family pass derived 3 730 sibling links from sister entities), meaning none recorded here, never that the firm has no partners; a `sibling` link is a reading of shared brand, not a declared org chart. Does not return the paid firm-intelligence profile, contacts, or any person.",
+      "description": "One firm's public profile by its slug from search_firms (verbatim; some slugs are numeric). A brand name such as 'accenture' returns the list of its entities to choose from. Public.",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {
           "slug": {
-            "description": "The DATABASE slug, taken verbatim from search_firms.rows[].slug. It is not always the web slug in citation_url: a minority of published rows carry a numeric firm id instead (365 of them on 2026-08-09 — the population is read at query time and returned as `_meta.tranche_total_row_count`, never written down here). get_firm{slug:\"00393\"} is GULP, whose page is /companies/gulp/. Deriving a slug from the citation URL fails on those rows, and deriving it from the NAME is not safe either; carry rows[].slug across instead. A slug this tool refuses is not proof the firm is absent from the market or even from the database — the published tranche is an editorial subset, and a row the editor has not published is refused here exactly as a wrong slug is.",
+            "description": "search_firms.rows[].slug, verbatim.",
             "type": "string"
           }
         },
@@ -344,55 +198,8 @@
       },
       "name": "get_firm",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "name": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "slug": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
@@ -400,75 +207,18 @@
     },
     {
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "List firm kinds with live counts"
+        "readOnlyHint": true
       },
-      "description": "Breakdown of the published firm directory by organisation kind, with a live row count per kind. Use this before search_firms to know what the population actually is instead of guessing.",
+      "description": "The organisation kinds of the firm directory with a live count each — the vocabulary of search_firms' `kind`. Public, complete without a key.",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {},
         "type": "object"
       },
       "name": "list_firm_kinds",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "kind": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "label": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "n": {
-                  "type": [
-                    "integer",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
@@ -476,35 +226,25 @@
     },
     {
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "List the CV/profile platforms a consultant can sign up on"
+        "readOnlyHint": true
       },
-      "description": "The subset of the published directory where a consultant can CREATE A PROFILE — freelance marketplaces, job boards with candidate profiles, talent platforms and expert networks — each with its signup URL, an editorial confidence grade and the date it was assessed. This answers the entering-contractor's first practical question ('where do I register?') in one call. Everything here is also in search_firms — this tool adds the platform fields and the filter, never a wider population. `signup_url` is the platform's own page: it was verified on `assessed_at`, and a platform absent here is not proven to refuse signups — it is unassessed or unpublished.",
+      "description": "Platforms where an SAP consultant can create a profile (freelance marketplaces, job boards, expert networks), with signup URL, confidence grade and assessment date. Public, complete without a key.",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {
           "country": {
-            "description": "ISO-3166-1 alpha-2 country code, e.g. DE, FR, CH.",
-            "pattern": "^[A-Za-z]{2}$",
+            "description": "ISO alpha-2.",
             "type": "string"
           },
           "cursor": {
-            "description": "Opaque token from a previous response's `_meta.next_cursor`. Pass it back with the SAME filter arguments; `null` means the last page. Changing a filter refuses the cursor.",
-            "maxLength": 512,
             "type": "string"
           },
           "limit": {
-            "default": 10,
-            "description": "Max rows (hard cap 50).",
-            "maximum": 50,
-            "minimum": 1,
+            "default": 50,
             "type": "integer"
           },
           "platform_type": {
-            "description": "Restrict to one platform type, lowercase snake_case. The live vocabulary with counts is `_meta.available_platform_types` on every response — a well-formed unknown value returns no rows, it never widens the result.",
+            "description": "Live list: _meta.available_platform_types.",
             "type": "string"
           }
         },
@@ -512,87 +252,8 @@
       },
       "name": "list_freelance_platforms",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "assessed_at": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "confidence": {
-                  "description": "Editorial confidence in the signup assessment.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "hq_country": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "name": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "platform_type": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "signup_url": {
-                  "description": "The platform's own signup/profile-creation page, verified on assessed_at.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "slug": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
@@ -600,28 +261,24 @@
     },
     {
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "Search the public SAP AI & analytics contract radar"
+        "readOnlyHint": true
       },
-      "description": "Search every SAP contract and permanent-role posting Analytics Legends publishes to an ANONYMOUS visitor. Only the SITE RADAR leg below is the population a human browses on /opportunities/, where each of its postings has its own prerendered page; the PROMOTED leg is served to agents only — it is not listed on /opportunities/ and its rows have no page of their own (citation_scope \"section_hub\"). It merges the platform's TWO public legs, which are near-disjoint (measured 2026-07-30: 1 row in common): (a) the PROMOTED feed (`public.public_opportunities`) — general SAP work (FI/CO, SD, EWM, MDG, BTP, ABAP), all German cities, dated (posted_at is populated on all but a few % of the live rows of that leg — the undated rows are sorted LAST and paginate like the others). 🔴 THIS LEG CHANGED SHAPE ON 2026-08-28: until then it was fed by three keyless APIs and carried no contract_type, country_code, expires_at or rate at all; it was then loaded from the site radar and now declares contract_type and country_code on most of its rows, an expiry on most, and an advertised rate on a small minority. Do NOT assume a field is null on this leg — read the `_meta` counters on YOUR OWN response, which are computed at query time; (b) the SITE RADAR (`/api/contracts-lean.json`) — these carry country, category, seniority, posted_at, `employment_type` and, on most of them, `expires_at`; they are the analytics-specific ones (SAC Planning, Datasphere Technical Lead, Business Data Cloud). READ `employment_type` BEFORE CALLING THIS A CONTRACT MARKET: the radar is mostly PERMANENT roles, so an unfiltered page answers a freelance question with salaried jobs unless you filter. The argument of the same name does the filtering, and `_meta.tranche_total_row_count` on your own response is the live population — read the split from a filtered call, never from a figure quoted in this text. TWO DIFFERENT RATE FIELDS, AND THEY MEAN DIFFERENT THINGS. `currency` / `daily_rate_min` / `daily_rate_max` are the posting's OWN advertised rate and are almost always null — most listings publish no rate at all. `rate_band` is the platform's editorial benchmark for that posting's (seniority × product × region) cell. It is a SUBSCRIBER surface of the WEBSITE, not of this server: the radar file this server reads carries no band since 2026-08-29, so `rate_band` is null on EVERY row here, with or without a key (each response's `_meta.rate_band_coverage` counts it). The panel grid itself covers European cells only — DACH, FR/Benelux, UK/IE, Southern EU, Eastern EU, Nordics — so a posting in the Americas, APAC, Africa or the Middle East has no band at ANY tier: never promise one for it. It is `rate_basis: \"panel_inferred\"` — Eursap n=312 plus the Analytics Legends operator panel, permanent rows restated as a TJM equivalent at ~220 billable days a year — NOT a rate this employer offered. Quote it as a band with its `basis`, `kind` and `source`, never as the posting's rate, and never average bands across postings: many rows share one cell. WHAT IS GATED IS A FIELD, NOT A ROW: on most radar rows `source_url` is null and `application_link` reads \"members_only\" — the verified link to the original listing is the paid deliverable (MCP Pass or Firm Pass key). Everything else about the posting is public, and `citation_url` is that posting's own page on analyticslegends.ai. Quote it. Report `_meta.tranche_row_count` as the published public population, never as the size of the market.",
+      "description": "Search public SAP AI & analytics postings. Mostly PERMANENT roles: set employment_type for freelance questions. A posting listed in several cities is one row with `locations`. Public, except the link to the original listing (paid).",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {
           "country": {
-            "description": "ISO-3166-1 alpha-2 code, applied to both legs as a predicate on the row's own country_code. It NO LONGER selects the site-radar leg alone: the promoted feed carried country_code on almost none of its rows until 2026-08-28 and now carries it on most, so a country filter now returns both legs. A row still without one is dropped because it does not match, not because its leg was excluded by assumption. `_meta.match_count_by_leg` shows what each leg contributed on YOUR call — read the split there, never from a figure quoted in this text.",
-            "pattern": "^[A-Za-z]{2}$",
+            "description": "ISO alpha-2.",
+            "examples": [
+              "DE"
+            ],
             "type": "string"
           },
           "cursor": {
-            "description": "Opaque token from a previous response's `_meta.next_cursor`. Pass it back with the SAME filter arguments; `null` means the last page. Changing a filter refuses the cursor.",
-            "maxLength": 512,
             "type": "string"
           },
           "eligibility": {
-            "description": "WHO MAY APPLY to a remote posting, read from the posting's own text: `open` (it explicitly opens the role across borders — worldwide, anywhere, a time-zone band such as EMEA/CET hours, nearshore welcome), `restricted` (it requires residence, citizenship, work authorisation, a clearance or US W-2 status somewhere, or scopes the remote work to a region — `eligibility_region` on the row names it when stated), `unstated` (it says nothing). Combine with remote_mode=\"remote\" for the contractor abroad. AN UNSTATED ROW IS NOT AN OPEN ROW: most remote postings say nothing about where the contractor may be, so `open` sets them aside and `_meta.eligibility_undeclared` counts how many remote rows THIS call read are silent. Classified deterministically from title, location and (promoted leg) description; the site-radar leg publishes no description, so its rows are mostly `unstated`.",
+            "description": "Who may apply to a remote role.",
             "enum": [
               "open",
               "restricted",
@@ -630,7 +287,7 @@
             "type": "string"
           },
           "employment_type": {
-            "description": "Restrict to one engagement type. THE RADAR IS MOSTLY PERMANENT, so a freelance or contract question answered off an unfiltered page is answered with salaried jobs. For the actual split, make the filtered call and read `_meta.tranche_total_row_count` — it is counted at query time. The promoted leg declared NO contract_type until 2026-08-28 and now declares one on most of its rows, so a value here no longer drops that leg wholesale — only the rows still silent. THOSE ROWS ARE NOT A FOURTH TYPE AND NOT PERMANENT ONES: `_meta.available_employment_types` counts only what declares, and `_meta.employment_type_undeclared` carries the rest, so the two together are the rows THIS call read (`_meta.employment_mix_rows_read` — a window, NOT the tranche: `_meta.tranche_total_row_count` is the population) and either alone is not even that. Read both before quoting a mix, and quote the window with it.",
+            "description": "Rows that declare none are set aside.",
             "enum": [
               "freelance",
               "contract",
@@ -639,28 +296,27 @@
             "type": "string"
           },
           "lang": {
-            "description": "Reading language for the TITLE — 'EN' (default), 'FR' or 'DE'. This is a RENDERING choice, never a filter: it changes which string `title` carries, never which rows come back. Read `title_lang` on every row for the language actually served: it differs from what you asked for exactly when that translation does not exist (the live FR/DE coverage is counted on every response in `_meta.untranslated_leg`), and the verbatim is served instead, labelled with the language the harvest chain measured. `source_lang` always carries the language the ADVERTISER wrote in, translated or not. The promoted leg has no translated columns at all: its rows ignore this argument and say so with `title_lang: null` — see `_meta.untranslated_leg`.",
-            "pattern": "^[A-Za-z]{2}$",
+            "default": "EN",
+            "description": "Title language; not a filter.",
             "type": "string"
           },
           "limit": {
             "default": 10,
-            "description": "Max rows (hard cap 50).",
-            "maximum": 50,
-            "minimum": 1,
             "type": "integer"
           },
           "location": {
-            "description": "City or place, matched case-insensitively as a substring of the posting's location. The promoted leg is all-German (Hamburg, Frankfurt am Main, Bremen, Munich, Cologne, Dortmund, Hanover, Landshut, Mannheim, Stuttgart); the site-radar leg is worldwide.",
+            "description": "City or place, substring match.",
             "type": "string"
           },
           "query": {
-            "description": "Free-text filter, case-insensitive. EVERY word must appear in the record (substring per word, any order), so a natural-language phrase narrows the answer instead of having to match verbatim.",
-            "maxLength": 200,
+            "description": "All words must match.",
+            "examples": [
+              "SAC Planning"
+            ],
             "type": "string"
           },
           "remote_mode": {
-            "description": "Restrict to one work-location policy: `remote`, `hybrid` or `onsite`. READ THIS BEFORE ANSWERING A REMOTE QUESTION: a large share of the radar declares no policy at all (`_meta.remote_mode_undeclared` carries the live count — roughly half the radar when last measured, and a frozen pair written here drifted ~30% in two days), and an undeclared row is NOT an on-site row — it is a posting that does not say. Any value here therefore sets those rows aside rather than classifying them, exactly as the site's own filter does, and `_meta.remote_mode_undeclared` reports how many were set aside. The promoted leg carries its own `remote_mode` column and is filtered by the same predicate. Read `_meta.available_remote_modes` for the live spread before assuming a value exists.",
+            "description": "Undeclared rows set aside.",
             "type": "string"
           }
         },
@@ -668,252 +324,8 @@
       },
       "name": "find_opportunities",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "application_link": {
-                  "description": "`public` (source_url is served) or `members_only` (the link to the original listing is the paid deliverable, opened by an MCP Pass or Firm Pass key; the row and its facts stay public).",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "canonical_id": {
-                  "description": "Set when the site folded this posting into another one it judged identical: `citation_url` is then the page of THAT posting (`canonical_id`). When both are matched, only the canonical row is served and `_meta.duplicates_folded` counts the fold. Null otherwise.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "category": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "country_code": {
-                  "description": "ISO-3166-1 alpha-2 of the posting's own country. Null on almost all of the promoted leg.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "currency": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "daily_rate_max": {
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_min": {
-                  "description": "Only when the source declares a DAILY rate period — never converted from other periods.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "description": {
-                  "description": "Posting text, HTML stripped, clamped. Null on the radar leg.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "duration_months": {
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "eligibility": {
-                  "description": "Who may apply, read from the posting's own text: `open`, `restricted` or `unstated`. `unstated` means the text does not say — never read it as open.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "eligibility_region": {
-                  "description": "The ISO-3166-1 alpha-2 country, or EU / EMEA, the text names for that opening or restriction. Null when it names none.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "employment_type": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "expires_at": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "firm_name": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "id": {
-                  "description": "The posting's identity — stable across calls, key for dedup.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "leg": {
-                  "description": "`promoted` or `site_radar` — which of the two merged public legs served this row.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "location": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "posted_at": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "rate_band": {
-                  "description": "Editorial benchmark for this posting's (seniority × product × region) cell — NOT a rate the employer offered. `basis` and `kind` are inside the object on purpose, so no extraction can lift the numbers away from what they mean. 2026-08-29: this band is a SUBSCRIBER surface and is no longer carried by the public radar file this lane reads — expect it to be null here. The posting's OWN published rate, when it has one, stays in currency / daily_rate_min / daily_rate_max.",
-                  "type": [
-                    "object",
-                    "null"
-                  ]
-                },
-                "rate_period": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "remote_mode": {
-                  "description": "The posting's declared work-location policy (`remote` / `hybrid` / `onsite`). NULL means the posting does not say — never read it as on-site.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "salary_max": {
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "salary_min": {
-                  "description": "The posting's own advertised salary, YEARLY (see `salary_period`). Null when none was published, and null when the published amount cannot be a yearly salary — `salary_withheld_reason` then says why.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "salary_period": {
-                  "description": "`year` when salary_min/salary_max are served. Null otherwise — never a guessed unit.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "salary_withheld_reason": {
-                  "description": "Why a published salary was NOT served: `below_annual_floor` (the low end is below any yearly salary in that currency — a monthly or daily figure filed as a salary) or `board_estimate` (the job board's own min = max estimate, not the employer's). The amount is withheld, never converted. Null when nothing was withheld.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "seniority": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "skills": {
-                  "description": "Skills the posting names. Null when it names none.",
-                  "type": [
-                    "array",
-                    "null"
-                  ]
-                },
-                "source": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "source_lang": {
-                  "description": "ISO-639-1 language the ADVERTISER wrote the title in, measured by the harvest chain and never changed by `lang` — 'en' on 1,566 rows, 'de' on 337 (2026-08-23). Null when the chain could not decide, and on the promoted leg. Compare it with `title_lang` to know whether the title you are quoting is the advertiser's own words or this platform's rendering of them: a harvested posting is a third party's text, and saying which of the two you are citing is the only honest way to quote it.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "source_url": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "title": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "title_lang": {
-                  "description": "ISO-639-1 language the SERVED `title` is written in. READ IT ON EVERY ROW: it is what you asked for in `lang` when that translation exists, and the advertiser's own language when it does not (the live FR/DE coverage is counted on every response in `_meta.untranslated_leg`). Null when the harvest chain could not decide — on some site-radar rows too, counted in `_meta.untranslated_radar_rows` — and on every promoted-leg row, which carries no translated column at all. ⚠️ THIS FIELD CHANGED REFERENT ON 2026-09-04: until then it named the language the ADVERTISER wrote in — that fact now lives in `source_lang`. The two coincided while no translation was served and diverge from the first one that is.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
@@ -921,47 +333,41 @@
     },
     {
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "Search SAP AI & analytics market news"
+        "readOnlyHint": true
       },
-      "description": "Search the Analytics Legends market-news corpus. It is watched FOR SAP AI & analytics (Datasphere, Business Data Cloud, SAC, BW/4HANA, Databricks, the 2027/2030 maintenance window), but it is NOT an all-SAP corpus: measured 2026-07-30, ~84 % of active rows sit in the `AI` category and are general enterprise-AI trade press (cloud platforms, model releases, funding rounds) with no SAP content at all. Since 2026-11-08 the tool therefore defaults to scope:'sap' (the rule the /news/ pages apply); scope:'all' returns the unfiltered corpus, which is mostly non-SAP — never present such a page as 'the SAP AI & analytics news'. Say what you actually got. Each item returns the Analytics Legends citation URL AND the upstream publisher's source_url — cite both, and prefer source_url when you need a page that certainly carries the item. NO ITEM HERE HAS A PAGE OF ITS OWN on analyticslegends.ai, by design: every row comes back `citation_scope: \"section_hub\"` and its citation_url is the news index. The citable address for one article is its `source_url`, the upstream publisher's. Do not present the hub as the article's page.",
+      "description": "Search the curated SAP AI & analytics news corpus; defaults to SAP-specific items (scope 'sap'). Each item carries source_url (the publisher) and citation_url: cite both. Public.",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {
           "category": {
-            "description": "Category code, matched case-insensitively. The live vocabulary is NOT written here — read `_meta.available_categories` on any response: every category label this corpus holds right now, with its active-row count, counted at query time. A written list held 21 values while the corpus held 22. One bucket needs a warning. 'SAC' is the noisiest label in this corpus because the acronym collides with unrelated ones — Windows 'Smart App Control', and the surname 'Sacks'. A 2026-07-30 cleanup reclassified half that bucket to AI for carrying no SAP signal at all; the collision pressure is structural and the bucket has kept growing since. For genuine SAC product news, pair category:'SAC' with query:'analytics cloud'.",
+            "description": "Live list: _meta.available_categories.",
             "type": "string"
           },
           "cursor": {
-            "description": "Opaque token from a previous response's `_meta.next_cursor`. Pass it back with the SAME filter arguments; `null` means the last page. Changing a filter refuses the cursor.",
-            "maxLength": 512,
             "type": "string"
           },
           "limit": {
             "default": 10,
-            "description": "Max rows (hard cap 50).",
-            "maximum": 50,
-            "minimum": 1,
             "type": "integer"
           },
           "published_since": {
-            "description": "Lower bound on `published_at`, inclusive, as YYYY-MM-DD. Without a bound a period question is only answerable by walking pages — and `_meta.match_count` then counts the QUERY, not the period, so any figure quoted for the window would be wrong.",
+            "description": "YYYY-MM-DD, inclusive.",
             "type": "string"
           },
           "published_until": {
-            "description": "Upper bound on `published_at`, INCLUSIVE of the day named, as YYYY-MM-DD. Combine with `published_since` for a window; `_meta.match_count` then describes that window, which is what makes it quotable.",
+            "description": "YYYY-MM-DD, inclusive.",
             "type": "string"
           },
           "query": {
-            "description": "Free-text filter, case-insensitive. EVERY word must appear in the record (substring per word, any order), so a natural-language phrase narrows the answer instead of having to match verbatim.",
-            "maxLength": 200,
+            "description": "All words must match.",
+            "examples": [
+              "Business Data Cloud"
+            ],
             "type": "string"
           },
           "scope": {
-            "description": "Editorial scope, set by one deterministic rule (2026-11-07): 'sap' = an SAP product or SAP itself named in the title or first sentence, or an SAP source; 'ecosystem' = adjacent data platforms, neighbouring ERP vendors, regulation, or SAP mentioned further down; 'general' = general AI. DEFAULT 'sap' since 2026-11-08 — the same inclusion rule as the /news/ pages; pass 'all' for the unfiltered corpus, which is mostly 'general'.",
+            "default": "sap",
+            "description": "Editorial scope, set by one deterministic rule (2026-11-07): 'sap' = an SAP product or SAP itself n…",
             "enum": [
               "sap",
               "ecosystem",
@@ -975,67 +381,8 @@
       },
       "name": "search_news",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "published_at": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "source_name": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "source_url": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "title": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
@@ -1043,35 +390,28 @@
     },
     {
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "Search the SAP AI & analytics concept encyclopaedia"
+        "readOnlyHint": true
       },
-      "description": "Search the SAP AI & analytics concept encyclopaedia — the vocabulary of the stack, written for practitioners. Returns slug, title, category, level, tags and the editor's summary. `level` is GRADED on every active row since 2026-09-18 (the CHECK constraint accepted only the legacy vocabulary OR NULL, so the loader wrote NULL rather than fail; 108 of 330 were blank). A null, if one ever returns, means 'not graded', never 'Beginner'. These are the same fields `get_concept` returns for ONE slug. The card BODY (cheat sheet, glossary, pro tip and the four analysis tables) is paid (MCP Pass or Firm Pass key): call `get_concept_card`. Why-it-matters and key points are NOT served by this endpoint either, but they are published in full on the concept page at citation_url — follow the URL for those, a plan buys the body, not them.",
+      "description": "Search the SAP AI & analytics concept encyclopaedia (the stack's vocabulary): slug, title, category, level, editor's summary. Full card: get_concept_card (paid). Public.",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {
           "category": {
-            "description": "Concept category, matched case-insensitively as an exact value OR a prefix — so category:\"datasphere\" reaches 'Datasphere Core'. The values are long human labels, not codes. DO NOT GUESS THEM FROM THIS TEXT: the live vocabulary with a row count per label comes back as `_meta.available_categories` on EVERY call, including a call that matched nothing. A list written here would say 14 labels with 2026-07-30 counts; the corpus holds 15 today, and five of those counts have moved. Read the envelope, not the prose.",
+            "description": "Category name or prefix, e.g. datasphere.",
             "type": "string"
           },
           "cursor": {
-            "description": "Opaque token from a previous response's `_meta.next_cursor`. Pass it back with the SAME filter arguments; `null` means the last page. Changing a filter refuses the cursor.",
-            "maxLength": 512,
             "type": "string"
           },
           "limit": {
             "default": 10,
-            "description": "Max rows (hard cap 50).",
-            "maximum": 50,
-            "minimum": 1,
             "type": "integer"
           },
           "query": {
-            "description": "Free-text filter, case-insensitive. EVERY word must appear in the record (substring per word, any order), so a natural-language phrase narrows the answer instead of having to match verbatim.",
-            "maxLength": 200,
+            "description": "All words must match.",
+            "examples": [
+              "data product"
+            ],
             "type": "string"
           }
         },
@@ -1079,55 +419,8 @@
       },
       "name": "search_concepts",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "slug": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "title": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
@@ -1135,18 +428,17 @@
     },
     {
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "Concept metadata and editor's summary (public)"
+        "readOnlyHint": true
       },
-      "description": "Fetch one concept entry by slug: title, category, level, tags and the editor's summary. Written by a named human editor, not generated. `level` is GRADED on every active row since 2026-09-18 (the CHECK constraint accepted only the legacy vocabulary OR NULL, so the loader wrote NULL rather than fail; 108 of 330 were blank). A null, if one ever returns, means 'not graded', never 'Beginner'. The card body, cheat sheet, glossary, pro tip and the four analysis tables are subscriber content and are NOT returned. Why-it-matters and key points are not returned here either, but they ARE published in full on the concept page at citation_url — follow the URL for those.",
+      "description": "One concept's metadata and editor's summary by slug from search_concepts (e.g. 'sap-business-data-cloud-bdc'). The card body, cheat sheet and tables are paid (get_concept_card). Public.",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {
           "slug": {
-            "description": "Concept slug from search_concepts.",
+            "description": "search_concepts.rows[].slug.",
+            "examples": [
+              "sap-business-data-cloud-bdc"
+            ],
             "type": "string"
           }
         },
@@ -1157,98 +449,35 @@
       },
       "name": "get_concept",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "slug": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "summary": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "title": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
-      "title": "Concept metadata and editor's summary (public)"
+      "title": "Concept metadata and editor's summary"
     },
     {
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "List the deep-research studies (metadata only)"
+        "readOnlyHint": true
       },
-      "description": "List the Analytics Legends deep-research studies with their edition, as-of date, audience, word count and canonical URL. METADATA ONLY: study bodies are a paid deliverable, served by `get_study` on this same endpoint with an MCP Pass or Firm Pass key. Use this to tell a reader that a study exists and where to read it. ONE ROW IS ONE LANGUAGE EDITION, NOT ONE STUDY: each study is published in every language it has been translated into, so `_meta.tranche_total_row_count` counts editions and `_meta.distinct_studies` counts the works. `_meta.available_languages` gives the live per-language counts; each row carries its `editions` list. Pass `lang` to get one row per study.",
+      "description": "List the deep-research studies: title, edition, as-of date, audience, word count, citation_url, one row per study in the language asked. Metadata only; the text is get_study (paid). Public.",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {
           "cursor": {
-            "description": "Opaque token from a previous response's `_meta.next_cursor`. Pass it back with the SAME filter arguments; `null` means the last page. Changing a filter refuses the cursor.",
-            "maxLength": 512,
             "type": "string"
           },
           "lang": {
-            "description": "ISO-639-1 language of the EDITION to list, e.g. en, fr or de — each study is published as one row per language. Omit it to see every edition of every study; the live list of languages actually present comes back as `_meta.available_languages` on every response. A well-formed code the corpus does not hold returns 0 rows.",
-            "pattern": "^[A-Za-z]{2}$",
+            "default": "en",
+            "description": "en, fr or de.",
             "type": "string"
           },
           "limit": {
             "default": 10,
-            "description": "Max rows (hard cap 50).",
-            "maximum": 50,
-            "minimum": 1,
             "type": "integer"
           },
           "query": {
-            "description": "Free-text filter, case-insensitive. EVERY word must appear in the record (substring per word, any order), so a natural-language phrase narrows the answer instead of having to match verbatim.",
-            "maxLength": 200,
+            "description": "All words must match.",
             "type": "string"
           }
         },
@@ -1256,88 +485,8 @@
       },
       "name": "list_studies",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "access": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "as_of": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "editions": {
-                  "items": {
-                    "type": "string"
-                  },
-                  "type": [
-                    "array",
-                    "null"
-                  ]
-                },
-                "lang": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "slug": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "title": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "word_count": {
-                  "type": [
-                    "integer",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
@@ -1345,27 +494,28 @@
     },
     {
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": true,
-        "readOnlyHint": true,
-        "title": "Public SAP AI & analytics day-rate aggregate"
+        "readOnlyHint": true
       },
-      "description": "The PUBLIC day-rate aggregate for SAP AI & analytics freelance work: min/max daily rate by country, specialisation and seniority — `daily_rate_min` / `daily_rate_max` (plus `daily_rate_median`, `daily_rate_p10`, `daily_rate_p90` when the source publishes them), every amount in the row's own `currency` — with source, source date, confidence and the sample the source states. This is the free aggregate published at analyticslegends.ai/api/market-rates.json, and it is SMALL — a few dozen rows at most, every one of them a secondary source (a published market study or a job-board scan), and `sample_size` is null on most of them. NO COUNT IS WRITTEN HERE ON PURPOSE: `_meta.tranche_total_row_count` and the rows themselves are the live measure. A frozen pair stood here until 2026-08-27 — '11 rows on 2026-08-09 … sample_size null on 8 of them' — and the second half was WRONG (7 of 11) while the first was still right, which is the whole argument against writing either. NOTHING IS HELD BACK BEHIND IT: there is no paid counterpart to this aggregate. The community-contribution path exists (public.rate_contributions) but publishes nothing yet — v_community_rate_aggregates and v_rate_index are still empty, because a contributed rate only surfaces once a cell holds enough submissions to be reported without identifying anyone. So whatever percentile a source row happens to carry is served here, free, to everyone. The GB row carries a median, p10 and p90, and its own note says its min/max ARE the 25th and 75th percentiles. What is missing from this answer is missing from THIS aggregate; it is not a paid tier. THIS IS NOT THE ONLY RATE THE PLATFORM PUBLISHES, AND ON THE QUESTIONS THIS MARKET ASKS MOST IT IS THE THINNER ONE. The website carries a `rate_band` per live radar posting for signed-in subscribers — a panel-inferred P25–P75 band per (seniority × product × region) cell, Eursap n=312 plus the Analytics Legends operator panel. This server does not serve it (`find_opportunities.rate_band` is null on every row, with or without a key). The grid covers EUROPEAN cells only — DACH, FR/Benelux, UK/IE, Southern EU, Eastern EU, Nordics — and there it prices exactly the cells this small aggregate cannot (Senior Datasphere DACH, Senior BDC DACH), where `specialisation:\"bdc\"` here returns nothing. When this tool comes back empty for a country × product: in one of those European regions, say the AGGREGATE holds no row and that subscribers read the platform's band on the posting pages; ANYWHERE ELSE (Americas, APAC, Africa, Middle East) say the platform publishes no rate for that cell at any tier — never that subscribers get one. The two are different instruments: this one is a published market study, that one is an editorial benchmark attached to a live posting. Read `_meta.available_countries` / `available_specialisations` / `available_seniorities` — they are computed from the aggregate on every call — before concluding that a rate is unpublished, and quote each row with its own currency, its confidence and its source date.",
+      "description": "Published SAP freelance day-rate aggregate by country, specialisation and seniority: min/max (median, p10, p90 when sourced) in the row's currency, with source, date and confidence. Small, secondary sources; 0 rows = no such cell here, see `_meta.available_*`. Public.",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {
           "country": {
-            "description": "ISO-3166-1 alpha-2 country code, e.g. DE, FR, CH.",
-            "pattern": "^[A-Za-z]{2}$",
+            "description": "ISO alpha-2.",
+            "examples": [
+              "FR"
+            ],
             "type": "string"
           },
           "seniority": {
-            "description": "e.g. senior, principal.",
+            "description": "e.g. senior.",
             "type": "string"
           },
           "specialisation": {
-            "description": "A specialisation code, matched exactly. The live list is `_meta.available_specialisations` on every call — no list is kept here, because a written one went stale. Codes are NOT evenly spread across countries: read the rows a country filter returns. A code this aggregate does not hold (bdc, joule) returns 0 rows and the available codes; it never widens to a neighbouring band. 0 rows here is an absence in THIS aggregate only — see the tool description for what the website's subscriber band covers and where no rate exists at any tier.",
+            "description": "Live list: _meta.available_specialisations.",
+            "examples": [
+              "datasphere"
+            ],
             "type": "string"
           }
         },
@@ -1373,445 +523,8 @@
       },
       "name": "get_day_rate_benchmark",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "accessed": {
-                  "description": "date the source was read (YYYY-MM-DD)",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "basis": {
-                  "description": "external_published_median | external_published_range | panel — see /api/market-rates.json _meta.basis_values.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "client_market": {
-                  "description": "india_domestic (INR, Indian client) | eu_uk_remote (EUR, India-based contractor billed to an EU/UK client). Set on the India rows only.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "confidence": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "conversion": {
-                  "description": "how an hourly or monthly source figure was turned into a day rate",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "country": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "currency": {
-                  "description": "ISO-4217 unit of every daily_rate_* amount on THIS row (EUR, GBP, CHF) — never an envelope constant.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "daily_rate_max": {
-                  "description": "Upper bound of the published band, in `currency`.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_max_aud": {
-                  "description": "DEPRECATED — read daily_rate_max + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_max_chf": {
-                  "description": "DEPRECATED — read daily_rate_max + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_max_eur": {
-                  "description": "DEPRECATED — read daily_rate_max + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_max_gbp": {
-                  "description": "DEPRECATED — read daily_rate_max + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_max_hkd": {
-                  "description": "DEPRECATED — read daily_rate_max + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_max_inr": {
-                  "description": "DEPRECATED — read daily_rate_max + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_max_jpy": {
-                  "description": "DEPRECATED — read daily_rate_max + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_max_nzd": {
-                  "description": "DEPRECATED — read daily_rate_max + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_max_sgd": {
-                  "description": "DEPRECATED — read daily_rate_max + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_max_usd": {
-                  "description": "DEPRECATED — read daily_rate_max + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_max_zar": {
-                  "description": "DEPRECATED — read daily_rate_max + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_median": {
-                  "description": "Median when the source publishes one, in `currency`.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_median_aud": {
-                  "description": "DEPRECATED — read daily_rate_median + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_median_eur": {
-                  "description": "DEPRECATED — read daily_rate_median + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_median_gbp": {
-                  "description": "DEPRECATED — read daily_rate_median + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_median_hkd": {
-                  "description": "DEPRECATED — read daily_rate_median + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_median_inr": {
-                  "description": "DEPRECATED — read daily_rate_median + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_median_jpy": {
-                  "description": "DEPRECATED — read daily_rate_median + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_median_nzd": {
-                  "description": "DEPRECATED — read daily_rate_median + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_median_sgd": {
-                  "description": "DEPRECATED — read daily_rate_median + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_median_zar": {
-                  "description": "DEPRECATED — read daily_rate_median + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_min": {
-                  "description": "Lower bound of the published band, in `currency`.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_min_aud": {
-                  "description": "DEPRECATED — read daily_rate_min + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_min_chf": {
-                  "description": "DEPRECATED — read daily_rate_min + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_min_eur": {
-                  "description": "DEPRECATED — read daily_rate_min + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_min_gbp": {
-                  "description": "DEPRECATED — read daily_rate_min + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_min_hkd": {
-                  "description": "DEPRECATED — read daily_rate_min + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_min_inr": {
-                  "description": "DEPRECATED — read daily_rate_min + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_min_jpy": {
-                  "description": "DEPRECATED — read daily_rate_min + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_min_nzd": {
-                  "description": "DEPRECATED — read daily_rate_min + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_min_sgd": {
-                  "description": "DEPRECATED — read daily_rate_min + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_min_usd": {
-                  "description": "DEPRECATED — read daily_rate_min + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_min_zar": {
-                  "description": "DEPRECATED — read daily_rate_min + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_p10": {
-                  "description": "10th percentile when the source publishes one, in `currency`.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_p10_gbp": {
-                  "description": "DEPRECATED — read daily_rate_p10 + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_p90": {
-                  "description": "90th percentile when the source publishes one, in `currency`.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "daily_rate_p90_gbp": {
-                  "description": "DEPRECATED — read daily_rate_p90 + currency.",
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "indicative": {
-                  "description": "true = orientation only: the source is a proxy (non-SAP BI band, generic ERP, agency monthly contract or marketing average). Never quote it as the SAP AI & analytics rate of its country.",
-                  "type": [
-                    "boolean",
-                    "null"
-                  ]
-                },
-                "note": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "sample_basis": {
-                  "description": "What `sample_size` counts (profiles, vacancies…), when the source says.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "sample_size": {
-                  "description": "The sample the SOURCE states behind this row; null when it states none — never estimated.",
-                  "type": [
-                    "integer",
-                    "null"
-                  ]
-                },
-                "sap_scope": {
-                  "description": "what the source actually measures: sap_analytics | sap_general | erp_general | bi_non_sap",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "seniority": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "source": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "source_date": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "source_period": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "source_type": {
-                  "description": "primary_agency_guide | primary_job_ads | primary_salary_survey | aggregator | marketing",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "source_url": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "specialisation": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "trend": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "yoy_change_pct": {
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
@@ -1819,31 +532,21 @@
     },
     {
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "SAP AI & analytics module taxonomy"
+        "readOnlyHint": true
       },
-      "description": "The canonical SAP module/product taxonomy Analytics Legends classifies against (codes and EN/FR labels by category). Use it to normalise a user's loose product wording — 'SAC', 'Analytics Cloud', 'Datasphere' — onto the codes the other tools filter on.",
+      "description": "The SAP module/product taxonomy (codes such as DATASPHERE, BDC, SAC, BW4HANA with labels) that other tools filter on; use it to map loose wording to a code. Public, complete without a key.",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {
           "cursor": {
-            "description": "Opaque token from a previous response's `_meta.next_cursor`. Pass it back with the SAME filter arguments; `null` means the last page. Changing a filter refuses the cursor.",
-            "maxLength": 512,
             "type": "string"
           },
           "limit": {
-            "default": 10,
-            "description": "Max rows (hard cap 50).",
-            "maximum": 50,
-            "minimum": 1,
+            "default": 50,
             "type": "integer"
           },
           "query": {
-            "description": "Free-text filter, case-insensitive. EVERY word must appear in the record (substring per word, any order), so a natural-language phrase narrows the answer instead of having to match verbatim.",
-            "maxLength": 200,
+            "description": "All words must match.",
             "type": "string"
           }
         },
@@ -1851,61 +554,8 @@
       },
       "name": "list_sap_modules",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "category": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "code": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "label_en": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
@@ -1913,39 +563,41 @@
     },
     {
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "Search the Academy training catalogue"
+        "readOnlyHint": true
       },
-      "description": "Search the Analytics Legends Academy — the written training modules on SAP Datasphere, Business Data Cloud, SAP Analytics Cloud, BW/4HANA and Databricks — by track, level and free text. `_meta.tranche_total_row_count` carries the live catalogue size on every call; it is the only count to quote. Returns the catalogue entry: id, slug, EN/FR title, track, level, duration in minutes, tags and the editor's summary. DO NOT CONFUSE IT WITH `list_sap_modules`, which serves a different population under the same word: that one is the 40-row PRODUCT taxonomy (codes such as SAC, DATASPHERE) used to normalise product wording. This one is the course catalogue. Without `query`, rows come back in the catalogue's own CURRICULUM order — the order a reader is meant to take them in — track by track. This catalogue is written training, NOT SAP certification tracks: this server publishes no certification data at any tier, so a certification question has no answer here rather than a partial one. CATALOGUE ONLY — the module BODY is subscriber content, served by `get_academy_module` on this same endpoint with an API key of an MCP Pass or Firm account. On THIS endpoint the paid tranche is opened by the MCP Pass (€29.90/month, analyticslegends.ai/mcp-server/) or the Firm Pass, from one key; the Consultant and Legend web plans do not include MCP access. `status` and `is_preview` are SERVED, never filtered on: they are the two flags the WEBSITE marks free access with (a free analyticslegends.ai account reads those modules on the site, M001 Datasphere Foundations included), NOT a free lane of this server — `get_academy_module` requires an MCP Pass or Firm Pass key for every module (a free account's key gets only the fixed daily showcase). They do not coincide (measured 2026-08-16: 38 rows `status='available'`, 56 rows `is_preview`), and you decide which one your answer needs. PAGINATED WITH A KEY (a free one is enough): pass `_meta.next_cursor` back as `cursor` with the same filters until it is null; without a key, first 10 rows only. Read `_meta.available_tracks` and `_meta.available_levels` — both counted on the served population at call time — before assuming a facet value exists.",
+      "description": "Search the Academy training catalogue (Datasphere, BDC, SAC, BW/4HANA, Databricks) by text, track or level. Rows are in the language asked. Full text: get_academy_module (paid). Public.",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {
           "cursor": {
-            "description": "Opaque token from a previous response's `_meta.next_cursor`. Pass it back with the SAME filter arguments; `null` means the last page. Changing a filter refuses the cursor.",
-            "maxLength": 512,
+            "type": "string"
+          },
+          "lang": {
+            "default": "EN",
+            "description": "EN or FR.",
+            "enum": [
+              "EN",
+              "FR"
+            ],
             "type": "string"
           },
           "level": {
-            "description": "Restrict to one level, matched case-insensitively: Beginner · Intermediate · Advanced · Expert. Counts in `_meta.available_levels`.",
+            "description": "Beginner, Intermediate, Advanced or Expert.",
             "type": "string"
           },
           "limit": {
             "default": 10,
-            "description": "Max rows (hard cap 50).",
-            "maximum": 50,
-            "minimum": 1,
             "type": "integer"
           },
           "query": {
-            "description": "Free-text filter, case-insensitive. EVERY word must appear in the record (substring per word, any order), so a natural-language phrase narrows the answer instead of having to match verbatim.",
-            "maxLength": 200,
+            "description": "All words must match.",
+            "examples": [
+              "datasphere"
+            ],
             "type": "string"
           },
           "track": {
-            "description": "Restrict to one track, by SLUG (`databricks-data-eng`) or by English name (`Databricks & Data Eng.`), matched case-insensitively. The live vocabulary with per-track counts is `_meta.available_tracks` on every response. The numeric track_id is deliberately NOT accepted — it is an internal counter, and passing `6` would look like naming a subject.",
+            "description": "Track slug or English name.",
             "type": "string"
           }
         },
@@ -1953,139 +605,8 @@
       },
       "name": "find_academy_modules",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "duration_minutes": {
-                  "type": [
-                    "number",
-                    "null"
-                  ]
-                },
-                "id": {
-                  "description": "Module id, e.g. M001 — the value get_academy_module takes.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "is_preview": {
-                  "description": "The second free-access marker of the WEBSITE. Does NOT coincide with status — read both. It does not open get_academy_module without a key.",
-                  "type": [
-                    "boolean",
-                    "null"
-                  ]
-                },
-                "level": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "slug": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "status": {
-                  "description": "Editorial access marker: 'available' or 'legend-pass'. Served, not filtered on. 'legend-pass' is a LEGACY label from when the paid web plan was called Legend; it sits on the majority of rows and does not say who can read the body here. On this endpoint every module body (get_academy_module) is opened by an MCP Pass or Firm Pass key, whatever this field says. The site stopped rendering this field on 2026-07-26; this endpoint still serves the raw value.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "summary_en": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "summary_fr": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "tags": {
-                  "items": {
-                    "type": "string"
-                  },
-                  "type": [
-                    "array",
-                    "null"
-                  ]
-                },
-                "title_en": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "title_fr": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "track_name_en": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "track_name_fr": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "track_slug": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "updated_at": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
@@ -2093,23 +614,18 @@
     },
     {
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "Traverse the learning knowledge graph"
+        "readOnlyHint": true
       },
-      "description": "The RELATIONS between the platform's teaching objects — which Academy module teaches which concept, which study covers which module, what a concept relates to. THIS IS THE ONLY TOOL ON THIS SERVER THAT SERVES EDGES; the others serve rows. Ask it what connects to what, not what exists. SCOPE, AND IT IS NARROWER THAN 'the knowledge graph': it carries four node types — `concept`, `module`, `study`, `vendor` — and every edge whose BOTH endpoints are one of them. The whole graph holds twelve node types; the eight it does not carry are each either served by their own tool or named as not served at all, and `_meta.excluded_node_types` says which per type (consultant data is served at NO tier), so a missing type is a documented boundary and never a silent gap. Call it with `node_id` (e.g. `module:M178`, `concept:C001`, `study:ai-impact-2026-EN`) to walk one node's neighbourhood; with `node_type` and/or `query` to find a node id first. `edge_type` and `direction` narrow a walk. Read `_meta.available_edge_types` — computed from the served projection on every call — before assuming an edge type exists.",
+      "description": "Relations between concepts, Academy modules, studies and vendors: list nodes (node_type, query) or one node's edges (node_id). The only tool that serves edges. Public.",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {
           "cursor": {
-            "description": "Opaque token from a previous response's `_meta.next_cursor`. Pass it back with the SAME filter arguments; `null` means the last page. Changing a filter refuses the cursor.",
-            "maxLength": 512,
             "type": "string"
           },
           "direction": {
-            "description": "Which side of the edge `node_id` must sit on. Default `both`. Ignored without `node_id`, and the response says so rather than pretending it applied.",
+            "default": "both",
+            "description": "Which side of the edge `node_id` must sit on.",
             "enum": [
               "from",
               "to",
@@ -2118,31 +634,31 @@
             "type": "string"
           },
           "edge_type": {
-            "description": "Restrict a walk to one relation. The authority is `_meta.available_edge_types`, computed on every call — no list is kept here: a four-name list once stood here while the projection served five, then a five-name list while it served six (`broader`).",
+            "description": "Live list: _meta.available_edge_types.",
             "type": "string"
           },
           "lang": {
-            "description": "ISO-639-1 language for the LABELS — en, fr or de. Defaults to en. The fallback is declared and never silent: the language asked for, then English, then French, and `_meta.label_language_coverage` says on how many nodes each language is actually filled. Concept and module titles carry French; German arrives as the corpus is translated, and an untranslated node falls back rather than being hidden.",
-            "pattern": "^[A-Za-z]{2}$",
+            "default": "en",
+            "description": "en, fr or de.",
             "type": "string"
           },
           "limit": {
             "default": 10,
-            "description": "Max rows (hard cap 50).",
-            "maximum": 50,
-            "minimum": 1,
             "type": "integer"
           },
           "node_id": {
-            "description": "Fully-qualified node id, `<type>:<id>` — `module:M178`, `concept:C001`, `study:ai-impact-2026-EN`, `vendor:alteryx`. With it, rows are that node's EDGES (one row per neighbour). Without it, rows are NODES.",
+            "description": "<type>:<id>; returns its edges.",
+            "examples": [
+              "concept:C001"
+            ],
             "type": "string"
           },
           "node_type": {
-            "description": "Restrict to one carried node type: concept · module · study · vendor. Read `_meta.available_node_types`.",
+            "description": "concept, module, study or vendor.",
             "type": "string"
           },
           "query": {
-            "description": "Case-insensitive substring of a node's label. Applies to the NODE listing, not to a walk. Matched against the label SERVED, so it follows `lang`.",
+            "description": "Substring of a node label (node listing only).",
             "type": "string"
           }
         },
@@ -2150,220 +666,26 @@
       },
       "name": "query_knowledge_graph",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "direction": {
-                  "description": "`out` = node_id → neighbour, `in` = neighbour → node_id, `both` = the relation is stored in both directions (served once — see `_meta.symmetric_edges_folded`). Walk rows only.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "edge_type": {
-                  "description": "Present only on a walk (when `node_id` was given).",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "label": {
-                  "description": "In the language asked for when the node carries it, else the declared fallback — see `label_lang`.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "label_lang": {
-                  "description": "The language the served `label` is actually written in. It differs from the requested `lang` exactly when that translation does not exist.",
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "node_id": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "node_type": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
       "title": "Traverse the learning knowledge graph"
     },
     {
-      "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
-        "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "Find the answer to an SAP AI & analytics problem"
-      },
-      "description": "Start here when someone asks about an SAP AI & analytics PROBLEM rather than a term. Matches a natural question, in English, French or German, to the twelve ranked challenges Analytics Legends tracks: agents in production, Joule value, AI cost, AI-ready data, on-premise reach, the open ecosystem, the BW cliff, BDC versus Datasphere versus Databricks, staffing, roadmap volatility, EU compliance, end of BI 4.3. Returns at most three rows: the short answer, what shipped, what is announced, what slipped or is unconfirmed, facts outside the status registry with their source and quality, next steps, review date and citation_url. Statuses are read from the SAP announcement registry; a date is a plan, not a commitment. An empty result means the question is outside these challenges: say so and use search_concepts, find_academy_modules or get_day_rate_benchmark.",
-      "inputSchema": {
-        "additionalProperties": false,
-        "properties": {
-          "audience": {
-            "description": "Who is asking. It only reorders challenges that already matched, it never adds one.",
-            "enum": [
-              "cio_architect",
-              "consultant",
-              "firm",
-              "recruiter"
-            ],
-            "type": "string"
-          },
-          "lang": {
-            "description": "Language of the answer. Omit it to answer in the language detected from the question, EN, FR or DE.",
-            "enum": [
-              "EN",
-              "FR",
-              "DE"
-            ],
-            "type": "string"
-          },
-          "question": {
-            "description": "The question as the person asked it, in English, French or German. Full sentences match best.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "question"
-        ],
-        "type": "object"
-      },
-      "name": "find_answers",
-      "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "answer": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "challenge_id": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "confidence": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "reviewed_at": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "title": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
-        ],
-        "type": "object"
-      },
-      "title": "Find the answer to an SAP AI & analytics problem"
-    },
-    {
       "_meta": {
         "ai.analyticslegends/requiresTier": "consultant"
       },
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "Full concept card (MCP Pass)"
+        "readOnlyHint": true
       },
-      "description": "The FULL encyclopaedia card for one concept — body, cheat sheet, glossary, pro tip, and the four analysis tables (decision table, peer comparison, named pitfalls, performance facts), EN, FR and DE, plus why-it-matters and key points (those two are also published free on the concept page; here they come structured, in three languages, in the same payload) — the corpus the Consultant web plan sells. On THIS endpoint the paid tranche is opened by the MCP Pass (€29.90/month, analyticslegends.ai/mcp-server/) or the Firm Pass, from one key; the Consultant and Legend web plans do not include MCP access. Requires the API key of an MCP Pass or Firm account (Authorization: Bearer alk_…) — the Consultant and Legend web plans do not include MCP access; without one this tool refuses and get_concept keeps serving the public metadata. Find slugs with search_concepts.",
+      "description": "The full concept card: body, cheat sheet, glossary, pro tip and the four analysis tables, EN/FR/DE. Paid: MCP Pass or Firm Pass key.",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {
           "slug": {
-            "description": "Concept slug, verbatim from search_concepts.rows[].slug.",
+            "description": "search_concepts.rows[].slug.",
             "type": "string"
           }
         },
@@ -2374,94 +696,35 @@
       },
       "name": "get_concept_card",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "body_en": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "slug": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "title_en": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
-      "title": "Full concept card (MCP Pass)"
+      "title": "Full concept card"
     },
     {
       "_meta": {
         "ai.analyticslegends/requiresTier": "consultant"
       },
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "Read a study (MCP Pass)"
+        "readOnlyHint": true
       },
-      "description": "Read one Analytics Legends study BODY — the paid text behind list_studies' metadata. Requires the API key of an MCP Pass or Firm account (the Consultant and Legend web plans do not include MCP access). Bodies run to 38k words and exceed the 256 KiB response ceiling, so this tool serves STRUCTURE first: called without `section` it returns the section list and the introduction; pass `section` (a heading from that list, matched case-insensitively) to read one section. Find slugs and languages with list_studies.",
+      "description": "Read a study's text: without `section` returns the section list and introduction, then pass a heading as `section`. Slugs from list_studies. Paid: MCP Pass or Firm Pass key.",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {
           "lang": {
             "default": "en",
-            "description": "ISO-639-1 language of the edition, e.g. en or fr. Defaults to en.",
-            "pattern": "^[A-Za-z]{2}$",
+            "description": "Edition language.",
             "type": "string"
           },
           "section": {
-            "description": "A section heading from a previous call's `sections` list. Omit to get the list.",
-            "maxLength": 200,
+            "description": "A heading from `sections`; omit for the list.",
             "type": "string"
           },
           "slug": {
-            "description": "Study slug, verbatim from list_studies.rows[].slug.",
+            "description": "list_studies.rows[].slug.",
             "type": "string"
           }
         },
@@ -2472,87 +735,30 @@
       },
       "name": "get_study",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "section_heading": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "slug": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "title": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
-      "title": "Read a study (MCP Pass)"
+      "title": "Read a study"
     },
     {
       "_meta": {
         "ai.analyticslegends/requiresTier": "consultant"
       },
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "Read an Academy module (MCP Pass)"
+        "readOnlyHint": true
       },
-      "description": "Read one Academy training module in full — body, learning objectives and summary, EN, FR and DE — the written course corpus the Consultant web plan sells. Modules marked free on the website (M001 Datasphere Foundations included) are free to read THERE with a free account; on this endpoint they are served like every other module, with an MCP Pass or Firm Pass key. A free account's key gets only the daily taste: the fixed showcase modules that an unfiltered `find_academy_modules` call serves first, the same for every account. On THIS endpoint the paid tranche is opened by the MCP Pass (€29.90/month, analyticslegends.ai/mcp-server/) or the Firm Pass; the Consultant and Legend web plans do not include MCP access. Requires an API key of an MCP Pass or Firm account (Authorization: Bearer alk_…); without one this tool refuses and `find_academy_modules` keeps serving the catalogue. Takes the module id (`M001`) or its slug (`datasphere-foundations`), both matched case-insensitively — `find_academy_modules` returns both on every row, and `query_knowledge_graph` returns the same ids as `module:M001` node ids, so a graph walk now ENDS somewhere. The module is served in one call. `lang` (en · fr · de) returns that language only; without it the three languages come back together — EXCEPT when the three would exceed the response ceiling (the Datasphere foundations course M001, rewritten as a full training on 2026-10-28, weighs 423 KB in three languages): the English text is then served alone and `filters.lang` says so — call again with lang=fr or lang=de for the other two.",
+      "description": "Read one Academy module in full (body, objectives, summary) by id or slug from find_academy_modules; `lang` picks one language. Paid: MCP Pass or Firm Pass key.",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {
           "id": {
-            "description": "Module id (`M001`) or slug (`datasphere-foundations`), verbatim from find_academy_modules.rows[].id / .slug.",
+            "description": "Module id (M001) or slug.",
             "type": "string"
           },
           "lang": {
-            "description": "Serve this language only. Omit it to get all three, unless they would exceed the response ceiling — then English alone is served and filters.lang says so.",
+            "description": "One language only; omit for all three.",
             "enum": [
               "en",
               "fr",
@@ -2568,121 +774,44 @@
       },
       "name": "get_academy_module",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "body_en": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "id": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "objectives_en": {
-                  "description": "Learning objectives, one per element — a text[] column, not a paragraph.",
-                  "items": {
-                    "type": "string"
-                  },
-                  "type": [
-                    "array",
-                    "null"
-                  ]
-                },
-                "slug": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "title_en": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
-      "title": "Read an Academy module (MCP Pass)"
+      "title": "Read an Academy module"
     },
     {
       "_meta": {
         "ai.analyticslegends/requiresTier": "legend"
       },
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "Search the SAP end-customer corpus (MCP Pass)"
+        "readOnlyHint": true
       },
-      "description": "Search the SAP END-CUSTOMER corpus — the companies that RUN SAP, not the firms that sell services (those are search_firms). This is the paid Legend+ dataset locked away from the public surface on 2026-07-08; it requires the API key of an MCP Pass or Firm account. Verification status is SERVED, never silently filtered: `sap_client_verification_status` and `status` are columns on every row ('verified' on a few hundred of ~15k rows — the exact counts are in _meta on every call, never in this text), and you decide what standard of proof your answer needs. `product` filters on the detected-adoption flags every profile already carries (the `uses_*` columns get_sap_client_profile serves): it keeps only rows where that product was DETECTED. A row it drops is 'not detected by our detection pass', never 'does not use it' — detection is a positive signal with no negative counterpart.",
+      "description": "Search the SAP END-CUSTOMER corpus (companies that run SAP); each row says its verification status. Paid: MCP Pass or Firm Pass key.",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {
           "country": {
-            "description": "ISO-3166-1 alpha-2 country code, e.g. DE, FR, CH.",
-            "pattern": "^[A-Za-z]{2}$",
+            "description": "ISO alpha-2.",
+            "examples": [
+              "DE"
+            ],
             "type": "string"
           },
           "cursor": {
-            "description": "Opaque token from a previous response's `_meta.next_cursor`. Pass it back with the SAME filter arguments; `null` means the last page. Changing a filter refuses the cursor.",
-            "maxLength": 512,
             "type": "string"
           },
           "industry": {
-            "description": "Industry or sector filter, matched case-insensitively.",
-            "maxLength": 200,
+            "description": "Substring match.",
             "type": "string"
           },
           "limit": {
             "default": 10,
-            "description": "Max rows (hard cap 50).",
-            "maximum": 50,
-            "minimum": 1,
             "type": "integer"
           },
           "product": {
-            "description": "Keep only end-customers where this SAP product was DETECTED in use. Absence from the result means undetected, not unused.",
+            "description": "Detected in use.",
             "enum": [
               "datasphere",
               "bdc",
@@ -2702,8 +831,7 @@
             "type": "string"
           },
           "query": {
-            "description": "Free-text filter, case-insensitive. EVERY word must appear in the record (substring per word, any order), so a natural-language phrase narrows the answer instead of having to match verbatim.",
-            "maxLength": 200,
+            "description": "All words must match.",
             "type": "string"
           }
         },
@@ -2711,96 +839,26 @@
       },
       "name": "find_sap_clients",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "country_code": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "id": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "industry": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "name": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "sap_client_verification_status": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
-      "title": "Search the SAP end-customer corpus (MCP Pass)"
+      "title": "Search the SAP end-customer corpus"
     },
     {
       "_meta": {
         "ai.analyticslegends/requiresTier": "legend"
       },
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "One SAP end-customer profile (MCP Pass)"
+        "readOnlyHint": true
       },
-      "description": "The full profile of one SAP end-customer — SAP footprint (products in use, modules known), analytics solutions, identity and evidence fields. Requires the API key of an MCP Pass or Firm account (the Consultant and Legend web plans do not include MCP access). `id` comes verbatim from find_sap_clients.rows[].id.",
+      "description": "One SAP end-customer's full profile (products in use, modules, analytics solutions, evidence) by id from find_sap_clients. Paid: MCP Pass or Firm Pass key.",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {
           "id": {
-            "description": "Profile id, verbatim from find_sap_clients.rows[].id.",
-            "maxLength": 160,
+            "description": "find_sap_clients.rows[].id.",
             "type": "string"
           }
         },
@@ -2811,78 +869,26 @@
       },
       "name": "get_sap_client_profile",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "id": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "name": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "sap_products_used": {}
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
-      "title": "One SAP end-customer profile (MCP Pass)"
+      "title": "One SAP end-customer profile"
     },
     {
       "_meta": {
         "ai.analyticslegends/requiresTier": "legend"
       },
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "Expansion brief for a target region (MCP Pass)"
+        "readOnlyHint": true
       },
-      "description": "The one-call brief a services practice reads before opening a subsidiary in another region: providers already there (by kind and by country, and how many are LOCAL entities versus members of multi-region groups), SAP end-customers there (by country and by industry — counts from the Legend corpus, never rows), live opportunities by country, and the BRIDGE GROUPS — brand families that hold entities both in the target region and in your home region (or anywhere else when `home_region` is omitted). Regions are the platform's six-value geography: EMEA holds Europe AND the Middle East, AFRICA is its own region, AMER is North America, LATAM and APAC are what they say, GLOBAL is the country-unknown bucket and is refused as a target. Day rates are NOT in this brief: call get_day_rate_benchmark per country; it answers only for the countries listed in its `available_countries` (Europe, the Middle East, North America and a few APAC countries at low/medium confidence) and refuses the rest rather than transpose a European band. Every count is read at query time from the SSOT. Requires the API key of an MCP Pass or Firm account (the Consultant and Legend web plans do not include MCP access).",
+      "description": "Brief for entering a region: providers there (local vs group), SAP end-customer counts by country and industry, live opportunities, brand families present in both regions. Paid: MCP Pass or Firm Pass key.",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {
           "home_region": {
-            "description": "Optional. The region you operate from today. When set, bridge groups are the families present in BOTH regions; when omitted, in the target region and any other.",
+            "description": "Where you operate today.",
             "enum": [
               "EMEA",
               "AMER",
@@ -2894,7 +900,7 @@
             "type": "string"
           },
           "target_region": {
-            "description": "The region you want to enter. One of EMEA, AMER, LATAM, APAC, AFRICA (GLOBAL is refused: it is not a market).",
+            "description": "Not GLOBAL.",
             "enum": [
               "EMEA",
               "AMER",
@@ -2913,151 +919,52 @@
       },
       "name": "get_expansion_brief",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "bridge_groups": {
-                  "type": [
-                    "array",
-                    "null"
-                  ]
-                },
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "end_customers": {
-                  "type": [
-                    "object",
-                    "null"
-                  ]
-                },
-                "home_region": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "opportunities": {
-                  "type": [
-                    "object",
-                    "null"
-                  ]
-                },
-                "professionals": {
-                  "type": [
-                    "object",
-                    "null"
-                  ]
-                },
-                "providers": {
-                  "type": [
-                    "object",
-                    "null"
-                  ]
-                },
-                "rates": {
-                  "type": [
-                    "object",
-                    "null"
-                  ]
-                },
-                "target_region": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
-      "title": "Expansion brief for a target region (MCP Pass)"
+      "title": "Expansion brief for a target region"
     },
     {
       "_meta": {
         "ai.analyticslegends/requiresTier": "legend"
       },
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "Local partner or acquisition candidates for a market entry (MCP Pass)"
+        "readOnlyHint": true
       },
-      "description": "Rank the LOCAL service providers of a target country or region — the firms a practice partners with, subcontracts to, or acquires to enter a market. `local_only` (default true) keeps firms with NO sister entity in another country (read from the brand-family key of the SSOT): a subsidiary of a global group is a competitor, not a partner. Filter by kind and by DECLARED SAP module; rows carry the declared modules, the sister countries of the brand (when any), the count of declared partnerships and the public directory fields. Ordered by SAP signal, then data completeness. `country` or `region` is required: a partner search without a target market is the whole directory. Paginated by cursor. Requires the API key of an MCP Pass or Firm account (the Consultant and Legend web plans do not include MCP access). No person, no e-mail — outreach details stay behind the platform's signed-URL path.",
+      "description": "Rank local service providers of a country or region as partner or acquisition candidates; local_only (default) excludes foreign groups' subsidiaries. Paid: MCP Pass or Firm Pass key.",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {
           "country": {
-            "description": "ISO-3166-1 alpha-2 country code, e.g. DE, FR, CH.",
-            "pattern": "^[A-Za-z]{2}$",
+            "description": "ISO alpha-2.",
+            "examples": [
+              "CH"
+            ],
             "type": "string"
           },
           "cursor": {
-            "description": "Opaque token from a previous response's `_meta.next_cursor`. Pass it back with the SAME filter arguments; `null` means the last page. Changing a filter refuses the cursor.",
-            "maxLength": 512,
             "type": "string"
           },
           "kind": {
-            "description": "Restrict to one provider kind (placement agencies, ESN/SI practices, Big-4, SAP partners, platforms). SAP's own entities, communities, schools and public bodies are never in this population.",
-            "enum": [
-              "agency_placement",
-              "professional_services_esn",
-              "professional_services_big4",
-              "vendor_partner",
-              "platform_marketplace",
-              "other"
-            ],
+            "description": "Organisation kind (list_firm_kinds).",
             "type": "string"
           },
           "limit": {
             "default": 10,
-            "description": "Max rows (hard cap 50).",
-            "maximum": 50,
-            "minimum": 1,
             "type": "integer"
           },
           "local_only": {
             "default": true,
-            "description": "true (default): only firms with no sister entity abroad. false: every provider of the market, groups included.",
+            "description": "true: firms with no sister entity abroad.",
             "type": "boolean"
           },
           "module": {
-            "description": "Restrict to firms with a DECLARED link to one SAP module code (UPPERCASE snake_case, e.g. DATASPHERE, BDC, SAC — call count_firms_by {by:\"module\"} for the live vocabulary). Absence means no declared link, never incapacity.",
+            "description": "SAP module code; list: count_firms_by by=module.",
             "type": "string"
           },
           "region": {
-            "description": "Region code of the HQ country — the platform's six-value geography: EMEA (Europe AND the Middle East), AMER (North America), LATAM, APAC, AFRICA (its own region, not folded into EMEA), GLOBAL (country unknown). Case-insensitive on input; anything else is refused.",
             "enum": [
               "EMEA",
               "AMER",
@@ -3073,153 +980,33 @@
       },
       "name": "find_partner_candidates",
       "outputSchema": {
-        "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
-            "type": "object"
-          },
-          "result_count": {
-            "type": "integer"
-          },
-          "rows": {
-            "items": {
-              "properties": {
-                "brand_family_key": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "declared_modules": {
-                  "type": [
-                    "array",
-                    "null"
-                  ]
-                },
-                "hq_city": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "hq_country": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "kind": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "name": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "partnerships_declared": {
-                  "type": [
-                    "integer",
-                    "null"
-                  ]
-                },
-                "region": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "sap_signal_band": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "sister_countries": {
-                  "type": [
-                    "array",
-                    "null"
-                  ]
-                },
-                "size_bracket": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "slug": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "website": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              },
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "tool": {
-            "type": "string"
-          }
-        },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "rows"
         ],
         "type": "object"
       },
-      "title": "Local partner or acquisition candidates for a market entry (MCP Pass)"
+      "title": "Local partner or acquisition candidates for a market entry"
     },
     {
       "_meta": {
         "ai.analyticslegends/requiresTier": "legend"
       },
       "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
         "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "Firm intelligence profile (MCP Pass)"
+        "readOnlyHint": true
       },
-      "description": "The paid intelligence profile of a services firm — SAP practice size and partner level, delivery flags per product, typical day rate and seniority, notable clients, analytics practice summary, and a LinkedIn company URL (present on ~71% of the corpus, re-measured 2026-09-05 on 9,104 profiles — it read ~39% from 2026-08-10 to 2026-09-05, i.e. a third of the corpus below the truth, because an enrichment pass filled the column and no reader of this sentence was told — glassdoor_rating, glassdoor_reviews_count and linkedin_followers are null on all but a handful of profiles, absence here is a data gap, not a signal). READ THE SPARSITY BEFORE QUOTING A ROW: on the 9,103 profiles measured 2026-08-23, `typical_day_rate_eur` is null on 78.0% and `sap_partner_level` on 85.7% — the two headline fields are the exception, not the rule, and a null means 'not researched', never 'no partner level'. Requires the API key of an MCP Pass or Firm account (the Consultant and Legend web plans do not include MCP access). Person-shaped fields (contacts, founders, leadership, recruiters, postal addresses) are NEVER served by this endpoint at any tier — they remain behind the platform's signed-URL path. Search by name; the public directory (search_firms) is a different, wider population.",
+      "description": "Intelligence profile of a services firm: SAP practice size, partner level, products delivered, typical day rate, notable clients. Search by name, country, product or engagement mode; a null is a data gap. Paid: MCP Pass or Firm Pass key.",
       "inputSchema": {
-        "additionalProperties": false,
         "properties": {
           "country": {
-            "description": "ISO-3166-1 alpha-2 country code, e.g. DE, FR, CH.",
-            "pattern": "^[A-Za-z]{2}$",
+            "description": "ISO alpha-2.",
             "type": "string"
           },
           "cursor": {
-            "description": "Opaque token from a previous response's `_meta.next_cursor`. Pass it back with the SAME filter arguments; `null` means the last page. Changing a filter refuses the cursor.",
-            "maxLength": 512,
             "type": "string"
           },
           "delivers": {
-            "description": "Keep only firms whose profile DECLARES delivery of this product (the `delivers_*` flags every row already carries). An undeclared flag drops the row: absence from the result means the profile does not declare it, not that the firm cannot deliver it.",
+            "description": "Declared by the firm.",
             "enum": [
               "datasphere",
               "bdc",
@@ -3240,13 +1027,10 @@
           },
           "limit": {
             "default": 3,
-            "description": "Max rows (hard cap 10 — these rows are wide).",
-            "maximum": 10,
-            "minimum": 1,
             "type": "integer"
           },
           "mode": {
-            "description": "Keep only firms whose profile declares this engagement mode (mode_freelance / mode_permanent / mode_subcontract). Same reading as `delivers`: declared-only.",
+            "description": "Declared by the firm.",
             "enum": [
               "freelance",
               "permanent",
@@ -3255,8 +1039,10 @@
             "type": "string"
           },
           "name": {
-            "description": "Firm name, matched case-insensitively; an exact name ranks first, then a name starting with it, then the other matches. Omit to browse the corpus by data completeness.",
-            "maxLength": 200,
+            "description": "Exact match ranks first.",
+            "examples": [
+              "Accenture"
+            ],
             "type": "string"
           }
         },
@@ -3264,61 +1050,133 @@
       },
       "name": "get_firm_intel",
       "outputSchema": {
+        "required": [
+          "rows"
+        ],
+        "type": "object"
+      },
+      "title": "Firm intelligence profile"
+    },
+    {
+      "_meta": {
+        "ai.analyticslegends/requiresTier": "legend"
+      },
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "ACTION: deposit an SAP need as a private brief, matched every 6 h against consenting consultants; nothing is e-mailed. Paid: MCP Pass or Firm Pass key.",
+      "inputSchema": {
         "properties": {
-          "_attribution": {
-            "type": "string"
-          },
-          "_meta": {
+          "architecture": {
+            "description": "recommend_architecture input.",
             "type": "object"
           },
-          "result_count": {
+          "budget_day_rate": {
             "type": "integer"
           },
-          "rows": {
+          "consent": {
+            "description": "Must be true.",
+            "type": "boolean"
+          },
+          "context": {
+            "type": "string"
+          },
+          "country": {
+            "description": "ISO alpha-2.",
+            "type": "string"
+          },
+          "duration_months": {
+            "type": "integer"
+          },
+          "idempotency_key": {
+            "description": "8-80 chars.",
+            "type": "string"
+          },
+          "languages": {
             "items": {
-              "properties": {
-                "citation_scope": {
-                  "enum": [
-                    "record",
-                    "section_hub"
-                  ],
-                  "type": "string"
-                },
-                "citation_url": {
-                  "type": "string"
-                },
-                "firm_id_unique": {},
-                "name": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "sap_partner_level": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "typical_day_rate_eur": {}
-              },
-              "type": "object"
+              "type": "string"
             },
             "type": "array"
           },
-          "tool": {
+          "remote_policy": {
+            "enum": [
+              "onsite",
+              "hybrid",
+              "remote"
+            ],
+            "type": "string"
+          },
+          "sap_products": {
+            "description": "1-8, such as Datasphere, BW/4HANA, Joule.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "seniority": {
+            "enum": [
+              "junior",
+              "mid",
+              "senior",
+              "architect"
+            ],
+            "type": "string"
+          },
+          "title": {
             "type": "string"
           }
         },
         "required": [
-          "tool",
-          "result_count",
-          "rows",
-          "_attribution"
+          "title",
+          "sap_products",
+          "country",
+          "consent",
+          "idempotency_key"
         ],
         "type": "object"
       },
-      "title": "Firm intelligence profile (MCP Pass)"
+      "name": "submit_brief",
+      "outputSchema": {
+        "required": [
+          "rows"
+        ],
+        "type": "object"
+      },
+      "title": "Submit a private SAP need"
+    },
+    {
+      "_meta": {
+        "ai.analyticslegends/requiresTier": "legend"
+      },
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "ACTION: a brief's anonymised selection, or with candidate_ref an introduction request the consultant answers in the app. Paid: MCP Pass or Firm Pass key.",
+      "inputSchema": {
+        "properties": {
+          "candidate_ref": {
+            "description": "Omit to read the selection.",
+            "type": "string"
+          },
+          "need_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "need_id"
+        ],
+        "type": "object"
+      },
+      "name": "request_introduction",
+      "outputSchema": {
+        "required": [
+          "rows"
+        ],
+        "type": "object"
+      },
+      "title": "Brief selection and introductions"
     }
   ],
   "url": "https://analyticslegends.ai/mcp"

@@ -6,22 +6,25 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://state.1court.ai/api/mcp` | 9 | [`763ac4ca9f0e`](c36a3ccafbf96b7eca38.json) | 2026-11-07 |
+| `https://state.1court.ai/api/mcp` | 11 | [`74988d947667`](c36a3ccafbf96b7eca38.json) | 2026-11-11 |
 
 ## Tools at `https://state.1court.ai/api/mcp`
 
 - `calculate_deadline`: `Calculate a court deadline from cited rules (weekends, court holidays, service extensions and local rules applied). Returns the date, each…`
+- `deadlines_from_trigger`: `Every deadline that follows one trigger event, like a docketing system: court, trigger, date in; all resulting deadlines out, each with its…`
 - `get_court_info`: `Get verified court information for one U.S. county: clerk contacts, courthouse address, e-filing provider and whether it is mandatory, fili…`
 - `get_rule`: `Get one deadline rule: its period, trigger, citation, the verbatim rule text, the official source URL, the 1Court rule page, any disclosed…`
 - `list_counties`: `List the counties covered in a U.S. state (full name, 2-letter code or slug), each with its 1Court page URL.`
 - `list_deadline_rules`: `List the deadline types 1Court can calculate for one rule set (TX, CA, CA-FAM, CA-APP, US, US-BK, US-CRIM, CA-PROB, CA-UD, CA-SC, CA-GOV, C…`
 - `list_rule_sets`: `List every deadline rule set 1Court covers, with rule counts and scope. Coverage: Deadlines: California in depth (civil, family, probate, e…`
 - `list_states`: `List the U.S. states in the 1Court Directory, with how many counties each has. Use this to discover coverage before looking up a county.`
+- `list_triggers`: `List the trigger events ("what happened": summons served, motion hearing date, trial date, notice of entry of judgment served...) that a co…`
 - `search_courts`: `Search the 1Court Directory by county or state name, courthouse name, city, or phone number. Returns matching counties and courthouses with…`
 - `search_rules`: `Find deadline rules by plain words (for example "opposition to motion", "answer complaint", "notice of appeal"). Searches rule names, ids,…`
 
 ## Changes
 
+- 2026-11-11: [count changed, tool added](../../deltas/2026-11-11/c36a3ccafbf96b7eca38.json): `2 tool(s) added`
 - 2026-11-07: [annotation changed, count changed, description changed, schema changed, tool added](../../deltas/2026-11-07/c36a3ccafbf96b7eca38.json): `3 tool(s) added; 13 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-04: [description changed, schema changed](../../deltas/2026-11-04/c36a3ccafbf96b7eca38.json): `3 field(s) changed`
 - 2026-10-29: [description changed, schema changed](../../deltas/2026-10-29/c36a3ccafbf96b7eca38.json): `3 field(s) changed`

@@ -6,17 +6,17 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.bluerate.ai/mcp` | 3 | [`86968d8c3a94`](8480c0b3b383f5f74749.json) | 2026-11-10 |
+| `https://api.bluerate.ai/mcp` | 3 | [`2bd2c20c2dbc`](8480c0b3b383f5f74749.json) | 2026-11-11 |
 
 ## Tools at `https://api.bluerate.ai/mcp`
 
-- `get_loan_officer`: `Get one loan officer's bluerate.ai profile by NMLS ID: name, company, licensed states, loan types, languages, about text, up to 3 client re…`
-- `request_callback`: `Ask a loan officer listed on bluerate.ai to call the user back. Returns confirmationUrl, a one-time bluerate link valid for 24 hours: give…`
-- `search_loan_officers`: `Find licensed US mortgage loan officers listed on bluerate.ai by state, optionally near a city or ZIP code, for a loan type (conventional,…`
+- `get_loan_officer`: `Returns one loan officer's bluerate.ai profile by NMLS ID: name, company, licensed states, loan types, languages, about text, up to 3 clien…`
+- `request_callback`: `Creates a one-time bluerate.ai link (confirmationUrl, valid for 24 hours) for asking a loan officer listed on bluerate.ai to call back. The…`
+- `search_loan_officers`: `Searches licensed US mortgage loan officers listed on bluerate.ai by state, optionally near a city or ZIP code, for a loan type (convention…`
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-11: [description changed, schema changed](../../deltas/2026-11-11/8480c0b3b383f5f74749.json): `5 field(s) changed`
 
 ## Check it from your agent
 

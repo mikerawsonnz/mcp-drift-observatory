@@ -1,0 +1,2859 @@
+{
+  "canon_version": "1",
+  "full_hash": "6c265d1cc6d0925476f85e91b14f509340cbd99298acadd9e990ddf0640f2550",
+  "name": "ai.a2uicatalog/catalog",
+  "observed_at": "2026-11-11T02:03:40.024405Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 40,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "list_catalogs"
+      },
+      "description": "List every A2UI catalog with a when-to-use, so you can pick the extension catalogs a surface needs. The base catalog (a2ui-atoms-v1) is always resolved.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_catalogs",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "baseCatalog": {
+            "description": "URI of the base catalog, always resolved.",
+            "type": "string"
+          },
+          "catalogs": {
+            "description": "Every catalog with a when-to-use.",
+            "items": {
+              "additionalProperties": true,
+              "description": "A catalog.",
+              "properties": {
+                "alwaysResolved": {
+                  "description": "True for the base catalog.",
+                  "type": "boolean"
+                },
+                "atomCount": {
+                  "description": "Atoms it holds.",
+                  "type": "integer"
+                },
+                "catalogId": {
+                  "description": "Catalog URI.",
+                  "type": "string"
+                },
+                "slug": {
+                  "description": "Short slug.",
+                  "type": "string"
+                },
+                "title": {
+                  "description": "Title.",
+                  "type": "string"
+                },
+                "whenToUse": {
+                  "description": "When to pick it.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "baseCatalog",
+          "catalogs"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "get_catalog"
+      },
+      "description": "Return one catalog's atoms (type + one-line description) so you know its vocabulary.",
+      "inputSchema": {
+        "properties": {
+          "catalog": {
+            "description": "catalog slug or catalogId URI",
+            "type": "string"
+          }
+        },
+        "required": [
+          "catalog"
+        ],
+        "type": "object"
+      },
+      "name": "get_catalog",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "atoms": {
+            "description": "The catalog's atoms, each with a type and one-line description.",
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "catalogId": {
+            "description": "Catalog URI.",
+            "type": "string"
+          },
+          "slug": {
+            "description": "Short slug.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Title.",
+            "type": "string"
+          },
+          "whenToUse": {
+            "description": "When to pick it.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "catalogId",
+          "slug",
+          "atoms"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "find_atoms"
+      },
+      "description": "Semantic search over the atom catalog: describe the UI piece you need in plain words and get the best-matching atoms, ranked best-first, each with a description and an example need. YOU choose from the list (the first entries are most likely, but check the descriptions), then call get_atom_schema for the one(s) you pick. Use this instead of scanning get_catalog when the vocabulary is large. Describe the need as a user would (e.g. \"let clients choose grooming services and see the total price\"), not by guessing an atom name.",
+      "inputSchema": {
+        "properties": {
+          "k": {
+            "description": "How many candidates to return (default 10, max 50). If none fits, rephrase the need or ask for more.",
+            "type": "integer"
+          },
+          "need": {
+            "description": "The UI piece you need, in plain words (one need per call)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "need"
+        ],
+        "type": "object"
+      },
+      "name": "find_atoms",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "also_named": {
+            "description": "Unranked atoms whose names share a word with the request.",
+            "items": {
+              "additionalProperties": true,
+              "description": "An atom.",
+              "properties": {
+                "description": {
+                  "description": "What it is for.",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "Atom type name.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "also_named_note": {
+            "description": "Why also_named is listed.",
+            "type": "string"
+          },
+          "atoms": {
+            "description": "Candidates, best first.",
+            "items": {
+              "additionalProperties": true,
+              "description": "A candidate.",
+              "properties": {
+                "description": {
+                  "description": "What the atom is for.",
+                  "type": "string"
+                },
+                "fits_need_like": {
+                  "description": "An example need the atom fits.",
+                  "type": "string"
+                },
+                "score": {
+                  "description": "Similarity score.",
+                  "type": "number"
+                },
+                "type": {
+                  "description": "Atom type name.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type",
+                "score",
+                "description"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "confident": {
+            "description": "True when the best score clears the rejection floor.",
+            "type": "boolean"
+          },
+          "count": {
+            "description": "Number of ranked atoms returned.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "count",
+          "confident",
+          "atoms"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "get_atom_schema"
+      },
+      "description": "Return the PROP SHAPE (field names + what each field takes) for named atoms. get_catalog tells you an atom EXISTS; this tells you how to fill it. Call this before authoring any atom you have not used before — guessing prop names is the single most common cause of an atom rendering empty or wrong. Accepts several types at once, so a multi-atom surface resolves in one call.",
+      "inputSchema": {
+        "properties": {
+          "types": {
+            "description": "Atom type names, e.g. [\"weather_now\",\"chartjs_bar\"] (max 25)",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "types"
+        ],
+        "type": "object"
+      },
+      "name": "get_atom_schema",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "atoms": {
+            "additionalProperties": true,
+            "description": "Prop shapes keyed by atom type; each value has fields, description and surfaces.",
+            "properties": {},
+            "type": "object"
+          },
+          "hint": {
+            "description": "What to do about the unknown names.",
+            "type": "string"
+          },
+          "unknown": {
+            "description": "Requested names that are not real atoms.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "atoms"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "required_catalogs"
+      },
+      "description": "Given an A2UI payload, return the resolvable catalog URIs it needs (deterministic — pure function of the atoms).",
+      "inputSchema": {
+        "properties": {
+          "payload": {
+            "description": "The A2UI payload to inspect: {title, theme, blocks:[...]} in the blocks dialect.",
+            "properties": {
+              "blocks": {
+                "description": "A2UI blocks-dialect atoms (see list_catalogs / get_catalog)",
+                "items": {
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "theme": {
+                "enum": [
+                  "light",
+                  "dark",
+                  "terminal"
+                ],
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "blocks"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "payload"
+        ],
+        "type": "object"
+      },
+      "name": "required_catalogs",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "required_catalogs": {
+            "description": "Catalog URIs the payload needs (base catalog first).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "required_catalogs"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "build_multi_page_surface"
+      },
+      "description": "Build a multi-section A2UI app from raw title+content sections — you never estimate size or decide how to split; each section becomes its own independently-encoded page (no shared hub, so per-page size never grows with page count — genuinely unlimited sections). Returns the first page's `url` plus a `pages` array ([{heading, url}]) for every section — present that list to the user yourself (e.g. numbered links); pages do not cross-link to each other. Prefer this over make_surface_url for multi-section content.",
+      "inputSchema": {
+        "properties": {
+          "renderer_url": {
+            "description": "Your deployed renderer /exec URL (optional; defaults to BYO)",
+            "type": "string"
+          },
+          "sections": {
+            "description": "Array of {heading, content} sections",
+            "items": {
+              "properties": {
+                "content": {
+                  "description": "Raw text content for this section",
+                  "type": "string"
+                },
+                "heading": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "heading",
+                "content"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "title": {
+            "description": "Hub page title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "sections"
+        ],
+        "type": "object"
+      },
+      "name": "build_multi_page_surface",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "clipboard": {
+            "additionalProperties": true,
+            "description": "Optional ready-made copy commands for the URL (linux, macos, windows) plus a note.",
+            "properties": {
+              "note": {
+                "description": "How to use these.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "note": {
+            "description": "How the pages relate.",
+            "type": "string"
+          },
+          "page_count": {
+            "description": "Number of pages.",
+            "type": "integer"
+          },
+          "pages": {
+            "description": "One entry per page, each with a url.",
+            "items": {
+              "additionalProperties": true,
+              "description": "A page.",
+              "properties": {
+                "heading": {
+                  "description": "Page heading, when the page came from a section.",
+                  "type": "string"
+                },
+                "url": {
+                  "description": "Page URL.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "url"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "required_catalogs": {
+            "description": "Catalog URIs the payload needs (base catalog first).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "size": {
+            "additionalProperties": true,
+            "description": "Present when the URL is large: url_length, warning and recommendation.",
+            "properties": {
+              "recommendation": {
+                "description": "What to do instead.",
+                "type": "string"
+              },
+              "url_length": {
+                "description": "Characters the URL is once the gas/ stable link is followed.",
+                "type": "integer"
+              },
+              "warning": {
+                "description": "Why the length matters.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "url": {
+            "description": "URL of the first page.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "pages",
+          "page_count",
+          "required_catalogs"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "make_surface_url"
+      },
+      "description": "Render an A2UI payload in the CALLER'S OWN environment. Pass renderer_url (your deployed renderer /exec) and get a live URL + the catalogs it declares. Omit renderer_url to get the encoded fragment + BYO guidance. We host nothing and never see your content.\n\nNEVER hand-write your own gzip/base64 encoding for the ?p= URL, in ANY language, even as a \"just this once\" fallback. This is the single most common cause of \"could not decompress gzip\" — a self-written encoder with one wrong flag (wrong wbits, standard vs. urlsafe base64, un-stripped padding) produces a broken URL at ANY size, not just large ones. Always call this tool again — never substitute your own implementation.\n\nSIZING IS AUTOMATIC — you do not need to estimate, count characters, or decide whether to split. Call this tool ONCE with your FULL, unsplit payload. If it fits, you get back `url` (and nothing else to do). If it does not fit the real size ceiling, the tool SPLITS IT FOR YOU server-side (at natural heading boundaries) and returns `auto_split: true` plus a `pages` array of independent URLs — present that list to the user (e.g. as numbered links) instead of the single `url`. Never pre-split your content before the first call; always send everything in one call and let the response tell you what happened.\n\nGRADUATE substantial surfaces with emit_deployment instead (no size limit at all) when you want a standing app rather than a shareable link.\n\nIF A RENDER CHECK REPORTS \"could not decompress gzip\" / \"Render error\" / \"invalid distance too far back\" on a URL this tool returned: STOP. Do NOT call this tool again with the SAME unchanged payload — re-call it with the SAME payload once to confirm, and if it still fails, use emit_deployment instead. Never fall back to a hand-written encoding script.",
+      "inputSchema": {
+        "properties": {
+          "payload": {
+            "description": "The A2UI payload to encode into a ?p= URL: {title, theme, blocks:[...]}. Send it whole; oversize payloads are split for you.",
+            "properties": {
+              "blocks": {
+                "description": "A2UI blocks-dialect atoms (see list_catalogs / get_catalog)",
+                "items": {
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "theme": {
+                "enum": [
+                  "light",
+                  "dark",
+                  "terminal"
+                ],
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "blocks"
+            ],
+            "type": "object"
+          },
+          "renderer_url": {
+            "description": "your renderer /exec (BYO). Omit for fragment + guidance.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "payload"
+        ],
+        "type": "object"
+      },
+      "name": "make_surface_url",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "auto_split": {
+            "description": "True when the payload was split into pages.",
+            "type": "boolean"
+          },
+          "clipboard": {
+            "additionalProperties": true,
+            "description": "Optional ready-made copy commands for the URL (linux, macos, windows) plus a note.",
+            "properties": {
+              "note": {
+                "description": "How to use these.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "fragment": {
+            "description": "The ?p= fragment to append to your own renderer (present when renderer_url was omitted).",
+            "type": "string"
+          },
+          "note": {
+            "description": "Guidance for the caller.",
+            "type": "string"
+          },
+          "page_count": {
+            "description": "Number of pages when split.",
+            "type": "integer"
+          },
+          "pages": {
+            "description": "One entry per page, each with a url.",
+            "items": {
+              "additionalProperties": true,
+              "description": "A page.",
+              "properties": {
+                "heading": {
+                  "description": "Page heading, when the page came from a section.",
+                  "type": "string"
+                },
+                "url": {
+                  "description": "Page URL.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "url"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "required_catalogs": {
+            "description": "Catalog URIs the payload needs (base catalog first).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "size": {
+            "additionalProperties": true,
+            "description": "Present when the URL is large: url_length, warning and recommendation.",
+            "properties": {
+              "recommendation": {
+                "description": "What to do instead.",
+                "type": "string"
+              },
+              "url_length": {
+                "description": "Characters the URL is once the gas/ stable link is followed.",
+                "type": "integer"
+              },
+              "warning": {
+                "description": "Why the length matters.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "url": {
+            "description": "Live renderer URL (present when renderer_url was given; the first page when split).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "required_catalogs"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "preview_url"
+      },
+      "description": "Quick DEMO render on the public renderer (ephemeral, nothing stored). Limited to 2 runs per client, then deploy your own renderer and use make_surface_url. Onboarding only — not the workflow. DATA-IN-URL: keep payloads SMALL (URL < ~2000 chars); large payloads make long URLs that get truncated (→ render errors). For substantial content GRADUATE with emit_deployment instead — no size limit.",
+      "inputSchema": {
+        "properties": {
+          "payload": {
+            "description": "The A2UI payload to preview: {title, theme, blocks:[...]}. Keep it small (URL under about 2000 chars).",
+            "properties": {
+              "blocks": {
+                "description": "A2UI blocks-dialect atoms (see list_catalogs / get_catalog)",
+                "items": {
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "theme": {
+                "enum": [
+                  "light",
+                  "dark",
+                  "terminal"
+                ],
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "blocks"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "payload"
+        ],
+        "type": "object"
+      },
+      "name": "preview_url",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "clipboard": {
+            "additionalProperties": true,
+            "description": "Optional ready-made copy commands for the URL (linux, macos, windows) plus a note.",
+            "properties": {
+              "note": {
+                "description": "How to use these.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "demo": {
+            "description": "Always true: this is a demo render.",
+            "type": "boolean"
+          },
+          "limitReached": {
+            "description": "True when the per-client demo limit was hit; no link is returned then.",
+            "type": "boolean"
+          },
+          "note": {
+            "description": "Which link to use.",
+            "type": "string"
+          },
+          "play_url": {
+            "description": "Link to the a2uicatalog.ai playground (recommended to share).",
+            "type": "string"
+          },
+          "required_catalogs": {
+            "description": "Catalog URIs the payload needs (base catalog first).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "size": {
+            "additionalProperties": true,
+            "description": "Present when the URL is large: url_length, warning and recommendation.",
+            "properties": {
+              "recommendation": {
+                "description": "What to do instead.",
+                "type": "string"
+              },
+              "url_length": {
+                "description": "Characters the URL is once the gas/ stable link is followed.",
+                "type": "integer"
+              },
+              "warning": {
+                "description": "Why the length matters.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "url": {
+            "description": "Link on the public Apps Script renderer.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://a2uicatalog/view/155"
+        },
+        "ui/resourceUri": "ui://a2uicatalog/view/155"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "render_surface"
+      },
+      "description": "Render an A2UI payload INSIDE the chat as a live interactive view (MCP Apps hosts only — on other hosts this returns the payload as text). No URL, no size ceiling, nothing stored: the payload travels in the tool result and renders in the a2ui_catalog_view. Accepts the blocks dialect or a v1.0 createSurface envelope (templates + dataModel decode in the view). Prefer this over preview_url when the host supports MCP Apps.\n\nIf the user names one of the Workspace's own pre-built views — Wall Builder, profile, history, links, composer — call open_workspace(view: ...) instead of composing one here yourself; those are wired demos with their own state, not something to reconstruct block by block. And never invent a generic block type (there is no \"text\" or \"button\" atom) — call get_catalog / get_atom_schema for the real vocabulary first; an unrecognised type is caught and replaced with a visible notice rather than silently dropped, but the block still won't render as intended.",
+      "inputSchema": {
+        "properties": {
+          "payload": {
+            "description": "The A2UI payload to render in the chat view: blocks dialect {title, theme, blocks:[...]} or a v1.0 createSurface envelope.",
+            "properties": {
+              "blocks": {
+                "description": "A2UI blocks-dialect atoms (see list_catalogs / get_catalog)",
+                "items": {
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "theme": {
+                "enum": [
+                  "light",
+                  "dark",
+                  "terminal"
+                ],
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "blocks"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "payload"
+        ],
+        "type": "object"
+      },
+      "name": "render_surface"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://a2uicatalog/view/155"
+        },
+        "ui/resourceUri": "ui://a2uicatalog/view/155"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "make_film"
+      },
+      "description": "Make a short motion film (a social clip, launch teaser, quote card...) built by the A2UI Design Studio: you choose a template and supply the words; the studio builds the film. Use this instead of composing motion_timeline blocks yourself. It plays inline here and comes with a link that opens in the A2UI Studio app on Android, where the user can edit the text and export MP4 or GIF on the phone.\n\nBEFORE CALLING, ask the user in one short message for what you do not know: what it is about (the hook line), any real numbers with their labels, the call to action, and where it will be posted (portrait 9:16 for LinkedIn/Instagram/stories, 16:9 for slides or YouTube, 1:1 for a quote card). Never invent statistics: with no real numbers, use scenes without a Numbers or Chart scene.\n\nTemplates (each a ready scene sequence; pass `scenes` to replace it):\nlaunch: Product launch, Title, numbers, phone, call to action (16:9; scenes title > stats > device > cta)\ndata: Data story, Chart, numbers, steps (16:9; scenes title > chart > stats > steps)\nagent: Agent demo, Chat, particle word, CTA (16:9; scenes chat > word > cta)\nquote: Quote card, A quote and a name (1:1; scenes quote > cta)\nhook: LinkedIn hook, Portrait: captions, numbers, CTA (9:16; scenes captions > stats > cta)\nclient: Client feature demo, Title, features that light up beside your pictures, CTA (16:9; scenes title > features > cta)\nevent: Event promo, Particle word, title, photo, CTA (16:9; scenes word > title > morph > cta)\n\nScene types and their fields (`fields` keys; text supports *word* for the accent colour; list fields take one item per line in the format the label gives):\ntitle (Title): eyebrow = Eyebrow; headline = Headline (use *word* for accent); sub = Subline\nstats (Numbers): kicker = Kicker; stats = Stats, one per line: value | label; roll = Number style\nchart (Chart): heading = Heading; kind = Chart; data = Data, one per line: label value; unit = Unit\nchat (Chat): heading = Heading; messages = Messages, alternating you / agent\nword (Particle word): word = Word (A-Z 0-9, up to 12); sub = Subline\nfeatures (Feature walkthrough): heading = Heading; features = Features (2-6): a title, a line of detail and an optional picture each; images = \ncollage (Collage swap): heading = Heading; sets = Sets of tiles, up to 4, separated by a blank line. One tile per line: label | optional picture link (2-6 tiles a set); hold = Seconds each set stays (0.8 to 8); swap = Seconds the swap and outline change take (0.4 to 3); fx = Panel outline\nbubbles (Bubbles title): heading = Heading; count = Bubbles (2-14)\nbeats (Beat countdown): items = One word or number per beat, 2-8 lines (fades; keep each beat over 0.35 s)\ndock (Icon dock): heading = Heading; items = Icons, one per line: glyph | name (2-7)\nlit (Cards light up): heading = Heading; cards = Cards, one per line: title | text (2-6)\narcs (Arc mark): heading = Heading; effect = Effect\nlockup (Centred lockup): lines = Lines, one per line; write {mark} where the arc mark goes (up to 4 lines); effect = Effect\npattern (Text pattern): text = Repeated text; word = One word turned on its side (optional); angle = Angle (-90 to 90)\nfit (Fill-the-width word): word = Word (up to 20 characters); recede = Recede at the end; effect = Effect\nmorph (Shape morph): heading = Heading; shapes = Shapes (comma list; also panel, notch, step, tab); wide = Wide panel (1.78:1); effect = Effect\nimage (Photo): heading = Heading; url = Image URL (https); caption = Caption\ndevice (Phone): heading = Heading; items = Checklist on the phone\ncaptions (Captions): sentence = Sentence (lights word by word)\nsteps (Steps): heading = Heading; steps = Steps, one per line (2-6)\nquote (Quote): quote = Quote; name = Name; role = Role\ncta (Call to action): headline = Headline; b1 = Button 1 text; l1 = Button 1 link; b2 = Button 2 text; l2 = Button 2 link; foot = Footer line\n\nGive the user the returned `link` as well as showing the film.",
+      "inputSchema": {
+        "properties": {
+          "aspect": {
+            "description": "Override the template aspect.",
+            "enum": [
+              "16:9",
+              "9:16",
+              "1:1"
+            ],
+            "type": "string"
+          },
+          "look": {
+            "description": "Colour preset. Default: the template's.",
+            "enum": [
+              "a2ui",
+              "amber-night",
+              "linkedin-blue",
+              "ocean",
+              "mint",
+              "violet",
+              "paper"
+            ],
+            "type": "string"
+          },
+          "pace": {
+            "description": "Timing preset for scene length and transitions. Default: the template's.",
+            "enum": [
+              "calm",
+              "standard",
+              "punchy"
+            ],
+            "type": "string"
+          },
+          "scenes": {
+            "description": "Scenes in order, replacing the template's. Omit to keep the template's scenes with its sample words.",
+            "items": {
+              "properties": {
+                "fields": {
+                  "description": "Field values for this scene type (see the list above); missing ones keep their defaults.",
+                  "type": "object"
+                },
+                "transition": {
+                  "enum": [
+                    "dissolve",
+                    "push",
+                    "rise",
+                    "blur",
+                    "zoom-through",
+                    "whip",
+                    "wipe",
+                    "iris",
+                    "clock",
+                    "slice",
+                    "flip",
+                    "spin",
+                    "ribbon",
+                    "cut"
+                  ],
+                  "type": "string"
+                },
+                "type": {
+                  "enum": [
+                    "title",
+                    "stats",
+                    "chart",
+                    "chat",
+                    "word",
+                    "features",
+                    "collage",
+                    "bubbles",
+                    "beats",
+                    "dock",
+                    "lit",
+                    "arcs",
+                    "lockup",
+                    "pattern",
+                    "fit",
+                    "morph",
+                    "image",
+                    "device",
+                    "captions",
+                    "steps",
+                    "quote",
+                    "cta"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type"
+              ],
+              "type": "object"
+            },
+            "maxItems": 8,
+            "type": "array"
+          },
+          "template": {
+            "description": "Starting template.",
+            "enum": [
+              "launch",
+              "data",
+              "agent",
+              "quote",
+              "hook",
+              "client",
+              "event"
+            ],
+            "type": "string"
+          },
+          "title": {
+            "description": "Film title (also the file name when exported).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "template"
+        ],
+        "type": "object"
+      },
+      "name": "make_film"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://a2uicatalog/view/155"
+        },
+        "ui/resourceUri": "ui://a2uicatalog/view/155"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "sketch_agent_start"
+      },
+      "description": "Start a real, live agent_sketchpad drawing: one Gemini call plans a complete picture as an ordered list of SVG strokes, the first stroke renders immediately, and the rest reveal as you call sketch_agent_poll again — a real multi-turn task, not a single one-shot render. MCP Apps hosts only (same as render_surface). Stateless server: the task is held in KV for 1 hour, not in this connection — keep the returned taskId and the next cursor to keep polling.",
+      "inputSchema": {
+        "properties": {
+          "subject": {
+            "description": "What to draw, e.g. \"a lighthouse at sunset\". Max 150 characters.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "subject"
+        ],
+        "type": "object"
+      },
+      "name": "sketch_agent_start"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://a2uicatalog/view/155"
+        },
+        "ui/resourceUri": "ui://a2uicatalog/view/155"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "sketch_agent_poll"
+      },
+      "description": "Continue a sketch_agent_start task: returns every stroke newer than the given cursor (an event log, not a snapshot — nothing is skipped regardless of poll timing) plus the next cursor, reveals the result in-chat the same way render_surface does, and reports whether the drawing is complete. Call again with the returned cursor until done is true.",
+      "inputSchema": {
+        "properties": {
+          "cursor": {
+            "description": "The cursor returned by the previous start/poll call. 0 to start from the beginning.",
+            "type": "integer"
+          },
+          "taskId": {
+            "description": "The taskId returned by sketch_agent_start.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "taskId",
+          "cursor"
+        ],
+        "type": "object"
+      },
+      "name": "sketch_agent_poll"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://a2uicatalog/ping/2"
+        },
+        "ui/resourceUri": "ui://a2uicatalog/ping/2"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "render_ping"
+      },
+      "description": "Diagnostic: render a tiny test view in-chat (MCP Apps hosts only). Proves view mounting works independent of the full catalog renderer. Echoes back whatever payload you pass.",
+      "inputSchema": {
+        "properties": {
+          "payload": {
+            "description": "Any JSON object; it is echoed back as the result so you can see what the view received. Optional.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "name": "render_ping"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://a2uicatalog/wasm-spike/2"
+        },
+        "ui/resourceUri": "ui://a2uicatalog/wasm-spike/2"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "wasm_spike"
+      },
+      "description": "Diagnostic (MCP Apps hosts only): mounts a view that instantiates a tiny hand-assembled WebAssembly module, computes per-frame state in it, renders to canvas, and captures arrow-key input -- the same three ingredients a WASM game port would need. Answers whether THIS host permits WASM execution inside a ui:// View iframe; it proves nothing about any other host or sandbox.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "wasm_spike"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://a2uicatalog/diagram-studio/11"
+        },
+        "ui/resourceUri": "ui://a2uicatalog/diagram-studio/11"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "diagram_studio"
+      },
+      "description": "Draw a diagram in-chat with the full Diagram Studio interface (MCP Apps hosts only; it opens fullscreen where the host allows it). YOU write the diagram; nothing is generated server-side and nothing is stored. PREFER `graph`: give vertices (id, label, type start|process|decision|database|cloud|end) and edges (source, target, optional label). The person then gets the whole studio: they can switch the same graph between Mermaid, D2, PlantUML and draw.io, flip its direction, zoom, copy the code, open it in the real draw.io editor with one click, and edit nodes and connections themselves (their edits come back to you). Use `syntax` with `source` instead only for diagrams a flow graph cannot express, drawn exactly as written: \"mermaid\" for sequence, class, state, ER, gantt and mind maps; \"d2\" for architecture diagrams with containers and nested boxes. Give exactly one of `graph` or `syntax` with `source`. Keep diagrams compact (the input schema states the limits). If the tool or the view reports a problem, fix it and call this tool again. On a host without MCP Apps support the diagram comes back as text.",
+      "inputSchema": {
+        "properties": {
+          "direction": {
+            "description": "Graph layout direction: TB (top to bottom, default) or LR.",
+            "enum": [
+              "TB",
+              "LR"
+            ],
+            "type": "string"
+          },
+          "format": {
+            "description": "Which format the view opens on. Default mermaid; mermaid and d2 draw a picture.",
+            "enum": [
+              "mermaid",
+              "d2",
+              "plantuml",
+              "drawio"
+            ],
+            "type": "string"
+          },
+          "graph": {
+            "description": "The diagram as a graph (preferred).",
+            "properties": {
+              "edges": {
+                "description": "The connections. Loops back to an earlier node are fine.",
+                "items": {
+                  "properties": {
+                    "label": {
+                      "description": "Optional: a condition such as Yes / No.",
+                      "maxLength": 60,
+                      "type": "string"
+                    },
+                    "source": {
+                      "description": "The id of the node it leaves.",
+                      "type": "string"
+                    },
+                    "target": {
+                      "description": "The id of the node it enters.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "source",
+                    "target"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 400,
+                "type": "array"
+              },
+              "vertices": {
+                "description": "The nodes.",
+                "items": {
+                  "properties": {
+                    "id": {
+                      "description": "Unique within the graph; any short text. Edges refer to it.",
+                      "maxLength": 40,
+                      "type": "string"
+                    },
+                    "label": {
+                      "description": "Short (two to five words reads best). Decision nodes: a question.",
+                      "maxLength": 80,
+                      "type": "string"
+                    },
+                    "type": {
+                      "description": "The shape. Defaults to process.",
+                      "enum": [
+                        "start",
+                        "process",
+                        "decision",
+                        "database",
+                        "cloud",
+                        "end"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "label"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 200,
+                "type": "array"
+              }
+            },
+            "required": [
+              "vertices"
+            ],
+            "type": "object"
+          },
+          "source": {
+            "description": "Only with `syntax`: a complete diagram, drawn as written.",
+            "maxLength": 20000,
+            "type": "string"
+          },
+          "syntax": {
+            "description": "Only with `source`: the language of that source.",
+            "enum": [
+              "mermaid",
+              "d2"
+            ],
+            "type": "string"
+          },
+          "theme": {
+            "description": "Colours for the draw.io output. Default modern_indigo.",
+            "enum": [
+              "modern_indigo",
+              "vibrant_cloud",
+              "warm_amber",
+              "monochrome"
+            ],
+            "type": "string"
+          },
+          "title": {
+            "description": "Optional heading shown above the diagram.",
+            "maxLength": 120,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "diagram_studio"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://a2uicatalog/amiga"
+        },
+        "ui/resourceUri": "ui://a2uicatalog/amiga"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "amiga"
+      },
+      "description": "Open a real, cycle-exact Amiga 500 emulator in-chat (MCP Apps hosts only). Boots straight into AROS, a free open-source environment (no copyrighted Kickstart ROM involved), with a public-domain Amiga game already loaded and running. This is a fixed, self-contained retro-computing demo -- there is nothing to configure and no arguments to give it; call it when someone wants to see or play with a real emulated Amiga. On a host without MCP Apps support this says so as text; an emulator has no useful non-visual form.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "amiga"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://a2uicatalog/view/155"
+        },
+        "ui/resourceUri": "ui://a2uicatalog/view/155"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "distill_document"
+      },
+      "description": "Compile a training.md / roadmap markdown document into a live interactive A2UI app — DETERMINISTIC parser, no model involved. Fact sheet: input is MARKDOWN following the training-md contract (frontmatter id/domain/name/source/license + a # Steps section); the text transits to the catalog's stateless parser service for the duration of the call and is NOT stored; lint errors come back as a structured report (fix and re-call). On success the result IS the compiled surface — MCP Apps hosts paint it in the view; other hosts can pass the returned payload to preview_url for a link.",
+      "inputSchema": {
+        "properties": {
+          "domain": {
+            "description": "parse contract to apply (default training)",
+            "enum": [
+              "training",
+              "roadmap"
+            ],
+            "type": "string"
+          },
+          "markdown": {
+            "description": "the full markdown document, frontmatter included",
+            "type": "string"
+          }
+        },
+        "required": [
+          "markdown"
+        ],
+        "type": "object"
+      },
+      "name": "distill_document"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "publish_url"
+      },
+      "description": "STORES the payload server-side and returns a SHORT shareable link. Opt-in only: requires acknowledge_storage=true — confirm with the user first that they accept operator-hosted storage (ONE WEEK retention on the public tier, revocable earlier via the returned delete_token; anyone with the link can view). target \"play\" (default) renders in the a2uicatalog playground by reference (no URL size ceiling); target \"gas\" makes the short link redirect to the public Apps Script renderer. For storage in the USER's own account use emit_deployment; for nothing-stored links use preview_url.",
+      "inputSchema": {
+        "properties": {
+          "acknowledge_storage": {
+            "description": "MUST be true — affirms the user consented to server-side storage",
+            "type": "boolean"
+          },
+          "alias": {
+            "description": "optional vanity name for the link (/s/<alias>) — first-come, frees when the link expires",
+            "type": "string"
+          },
+          "payload": {
+            "description": "The A2UI payload to store and share: {title, theme, blocks:[...]}, up to 100 KB serialised.",
+            "properties": {
+              "blocks": {
+                "description": "A2UI blocks-dialect atoms (see list_catalogs / get_catalog)",
+                "items": {
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "theme": {
+                "enum": [
+                  "light",
+                  "dark",
+                  "terminal"
+                ],
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "blocks"
+            ],
+            "type": "object"
+          },
+          "target": {
+            "description": "Where the short link opens: \"play\" (default) the a2uicatalog playground by reference, \"gas\" the public Apps Script renderer.",
+            "enum": [
+              "play",
+              "gas"
+            ],
+            "type": "string"
+          },
+          "ttl_days": {
+            "description": "OPERATOR-ONLY (authenticated requests): retention override; 0 = permanent. Public tier is fixed at one week.",
+            "type": "number"
+          }
+        },
+        "required": [
+          "payload",
+          "acknowledge_storage"
+        ],
+        "type": "object"
+      },
+      "name": "publish_url",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "delete_token": {
+            "description": "Pass to unpublish_url to revoke.",
+            "type": "string"
+          },
+          "error": {
+            "description": "Why nothing was stored (present when ok is false, e.g. daily limit).",
+            "type": "string"
+          },
+          "note": {
+            "description": "Retention and viewing notes.",
+            "type": "string"
+          },
+          "ok": {
+            "description": "True when the payload was stored.",
+            "type": "boolean"
+          },
+          "short_url": {
+            "description": "Short shareable link.",
+            "type": "string"
+          },
+          "stored_until": {
+            "description": "Expiry date (YYYY-MM-DD) or \"permanent\".",
+            "type": "string"
+          },
+          "target": {
+            "description": "\"play\" or \"gas\".",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "unpublish_url"
+      },
+      "description": "Delete a published short link before its TTL using the delete_token returned by publish_url.",
+      "inputSchema": {
+        "properties": {
+          "delete_token": {
+            "description": "The delete_token that publish_url returned for this link.",
+            "type": "string"
+          },
+          "id": {
+            "description": "The published link id, or the full short URL (https://a2uicatalog.ai/s/<id>) returned by publish_url.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "delete_token"
+        ],
+        "type": "object"
+      },
+      "name": "unpublish_url",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "data": {
+            "additionalProperties": true,
+            "description": "Result detail.",
+            "properties": {
+              "deleted": {
+                "description": "The id that was deleted.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "ok": {
+            "description": "True when the link was deleted.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "emit_deployment"
+      },
+      "description": "🎓 GRADUATE a tested surface into a dedicated, DEPLOYER-ONLY standing app in YOUR OWN Google Apps Script account. Returns a deterministic recipe (config files + clasp ops + least-privilege scopes derived from the atoms + verify) — you run it with your own clasp; nothing runs on our side, we hold no creds.",
+      "inputSchema": {
+        "properties": {
+          "app_name": {
+            "description": "Name for the Apps Script project and its folder. Defaults to the payload title, else \"A2UI App\".",
+            "type": "string"
+          },
+          "payload": {
+            "description": "The tested A2UI payload to bake into the standing app as its home surface: {title, theme, blocks:[...]}.",
+            "properties": {
+              "blocks": {
+                "description": "A2UI blocks-dialect atoms (see list_catalogs / get_catalog)",
+                "items": {
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "theme": {
+                "enum": [
+                  "light",
+                  "dark",
+                  "terminal"
+                ],
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "blocks"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "payload"
+        ],
+        "type": "object"
+      },
+      "name": "emit_deployment",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "files": {
+            "additionalProperties": true,
+            "description": "File name to file content for the Apps Script project (HomeSurface.gs, appsscript.json).",
+            "properties": {},
+            "type": "object"
+          },
+          "inputs": {
+            "additionalProperties": true,
+            "description": "Resolved inputs.",
+            "properties": {
+              "access": {
+                "description": "Always \"deployer-only\".",
+                "type": "string"
+              },
+              "app_name": {
+                "description": "Project name.",
+                "type": "string"
+              },
+              "scopes": {
+                "description": "OAuth scopes derived from the atoms.",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "note": {
+            "description": "What the recipe does.",
+            "type": "string"
+          },
+          "ops": {
+            "description": "Ordered shell steps to build and deploy.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "renderer_source": {
+            "additionalProperties": true,
+            "description": "Where to fetch the open renderer.",
+            "properties": {
+              "path": {
+                "description": "Path in the repo.",
+                "type": "string"
+              },
+              "ref": {
+                "description": "Pinned tag.",
+                "type": "string"
+              },
+              "repo": {
+                "description": "Repository URL.",
+                "type": "string"
+              },
+              "zip": {
+                "description": "Release zip URL.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "required_catalogs": {
+            "description": "Catalog URIs the payload needs (base catalog first).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "verify": {
+            "description": "How to check the deployed app.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "note",
+          "inputs",
+          "required_catalogs",
+          "files",
+          "ops",
+          "verify"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "emit_training_runbook"
+      },
+      "description": "Build a multi-lesson training/course surface as ONE properly-linked page with real in-app tab navigation between lessons — prefer this over build_multi_page_surface for training/course content specifically: that tool produces N independent pages with NO links between them (you must present the list yourself); this tool produces one page where lessons are real, clickable tabs. Zero sizing/estimation judgment required — give it your lessons, it handles composition and navigation.",
+      "inputSchema": {
+        "properties": {
+          "lessons": {
+            "description": "Array of {heading, content} lessons — each becomes its own tab",
+            "items": {
+              "properties": {
+                "content": {
+                  "description": "Raw text content for this lesson",
+                  "type": "string"
+                },
+                "heading": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "heading",
+                "content"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "renderer_url": {
+            "description": "Your deployed renderer /exec URL (optional; defaults to BYO)",
+            "type": "string"
+          },
+          "title": {
+            "description": "Course title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "lessons"
+        ],
+        "type": "object"
+      },
+      "name": "emit_training_runbook",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "clipboard": {
+            "additionalProperties": true,
+            "description": "Optional ready-made copy commands for the URL (linux, macos, windows) plus a note.",
+            "properties": {
+              "note": {
+                "description": "How to use these.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "note": {
+            "description": "How the tabs work.",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "description": "The compiled A2UI v1.0 createSurface payload.",
+            "properties": {},
+            "type": "object"
+          },
+          "required_catalogs": {
+            "description": "Catalog URIs the payload needs (base catalog first).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "size": {
+            "additionalProperties": true,
+            "description": "Present when the URL is large: url_length, warning and recommendation.",
+            "properties": {
+              "recommendation": {
+                "description": "What to do instead.",
+                "type": "string"
+              },
+              "url_length": {
+                "description": "Characters the URL is once the gas/ stable link is followed.",
+                "type": "integer"
+              },
+              "warning": {
+                "description": "Why the length matters.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "url": {
+            "description": "Renderer URL carrying the payload.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "payload",
+          "url",
+          "required_catalogs"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "emit_runbook_surface"
+      },
+      "description": "Stamp your content through a DECLARED runbook — a pre-authored, judgment-free surface composition. You supply content only; the runbook supplies the composition (which atoms, how arranged, navigation). DISCOVERY: call with runbook_id only (no content) to get that runbook's input_contract + parsing_guide — shape your source data to the contract (parsing is your job as the consumer), then call again with `content`. Some runbooks also return `elicit` — questions to ASK THE USER before you fill the contract. Ask them; do not guess the answers.\nON SUCCESS YOU GET BOTH `payload` AND `url`, AND THEY ARE NOT THE SAME OFFER. `payload` is the compiled surface — pass it STRAIGHT to render_surface and the reading appears inline, in the conversation, where the reader already is. `url` is the shareable link, for later or for elsewhere. Default to rendering: handing back only a link makes the reader leave to see the thing they asked for. If the reading was too large to encode as a link you get `payload` and `url_unavailable` instead — that is a SUCCESS, so render it and say the link is missing.\nAvailable stampable runbooks: (1) learning_hub — curriculum/revision study app: subject tabs, slide pills, timeline/drill/flashcards/quiz/takeaways/method interactions per slide, the full rich hub UI. Prefer this over emit_training_runbook for study/curriculum content — much richer output, still zero composition decisions. (2) article_playbook — a steered critical reading of SOMEONE ELSE'S article: source attribution bar, a hero mental-model card, then rungs down a rail. The reader picks a lens (explain, apply to their domain, challenge, situate in prior art) and says what they want it to look for; the rung progression is Toulmin (claim → grounds → warrant) so the analysis lands on the assumption a summary drops. Use it whenever asked to analyse, critique, tear down, or work out what an article means for a particular domain. You fetch and read the article yourself; nothing is retrieved server-side.",
+      "inputSchema": {
+        "properties": {
+          "content": {
+            "description": "Your content shaped to the runbook's input_contract. Omit to get the contract back instead of a URL.",
+            "type": "object"
+          },
+          "renderer_url": {
+            "description": "Your deployed renderer /exec URL (optional; defaults to the public demo renderer)",
+            "type": "string"
+          },
+          "runbook_id": {
+            "description": "Stampable runbook name. \"learning_hub\" = curriculum/study app from content you supply. \"article_playbook\" = a steered critical reading of someone else's article (you fetch and read it yourself; the runbook supplies the composition and the method). Call with this alone, no `content`, to get the contract and any questions to ask the user.",
+            "enum": [
+              "article_playbook",
+              "learning_hub"
+            ],
+            "type": "string"
+          },
+          "source": {
+            "description": "The source the USER supplied (workspace surfaces pass this; you normally do not). {url?, text?}. Echoed back in the discovery response so you read THAT source rather than asking for it again. Ignored when `content` is present — by then the reading is done.",
+            "properties": {
+              "text": {
+                "description": "Source text the reader pasted or dropped in, when they had no fetchable URL.",
+                "type": "string"
+              },
+              "url": {
+                "description": "The article URL the reader gave. Fetch it yourself.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "runbook_id"
+        ],
+        "type": "object"
+      },
+      "name": "emit_runbook_surface"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://a2uicatalog/view/155"
+        },
+        "ui/resourceUri": "ui://a2uicatalog/view/155"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "describe_playbook"
+      },
+      "description": "Explain a playbook to a HUMAN as a rendered surface: the frame it reads against, the lenses available, and the questions it will ask them. Compiled from the runbook declaration, so it costs nothing and cannot drift from what the stamper enforces. This is NOT emit_runbook_surface discovery — that returns a contract addressed to YOU. Use this when someone asks what a playbook does or how it works; pass the result to render_surface.",
+      "inputSchema": {
+        "properties": {
+          "runbook_id": {
+            "description": "Which stampable runbook to describe.",
+            "enum": [
+              "article_playbook",
+              "learning_hub"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "runbook_id"
+        ],
+        "type": "object"
+      },
+      "name": "describe_playbook"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://a2uicatalog/view/155"
+        },
+        "ui/resourceUri": "ui://a2uicatalog/view/155"
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "open_workspace"
+      },
+      "description": "Open the A2UI Workspace — a rendered surface that IS the demo: each tool is introduced by the scenario it answers, then wired to run, then shows what it saved. This tool RENDERS ITSELF: its result carries the view, so call it alone and show the result — do NOT pass it on to render_surface, and do not describe the payload in prose. Call it when the user asks to open the workspace, wants to see what this connector can do, asks what is saved about them, or names one of its tools directly — e.g. \"open the Wall Builder\" means THIS tool with view: \"wall_builder\", not a separate tool named wall_builder. It shows a display name they chose, never their email.",
+      "inputSchema": {
+        "properties": {
+          "prompt": {
+            "description": "Composer view only. Pre-fills the custom-prompt box with this text instead of the default example — used by a reopened generation's \"Need to tweak?\" action to carry its original prompt back into an editable view. Omit for a fresh Composer visit.",
+            "type": "string"
+          },
+          "view": {
+            "description": "Which screen to open — omit or \"home\" for the tool selector. The workspace UI navigates between these by calling this tool again with a different view (its own back button); you would normally only pass this yourself to jump straight to one, e.g. \"open my profile\" -> profile, \"open the wall builder\" -> wall_builder (a native-catalogue rebuild of the Gemini Enterprise wall-builder demo).",
+            "enum": [
+              "home",
+              "profile",
+              "read",
+              "history",
+              "links",
+              "wall_builder",
+              "composer"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "open_workspace"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "get_profile"
+      },
+      "description": "Read the signed-in reader's saved profile and recent history. Call this BEFORE asking a runbook's `elicit` questions: if a domain or default lens is already saved, CONFIRM it (\"reading as: a2ui, generative ui — change?\") instead of asking from scratch. Returns available:false on the public endpoint, where there is no one to have a profile — that is the designed state, so degrade quietly and just ask the questions.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_profile",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "available": {
+            "description": "False when there is no signed-in reader or the store failed.",
+            "type": "boolean"
+          },
+          "display_name_set": {
+            "description": "Whether a display name is saved.",
+            "type": "boolean"
+          },
+          "greeting": {
+            "description": "Display name or \"you\".",
+            "type": "string"
+          },
+          "note": {
+            "description": "Guidance for the caller.",
+            "type": "string"
+          },
+          "profile": {
+            "additionalProperties": true,
+            "description": "Saved profile fields.",
+            "properties": {},
+            "type": "object"
+          },
+          "reason": {
+            "description": "Why it is unavailable.",
+            "type": "string"
+          },
+          "recent_readings": {
+            "description": "Most recent readings.",
+            "items": {
+              "additionalProperties": true,
+              "description": "A reading history row.",
+              "properties": {
+                "id": {
+                  "description": "Reading id.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "total_readings": {
+            "description": "Total saved readings.",
+            "type": "integer"
+          },
+          "user": {
+            "additionalProperties": true,
+            "description": "The reader {sub, email}.",
+            "properties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "available"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "save_profile"
+      },
+      "description": "Update the signed-in reader's profile. Only the keys you pass change; pass null to clear one. Save what the reader TOLD you, never what you inferred from one article — a profile that drifts on every reading is worse than no profile, because they stop being able to predict what it will do.",
+      "inputSchema": {
+        "properties": {
+          "concerns": {
+            "description": "Standing things they always want pushed on, in their own words.",
+            "type": "string"
+          },
+          "default_lens": {
+            "description": "Opening posture when the reader does not name one: explain | apply | challenge | situate.",
+            "type": "string"
+          },
+          "display_name": {
+            "description": "What to call them in a rendered surface. Set this so a UI never has to show their email — the address is an identifier, not a greeting, and a shared screen should not leak it.",
+            "type": "string"
+          },
+          "domains": {
+            "description": "Areas of interest the apply lens transfers into, e.g. [\"a2ui\",\"generative ui\"].",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "theme": {
+            "description": "Reader's preferred UI theme. The Workspace saves this itself when its toggle is clicked — you would not normally set this from a chat turn.",
+            "enum": [
+              "dark",
+              "light"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "save_profile",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "available": {
+            "description": "False when there is no signed-in reader or the store failed.",
+            "type": "boolean"
+          },
+          "note": {
+            "description": "Guidance for the caller.",
+            "type": "string"
+          },
+          "profile": {
+            "additionalProperties": true,
+            "description": "The profile after the update.",
+            "properties": {},
+            "type": "object"
+          },
+          "reason": {
+            "description": "Why nothing was saved or the store is unavailable.",
+            "type": "string"
+          },
+          "saved": {
+            "description": "True when the profile changed.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "available"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "save_reading"
+      },
+      "description": "Record a stamped surface in the reader's history so it can be compared and reopened later. Call it AFTER emit_runbook_surface, and PASS ITS `payload` — that stores the reading itself rather than a link to it. Silently no-ops when nobody is signed in.",
+      "inputSchema": {
+        "properties": {
+          "lens": {
+            "description": "The lens the reading was made through (e.g. \"explain\"), so history can show it.",
+            "type": "string"
+          },
+          "payload": {
+            "description": "The compiled surface emit_runbook_surface returned (its `payload`). PASS IT. Without it the row is a link only, and a link depends on a renderer staying reachable — with it the reading is stored portably and can be re-rendered or exported long after any URL stops working.",
+            "type": "object"
+          },
+          "runbook": {
+            "description": "e.g. \"article_playbook\"",
+            "type": "string"
+          },
+          "source_title": {
+            "description": "The original article's headline, kept beside source_url.",
+            "type": "string"
+          },
+          "source_url": {
+            "description": "The original article, so history stays attributable.",
+            "type": "string"
+          },
+          "title": {
+            "description": "The ANALYSIS title (yours), not the source headline.",
+            "type": "string"
+          },
+          "url": {
+            "description": "The stamped surface url returned by emit_runbook_surface.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "runbook"
+        ],
+        "type": "object"
+      },
+      "name": "save_reading",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "available": {
+            "description": "False when there is no signed-in reader or the store failed.",
+            "type": "boolean"
+          },
+          "id": {
+            "description": "Id of the stored reading.",
+            "type": "string"
+          },
+          "note": {
+            "description": "Guidance for the caller.",
+            "type": "string"
+          },
+          "portable": {
+            "description": "True when the payload was stored with it.",
+            "type": "boolean"
+          },
+          "reason": {
+            "description": "Why nothing was saved.",
+            "type": "string"
+          },
+          "saved": {
+            "description": "True when the row was stored.",
+            "type": "boolean"
+          },
+          "warning": {
+            "description": "Why the payload was not stored.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "available"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "export_reading"
+      },
+      "description": "Export a kept reading as something that outlives this connector. format \"html\" returns ONE self-contained file — styles inlined, no network, opens in any browser years from now with nothing installed. \"url\" rebuilds a link against any renderer (yours by preference). \"surface\" returns the payload for repainting in place. \"json\" returns the decoded payload. Needs a reading saved WITH its payload; older link-only rows cannot be re-rendered and will say so.",
+      "inputSchema": {
+        "properties": {
+          "format": {
+            "description": "Default html. \"surface\" returns the payload itself, for repainting in place.",
+            "enum": [
+              "html",
+              "url",
+              "json",
+              "surface"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "description": "Reading id from list_readings. OMIT for the most recent one.",
+            "type": "string"
+          },
+          "renderer_url": {
+            "description": "For format \"url\": your own renderer /exec.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "export_reading",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "available": {
+            "description": "False when there is no signed-in reader or the store failed.",
+            "type": "boolean"
+          },
+          "bytes": {
+            "description": "Size of the HTML.",
+            "type": "integer"
+          },
+          "exported": {
+            "description": "True when an export was produced.",
+            "type": "boolean"
+          },
+          "fonts_delocalised": {
+            "description": "Remote font faces removed.",
+            "type": "integer"
+          },
+          "format": {
+            "description": "\"html\", \"url\", \"json\" or \"surface\".",
+            "type": "string"
+          },
+          "html": {
+            "description": "Self-contained HTML (format html).",
+            "type": "string"
+          },
+          "note": {
+            "description": "Guidance for the caller.",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "description": "The stored payload (format json).",
+            "properties": {},
+            "type": "object"
+          },
+          "reason": {
+            "description": "Why it is unavailable.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Reading title.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "url": {
+            "description": "Rebuilt renderer URL (format url).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "available"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "render_reading_to_slack"
+      },
+      "description": "Post a kept reading into Slack as real, native Block Kit — the continuity proof: generate here, save it, and the SAME content reopens in Slack, not a link back to a renderer. Requires the caller's Slack account to already be linked (`/a2ui link` in Slack) and only works on an authenticated connection — it posts to a real workspace using a shared bot token.",
+      "inputSchema": {
+        "properties": {
+          "channel": {
+            "description": "Slack channel to post to. Default #general.",
+            "type": "string"
+          },
+          "id": {
+            "description": "Reading id from list_readings. OMIT for the most recent one.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "render_reading_to_slack",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "atoms_compiled": {
+            "description": "Atoms posted.",
+            "type": "integer"
+          },
+          "atoms_skipped": {
+            "description": "Atom types with no Slack mapping.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "available": {
+            "description": "False without a signed-in reader.",
+            "type": "boolean"
+          },
+          "degraded": {},
+          "note": {
+            "description": "Guidance for the caller.",
+            "type": "string"
+          },
+          "ok": {
+            "description": "True when the post succeeded.",
+            "type": "boolean"
+          },
+          "posted_as": {
+            "description": "Linked Slack account.",
+            "type": "string"
+          },
+          "posted_to": {
+            "description": "Slack channel.",
+            "type": "string"
+          },
+          "reading_id": {
+            "description": "Reading id.",
+            "type": "string"
+          },
+          "reason": {
+            "description": "Why nothing was posted.",
+            "type": "string"
+          },
+          "slack_ts": {
+            "description": "Slack message timestamp.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Reading title.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "truncated": {}
+        },
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "list_readings"
+      },
+      "description": "The reader's recent stamped surfaces, newest first — what makes \"compare this to my last three teardowns\" answerable at all. Optionally filter to one runbook. Returns available:false when nobody is signed in.",
+      "inputSchema": {
+        "properties": {
+          "limit": {
+            "description": "Default 20, max 100.",
+            "type": "integer"
+          },
+          "runbook": {
+            "description": "Filter to one runbook, e.g. \"article_playbook\".",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "list_readings",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "available": {
+            "description": "False when there is no signed-in reader or the store failed.",
+            "type": "boolean"
+          },
+          "count": {
+            "description": "Number of readings returned.",
+            "type": "integer"
+          },
+          "note": {
+            "description": "Guidance for the caller.",
+            "type": "string"
+          },
+          "readings": {
+            "description": "Saved readings, newest first.",
+            "items": {
+              "additionalProperties": true,
+              "description": "A reading history row.",
+              "properties": {
+                "id": {
+                  "description": "Reading id.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "reason": {
+            "description": "Why it is unavailable.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "available"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "delete_reading"
+      },
+      "description": "Permanently remove one or more of the reader's saved readings from their History. Takes an array so the Workspace's multi-select can delete a batch in one call rather than one round trip per row. Ids that don't exist (or belong to someone else's history) are silently skipped — the response's `deleted` count says how many rows actually went, never assume it equals the number of ids you sent.",
+      "inputSchema": {
+        "properties": {
+          "ids": {
+            "description": "Reading ids from list_readings. A single-item array deletes one row.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "ids"
+        ],
+        "type": "object"
+      },
+      "name": "delete_reading",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "available": {
+            "description": "False when there is no signed-in reader or the store failed.",
+            "type": "boolean"
+          },
+          "deleted": {
+            "description": "Rows deleted.",
+            "type": "integer"
+          },
+          "note": {
+            "description": "Guidance for the caller.",
+            "type": "string"
+          },
+          "reason": {
+            "description": "Why nothing was deleted.",
+            "type": "string"
+          },
+          "requested": {
+            "description": "Ids requested.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "available"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "read_article"
+      },
+      "description": "Have the catalog's own model (Gemini) read an article through the article_playbook runbook and KEEP the reading in the signed-in reader's history, in one call. For a client with no model of its own (the Android analyser app), or when the reader asks for a Gemini reading. If you can read the article yourself, prefer emit_runbook_surface + save_reading. Pass `text` when you already have the article (it is then the only source the reading may quote), else `url` and it is fetched server-side. Takes 20-60 s. Needs a signed-in reader; capped per reader per day.",
+      "inputSchema": {
+        "properties": {
+          "concerns": {
+            "description": "What the reader wants the reading to look for or push back on.",
+            "type": "string"
+          },
+          "domains": {
+            "description": "For lens \"apply\": the reader's domains, comma-separated.",
+            "type": "string"
+          },
+          "lens": {
+            "description": "Default explain.",
+            "enum": [
+              "explain",
+              "apply",
+              "challenge",
+              "situate"
+            ],
+            "type": "string"
+          },
+          "source_title": {
+            "description": "The article's headline, kept with the reading for attribution.",
+            "type": "string"
+          },
+          "text": {
+            "description": "The article text, if the caller already fetched it. Truncated to 60000 chars.",
+            "type": "string"
+          },
+          "url": {
+            "description": "The article's public URL. Required: it is the attribution link.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "type": "object"
+      },
+      "name": "read_article",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "analysed_by": {
+            "description": "Model that read the article.",
+            "type": "string"
+          },
+          "note": {
+            "description": "Set when the article text was truncated.",
+            "type": "string"
+          },
+          "ok": {
+            "description": "True when the reading was produced.",
+            "type": "boolean"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "description": "The stamped article_playbook surface.",
+            "properties": {},
+            "type": "object"
+          },
+          "reading_id": {
+            "description": "Id of the saved reading.",
+            "type": "string"
+          },
+          "reads_today": {
+            "description": "Reads used today by this reader.",
+            "type": "integer"
+          },
+          "retrieval": {
+            "description": "How the text was obtained.",
+            "type": "string"
+          },
+          "save_warning": {
+            "description": "Why the reading was not saved.",
+            "type": "string"
+          },
+          "url": {
+            "description": "Renderer URL for the reading.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "PPTX layouts"
+      },
+      "description": "List the slide layouts the PPTX renderer builds (title, bullets, stats, quote, table, media, cta), each field with its limits, the targets, the film-only scenes, and the A2UI atoms that have a slide recipe (payload_atoms). Read this before writing a deck.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "deck_schema"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Validate a deck"
+      },
+      "description": "Check a deck (scene list or A2UI payload) without building it. Returns every error with its slide, field and exact limit, warnings (no speaker notes, no link) and, for a payload, which atoms have no slide recipe. Not rate-limited.",
+      "inputSchema": {
+        "properties": {
+          "deck": {
+            "description": "A typed scene list: {\"title\",\"target\",\"scenes\":[{\"type\":\"title|bullets|stats|quote|table|media|cta\",\"f\":{...fields...},\"notes\":\"speaker notes\"}]}. Same scene fields as make_film (eyebrow, headline, sub, kicker, stats as [value,label] pairs, steps/items, quote, name, role, b1/l1, foot). Call deck_schema for every layout and limit. Give deck OR payload."
+          },
+          "payload": {
+            "description": "An A2UI payload {\"blocks\":[{\"type\":\"quote\",...},...]}: each atom with a slide recipe becomes slides, others are listed under `unsupported`, never guessed. deck_schema lists the atoms. Give payload OR deck."
+          },
+          "skip_film_only": {
+            "description": "For a scene list that came from a film: leave out scenes with no slide layout (chart, chat, word, morph, captions, image) instead of treating them as errors.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "name": "deck_validate"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Build a PPTX"
+      },
+      "description": "Build a PowerPoint (.pptx) file from a scene list or an A2UI payload. Deterministic (same input, same bytes), nothing is stored or fetched, text is fitted with real font metrics and the file is linted (overlap, bounds, contrast, alt text). Returns the file as an embedded resource plus a report: errors, lint, warnings and unsupported atoms. Opens in PowerPoint and Google Slides (checked in Google Slides). Demo limit: 10 builds a day per connection.",
+      "inputSchema": {
+        "properties": {
+          "deck": {
+            "description": "A typed scene list: {\"title\",\"target\",\"scenes\":[{\"type\":\"title|bullets|stats|quote|table|media|cta\",\"f\":{...fields...},\"notes\":\"speaker notes\"}]}. Same scene fields as make_film (eyebrow, headline, sub, kicker, stats as [value,label] pairs, steps/items, quote, name, role, b1/l1, foot). Call deck_schema for every layout and limit. Give deck OR payload."
+          },
+          "delivery": {
+            "description": "How the .pptx comes back. link (default): a download link valid for one hour, which works in every client including chat apps that cannot receive attachments. file: the .pptx as an embedded resource, for clients that save attachments (Claude Desktop, Claude Code). both: the two together.",
+            "enum": [
+              "link",
+              "file",
+              "both"
+            ],
+            "type": "string"
+          },
+          "payload": {
+            "description": "An A2UI payload {\"blocks\":[{\"type\":\"quote\",...},...]}: each atom with a slide recipe becomes slides, others are listed under `unsupported`, never guessed. deck_schema lists the atoms. Give payload OR deck."
+          },
+          "skip_film_only": {
+            "description": "For a scene list that came from a film: leave out scenes with no slide layout (chart, chat, word, morph, captions, image) instead of treating them as errors.",
+            "type": "boolean"
+          },
+          "target": {
+            "description": "Where the file will be opened. google-slides fits text tighter; powerpoint and any keep a 12% margin for a substituted font. Default any. Ask the user if you do not know.",
+            "enum": [
+              "google-slides",
+              "powerpoint",
+              "any"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "deck_build"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Open a diagram in draw.io"
+      },
+      "description": "Open a diagram you wrote in draw.io (diagrams.net). YOU write the diagram as mxGraph XML, the format draw.io reads; this tool checks it, and returns a link that opens it in the draw.io editor for the person, plus a .drawio file to download (kept for one hour). Nothing is drawn or laid out for you, so give every shape its x, y, width and height. The XML must be uncompressed and shaped like this (ids unique, every shape parent=\"1\", edges name source and target ids): <mxGraphModel><root><mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/><mxCell id=\"a\" value=\"Start\" style=\"rounded=1;whiteSpace=wrap;html=1;\" vertex=\"1\" parent=\"1\"><mxGeometry x=\"40\" y=\"40\" width=\"120\" height=\"60\" as=\"geometry\"/></mxCell><mxCell id=\"b\" value=\"Done\" style=\"rounded=1;whiteSpace=wrap;html=1;\" vertex=\"1\" parent=\"1\"><mxGeometry x=\"240\" y=\"40\" width=\"120\" height=\"60\" as=\"geometry\"/></mxCell><mxCell id=\"e1\" style=\"edgeStyle=orthogonalEdgeStyle;html=1;\" edge=\"1\" parent=\"1\" source=\"a\" target=\"b\"><mxGeometry relative=\"1\" as=\"geometry\"/></mxCell></root></mxGraphModel> If the check finds problems it lists each one with the cell id and the fix; correct the XML and call again. Limits: 200 KB of XML and 500 cells. For AWS and Google Cloud diagrams the check also looks at missing labels, overlaps, text that does not fit, contrast and placement (for example an instance outside a subnet); each finding names the cell. These are vendor-style conventions drawn from draw.io's own libraries, not an official checker from AWS or Google. Labels may use simple HTML (set html=1 in the style); scripts, iframes, event handlers and javascript: links are refused. The diagram travels in the link's fragment, which is never sent to a server.",
+      "inputSchema": {
+        "properties": {
+          "animate": {
+            "description": "Add moving dashes along the connectors (draw.io flow animation). Shows in the draw.io editor; default false.",
+            "type": "boolean"
+          },
+          "host": {
+            "description": "diagrams (default): open in app.diagrams.net. self: open in the editor hosted on a2uicatalog.ai, so the diagram never leaves this domain.",
+            "enum": [
+              "diagrams",
+              "self"
+            ],
+            "type": "string"
+          },
+          "polish": {
+            "description": "Visual finish using draw.io's own effects, layered on your styles without overriding any key you set: clean (default, nothing added), soft (rounded corners, gentle shadow, subtle gradient), glass (soft plus a glass shine), sketch (hand-drawn outlines). Text, images, icons, containers and shapes restyled by a vendor pack are left alone.",
+            "enum": [
+              "clean",
+              "soft",
+              "glass",
+              "sketch"
+            ],
+            "type": "string"
+          },
+          "restyle": {
+            "description": "Rewrite recognised services to draw.io's own icon styles and recognised groups (AWS: VPC, subnets, Region; Google Cloud: zones) to their group styles. AWS has icons for 350 services; for Google Cloud draw.io has 19 core products as stencils, and other Google services keep your style. Default false: the diagram is passed through as you wrote it and only reported on.",
+            "type": "boolean"
+          },
+          "style": {
+            "description": "Style pack. auto (default): if the diagram names AWS or Google Cloud services, check it against that vendor's conventions and report findings. aws or gcp: force a pack. none: no style checks. Name a service in the label (\"Lambda\", \"Cloud Run\") or set a service=\"...\" attribute on an <object> wrapper.",
+            "enum": [
+              "auto",
+              "aws",
+              "gcp",
+              "none"
+            ],
+            "type": "string"
+          },
+          "title": {
+            "description": "Optional name for the downloaded file, for example \"checkout-flow\".",
+            "type": "string"
+          },
+          "xml": {
+            "description": "The mxGraph XML: an <mxGraphModel> (or an uncompressed <mxfile> holding one).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "xml"
+        ],
+        "type": "object"
+      },
+      "name": "drawio_open"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "unlink_slack_account"
+      },
+      "description": "Revoke one or more Slack accounts' link to this reader's store, from the Workspace side (the reverse of the Slack-side `/a2ui unlink` command — see slack-compiler/DESIGN-identity.md, \"many Slack -> one sub\"). Removes that account's ability to post via render_reading_to_slack or resolve to this reader; everything else about the reader's account is untouched. Takes an array so the Workspace's multi-select can revoke a batch in one call.",
+      "inputSchema": {
+        "properties": {
+          "keys": {
+            "description": "slack_key values from the Links view, \"{team_id}:{user_id}\".",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "keys"
+        ],
+        "type": "object"
+      },
+      "name": "unlink_slack_account",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "available": {
+            "description": "False when there is no signed-in reader or the store failed.",
+            "type": "boolean"
+          },
+          "note": {
+            "description": "Guidance for the caller.",
+            "type": "string"
+          },
+          "reason": {
+            "description": "Why nothing was removed.",
+            "type": "string"
+          },
+          "removed": {
+            "description": "Links removed.",
+            "type": "integer"
+          },
+          "requested": {
+            "description": "Keys requested.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "available"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "wall_calc"
+      },
+      "description": "Compute a coursed block/brick wall specification — course and unit counts, weight, cost, mortar bags, a build-time curve across 1-6 builders, and load-bearing/height advisories. Pure arithmetic, no model call: a native-catalogue rebuild of the Gemini Enterprise \"Wall Builder\" demo, kept byte-for-byte correct against that original's formulas (see mcp-worker/test/test_wall_calc_parity.py). `country` is not an input — it is derived from block_id and returned in the result.",
+      "inputSchema": {
+        "properties": {
+          "block_id": {
+            "description": "parpaing200/150 and brique are French standards; uk_brick/uk_block are UK standards. Determines unit dimensions, weight, and colour.",
+            "enum": [
+              "parpaing200",
+              "parpaing150",
+              "brique",
+              "uk_brick",
+              "uk_block"
+            ],
+            "type": "string"
+          },
+          "builders": {
+            "description": "1-6, snapped/clamped. Selects which point on the returned build_days_curve is build_days_selected.",
+            "type": "number"
+          },
+          "height_m": {
+            "description": "0.2-20m, snapped to 0.2m steps.",
+            "type": "number"
+          },
+          "include_dpc": {
+            "description": "Adds a damp-proof-course length to the result.",
+            "type": "boolean"
+          },
+          "load_bearing": {
+            "description": "Triggers an advisory (not a block swap) if the chosen block is under the load-bearing weight threshold.",
+            "type": "boolean"
+          },
+          "pattern": {
+            "description": "running = half-unit stagger on alternate courses; stack = none.",
+            "enum": [
+              "running",
+              "stack"
+            ],
+            "type": "string"
+          },
+          "width_m": {
+            "description": "0.2-20m, snapped to 0.2m steps.",
+            "type": "number"
+          }
+        },
+        "required": [
+          "block_id",
+          "height_m",
+          "width_m",
+          "pattern"
+        ],
+        "type": "object"
+      },
+      "name": "wall_calc",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "actual_h_mm": {
+            "description": "Built height in mm.",
+            "type": "number"
+          },
+          "actual_w_mm": {
+            "description": "Built width in mm.",
+            "type": "number"
+          },
+          "available": {
+            "description": "Always true.",
+            "type": "boolean"
+          },
+          "block_id": {
+            "description": "Block id.",
+            "type": "string"
+          },
+          "build_days_curve": {
+            "description": "Build days per builder count.",
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "build_days_selected": {
+            "description": "Build days at the chosen builder count.",
+            "type": "number"
+          },
+          "builders": {
+            "description": "Builders, snapped to range.",
+            "type": "integer"
+          },
+          "country": {
+            "description": "Country the block spec is for.",
+            "type": "string"
+          },
+          "courses": {
+            "description": "Courses of blocks.",
+            "type": "integer"
+          },
+          "dpc_length_m": {
+            "description": "DPC length in metres.",
+            "type": "number"
+          },
+          "height_advisory": {
+            "description": "True when the wall is tall.",
+            "type": "boolean"
+          },
+          "height_m": {
+            "description": "Snapped wall height in metres.",
+            "type": "number"
+          },
+          "height_mm": {
+            "description": "Height in mm.",
+            "type": "number"
+          },
+          "height_pct": {
+            "description": "Height as a percentage of the maximum.",
+            "type": "number"
+          },
+          "include_dpc": {
+            "description": "Whether a damp-proof course is included.",
+            "type": "boolean"
+          },
+          "load_bearing": {
+            "description": "Whether load-bearing was requested.",
+            "type": "boolean"
+          },
+          "load_bearing_advisory": {
+            "description": "True when the block is too light for load-bearing.",
+            "type": "boolean"
+          },
+          "mortar_bags": {
+            "description": "Mortar bags.",
+            "type": "integer"
+          },
+          "pattern": {
+            "description": "Bond pattern.",
+            "type": "string"
+          },
+          "per_course": {
+            "description": "Blocks per course.",
+            "type": "integer"
+          },
+          "total_cost": {
+            "description": "Total block cost.",
+            "type": "number"
+          },
+          "total_units": {
+            "description": "Total blocks.",
+            "type": "integer"
+          },
+          "total_weight_kg": {
+            "description": "Total weight in kg.",
+            "type": "number"
+          },
+          "width_m": {
+            "description": "Snapped wall width in metres.",
+            "type": "number"
+          },
+          "width_mm": {
+            "description": "Width in mm.",
+            "type": "number"
+          }
+        },
+        "required": [
+          "available",
+          "courses",
+          "per_course",
+          "total_units",
+          "total_weight_kg",
+          "total_cost",
+          "builders"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "whoami"
+      },
+      "description": "Report who this connection is authenticated as. Answers two SEPARATE questions that are easy to conflate: which APPLICATION is connected (the OAuth client), and which HUMAN authorised it (the signed-in account, when the endpoint is one that can know). The public endpoint is anonymous by design and will say so — that is not an error, it is the free tier. Use it to check whether per-user features (saved profile, reading history) are available before offering them.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "whoami",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "application": {
+            "description": "OAuth client id, or null when anonymous.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "authenticated": {
+            "description": "True on the authenticated endpoint.",
+            "type": "boolean"
+          },
+          "endpoint": {
+            "description": "\"public\" or \"authenticated\".",
+            "type": "string"
+          },
+          "note": {
+            "description": "What this identity can do.",
+            "type": "string"
+          },
+          "per_user_features": {
+            "description": "True when a human is attributable.",
+            "type": "boolean"
+          },
+          "user": {
+            "description": "The signed-in user {sub, email}, or null.",
+            "type": [
+              "object",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "authenticated",
+          "endpoint",
+          "per_user_features",
+          "note"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "identify_model"
+      },
+      "description": "CALL THIS FIRST, before any other a2ui-catalog tool, once per session. Declares your own model identity so this response can hand you capability-matched guidance up front — some models need simpler, judgment-free tools; skipping this just means you default to the full toolkit, including tools that require sizing/pagination judgment calls.\n\nHOW TO ANSWER — do not guess:\n- Copy your model name EXACTLY as stated in your own system prompt or developer context (look for phrasing like \"you are powered by the model named X\" or similar). Do NOT infer it from your training cutoff, your own behavior, or general capability.\n- Examples of valid values: \"claude-haiku-4-5\", \"claude-sonnet-5\", \"claude-opus-4-8\", \"gemini-2.0-flash\", \"gpt-4o\". Partial names are fine (\"haiku\", \"sonnet\").\n- If your model name is genuinely not stated anywhere in your context, pass \"unknown\" — do NOT guess a plausible-sounding value. A wrong report is worse than no report: it can hand you tools you cannot reliably operate.",
+      "inputSchema": {
+        "properties": {
+          "model": {
+            "description": "Your own model identifier, exactly as your system prompt states it, or \"unknown\" if not stated. Do not guess.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "model"
+        ],
+        "type": "object"
+      },
+      "name": "identify_model",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "guidance": {
+            "description": "Capability-matched advice.",
+            "type": "string"
+          },
+          "recognized_as": {
+            "description": "Model name as declared, lower-cased, or \"unknown\".",
+            "type": "string"
+          },
+          "recommended_tools": {
+            "description": "Tool names to prefer.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "tier": {
+            "description": "Capability tier.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "recognized_as",
+          "tier",
+          "recommended_tools",
+          "guidance"
+        ],
+        "type": "object"
+      }
+    }
+  ],
+  "url": "https://a2uicatalog.ai/mcp"
+}

@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "4b3eebe3e9b1e4e1d4b1248474e492afe2d59e2f52e5dc0a54b95aed9c216d7a",
+  "full_hash": "981a96f583b69334dfa7cdf78c31f459818b691f595ffbe0ecda845c9676092a",
   "name": "ai.agenticfabricationnetwork/ufp",
-  "observed_at": "2026-11-06T02:02:12.268784Z",
+  "observed_at": "2026-11-11T02:03:42.389205Z",
   "sources": [
     "official"
   ],
-  "tool_count": 12,
+  "tool_count": 14,
   "tools": [
     {
       "_meta": {
@@ -26,7 +26,7 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Get fabrication price and delivery offers for a design file or an existing AFN part number. Supports 3D printing, CNC machining, sheet metal, decals, print, and apparel. If the user just provides a file and asks for a price, omit process so AFN can route it to suitable makers. Provide the design as design_file (an attachment or generated file) or file_url (a public URL). For a reorder, pass the UFP part number as part_number instead of a file; locked parts also require share_key from the owner's share link. A .ufp part container is accepted as a design file, and its saved specification applies unless the user changes it.",
+      "description": "Get fabrication price and delivery offers for a design file or an existing AFN part number. Supports 3D printing, CNC machining, sheet metal, decals, print, and apparel. If the user just provides a file and asks for a price, omit process so AFN can route it to suitable makers. Provide the design as design_file (an attachment or generated file) or file_url (a public URL). For a reorder, pass the UFP part number as part_number instead of a file; locked parts also require share_key from the owner's share link. A .ufp part container is accepted as a design file, and its saved specification applies unless the user changes it. Some offers carry manufacturability_check: the price is set; the shop is confirming it can make the part as drawn (status \"checking\" for about expected_s seconds, then passed, repriced, or failed) — present them as real prices and never call create_checkout on one while it is still checking.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -549,6 +549,19 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "additionalProperties": false,
         "properties": {
+          "bend_count": {
+            "anyOf": [
+              {
+                "maximum": 50,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How many bends this part has, when the user names a COUNT but not where the bends go (\"it has 2 bends\" → 2) — a spec change: sheet-metal lanes requote the part formed with that many bends (0 = cut it flat, on the record). The cheap acknowledgment for a flat design whose bends are not articulated: when a bends list is on the quote (or passed here), the list wins and this count follows it — change articulated bends through bends, not this. An earlier \"cut it flat\" (bends: null) does not pin the count: a later bend_count > 0 re-prices the part formed. Pass null to REMOVE a previously asked bend count — the part prices as if no count was ever stated"
+          },
           "bends": {
             "anyOf": [
               {
@@ -1085,6 +1098,19 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "additionalProperties": false,
         "properties": {
+          "bend_count": {
+            "anyOf": [
+              {
+                "maximum": 50,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How many bends this part has, when the user names a COUNT but not where the bends go (\"it has 2 bends\" → 2) — a spec change: sheet-metal lanes requote the part formed with that many bends (0 = cut it flat, on the record). The cheap acknowledgment for a flat design whose bends are not articulated: when a bends list is on the quote (or passed here), the list wins and this count follows it — change articulated bends through bends, not this. An earlier \"cut it flat\" (bends: null) does not pin the count: a later bend_count > 0 re-prices the part formed. Pass null to REMOVE a previously asked bend count — the part prices as if no count was ever stated"
+          },
           "bends": {
             "anyOf": [
               {
@@ -1624,7 +1650,7 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
-      "description": "INTERNAL — the offer board calls this to refresh itself while vendors finish pricing. Never call this yourself. The board you were given is already final for its turn; do not reach for refine_quote to look at it again either, that paints a duplicate board.",
+      "description": "INTERNAL — the offer board calls this to refresh itself while vendors finish pricing. Never call this yourself. The board you were given is already final for its turn; do not reach for refine_quote to look at it again either, that paints a duplicate board. An offer's manufacturability_check (status checking → passed | repriced | failed, expected_s) means the price is set; the shop is confirming it can make the part as drawn; the board renders it.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -1698,7 +1724,7 @@
         "openWorldHint": false,
         "readOnlyHint": false
       },
-      "description": "Create the order and get a hosted payment link for a chosen offer. Call this as soon as the user picks an offer + shipping speed. This tool takes NO personal details: never ask for — and never pass — a name, address, email, or phone; the secure payment page collects the shipping address, email, and phone (and billing) itself, even when the user volunteered them in chat. Returns checkout_url — AFN's order page (what is being made, by which shop, the all-in price) with a Continue to payment button to the secure hosted payment page; give the link to the user. UFP places the vendor order automatically after payment.",
+      "description": "Create the order and get a hosted payment link for a chosen offer. Call this as soon as the user picks an offer + shipping speed. This tool takes NO personal details: never ask for — and never pass — a name, address, email, or phone; the secure payment page collects the shipping address, email, and phone (and billing) itself, even when the user volunteered them in chat. Returns checkout_url — AFN's order page (what is being made, by which shop, the all-in price) with a Continue to payment button to the secure hosted payment page; give the link to the user. UFP places the vendor order automatically after payment. An offer whose manufacturability_check.status is still \"checking\" is refused (offer_not_ready, with retry_after_s): the price is set; the shop is confirming it can make the part as drawn — wait for the check to pass before calling, and never call this on a checking offer. An offer whose status is \"unchecked\" (no shop asked for that option yet — the price stands) needs check_offer first; check out once it reads passed or repriced.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -2012,6 +2038,103 @@
       },
       "name": "get_shop_gauges",
       "title": "A shop's stocked sheet gauges"
+    },
+    {
+      "_meta": {
+        "openai/toolInvocation/invoked": "Fetched prices by quantity",
+        "openai/toolInvocation/invoking": "Pricing by quantity…",
+        "openai/widgetAccessible": true,
+        "ui": {
+          "visibility": [
+            "model",
+            "app"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "How the per-unit price moves with quantity for a quote you already have: for every shop on the board, the item price per unit at each quantity (default 1, 2, 5, 10, 25, 50, 100, 250, 500, 1000; pass up to 16 of your own in 1..10000) from that shop's own pricing with the network's markup included, plus its arrival window — instant, no shop is contacted, nothing changes on the quote. Call it when the user asks what more or fewer pieces would cost (\"what would 50 run me?\", \"any price breaks?\"). The board's quoted price stays the ceiling at the chosen quantity (each option's `live` row); a null cell means that shop's pricing does not cover that quantity — refine_quote with the new quantities gets the real number. Present these as the shops' own pricing, never as an estimate; every order still passes the manufacturability check.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "quantities": {
+            "description": "Up to 16 quantities in 1..10000; omit for 1, 2, 5, 10, 25, 50, 100, 250, 500, 1000",
+            "items": {
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "maxItems": 16,
+            "type": "array"
+          },
+          "quote_id": {
+            "description": "The quote whose board to price by quantity",
+            "type": "string"
+          }
+        },
+        "required": [
+          "quote_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_price_curve",
+      "title": "Price by quantity"
+    },
+    {
+      "_meta": {
+        "openai/toolInvocation/invoked": "The shop answered",
+        "openai/toolInvocation/invoking": "Asking the shop to confirm…",
+        "openai/widgetAccessible": true,
+        "ui": {
+          "visibility": [
+            "model",
+            "app"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Run the shop's manufacturability check on ONE offer whose manufacturability_check.status is \"unchecked\" (the price stands from the shop's own pricing, but no shop was asked for that material / finish yet) or still \"checking\". The network asks that shop once for exactly this option — its material, gauge, finish, quantity and the quote's destination — and lands the answer on the SAME offer: passed (orderable at the shown price), repriced (the shop priced it higher; the detail says so), or failed (the shop declined it). Call it when the user settles on such an offer and before create_checkout (checkout refuses an unchecked offer). Waits up to wait_s (default 45) for the shop; pending: true means the shop is still answering — re-read the quote shortly. Nothing else on the quote changes.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "offer_id": {
+            "description": "The offer to have the shop confirm",
+            "type": "string"
+          },
+          "quote_id": {
+            "description": "The quote the offer belongs to",
+            "type": "string"
+          },
+          "wait_s": {
+            "description": "Seconds to wait for the shop (default 45)",
+            "maximum": 60,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "quote_id",
+          "offer_id"
+        ],
+        "type": "object"
+      },
+      "name": "check_offer",
+      "title": "Ask the shop to confirm an offer"
     }
   ],
   "url": "https://agenticfabricationnetwork.ai/mcp"

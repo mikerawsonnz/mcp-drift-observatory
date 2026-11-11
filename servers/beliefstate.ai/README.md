@@ -6,16 +6,16 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://beliefstate.ai/v1/research/mcp` | 23 | [`9fde12747fb8`](d29176e06366706dabab.json) | 2026-11-10 |
+| `https://beliefstate.ai/v1/research/mcp` | 23 | [`ae00b9ae2b9e`](d29176e06366706dabab.json) | 2026-11-11 |
 
 ## Tools at `https://beliefstate.ai/v1/research/mcp`
 
-- `get_brief`: `Retrieves a cited research brief for a company, ETF or research subject, including investor theses, risks, catalysts, changes and available…`
+- `get_brief`: `Read a cited research brief for a covered U.S. ticker, ETF or released subject. Overview, current and full views support dated research and…`
 - `get_case`: `Retrieves one complete investment case by returned belief_id: investor, reasoning, evidence, risks, catalysts, conditions, revisions, outco…`
 - `get_cases`: `Retrieves dated investment cases for one company or research subject, with optional investor, direction and time filters. Returns attribute…`
 - `get_catalysts`: `Retrieves evidence-linked catalysts for one company, research subject, investment case or the explicitly selected released corpus. Returns…`
 - `get_changes`: `Retrieves the ordered research change journal for a company, subject, case or explicitly selected released corpus. Returns dated events, ci…`
-- `get_companies`: `Retrieves matching SEC-registered US companies by ticker or company name. Returns matching companies and their direct BeliefState research…`
+- `get_companies`: `Find SEC-registered U.S. companies and selected verified international listings by symbol or name. Search by market, sector or exchange-qua…`
 - `get_company_facts`: `Retrieves retained financial facts, company references, segment metrics, operating KPIs and management guidance for one ticker. Select reco…`
 - `get_comparison`: `Retrieves a cited engine comparison of two distinct investment cases using their returned belief_id and compare_to_belief_id. Returns a cit…`
 - `get_context_assessment`: `Retrieves a dated engine context assessment by its returned assessment identifier, including permitted supporting evidence and coverage lim…`
@@ -25,7 +25,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_investor_outcomes`: `Retrieves an investor's stored publication-based outcomes for one company, research subject, investment case or the explicitly selected rel…`
 - `get_macro_context`: `Retrieves retained government macroeconomic observations in one ticker research scope. Filter by native series_ids, agency, measurement_nam…`
 - `get_market_returns`: `Retrieves supported split-adjusted close-price returns for one ticker versus SPY. Request session_intervals from 1 to 252; date bounds sele…`
-- `get_news`: `Retrieves recent SEC filing metadata for one verified ticker: forms, filing and acceptance dates, official SEC links and the last observati…`
+- `get_news`: `Check recent SEC filings for one verified ticker. Set include_earnings to also read issuer-announced earnings schedules when available. Fre…`
 - `get_options_activity`: `Retrieves retained options bars, flow aggregates and open interest for one ticker. Select activity_type, call/put right, expiration, strike…`
 - `get_risks`: `Retrieves evidence-linked risks for one company, research subject, investment case or the explicitly selected released corpus. Returns reco…`
 - `get_search_results`: `Retrieves ranked published investment cases matching thesis, investment theme or trade setup, with an optional company or subject filter. R…`
@@ -36,6 +36,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-11: [description changed, schema changed](../../deltas/2026-11-11/d29176e06366706dabab.json): `6011 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-10: [schema changed](../../deltas/2026-11-10/d29176e06366706dabab.json): `4959 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-09: [annotation changed, count changed, description changed, field changed, schema changed, tool added, tool removed](../../deltas/2026-11-09/d29176e06366706dabab.json): `20 tool(s) added; 15 tool(s) removed; 9574 field(s) changed; signals: length_more_than_doubled, url_introduced`
 - 2026-11-08: [schema changed](../../deltas/2026-11-08/d29176e06366706dabab.json): `32408 field(s) changed; signals: length_more_than_doubled`

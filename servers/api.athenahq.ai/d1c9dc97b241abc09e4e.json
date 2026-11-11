@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "5957419c6d444ec536daadd590f8a056c48bdb0c413b293ee8646221b4b2edfb",
+  "full_hash": "92166e7a5113e514c9e3494740da31e9ceed1295b33323015a00aa9b8f6b5f2a",
   "name": "ai.athenahq/mcp",
-  "observed_at": "2026-11-10T02:04:38.029068Z",
+  "observed_at": "2026-11-11T02:03:48.193562Z",
   "sources": [
     "official"
   ],
-  "tool_count": 128,
+  "tool_count": 132,
   "tools": [
     {
       "_meta": {
@@ -13015,6 +13015,328 @@
         "destructiveHint": false,
         "openWorldHint": true,
         "readOnlyHint": false,
+        "title": "Create brand kit"
+      },
+      "description": "Create a brand kit from text the user provides: a name, guidance text per field (voice is the writing direction), voice settings and writing rules, all authored by the caller; nothing is generated. The kit starts as a draft; content generation uses it only once published, which publish: true does as version 1 (or update_brand_kit later). The website's first kit becomes its default. A name another kit uses is refused; a rule that contradicts an existing global rule is refused with the explanation and no kit is created. Kit rules need the writing rules feature on the plan. To change an existing kit, use update_brand_kit; to generate a kit from the website or uploaded documents, use the Brand Profile page.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "guidance": {
+            "description": "Guidance text per field, one entry per field.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "field": {
+                  "description": "voice is the writing direction; the others are audience, perspective (point of view), author (author guidance), terminology, channel (format and channel), locale (language and locale), disclosures (claims and disclosures).",
+                  "enum": [
+                    "voice",
+                    "audience",
+                    "perspective",
+                    "author",
+                    "terminology",
+                    "channel",
+                    "locale",
+                    "disclosures"
+                  ],
+                  "type": "string"
+                },
+                "text": {
+                  "description": "The field's text. Markdown paragraphs, headings, bullets and numbered items are kept as structure.",
+                  "maxLength": 12000,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "field",
+                "text"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "name": {
+            "description": "The kit's name, unique on the website.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "publish": {
+            "description": "true publishes the new kit as version 1 so content generation can use it. Only when the user asked to publish.",
+            "type": "boolean"
+          },
+          "rules": {
+            "additionalProperties": false,
+            "description": "Writing rules for this kit.",
+            "properties": {
+              "add": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "category": {
+                      "description": "A short grouping label; \"\" clears it.",
+                      "maxLength": 100,
+                      "type": "string"
+                    },
+                    "text": {
+                      "description": "One writing rule, as an instruction to the writer.",
+                      "maxLength": 2000,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "voice_settings": {
+            "additionalProperties": false,
+            "description": "Each 1 (formality: casual, expression: reserved, humor: serious, stance: neutral, technicality: plain) to 5 (formal, expressive, playful, opinionated, technical), or \"auto\" to let the writer decide. Omitted dimensions keep their value.",
+            "properties": {
+              "expression": {
+                "anyOf": [
+                  {
+                    "maximum": 5,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "const": "auto",
+                    "type": "string"
+                  }
+                ]
+              },
+              "formality": {
+                "anyOf": [
+                  {
+                    "maximum": 5,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "const": "auto",
+                    "type": "string"
+                  }
+                ]
+              },
+              "humor": {
+                "anyOf": [
+                  {
+                    "maximum": 5,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "const": "auto",
+                    "type": "string"
+                  }
+                ]
+              },
+              "stance": {
+                "anyOf": [
+                  {
+                    "maximum": 5,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "const": "auto",
+                    "type": "string"
+                  }
+                ]
+              },
+              "technicality": {
+                "anyOf": [
+                  {
+                    "maximum": 5,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "const": "auto",
+                    "type": "string"
+                  }
+                ]
+              }
+            },
+            "type": "object"
+          },
+          "website_id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "website_id",
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "create_brand_kit",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "changed": {
+            "additionalProperties": false,
+            "properties": {
+              "guidance_fields": {
+                "items": {
+                  "description": "voice is the writing direction; the others are audience, perspective (point of view), author (author guidance), terminology, channel (format and channel), locale (language and locale), disclosures (claims and disclosures).",
+                  "enum": [
+                    "voice",
+                    "audience",
+                    "perspective",
+                    "author",
+                    "terminology",
+                    "channel",
+                    "locale",
+                    "disclosures"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "name": {
+                "type": "boolean"
+              },
+              "rules_added": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "rules_removed": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "rules_updated": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "voice_settings": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "name",
+              "guidance_fields",
+              "voice_settings",
+              "rules_added",
+              "rules_updated",
+              "rules_removed"
+            ],
+            "type": "object"
+          },
+          "kit": {
+            "additionalProperties": false,
+            "properties": {
+              "draft_version": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "generation_status": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "generating",
+                      "failed"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "has_unpublished_changes": {
+                "type": "boolean"
+              },
+              "id": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "is_default": {
+                "type": "boolean"
+              },
+              "name": {
+                "type": "string"
+              },
+              "published_version": {
+                "anyOf": [
+                  {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "is_default",
+              "draft_version",
+              "published_version",
+              "has_unpublished_changes",
+              "generation_status"
+            ],
+            "type": "object"
+          },
+          "outcome": {
+            "enum": [
+              "saved",
+              "saved_and_published",
+              "saved_publish_failed"
+            ],
+            "type": "string"
+          },
+          "publish_error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [],
+          "type": "oauth2"
+        }
+      ]
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
         "title": "Generate an article or content brief"
       },
       "description": "Generate an article or content brief in AthenaHQ. Fetches source URLs, sends source material to external AI providers, and consumes content credits. Obtain user approval before calling. Does not publish to a website or CMS. For draft mode, auto_approve defaults to true; set false to generate only a brief and wait for approve_brief. Poll get_content_status using each returned content_ids value. Slice mode returns slice_titles and an empty content_ids array; generated items appear in list_content. To save an already-written article without generation or credit use, call add_content.",
@@ -15985,6 +16307,488 @@
             "maximum": 9007199254740991,
             "minimum": 0,
             "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [],
+          "type": "oauth2"
+        }
+      ]
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get brand kit"
+      },
+      "description": "Read a brand kit as the Brand Profile editor shows it, to inspect or change it: the draft name, the eight guidance fields as text (voice is the writing direction), voice settings (1-5 or auto), tone traits, the kit's writing rules with ids, and the website's global writing rules with ids, plus draft and published versions. Omit kit_id for the website's default kit; available_kits lists every kit. Content generation uses a kit's published version, so has_unpublished_changes means the draft differs from it. Guidance fields longer than the clip come back shortened and listed in truncated_fields; pass fields to read those whole, which update_brand_kit's find needs. Rules are clipped too, each with its own truncated flag. Call this before update_brand_kit. To write in the brand's voice, read brandKit__get instead. Read-only.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "fields": {
+            "description": "Guidance fields to return whole (up to 12,000 characters) instead of clipped at 4,000. Needed before a find edit on a clipped field.",
+            "items": {
+              "description": "voice is the writing direction; the others are audience, perspective (point of view), author (author guidance), terminology, channel (format and channel), locale (language and locale), disclosures (claims and disclosures).",
+              "enum": [
+                "voice",
+                "audience",
+                "perspective",
+                "author",
+                "terminology",
+                "channel",
+                "locale",
+                "disclosures"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "kit_id": {
+            "description": "The brand kit to read. Omit it for the website's default kit; available_kits lists every kit.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "website_id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "website_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_brand_kit",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "available_kits": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "draft_version": {
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "generation_status": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "generating",
+                        "failed"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "has_unpublished_changes": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "is_default": {
+                  "type": "boolean"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "published_version": {
+                  "anyOf": [
+                    {
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "is_default",
+                "draft_version",
+                "published_version",
+                "has_unpublished_changes",
+                "generation_status"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "can_use_rules": {
+            "type": "boolean"
+          },
+          "global_rules": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "category": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "is_active": {
+                  "type": "boolean"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "truncated": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "text",
+                "category",
+                "is_active",
+                "truncated"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "global_version": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "kit": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "custom_voice_traits": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "anyOf": [
+                            {
+                              "maximum": 5,
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            {
+                              "const": "auto",
+                              "type": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "value"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "draft_version": {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "examples_count": {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "generation_status": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "generating",
+                          "failed"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "guidance": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "audience": {
+                        "type": "string"
+                      },
+                      "author": {
+                        "type": "string"
+                      },
+                      "channel": {
+                        "type": "string"
+                      },
+                      "disclosures": {
+                        "type": "string"
+                      },
+                      "locale": {
+                        "type": "string"
+                      },
+                      "perspective": {
+                        "type": "string"
+                      },
+                      "terminology": {
+                        "type": "string"
+                      },
+                      "voice": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "voice",
+                      "audience",
+                      "perspective",
+                      "author",
+                      "terminology",
+                      "channel",
+                      "locale",
+                      "disclosures"
+                    ],
+                    "type": "object"
+                  },
+                  "has_unpublished_changes": {
+                    "type": "boolean"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                    "type": "string"
+                  },
+                  "is_default": {
+                    "type": "boolean"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "published_version": {
+                    "anyOf": [
+                      {
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "rules": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "category": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                          "type": "string"
+                        },
+                        "is_active": {
+                          "type": "boolean"
+                        },
+                        "text": {
+                          "type": "string"
+                        },
+                        "truncated": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "text",
+                        "category",
+                        "is_active",
+                        "truncated"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "rules_total": {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "sources_count": {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "tone_traits": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "voice_settings": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "expression": {
+                        "anyOf": [
+                          {
+                            "maximum": 5,
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          {
+                            "const": "auto",
+                            "type": "string"
+                          }
+                        ]
+                      },
+                      "formality": {
+                        "anyOf": [
+                          {
+                            "maximum": 5,
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          {
+                            "const": "auto",
+                            "type": "string"
+                          }
+                        ]
+                      },
+                      "humor": {
+                        "anyOf": [
+                          {
+                            "maximum": 5,
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          {
+                            "const": "auto",
+                            "type": "string"
+                          }
+                        ]
+                      },
+                      "stance": {
+                        "anyOf": [
+                          {
+                            "maximum": 5,
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          {
+                            "const": "auto",
+                            "type": "string"
+                          }
+                        ]
+                      },
+                      "technicality": {
+                        "anyOf": [
+                          {
+                            "maximum": 5,
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          {
+                            "const": "auto",
+                            "type": "string"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "formality",
+                      "expression",
+                      "humor",
+                      "stance",
+                      "technicality"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "is_default",
+                  "draft_version",
+                  "published_version",
+                  "has_unpublished_changes",
+                  "generation_status",
+                  "guidance",
+                  "tone_traits",
+                  "voice_settings",
+                  "custom_voice_traits",
+                  "rules",
+                  "rules_total",
+                  "examples_count",
+                  "sources_count"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rules_unavailable": {
+            "type": "boolean"
+          },
+          "truncated": {
+            "type": "boolean"
+          },
+          "truncated_fields": {
+            "items": {
+              "description": "voice is the writing direction; the others are audience, perspective (point of view), author (author guidance), terminology, channel (format and channel), locale (language and locale), disclosures (claims and disclosures).",
+              "enum": [
+                "voice",
+                "audience",
+                "perspective",
+                "author",
+                "terminology",
+                "channel",
+                "locale",
+                "disclosures"
+              ],
+              "type": "string"
+            },
+            "type": "array"
           }
         },
         "type": "object"
@@ -23424,6 +24228,551 @@
               "created_at"
             ],
             "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [],
+          "type": "oauth2"
+        }
+      ]
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Update brand kit"
+      },
+      "description": "Change one brand kit's name, guidance text, voice settings, or kit writing rules, and optionally publish it, under the same rules as the Brand Profile page. Call get_brand_kit first. Edits save to the kit's draft; content generation keeps using the published version until publish is true, which creates a new immutable version (the Brand Profile page can restore earlier ones). A guidance entry without find replaces the whole field with text (empty text clears it); with find, text replaces that passage, which must occur exactly once in the field text get_brand_kit returned (empty text deletes it). Voice settings take 1-5 or \"auto\"; omitted settings keep their value. Rules: add new ones, update by id (omitted fields keep their value; category \"\" clears it), or remove by id. Kit rules need the writing rules feature on the plan. A rule that contradicts an existing kit or global rule is refused with the explanation and nothing is saved; a rename to a name another kit uses is refused. When the result says the kit changed in another session, call get_brand_kit again and retry. outcome saved_publish_failed means the draft was saved but not published; publish_error says why. Global writing rules are changed with update_global_rules, not here.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "guidance": {
+            "description": "Guidance text changes, one entry per field. Without find, text replaces the whole field (empty text clears it). With find, text replaces that passage (empty text deletes it).",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "field": {
+                  "description": "voice is the writing direction; the others are audience, perspective (point of view), author (author guidance), terminology, channel (format and channel), locale (language and locale), disclosures (claims and disclosures).",
+                  "enum": [
+                    "voice",
+                    "audience",
+                    "perspective",
+                    "author",
+                    "terminology",
+                    "channel",
+                    "locale",
+                    "disclosures"
+                  ],
+                  "type": "string"
+                },
+                "find": {
+                  "description": "A passage to replace with text, copied exactly from the field text get_brand_kit returned; it must occur exactly once. Omit it to replace the whole field.",
+                  "maxLength": 12000,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "text": {
+                  "description": "The new text. Markdown paragraphs, headings, bullets and numbered items are kept as structure.",
+                  "maxLength": 12000,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "field",
+                "text"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "kit_id": {
+            "description": "The brand kit, from get_brand_kit's available_kits.",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "name": {
+            "description": "A new name, unique on the website.",
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "publish": {
+            "description": "true publishes the saved draft as a new version, which content generation uses from then on. Only when the user asked to publish.",
+            "type": "boolean"
+          },
+          "rules": {
+            "additionalProperties": false,
+            "description": "Writing rules to add, update by id, or remove by id. Ids come from get_brand_kit.",
+            "properties": {
+              "add": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "category": {
+                      "description": "A short grouping label; \"\" clears it.",
+                      "maxLength": 100,
+                      "type": "string"
+                    },
+                    "text": {
+                      "description": "One writing rule, as an instruction to the writer.",
+                      "maxLength": 2000,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "text"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "remove": {
+                "description": "Rule ids to delete.",
+                "items": {
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "update": {
+                "description": "By id; omitted fields keep their value.",
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "category": {
+                      "description": "A short grouping label; \"\" clears it.",
+                      "maxLength": 100,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                      "type": "string"
+                    },
+                    "is_active": {
+                      "description": "false keeps the rule but stops applying it.",
+                      "type": "boolean"
+                    },
+                    "text": {
+                      "description": "One writing rule, as an instruction to the writer.",
+                      "maxLength": 2000,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "voice_settings": {
+            "additionalProperties": false,
+            "description": "Each 1 (formality: casual, expression: reserved, humor: serious, stance: neutral, technicality: plain) to 5 (formal, expressive, playful, opinionated, technical), or \"auto\" to let the writer decide. Omitted dimensions keep their value.",
+            "properties": {
+              "expression": {
+                "anyOf": [
+                  {
+                    "maximum": 5,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "const": "auto",
+                    "type": "string"
+                  }
+                ]
+              },
+              "formality": {
+                "anyOf": [
+                  {
+                    "maximum": 5,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "const": "auto",
+                    "type": "string"
+                  }
+                ]
+              },
+              "humor": {
+                "anyOf": [
+                  {
+                    "maximum": 5,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "const": "auto",
+                    "type": "string"
+                  }
+                ]
+              },
+              "stance": {
+                "anyOf": [
+                  {
+                    "maximum": 5,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "const": "auto",
+                    "type": "string"
+                  }
+                ]
+              },
+              "technicality": {
+                "anyOf": [
+                  {
+                    "maximum": 5,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "const": "auto",
+                    "type": "string"
+                  }
+                ]
+              }
+            },
+            "type": "object"
+          },
+          "website_id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "website_id",
+          "kit_id"
+        ],
+        "type": "object"
+      },
+      "name": "update_brand_kit",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "changed": {
+            "additionalProperties": false,
+            "properties": {
+              "guidance_fields": {
+                "items": {
+                  "description": "voice is the writing direction; the others are audience, perspective (point of view), author (author guidance), terminology, channel (format and channel), locale (language and locale), disclosures (claims and disclosures).",
+                  "enum": [
+                    "voice",
+                    "audience",
+                    "perspective",
+                    "author",
+                    "terminology",
+                    "channel",
+                    "locale",
+                    "disclosures"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "name": {
+                "type": "boolean"
+              },
+              "rules_added": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "rules_removed": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "rules_updated": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "voice_settings": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "name",
+              "guidance_fields",
+              "voice_settings",
+              "rules_added",
+              "rules_updated",
+              "rules_removed"
+            ],
+            "type": "object"
+          },
+          "kit": {
+            "additionalProperties": false,
+            "properties": {
+              "draft_version": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "generation_status": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "generating",
+                      "failed"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "has_unpublished_changes": {
+                "type": "boolean"
+              },
+              "id": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "is_default": {
+                "type": "boolean"
+              },
+              "name": {
+                "type": "string"
+              },
+              "published_version": {
+                "anyOf": [
+                  {
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "is_default",
+              "draft_version",
+              "published_version",
+              "has_unpublished_changes",
+              "generation_status"
+            ],
+            "type": "object"
+          },
+          "outcome": {
+            "enum": [
+              "saved",
+              "saved_and_published",
+              "saved_publish_failed"
+            ],
+            "type": "string"
+          },
+          "publish_error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "scopes": [],
+          "type": "oauth2"
+        }
+      ]
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Update global rules"
+      },
+      "description": "Add, update or remove the website's global writing rules, the ones the Global rules tab holds and every brand kit and every future piece of content follows. Call get_brand_kit first: its global_rules carry the ids. Add new rules, update by id (omitted fields keep their value; category \"\" clears it), or remove by id. There is no draft: the change is live for all content generation as soon as it is saved, as a new version the Global rules tab's change history can restore. A rule that contradicts an existing global or kit rule is refused with the explanation and nothing is saved; when the result says the rules changed in another session, call get_brand_kit again and retry. Needs the writing rules feature on the plan. A rule meant for one kit only belongs in update_brand_kit, not here.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "add": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "category": {
+                  "description": "A short grouping label; \"\" clears it.",
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                "text": {
+                  "description": "One writing rule, as an instruction to the writer.",
+                  "maxLength": 2000,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "remove": {
+            "description": "Rule ids to delete.",
+            "items": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "update": {
+            "description": "By id; omitted fields keep their value.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "category": {
+                  "description": "A short grouping label; \"\" clears it.",
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "is_active": {
+                  "description": "false keeps the rule but stops applying it.",
+                  "type": "boolean"
+                },
+                "text": {
+                  "description": "One writing rule, as an instruction to the writer.",
+                  "maxLength": 2000,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "website_id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "website_id"
+        ],
+        "type": "object"
+      },
+      "name": "update_global_rules",
+      "outputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "added": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "removed": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "rules": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "category": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "is_active": {
+                  "type": "boolean"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "truncated": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "text",
+                "category",
+                "is_active",
+                "truncated"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "updated": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "version": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
           }
         },
         "type": "object"

@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://zoll.agency/mcp` | 8 | [`f4c1631edf0c`](4a6b54c7b92fc67af28d.json) | 2026-11-10 |
+| `https://zoll.agency/mcp` | 8 | [`025349c7bd47`](4a6b54c7b92fc67af28d.json) | 2026-11-11 |
 
 ## Tools at `https://zoll.agency/mcp`
 
@@ -15,12 +15,13 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `incoterms_waehlen`: `Ordnet Antworten zu Transportweg, Fracht, Gefahrübergang, Versicherung, Einfuhrabgaben und Abladen einer Klausel der Incoterms® 2020 zu, mi…`
 - `kumulierung_pruefen`: `Darf Vormaterial aus einem Partnerland der EU für den Ursprung der fertigen Ware zählen, wenn sie in ein bestimmtes Land verkauft wird? Nac…`
 - `praeferenznachweis_bestimmen`: `Welcher Präferenznachweis gilt für die Ausfuhr aus der EU in ein Land (EUR.1, A.TR, Erklärung zum Ursprung auf der Rechnung, REX), mit Wert…`
-- `ratgeber_suchen`: `Sucht in den Seiten von zoll.agency zu Ausfuhr und Einfuhr (Ratgeber, Themen, Werkzeuge, Leistungen) wie das Suchfeld der Seite und gibt hö…`
+- `ratgeber_suchen`: `Sucht in den Seiten von zoll.agency zu Einfuhr und Ausfuhr (Ratgeber, Themen, Werkzeuge, Leistungen) wie das Suchfeld der Seite und gibt hö…`
 - `vorpruefung`: `Die Vorprüfung von zoll.agency mit den Angaben einer Handelsrechnung, die der Assistent aus der Rechnung übernimmt: Versender und Empfänger…`
 - `warennummer_suchen`: `Sucht mit Wörtern oder einer Nummer (2 bis 11 Ziffern) in der Kombinierten Nomenklatur und zeigt höchstens 10 Codes mit dem amtlichen Wortl…`
 
 ## Changes
 
+- 2026-11-11: [annotation changed, description changed, field changed](../../deltas/2026-11-11/4a6b54c7b92fc67af28d.json): `3 field(s) changed`
 - 2026-11-10: [count changed, description changed, tool added, tool removed](../../deltas/2026-11-10/4a6b54c7b92fc67af28d.json): `2 tool(s) added; 1 tool(s) removed; 3 field(s) changed; signals: length_more_than_doubled`
 
 ## Check it from your agent

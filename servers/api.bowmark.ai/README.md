@@ -6,8 +6,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.bowmark.ai/mcp` | 35 | [`d28b8f34b16a`](5f2d24be930573ed8878.json) | 2026-11-09 |
-| `https://api.bowmark.ai/mcp/registry` | 35 | [`d28b8f34b16a`](e742a173e323c903336e.json) | 2026-11-09 |
+| `https://api.bowmark.ai/mcp` | 29 | [`3fd9c0137f0d`](5f2d24be930573ed8878.json) | 2026-11-11 |
+| `https://api.bowmark.ai/mcp/registry` | 29 | [`3fd9c0137f0d`](e742a173e323c903336e.json) | 2026-11-11 |
 
 ## Tools at `https://api.bowmark.ai/mcp`
 
@@ -16,21 +16,16 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_library`: `**Use this whenever a task touches a live website.** It answers whether Bowmark can already DO the thing: current prices, real availability…`
 - `get_secret_link`: `Return the dashboard link for one stored secret this account holds, so you can answer "where is my Acme password?" with somewhere to go. **…`
 - `get_usage`: `See the real cost of calls on this account, itemized by resource (provider calls, browser sessions, IP leases) and aggregated in dollars. P…`
-- `jig_cache`: `Used by an open jig to save a call's last good result. You do not need to call this.`
-- `jig_call`: `Used by an open jig to call the library. You do not need to call this — use 'run'.`
 - `jig_get`: `Copy someone's published jig into THIS user's account, from its current version. The copy is the user's own: it runs as them with their log…`
 - `jig_list`: `The jigs this user has, newest change first: id, slug, title, the built-in it started from, and when it last changed. A copy of someone's p…`
 - `jig_look`: `See what an open jig is showing the user right now — the items on screen, which view they are on — plus what they just did on it (watched,…`
 - `jig_open`: `Make the user a "jig": their own copy of a website, that you curate as they talk. Asked for "a jig of YouTube", build a page that LOOKS lik…`
-- `jig_perf`: `Used by an open jig to report how fast it loaded. You do not need to call this.`
 - `jig_publish`: `Publish the user's jig (name it by 'jigId' or your jig's 'jigSlug') as a listing others can get: it snapshots the page and state AS THEY AR…`
 - `jig_pull_update`: `For a jig the user got from someone's listing ('jig_list' shows 'updateAvailable'): the three pages a merge needs. 'base' is the version th…`
 - `jig_read`: `List a jig's files with their byte sizes, or with 'path' read one file's text. A page written as 'html' is one file, index.html. Read befor…`
 - `jig_search`: `Search the public jigs other people published: "is there a jig for my Amazon orders?". Call it BEFORE building a page from scratch. Leave '…`
-- `jig_seen`: `Used by an open jig to report what it shows. You do not need to call this.`
 - `jig_set_handle`: `Claim the user's public handle: the @name in the links to pages they publish, bowmark.ai/jigs/@<handle>/<slug>. It is PUBLIC and PERMANENT:…`
 - `jig_update`: `Change a page you opened with 'jig_open': merge 'state' into its state (a key set to null is removed), replace its 'html' or 'title', or ch…`
-- `jig_view`: `Used by an open jig to pick up its latest state. You do not need to call this.`
 - `lease_ip`: `Some sites (LinkedIn, marked 📍 in 'get_library') only accept a login from the address it signed in from. A dedicated IP is one address that…`
 - `list_connections`: `List the saved logins this account already holds, one entry per login: its 'id' (name it in a signed-in call as '{ connection: id }'), the…`
 - `list_secrets`: `List the stored secrets this account holds, by NAME. Returns name, type, which hosts each may be used against, when it expires and when it…`
@@ -41,7 +36,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `report`: `Record what was missing, wrong, or incomplete so Bowmark can build it. Call it yourself, in the same turn, without asking your user first:…`
 - `request_secret`: `Create a named, empty slot for a secret and get back a link the user opens to fill it in. They type the value on a Bowmark page and choose…`
 - `run`: `**Executes the task on live websites** and returns the result. Call 'get_library' FIRST, then 'run({ script })'. The same script can run fr…`
-- `run_view`: `Used by the inline run view to draw a run's progress. You do not need to call this — 'run' returns the result.`
 - `session_call`: `Runs ONE library function in a Bowmark session, so a flow that needs several calls in the SAME session can finish: a booking that texts the…`
 - `session_close`: `Ends a session 'session_call' opened and frees what it held. Pass the 'sessionId'. Closing one that is already closed is harmless.`
 - `support`: `Chat live with a Bowmark support agent about a problem you reported. Use it only after your user said yes to talking to support. Pass the '…`
@@ -54,21 +48,16 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_library`: `**Use this whenever a task touches a live website.** It answers whether Bowmark can already DO the thing: current prices, real availability…`
 - `get_secret_link`: `Return the dashboard link for one stored secret this account holds, so you can answer "where is my Acme password?" with somewhere to go. **…`
 - `get_usage`: `See the real cost of calls on this account, itemized by resource (provider calls, browser sessions, IP leases) and aggregated in dollars. P…`
-- `jig_cache`: `Used by an open jig to save a call's last good result. You do not need to call this.`
-- `jig_call`: `Used by an open jig to call the library. You do not need to call this — use 'run'.`
 - `jig_get`: `Copy someone's published jig into THIS user's account, from its current version. The copy is the user's own: it runs as them with their log…`
 - `jig_list`: `The jigs this user has, newest change first: id, slug, title, the built-in it started from, and when it last changed. A copy of someone's p…`
 - `jig_look`: `See what an open jig is showing the user right now — the items on screen, which view they are on — plus what they just did on it (watched,…`
 - `jig_open`: `Make the user a "jig": their own copy of a website, that you curate as they talk. Asked for "a jig of YouTube", build a page that LOOKS lik…`
-- `jig_perf`: `Used by an open jig to report how fast it loaded. You do not need to call this.`
 - `jig_publish`: `Publish the user's jig (name it by 'jigId' or your jig's 'jigSlug') as a listing others can get: it snapshots the page and state AS THEY AR…`
 - `jig_pull_update`: `For a jig the user got from someone's listing ('jig_list' shows 'updateAvailable'): the three pages a merge needs. 'base' is the version th…`
 - `jig_read`: `List a jig's files with their byte sizes, or with 'path' read one file's text. A page written as 'html' is one file, index.html. Read befor…`
 - `jig_search`: `Search the public jigs other people published: "is there a jig for my Amazon orders?". Call it BEFORE building a page from scratch. Leave '…`
-- `jig_seen`: `Used by an open jig to report what it shows. You do not need to call this.`
 - `jig_set_handle`: `Claim the user's public handle: the @name in the links to pages they publish, bowmark.ai/jigs/@<handle>/<slug>. It is PUBLIC and PERMANENT:…`
 - `jig_update`: `Change a page you opened with 'jig_open': merge 'state' into its state (a key set to null is removed), replace its 'html' or 'title', or ch…`
-- `jig_view`: `Used by an open jig to pick up its latest state. You do not need to call this.`
 - `lease_ip`: `Some sites (LinkedIn, marked 📍 in 'get_library') only accept a login from the address it signed in from. A dedicated IP is one address that…`
 - `list_connections`: `List the saved logins this account already holds, one entry per login: its 'id' (name it in a signed-in call as '{ connection: id }'), the…`
 - `list_secrets`: `List the stored secrets this account holds, by NAME. Returns name, type, which hosts each may be used against, when it expires and when it…`
@@ -79,7 +68,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `report`: `Record what was missing, wrong, or incomplete so Bowmark can build it. Call it yourself, in the same turn, without asking your user first:…`
 - `request_secret`: `Create a named, empty slot for a secret and get back a link the user opens to fill it in. They type the value on a Bowmark page and choose…`
 - `run`: `**Executes the task on live websites** and returns the result. Call 'get_library' FIRST, then 'run({ script })'. The same script can run fr…`
-- `run_view`: `Used by the inline run view to draw a run's progress. You do not need to call this — 'run' returns the result.`
 - `session_call`: `Runs ONE library function in a Bowmark session, so a flow that needs several calls in the SAME session can finish: a booking that texts the…`
 - `session_close`: `Ends a session 'session_call' opened and frees what it held. Pass the 'sessionId'. Closing one that is already closed is harmless.`
 - `support`: `Chat live with a Bowmark support agent about a problem you reported. Use it only after your user said yes to talking to support. Pass the '…`
@@ -87,6 +75,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-11: [count changed, tool removed](../../deltas/2026-11-11/e742a173e323c903336e.json): `6 tool(s) removed`
+- 2026-11-11: [count changed, tool removed](../../deltas/2026-11-11/5f2d24be930573ed8878.json): `6 tool(s) removed`
 - 2026-11-09: [description changed, schema changed](../../deltas/2026-11-09/5f2d24be930573ed8878.json): `444 field(s) changed; signals: url_introduced`
 - 2026-11-09: [description changed, schema changed](../../deltas/2026-11-09/e742a173e323c903336e.json): `444 field(s) changed; signals: url_introduced`
 - 2026-11-08: [annotation changed, count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-08/e742a173e323c903336e.json): `1 tool(s) added; 22 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**
@@ -105,8 +95,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - 2026-11-01: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-01/5f2d24be930573ed8878.json): `1 tool(s) added; 27 field(s) changed`
 - 2026-10-31: [annotation changed, schema changed](../../deltas/2026-10-31/e742a173e323c903336e.json): `14 field(s) changed`
 - 2026-10-31: [annotation changed, schema changed](../../deltas/2026-10-31/5f2d24be930573ed8878.json): `14 field(s) changed`
-- 2026-10-30: [annotation changed, description changed](../../deltas/2026-10-30/5f2d24be930573ed8878.json): `18 field(s) changed`
-- 2026-10-30: [annotation changed, description changed](../../deltas/2026-10-30/e742a173e323c903336e.json): `18 field(s) changed`
 
 ## Check it from your agent
 

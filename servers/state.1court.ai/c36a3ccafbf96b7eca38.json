@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "763ac4ca9f0e52a0713b5c47ec958c964676bd9b52b9d2ee267803d61a91cc47",
+  "full_hash": "74988d947667035ae5047b081cc47d58c39881952f72d4932f88f25a4f061b99",
   "name": "ai.1court.state/court-directory",
-  "observed_at": "2026-11-07T02:03:21.215631Z",
+  "observed_at": "2026-11-11T02:03:39.858681Z",
   "sources": [
     "official"
   ],
-  "tool_count": 9,
+  "tool_count": 11,
   "tools": [
     {
       "annotations": {
@@ -91,6 +91,94 @@
         "type": "object"
       },
       "name": "get_rule"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List trigger events"
+      },
+      "description": "List the trigger events (\"what happened\": summons served, motion hearing date, trial date, notice of entry of judgment served...) that a court's deadline rules run from, for one rule set (TX, CA, CA-FAM, CA-APP, US, US-BK, US-CRIM, CA-PROB, CA-UD, CA-SC, CA-GOV, CA-CRIM, CA-JUV, CA-AGENCY, CA-PRESUIT, CA-SPECIAL, CA-SOL). Each trigger shows how many deadlines it starts, whether the service method changes the dates, and, for broad triggers, the kinds you can narrow to (for a motion hearing: noticed motion, summary judgment...). Use with deadlines_from_trigger. Coverage: Deadlines: California in depth (civil, family, probate, eviction, small claims, government claims, criminal, juvenile, appeals, agencies, pre-suit clocks, special proceedings, statutes of limitations; local rules for all 58 counties), federal civil and criminal, federal bankruptcy, and a partial Texas set. Other states’ deadlines are not covered. Court directory: every U.S. county.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "county": {
+            "description": "California county slug for local rules, e.g. \"los-angeles\" (CA sets only)",
+            "type": "string"
+          },
+          "court": {
+            "description": "Court id for local rules: cacd, cand, casd, caed, ca9, cacb, canb, casb, caeb, 1dca to 6dca",
+            "type": "string"
+          },
+          "query": {
+            "description": "Optional words to filter triggers, e.g. \"subpoena\" or \"served\"",
+            "type": "string"
+          },
+          "rule_set": {
+            "description": "Rule set id: TX, CA, CA-FAM, CA-APP, US, US-BK, US-CRIM, CA-PROB, CA-UD, CA-SC, CA-GOV, CA-CRIM, CA-JUV, CA-AGENCY, CA-PRESUIT, CA-SPECIAL, CA-SOL",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rule_set"
+        ],
+        "type": "object"
+      },
+      "name": "list_triggers"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "All deadlines from a trigger event"
+      },
+      "description": "Every deadline that follows one trigger event, like a docketing system: court, trigger, date in; all resulting deadlines out, each with its date, the rule citation, the official source and the 1Court rule page. Deadlines that apply only to some case types (limited civil, asbestos, PI Pathway...) are listed separately. For broad triggers (a motion hearing covers every motion type), pass kind to narrow (e.g. \"Noticed motion\", \"Motion for summary judgment\"); otherwise the usual kind is chosen and the rest are listed as other_deadlines. Ask the user for the trigger date and how the paper was served; do not assume them. Show the user the citation and source link with every date or rule. Results are not legal advice. Coverage: Deadlines: California in depth (civil, family, probate, eviction, small claims, government claims, criminal, juvenile, appeals, agencies, pre-suit clocks, special proceedings, statutes of limitations; local rules for all 58 counties), federal civil and criminal, federal bankruptcy, and a partial Texas set. Other states’ deadlines are not covered. Court directory: every U.S. county.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "county": {
+            "description": "California county slug for local rules, e.g. \"los-angeles\"",
+            "type": "string"
+          },
+          "court": {
+            "description": "Court id for local rules (federal and appellate)",
+            "type": "string"
+          },
+          "date": {
+            "description": "Date of the trigger event, YYYY-MM-DD",
+            "type": "string"
+          },
+          "kind": {
+            "description": "For broad triggers, the kind to select (from list_triggers kinds), or \"all\"",
+            "type": "string"
+          },
+          "rule_set": {
+            "description": "Rule set id: TX, CA, CA-FAM, CA-APP, US, US-BK, US-CRIM, CA-PROB, CA-UD, CA-SC, CA-GOV, CA-CRIM, CA-JUV, CA-AGENCY, CA-PRESUIT, CA-SPECIAL, CA-SOL",
+            "type": "string"
+          },
+          "service_method": {
+            "description": "How the triggering paper (or the summons) was served, from the trigger's service_options. Omit for personal service.",
+            "type": "string"
+          },
+          "trigger": {
+            "description": "Trigger id from list_triggers, e.g. \"complaint_served\", \"motion_hearing\", \"trial_date\"",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rule_set",
+          "trigger",
+          "date"
+        ],
+        "type": "object"
+      },
+      "name": "deadlines_from_trigger"
     },
     {
       "annotations": {

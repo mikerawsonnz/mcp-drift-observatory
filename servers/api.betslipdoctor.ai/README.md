@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.betslipdoctor.ai/api/mcp` | 98 | [`4f939506aae2`](f29327f2a9147dd897c0.json) | 2026-11-10 |
+| `https://api.betslipdoctor.ai/api/mcp` | 99 | [`1b47a1de5ba7`](f29327f2a9147dd897c0.json) | 2026-11-11 |
 
 ## Tools at `https://api.betslipdoctor.ai/api/mcp`
 
@@ -32,6 +32,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_bettor_history`: `Read a visible bettor profile’s settled History in units.`
 - `get_bettor_profile`: `Read this authenticated account’s bettor model, optionally filtered by topic: confirmed notes and revisions, separately attributed Honcho i…`
 - `get_box_score`: `Read the in-play or final score and box score for one game (eventId from search_markets or the board), the same read as the app’s Live game…`
+- `get_crowd_parlay`: `Read the crowd parlay (the app’s Heat Check card): the one parlay bettors are on most right now, built in code, 2 to 4 legs on different ga…`
 - `get_doctor_conversation`: `Read the owned threadId, saved user messages, Doctor answers and jobs; optional before pages older messages. Does not generate a new answer.`
 - `get_doctor_events`: `Read saved events for the owned Doctor jobId, optionally after a sequence. While a reply is written, doctor_research_progress events say ho…`
 - `get_doctor_job`: `Read the owned Doctor jobId, including its real saved answer when available: paragraphs, the linked pages it cites (sources) and what it ch…`
@@ -69,11 +70,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `notifications`: `This account's notification inbox and settings, the same as the app's bell. feed: GET notifications/feed params {filter all/mentions/verifi…`
 - `onboarding_preferences`: `Read the current league catalog and per-league team membership, or read/save your leagues and teams. Use original source-qualified IDs. Log…`
 - `open_doctor_conversation`: `Persist an app Doctor thread, optionally attached to an owned ticket, report or history item. Does not start a reply or spend a consult all…`
-- `prepare_sportsbook_handoff`: `Prepare the existing app’s fresh, vetted direct sportsbook link for an owned saved ticket. Choose the same sportsbook as the saved ticket a…`
-- and 38 more in [f29327f2a9147dd897c0.json](f29327f2a9147dd897c0.json)
+- and 39 more in [f29327f2a9147dd897c0.json](f29327f2a9147dd897c0.json)
 
 ## Changes
 
+- 2026-11-11: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-11/f29327f2a9147dd897c0.json): `1 tool(s) added; 51 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-10: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-10/f29327f2a9147dd897c0.json): `2 tool(s) added; 34 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-09: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-09/f29327f2a9147dd897c0.json): `2 tool(s) added; 118 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-08: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-08/f29327f2a9147dd897c0.json): `2 tool(s) added; 2370 field(s) changed; signals: length_more_than_doubled, url_introduced`
@@ -93,7 +94,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - 2026-10-18: [count changed, description changed, schema changed, tool added](../../deltas/2026-10-18/f29327f2a9147dd897c0.json): `10 tool(s) added; 478 field(s) changed; signals: length_more_than_doubled, url_introduced`
 - 2026-10-15: [annotation changed, description changed, field changed, schema changed](../../deltas/2026-10-15/f29327f2a9147dd897c0.json): `25 field(s) changed`
 - 2026-10-13: [schema changed](../../deltas/2026-10-13/f29327f2a9147dd897c0.json): `20 field(s) changed`
-- 2026-10-11: [annotation changed, description changed, schema changed](../../deltas/2026-10-11/f29327f2a9147dd897c0.json): `62 field(s) changed`
 
 ## Check it from your agent
 

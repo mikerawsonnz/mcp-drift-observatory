@@ -6,16 +6,18 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://agenticfabricationnetwork.ai/mcp` | 12 | [`4b3eebe3e9b1`](db3010688319f7ebe01c.json) | 2026-11-06 |
+| `https://agenticfabricationnetwork.ai/mcp` | 14 | [`981a96f583b6`](db3010688319f7ebe01c.json) | 2026-11-11 |
 
 ## Tools at `https://agenticfabricationnetwork.ai/mcp`
 
+- `check_offer`: `Run the shop's manufacturability check on ONE offer whose manufacturability_check.status is "unchecked" (the price stands from the shop's o…`
 - `create_checkout`: `Create the order and get a hosted payment link for a chosen offer. Call this as soon as the user picks an offer + shipping speed. This tool…`
 - `finalize_quote`: `ONLY for the case where a quote response came back with an EMPTY board and told you to call this: waits for the vendors to answer (up to ~4…`
 - `get_fabrication_quote`: `Get fabrication price and delivery offers for a design file or an existing AFN part number. Supports 3D printing, CNC machining, sheet meta…`
 - `get_material_guide`: `Honest, cited material intelligence for material-choice / strength / durability / heat / outdoor questions ("my PLA part broke, what's stro…`
 - `get_network_capabilities`: `The LIVE catalog of what the fabrication network can do RIGHT NOW — no quote needed. Returns the services ledger (tapping, inserts, welding…`
 - `get_order_status`: `Check status, ETA and tracking for a UFP order.`
+- `get_price_curve`: `How the per-unit price moves with quantity for a quote you already have: for every shop on the board, the item price per unit at each quant…`
 - `get_shop_gauges`: `Every sheet thickness (gauge) ONE named shop stocks right now, per material — read live off the shop's declared catalog, no quote needed. C…`
 - `leave_review`: `Record the user's verified-purchase review of how a UFP order turned out. YOUR JOB IS TO STRUCTURE THE FEEDBACK: turn what the user actuall…`
 - `poll_quote`: `INTERNAL — the offer board calls this to refresh itself while vendors finish pricing. Never call this yourself. The board you were given is…`
@@ -25,6 +27,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-11: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-11/db3010688319f7ebe01c.json): `2 tool(s) added; 13 field(s) changed`
 - 2026-11-06: [annotation changed, description changed, schema changed](../../deltas/2026-11-06/db3010688319f7ebe01c.json): `460 field(s) changed`
 - 2026-11-05: [count changed, description changed, schema changed, tool removed](../../deltas/2026-11-05/db3010688319f7ebe01c.json): `1 tool(s) removed; 3 field(s) changed; signals: length_more_than_doubled`
 - 2026-10-27: [description changed, schema changed](../../deltas/2026-10-27/db3010688319f7ebe01c.json): `26 field(s) changed`

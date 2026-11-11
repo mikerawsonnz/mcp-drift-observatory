@@ -6,19 +6,19 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://employerofrecord.ae/mcp` | 5 | [`c787e727f3d4`](9a53f9818a2eefcb5dfa.json) | 2026-11-10 |
+| `https://employerofrecord.ae/mcp` | 5 | [`b9415b4193e0`](9a53f9818a2eefcb5dfa.json) | 2026-11-11 |
 
 ## Tools at `https://employerofrecord.ae/mcp`
 
 - `check_prepared_hire`: `Whether the person opened the link from prepare_hire or prepare_account and created their account yet.`
 - `get_quote`: `Monthly and upfront cost of employing one person in the UAE through Moha, an Employer of Record: salary split, employer costs, government f…`
 - `how_to_hire_in_the_uae`: `How hiring in the UAE works through Moha, an Employer of Record, for a company with no UAE entity: when it fits, the information needed abo…`
-- `prepare_account`: `Prepares a Moha account without signing in: the company profile, the person setting it up, one to ten hires and colleagues to invite. Retur…`
-- `prepare_hire`: `Prepares the hire of one employee in the UAE without an account. Returns the quote and a link: the person opens it, checks the details and…`
+- `prepare_account`: `Prepares a Moha account without signing in: company profile, the person setting it up, one to ten hires and colleagues to invite. Returns t…`
+- `prepare_hire`: `Prepares one hire in the UAE without an account. Returns the quote and a link: the person opens it, checks the details and creates their Mo…`
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-11: [description changed](../../deltas/2026-11-11/9a53f9818a2eefcb5dfa.json): `2 field(s) changed`
 
 ## Check it from your agent
 
