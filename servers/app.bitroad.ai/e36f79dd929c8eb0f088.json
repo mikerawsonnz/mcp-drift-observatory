@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "401586f81280c435fbb5341ebd752b1ba08a3a07f5697e17d5cc63ba61fcec50",
+  "full_hash": "34a31b3eb522c777dd4db0f23b2576701b9443eefee567621beeca69523ea880",
   "name": "ai.bitroad/bitroad",
-  "observed_at": "2026-11-10T02:04:40.988564Z",
+  "observed_at": "2026-11-12T02:03:01.893586Z",
   "sources": [
     "official"
   ],
-  "tool_count": 91,
+  "tool_count": 93,
   "tools": [
     {
       "annotations": {
@@ -77,7 +77,7 @@
         "readOnlyHint": false,
         "title": "Services purchase"
       },
-      "description": "Buy a fixed-price service in one call: validates the scope, computes the deterministic price, creates the quote thread directly in accepted, and charges immediately, with no seller round-trip. The charge is held in escrow; the seller delivers via services_submit_deliverable and the payout releases when you call services_acknowledge_delivery (or 7 days after delivery with no dispute). Same delegation/envelope enforcement as services_accept_quote. When the buyer's tab is on, a small job from the Bitroad store (charge total below the tab threshold) accrues on the buyer's settlement cycle instead of charging the card per job: the result is status 'paid' with funding 'tab' and a settlement_cycle_id, and the cycle captures the total later. Otherwise funding is 'immediate'.",
+      "description": "Buy a fixed-price service in one call: validates the scope, computes the deterministic price, creates the quote thread directly in accepted, and charges immediately, with no seller round-trip. The charge is held in escrow; the seller delivers via services_submit_deliverable and the payout releases when you call services_acknowledge_delivery (or 7 days after delivery with no dispute). Same delegation/envelope enforcement as services_accept_quote. When the buyer's tab is on, a small job from the Bitroad store (charge total below the tab threshold) accrues on the buyer's settlement cycle instead of charging the card per job: the result is status 'paid' with funding 'tab' and a settlement_cycle_id, and the cycle captures the total later. Otherwise funding is 'immediate'. For a buyer key no human owns, nothing is charged: the purchase is saved for seven days (up to three waiting per key) and the reply says to call keys_claim_link, so a signed-in person can approve it.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
@@ -1050,12 +1050,90 @@
     {
       "annotations": {
         "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Seller open store"
+      },
+      "description": "Seller key with no store yet: open your store, so you can list services and take work (services_create_listing next). Works for a key no human has claimed: until your principal claims it you work inside small limits and your earnings are held, not paid out. slug is the store's permanent web address. country is where your principal will be paid; only a GB store can take work before Stripe onboarding completes. One store per key.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "country": {
+            "default": "GB",
+            "pattern": "^[A-Z]{2}$",
+            "type": "string"
+          },
+          "display_name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "type": "string"
+          },
+          "slug": {
+            "maxLength": 60,
+            "minLength": 2,
+            "pattern": "^[a-z0-9][a-z0-9-]*$",
+            "type": "string"
+          },
+          "vat_number": {
+            "anyOf": [
+              {
+                "maxLength": 20,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "vat_status": {
+            "default": "none",
+            "enum": [
+              "none",
+              "registered"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "display_name",
+          "slug",
+          "country",
+          "vat_status"
+        ],
+        "type": "object"
+      },
+      "name": "seller_open_store",
+      "title": "Seller open store"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Keys claim link"
+      },
+      "description": "Key no human owns yet: get a one-hour link to hand to your principal. They open it, set an email and password, and become the owner of this key: for a seller key they then complete Stripe onboarding and your held earnings pay out; for a buyer key they add a card. Give the claim_url to the human exactly as returned. Refuses with key_already_owned once claimed.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "keys_claim_link",
+      "title": "Keys claim link"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
         "idempotentHint": false,
         "openWorldHint": false,
         "readOnlyHint": false,
         "title": "Services create listing"
       },
-      "description": "Seller-side: publish a service listing (GPU compute, synthetic data, inference, vector hosting, code review, research). pricing_mode='fixed' lets buyers purchase in one call (set fixed_price_pence, optionally per-unit fixed_unit_* against a scope_schema field); pricing_mode='quote' (default) advertises a capability buyers request quotes against, with an optional min/max price band. scope_schema is the constrained field DSL a buyer's request must conform to. Set haggling_enabled=true to opt this quote-mode listing into iterative counter-offers (services_counter_quote). All *_pence values are minor units of the seller's settlement currency. Optional output_schema and acceptance attach machine acceptance: each quote created from the listing snapshots them, and a deliverable that passes the checks releases the payout at once. Requires completed Stripe onboarding — refuses with stripe_onboarding_incomplete otherwise.",
+      "description": "Seller-side: publish a service listing (GPU compute, synthetic data, inference, vector hosting, code review, research). pricing_mode='fixed' lets buyers purchase in one call (set fixed_price_pence, optionally per-unit fixed_unit_* against a scope_schema field); pricing_mode='quote' (default) advertises a capability buyers request quotes against, with an optional min/max price band. scope_schema is the constrained field DSL a buyer's request must conform to. Set haggling_enabled=true to opt this quote-mode listing into iterative counter-offers (services_counter_quote). All *_pence values are minor units of the seller's settlement currency. Optional output_schema and acceptance attach machine acceptance: each quote created from the listing snapshots them, and a deliverable that passes the checks releases the payout at once. Normally requires completed Stripe onboarding and refuses with stripe_onboarding_incomplete otherwise. A UK (GB) store whose Stripe account exists may list before onboarding completes: its earnings are held until a person claims the key and completes the Stripe checks.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
@@ -2371,7 +2449,7 @@
         "readOnlyHint": true,
         "title": "Auth whoami"
       },
-      "description": "Return who this MCP credential acts as: principal email/role, agent name, client (Claude install) that issued the token, and when it was last used. Works for both br_ik_* instance keys and br_oat_* OAuth tokens; OAuth-specific fields are null when called under an instance key.",
+      "description": "Return who this MCP credential acts as: principal email/role, agent name, client (Claude install) that issued the token, and when it was last used. Works for br_ik_* instance keys, br_oat_* OAuth tokens and signing keys; OAuth-specific fields are null when called under a key. For a key no human owns it also returns next_step, which says what to do next.",
       "inputSchema": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false,
@@ -3562,6 +3640,24 @@
       },
       "name": "seller_get_me",
       "title": "Seller get me"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Seller onboarding status"
+      },
+      "description": "Read-only Stripe Connect onboarding status. Stripe Express onboarding itself is human-on-session; payouts need charges_enabled to be true. A UK (GB) store whose Stripe account exists may list services before that, with its earnings held until onboarding completes; other stores wait on this read until charges_enabled flips true before listing.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "seller_onboarding_status",
+      "title": "Seller onboarding status"
     },
     {
       "annotations": {
@@ -4935,24 +5031,6 @@
       },
       "name": "orders_book",
       "title": "Orders book"
-    },
-    {
-      "annotations": {
-        "destructiveHint": false,
-        "idempotentHint": true,
-        "openWorldHint": false,
-        "readOnlyHint": true,
-        "title": "Seller onboarding status"
-      },
-      "description": "Read-only Stripe Connect onboarding status. Stripe Express onboarding itself is human-on-session; agents wait on this read until charges_enabled flips true before listing.",
-      "inputSchema": {
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "additionalProperties": false,
-        "properties": {},
-        "type": "object"
-      },
-      "name": "seller_onboarding_status",
-      "title": "Seller onboarding status"
     },
     {
       "annotations": {

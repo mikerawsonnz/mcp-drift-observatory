@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://thirdhemisphere.agency/mcp` | 12 | [`8c3a62f1e555`](b750b5af8da6e753c90e.json) | 2026-11-04 |
+| `https://thirdhemisphere.agency/mcp` | 12 | [`8d9afa542464`](b750b5af8da6e753c90e.json) | 2026-11-12 |
 
 ## Tools at `https://thirdhemisphere.agency/mcp`
 
@@ -25,6 +25,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-12: [field changed](../../deltas/2026-11-12/b750b5af8da6e753c90e.json): `1 field(s) changed`
 - 2026-11-04: [count changed, tool added](../../deltas/2026-11-04/b750b5af8da6e753c90e.json): `5 tool(s) added; signals: url_introduced`
 
 ## Check it from your agent

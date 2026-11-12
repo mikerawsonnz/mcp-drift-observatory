@@ -6,11 +6,12 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.bamf.ai` | 160 | [`b2f70a86e7cb`](bcec739ff4350c4ddf27.json) | 2026-11-07 |
+| `https://mcp.bamf.ai` | 170 | [`b2985da19987`](bcec739ff4350c4ddf27.json) | 2026-11-12 |
 
 ## Tools at `https://mcp.bamf.ai`
 
 - `bamf.add_knowledge_doc`: `Add a knowledge or memory document to a creator space. API documentation: https://bamf.ai/docs/mcp/overview`
+- `bamf.add_likeness_photo`: `Save a photo of the creator to their likeness library from an HTTPS URL or a data URL, then label it. Always persist any creator photo you…`
 - `bamf.add_media`: `Register an external media URL as a BAMF media asset. API documentation: https://bamf.ai/docs/mcp/overview`
 - `bamf.add_memory`: `Add a short durable memory to the creator's knowledge base.`
 - `bamf.admit_outreach_campaign_execution`: `Admit the exact queued campaign into executing state after rechecking current list, connector, fingerprint, and approval, returning canonic…`
@@ -35,6 +36,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `bamf.create_x_post_draft`: `Create an X-native draft after exact approval. Use for single X posts, threads, image posts, long-form X drafts, and resource/DM campaign d…`
 - `bamf.decide_client_approval`: `Record a client decision on an approval request: approved, changes_requested (comment required) or rejected; team members may only resubmit…`
 - `bamf.delete_post`: `Delete a normal BAMF content post.`
+- `bamf.design_post`: `Designing in the background: picks an approved reference, writes slot copy from the post, places the creator's real photo and official app…`
 - `bamf.duplicate_profile_package`: `Duplicate a saved Profile Studio package as a draft variation after exact approval. This is reversible and never applies the variation to L…`
 - `bamf.edit_carousel_slide`: `Edit ONE slide of an existing carousel post in place, the same as asking the in-app BAMF Bot to change one slide. Pass title/body/cta/conte…`
 - `bamf.edit_post`: `Patch an existing draft or scheduled post after the user approves exact edits. Supports first comments and media fields.`
@@ -59,21 +61,20 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `bamf.get_agent_identity`: `Return the authenticated BAMF actor identity through the canonical server-resolved authority path.`
 - `bamf.get_analytics_summary`: `Get LinkedIn Late-authoritative analytics totals for a creator space. Pass platform=x or use bamf.get_x_analytics_summary for X metrics.`
 - `bamf.get_brain`: `Read your personal or company brain as Brain format v1 files. Returns the manifest plus BRAIN.md and the brain markdown files, with secrets…`
+- `bamf.get_client_access`: `Read a client's LinkedIn access checklist: authenticator key in BAMF Vault, LinkedIn login on BAMF Cloud, Multilogin profile, BAMF Connect,…`
 - `bamf.get_client_approval`: `Read one content approval request with its post and comments. Requires client_approvals:read.`
+- `bamf.get_client_totp_code`: `Get the current 6-digit LinkedIn authenticator code for a client from their BAMF Vault key, so nobody relays PINs. Agency owner/admin only;…`
 - `bamf.get_creator_analytics_report`: `Build a native, interactive LinkedIn analytics report across every creator space the signed-in BAMF account can access. Use for creator por…`
 - `bamf.get_creator_context`: `Return the comprehensive creator context bundle for one creator space: knowledge docs, voice profile, AI analyses, integrations, interviews…`
+- `bamf.get_design`: `Read a design's status, image, matched reference, template and layers (likeness, art, text). Poll after bamf.design_post. Read-only.`
 - `bamf.get_funnel_mix`: `Get a creator's TOF/MOF/BOF funnel mix from tagged LinkedIn posts: per-stage counts and performance, per-format stats, the resolved goal ta…`
 - `bamf.get_intelligence_processing_status`: `Read recent intelligence processing jobs for the authenticated creator, optionally limited to one resource.`
 - `bamf.get_intelligence_resource_context`: `Get source-linked evidence, facts, and relationships for one intelligence resource the authenticated creator can access.`
-- `bamf.get_job`: `Read one BAMF async job status and output.`
-- `bamf.get_onboarding`: `Start or resume BAMF Bot setup for the signed-in person: the same ordered steps, progress and rewards as onboarding on bamf.ai. Returns eac…`
-- `bamf.get_outreach_campaign_status`: `Read redacted state, canonical workspace/list-version/connector bindings, readiness evidence, admission evidence, and any matching provider…`
-- `bamf.get_outreach_discovery_status`: `Read the status of one tenant- and principal-scoped outreach discovery session. This never mutates a provider.`
-- `bamf.get_profile`: `Return the profile represented by this request's authenticated credentials. The opaque id is unique within this app and remains unchanged a…`
-- and 100 more in [bcec739ff4350c4ddf27.json](bcec739ff4350c4ddf27.json)
+- and 110 more in [bcec739ff4350c4ddf27.json](bcec739ff4350c4ddf27.json)
 
 ## Changes
 
+- 2026-11-12: [count changed, schema changed, tool added](../../deltas/2026-11-12/bcec739ff4350c4ddf27.json): `10 tool(s) added; 13 field(s) changed`
 - 2026-11-07: [count changed, tool added](../../deltas/2026-11-07/bcec739ff4350c4ddf27.json): `3 tool(s) added`
 - 2026-11-06: [count changed, description changed, tool added](../../deltas/2026-11-06/bcec739ff4350c4ddf27.json): `3 tool(s) added; 2 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-05: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-05/bcec739ff4350c4ddf27.json): `2 tool(s) added; 9 field(s) changed`

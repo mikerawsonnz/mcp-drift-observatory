@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.appgoat.ai/mcp` | 26 | [`9881ef918664`](9aff2500785fcb6529f4.json) | 2026-11-03 |
+| `https://api.appgoat.ai/mcp` | 26 | [`028a9e48f8fa`](9aff2500785fcb6529f4.json) | 2026-11-12 |
 
 ## Tools at `https://api.appgoat.ai/mcp`
 
@@ -39,6 +39,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-12: [description changed, schema changed](../../deltas/2026-11-12/9aff2500785fcb6529f4.json): `28 field(s) changed`
 - 2026-11-03: [annotation changed](../../deltas/2026-11-03/9aff2500785fcb6529f4.json): `2 field(s) changed`
 - 2026-10-28: [count changed, description changed, schema changed, tool removed](../../deltas/2026-10-28/9aff2500785fcb6529f4.json): `3 tool(s) removed; 2 field(s) changed`
 

@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mizan.ac/mcp` | 5 | [`8ab082461ef2`](70c77423ed2d6ce6e69e.json) | 2026-11-10 |
+| `https://mizan.ac/mcp` | 5 | [`0b7261ca40de`](70c77423ed2d6ce6e69e.json) | 2026-11-12 |
 
 ## Tools at `https://mizan.ac/mcp`
 
@@ -18,6 +18,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-12: [schema changed](../../deltas/2026-11-12/70c77423ed2d6ce6e69e.json): `19 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-10: [schema changed](../../deltas/2026-11-10/70c77423ed2d6ce6e69e.json): `5 field(s) changed`
 
 ## Check it from your agent

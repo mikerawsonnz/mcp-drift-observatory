@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "e136999eb93473cc7e20f52be93f90db8562da8d2f2d408bc641dcd9807cc620",
+  "full_hash": "e0fcec0a1751513c654af670f59ade41023dee90c4c2bd9f51e8aa6152be4d8f",
   "name": "ai.agentgates/compute",
-  "observed_at": "2026-11-11T02:03:41.712529Z",
+  "observed_at": "2026-11-12T02:02:52.131424Z",
   "sources": [
     "official"
   ],
@@ -14,9 +14,9 @@
         "idempotentHint": true,
         "openWorldHint": true,
         "readOnlyHint": true,
-        "title": "Confidential VM plans and prices"
+        "title": "Machine plans and prices"
       },
-      "description": "Lists the confidential virtual machines (Intel TDX, memory encrypted in use) Agentgates rents to agents by the hour: each plan's vCPU, memory, disk and traffic, the hours one payment may buy, and the live price of each block of hours on each payment network (USDC over x402). Read from the live catalog at call time. Free: no account, no wallet, no payment. Pass `plan` to read one plan.",
+      "description": "Lists the virtual machines Agentgates rents to agents by the hour: confidential ones (Intel TDX, memory encrypted in use) and plain ones with no proof (`proof: \"none\"`: the host can read them, for a lower price). Each plan's vCPU, memory, disk and traffic, the hours one payment may buy, and the live price of each block of hours on each payment network (USDC over x402). Read from the live catalog at call time. Free: no account, no wallet, no payment. Pass `plan` to read one plan.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -47,6 +47,10 @@
           },
           "note": {
             "type": "string"
+          },
+          "notices": {
+            "description": "The API's notices on its answer, when it sent any.",
+            "type": "object"
           },
           "ok": {
             "type": "boolean"
@@ -157,6 +161,14 @@
                 "name": {
                   "type": "string"
                 },
+                "pauses": {
+                  "description": "Only on a plain plan: true when its machines pause (stop keeps the disk and address, the paid time paying their keep; start runs it again and uses up an hour of it).",
+                  "type": "boolean"
+                },
+                "paygOffered": {
+                  "description": "Only on a plain plan: true when it is sold pay-as-you-go by the hour (its first hour priced as a new machine, each later hour as a renewed one: the 402's extra.paygHourMicro); false: buy hours up front.",
+                  "type": "boolean"
+                },
                 "ports": {
                   "description": "\"any\": every port but closedPorts.",
                   "type": "string"
@@ -232,6 +244,10 @@
                   },
                   "type": "array"
                 },
+                "resizes": {
+                  "description": "Only on a plain plan: true when its machines resize to another plain size, the disk kept.",
+                  "type": "boolean"
+                },
                 "runsIn": {
                   "description": "Only on a plain plan: where its machines run (no region to pick).",
                   "items": {
@@ -247,6 +263,10 @@
                   },
                   "type": "array"
                 },
+                "takesNewSetup": {
+                  "description": "Only on a plain plan: true when a running machine takes a new setup or new env values (it restarts once with them); false: start a new one.",
+                  "type": "boolean"
+                },
                 "tier": {
                   "description": "The plan's tier, where it has one.",
                   "type": "string"
@@ -256,6 +276,10 @@
                     "number",
                     "null"
                   ]
+                },
+                "usePolicyUrl": {
+                  "description": "Only on a plain plan: what its machines may not be used for.",
+                  "type": "string"
                 },
                 "vcpu": {
                   "type": [
@@ -277,7 +301,7 @@
         ],
         "type": "object"
       },
-      "title": "Confidential VM plans and prices"
+      "title": "Machine plans and prices"
     },
     {
       "annotations": {
@@ -305,6 +329,12 @@
             "description": "A docker-compose.yml as a string. It must publish a port. Or send image.",
             "type": "string"
           },
+          "count": {
+            "description": "A new purchase only: 2 to 10 in one payment.",
+            "maximum": 10,
+            "minimum": 2,
+            "type": "integer"
+          },
           "hours": {
             "description": "Prepaid hours (within the plan's range), or hours to add on a renewal. Or send minutes.",
             "minimum": 1,
@@ -319,12 +349,8 @@
             "type": "string"
           },
           "minutes": {
-            "description": "In place of hours, where the API sells quarter-hours (compute_plans shows minutePrices): 15, 30 or 45 minutes, on every plan but GPU. A quarter-hour costs more per hour than an hour.",
-            "enum": [
-              15,
-              30,
-              45
-            ],
+            "description": "In place of hours, where the API sells quarter-hours (compute_plans shows minutePrices): 15, 30 or 45 minutes, on every plan but GPU. A quarter-hour costs more per hour than an hour. A plan whose card in compute_plans carries minMinutes takes any whole minutes from it.",
+            "minimum": 1,
             "type": "integer"
           },
           "plan": {
@@ -418,6 +444,10 @@
           },
           "next": {
             "type": "string"
+          },
+          "notices": {
+            "description": "The API's notices on its answer, when it sent any.",
+            "type": "object"
           },
           "ok": {
             "type": "boolean"

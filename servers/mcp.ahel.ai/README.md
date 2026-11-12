@@ -6,25 +6,25 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.ahel.ai` | 11 | [`9bad498c660a`](f81cefdfba92e36c524a.json) | 2026-11-08 |
+| `https://mcp.ahel.ai` | 11 | [`aff07a974b8a`](f81cefdfba92e36c524a.json) | 2026-11-12 |
 
 ## Tools at `https://mcp.ahel.ai`
 
-- `balance`: `The workspace's prepaid balance in USD, what runs in flight hold, what settled runs used today and this month (shown to the Owner), any dai…`
-- `capability_inspect`: `Read one task or provider tool from Ahel's catalog by its id: its exact inputs (Ahel's own contract, or the published reference input when…`
-- `capability_run_status`: `Without execution_id: the paid data capabilities this workspace can run, each with its providers and exact prices. With execution_id: that…`
-- `capability_search`: `Search Ahel's catalog of data tasks and provider tools by words, a task id or a tool id: company and people enrichment, SEO, social, ads, e…`
-- `catalog_request`: `Ask Ahel to add a data task or provider tool the catalog does not have yet: call it when capability_search answers verdict none and none of…`
-- `feedback`: `Rate one run or one catalog request of this workspace good or bad, or, with no id, report anything about Ahel: confusing results or charges…`
-- `get_started`: `How to start with Ahel: call this when the person asks what Ahel is, what it can do or how to begin. Returns what Ahel is, how the prepaid…`
-- `my_tools`: `This team's own tools: the APIs and MCP servers the team added at ahel.ai/app/tools. Without tool, lists each one with its tools, their inp…`
-- `review`: `Rate how useful one finished run of this workspace was, after you have used its result: useful, partly, not_useful, or not_sure when you ca…`
-- `run_batch`: `Run one task over many inputs in one call: for repeated runs of the same task, one round trip rather than one per run. Priced the same per…`
-- `run_capability`: `Run one paid data capability (company data, people and contact data and the like) through Ahel's provider execution: it is quoted, the exac…`
+- `balance`: `The workspace's prepaid balance, what running jobs have set aside, spending today and this month (for the Owner), any daily cap on this con…`
+- `capability_inspect`: `One action by its id: its inputs, what it gives and its price rule. With arguments (the person's real inputs) it also prices that exact run…`
+- `capability_run_status`: `Read a run that was still going: give execution_id from run_capability and results true for its rows. Answers the result in plain words, th…`
+- `capability_search`: `Find the action for a job, by the person's own words ("work email of a person", "dentists in a city") or by an action id. Use it first for…`
+- `catalog_request`: `Ask Ahel to add an action the catalog does not have, when capability_search finds nothing that fits. Give the job in plain words, one examp…`
+- `feedback`: `Tell Ahel what went wrong or right: rate one run or request good or bad by its id, or with no id report anything confusing (results, charge…`
+- `get_started`: `Start here when the person is new, asks what Ahel can do, or has no clear job yet. Answers what Ahel does in plain words, the ready-made re…`
+- `review`: `Rate how useful one finished run was, after using its result: useful, partly, not_useful or not_sure, with an optional reason (missing rows…`
+- `run_batch`: `Run one action over many inputs in one call (1 to 100 items, each the action's inputs), such as a company lookup for 20 domains. Priced the…`
+- `run_capability`: `Run one action, after the person agreed to the price capability_inspect gave. Give id, arguments and max_cost_usd from that price: a run th…`
+- `run_recipe`: `Run a recipe: a ready-made job of several actions, such as local businesses of one kind in one place with their emails, a company list with…`
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-12: [annotation changed, description changed, field changed, schema changed, tool added, tool removed](../../deltas/2026-11-12/f81cefdfba92e36c524a.json): `1 tool(s) added; 1 tool(s) removed; 34 field(s) changed`
 
 ## Check it from your agent
 

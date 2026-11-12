@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://aibotoffice.ai/mcp/join` | 2 | [`8da85cb5477f`](0850381780b97d0055f6.json) | 2026-11-04 |
+| `https://aibotoffice.ai/mcp/join` | 2 | [`246e15ae0afc`](0850381780b97d0055f6.json) | 2026-11-12 |
 | `https://aibotoffice.ai/mcp` | 24 | [`2937d71f00e8`](fc8e74607f47f6d241c0.json) | 2026-11-04 |
 
 ## Tools at `https://aibotoffice.ai/mcp/join`
@@ -43,7 +43,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-12: [description changed, schema changed](../../deltas/2026-11-12/0850381780b97d0055f6.json): `8 field(s) changed; signals: credential_shaped_string_introduced` **(notable)**
 
 ## Check it from your agent
 

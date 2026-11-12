@@ -1,6 +1,6 @@
 # Observed MCP servers
 
-461 hosts whose MCP tool declarations we have observed. Each page lists the declared tools, every observed change, and an Atom feed of changes to that server.
+462 hosts whose MCP tool declarations we have observed. Each page lists the declared tools, every observed change, and an Atom feed of changes to that server.
 
 Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_alerts
 
@@ -37,6 +37,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [alexeysound.ae](alexeysound.ae/) (3 tools)
 - [analyticslegends.ai](analyticslegends.ai/) (25 tools)
 - [apexai.academy](apexai.academy/) (30 tools)
+- [apexrunner.ai](apexrunner.ai/) (49 tools)
 - [api-v2.lifeclaw.agentese.ai](api-v2.lifeclaw.agentese.ai/) (16 tools)
 - [api.adadvisor.ai](api.adadvisor.ai/) (43 tools)
 - [api.agentrapay.ai](api.agentrapay.ai/) (6 tools)
@@ -84,7 +85,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [app.augenix.ai](app.augenix.ai/) (3 tools)
 - [app.avlira.ai](app.avlira.ai/) (28 tools)
 - [app.bezal.ai](app.bezal.ai/) (9 tools)
-- [app.bitroad.ai](app.bitroad.ai/) (91 tools)
+- [app.bitroad.ai](app.bitroad.ai/) (93 tools)
 - [app.bugtape.ai](app.bugtape.ai/) (14 tools)
 - [app.cleartape.ai](app.cleartape.ai/) (11 tools)
 - [app.deepvalues.ai](app.deepvalues.ai/) (25 tools)
@@ -307,9 +308,9 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [mcp.askwatch.ai](mcp.askwatch.ai/) (11 tools)
 - [mcp.augmap.ai](mcp.augmap.ai/) (10 tools)
 - [mcp.auralogs.ai](mcp.auralogs.ai/) (7 tools)
-- [mcp.bamf.ai](mcp.bamf.ai/) (160 tools)
+- [mcp.bamf.ai](mcp.bamf.ai/) (170 tools)
 - [mcp.bcited.ai](mcp.bcited.ai/) (6 tools)
-- [mcp.beatra.ai](mcp.beatra.ai/) (34 tools)
+- [mcp.beatra.ai](mcp.beatra.ai/) (36 tools)
 - [mcp.bev-buyer.ai](mcp.bev-buyer.ai/) (9 tools)
 - [mcp.bev-cuvee.org](mcp.bev-cuvee.org/) (2 tools)
 - [mcp.biel.ai](mcp.biel.ai/) (1 tools)

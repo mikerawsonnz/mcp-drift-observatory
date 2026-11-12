@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.bluerate.ai/mcp` | 3 | [`2bd2c20c2dbc`](8480c0b3b383f5f74749.json) | 2026-11-11 |
+| `https://api.bluerate.ai/mcp` | 3 | [`a57c465b405d`](8480c0b3b383f5f74749.json) | 2026-11-12 |
 
 ## Tools at `https://api.bluerate.ai/mcp`
 
@@ -16,6 +16,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-12: [annotation changed, description changed, schema changed](../../deltas/2026-11-12/8480c0b3b383f5f74749.json): `4 field(s) changed`
 - 2026-11-11: [description changed, schema changed](../../deltas/2026-11-11/8480c0b3b383f5f74749.json): `5 field(s) changed`
 
 ## Check it from your agent

@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://app.bitroad.ai/api/v1/mcp` | 91 | [`401586f81280`](e36f79dd929c8eb0f088.json) | 2026-11-10 |
+| `https://app.bitroad.ai/api/v1/mcp` | 93 | [`34a31b3eb522`](e36f79dd929c8eb0f088.json) | 2026-11-12 |
 
 ## Tools at `https://app.bitroad.ai/api/v1/mcp`
 
@@ -34,6 +34,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `intents_bid`: `Seller side (respond_quote): submit or replace your sealed bid on an open intent: amount_pence (inc-VAT, at most the budget ceiling), eta_m…`
 - `intents_list_open`: `Seller side (respond_quote): list open intents you can bid on, in categories where you have an active listing and in your settlement curren…`
 - `intents_post`: `Post an open intent: describe the job instead of picking a listing. Give a category (optionally a capability_class such as code_review.secu…`
+- `keys_claim_link`: `Key no human owns yet: get a one-hour link to hand to your principal. They open it, set an email and password, and become the owner of this…`
 - `orders_book`: `Read one grade's book in one currency. A fungible grade: its token book, price levels { price_pence per million tokens, quantity_tokens, or…`
 - `orders_cancel`: `Take one of your orders off the book, by the kind and id orders_list_mine returned: a listing is archived, an intent withdrawn while its bi…`
 - `orders_get`: `Fetch a single order with line items, shipment / tracking, payment status, and any associated returns or disputes. Buyer-side view — for se…`
@@ -69,11 +70,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `seller_list_returns`: `List returns filed against the bound seller's orders, paginated. Filter by 'status' (initiated, label_ready, in_transit, received, refunded…`
 - `seller_list_reviews`: `List reviews left on this seller's orders, paginated. Filter by 'responded: false' to find reviews that still need a seller response. A rev…`
 - `seller_mark_delivered`: `Declare a shipped order as delivered (no carrier confirmation is wired). Only valid from shipped; already-delivered is a no-op success. Not…`
-- `seller_mark_shipped`: `Mark an order as shipped with a tracking number. Idempotent on (order_id, tracking_number) — same pair is a no-op success. Enqueues carrier…`
-- and 31 more in [e36f79dd929c8eb0f088.json](e36f79dd929c8eb0f088.json)
+- and 33 more in [e36f79dd929c8eb0f088.json](e36f79dd929c8eb0f088.json)
 
 ## Changes
 
+- 2026-11-12: [count changed, description changed, tool added](../../deltas/2026-11-12/e36f79dd929c8eb0f088.json): `2 tool(s) added; 4 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-10: [count changed, tool added](../../deltas/2026-11-10/e36f79dd929c8eb0f088.json): `13 tool(s) added`
 - 2026-11-09: [count changed, tool added](../../deltas/2026-11-09/e36f79dd929c8eb0f088.json): `6 tool(s) added`
 - 2026-11-06: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-06/e36f79dd929c8eb0f088.json): `7 tool(s) added; 21 field(s) changed; signals: imperative_language_introduced` **(notable)**

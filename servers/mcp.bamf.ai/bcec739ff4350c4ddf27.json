@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "b2f70a86e7cb57869c3dd56bda2492f59db02e5910839f745dc8a65aa3703906",
+  "full_hash": "b2985da1998772bf148ef1f10a397c6fc251261d75ca41c3badc977d23410a4a",
   "name": "ai.bamf/bamf",
-  "observed_at": "2026-11-07T02:03:29.972594Z",
+  "observed_at": "2026-11-12T02:02:59.478939Z",
   "sources": [
     "official"
   ],
-  "tool_count": 160,
+  "tool_count": 170,
   "tools": [
     {
       "annotations": {
@@ -1440,6 +1440,57 @@
         "type": "object"
       },
       "name": "bamf.check_linkedin_session"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Client Access"
+      },
+      "description": "Read a client's LinkedIn access checklist: authenticator key in BAMF Vault, LinkedIn login on BAMF Cloud, Multilogin profile, BAMF Connect, LinkedIn posting OAuth, and the detected LinkedIn plan (Sales Navigator green, other plans amber with the upgrade link). Agency owner/admin only; API keys need the client_access:read scope. Never returns secrets.",
+      "inputSchema": {
+        "properties": {
+          "client": {
+            "description": "Client workspace id, slug, or client name (a client of an agency you own or admin).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "client"
+        ],
+        "type": "object"
+      },
+      "name": "bamf.get_client_access"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Get Client Sign-in Code"
+      },
+      "description": "Get the current 6-digit LinkedIn authenticator code for a client from their BAMF Vault key, so nobody relays PINs. Agency owner/admin only; API keys need the client_access:totp scope (posts:read is not enough). Rate-limited. A reason is required and every code is logged (who, when, why). Never returns the setup key.",
+      "inputSchema": {
+        "properties": {
+          "client": {
+            "description": "Client workspace id, slug, or client name.",
+            "type": "string"
+          },
+          "reason": {
+            "description": "Why the code is needed, e.g. 'LinkedIn sign-in on BAMF Cloud for the client's Multilogin profile'.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "client",
+          "reason"
+        ],
+        "type": "object"
+      },
+      "name": "bamf.get_client_totp_code"
     },
     {
       "annotations": {
@@ -4254,6 +4305,14 @@
           "category": {
             "type": "string"
           },
+          "design_subtype": {
+            "description": "With source=library, e.g. numbered_cards, cheat_sheet, steps_process, whiteboard, dark.",
+            "type": "string"
+          },
+          "design_type": {
+            "description": "With source=library, e.g. infographic, diagram, tweet_card, quote_card, personal_image, visual_metaphor.",
+            "type": "string"
+          },
           "include_guide": {
             "description": "Also return the repurposing guide.",
             "type": "boolean"
@@ -4262,6 +4321,16 @@
             "default": 20,
             "maximum": 50,
             "type": "number"
+          },
+          "person_slot": {
+            "enum": [
+              "none",
+              "avatar",
+              "card_photo",
+              "full_bleed_photo",
+              "illustration"
+            ],
+            "type": "string"
           },
           "platform": {
             "enum": [
@@ -4277,6 +4346,13 @@
           },
           "query": {
             "description": "Matches reference name or tag.",
+            "type": "string"
+          },
+          "source": {
+            "description": "library = human-approved reference designs (reference image, design_type, design_subtype, slot shape, person slot, render route, agent_notes). Pick by subtype and slot shape that fit the post.",
+            "enum": [
+              "library"
+            ],
             "type": "string"
           }
         },
@@ -4530,6 +4606,315 @@
         "type": "object"
       },
       "name": "bamf.update_brand_kit_references"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List Likeness Photos"
+      },
+      "description": "List a creator's likeness photos with labels (shot, setting, mood, quality), Real/AI source and review status. Pass post_text and/or slot (avatar, stats_over_photo, personal_image) to get the best-fitting accepted photos ranked with a reason instead. Read-only.",
+      "inputSchema": {
+        "properties": {
+          "creator_id": {
+            "type": "string"
+          },
+          "limit": {
+            "maximum": 20,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "post_text": {
+            "description": "Rank accepted photos for this post.",
+            "type": "string"
+          },
+          "slot": {
+            "enum": [
+              "avatar",
+              "stats_over_photo",
+              "personal_image",
+              "any"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "accepted",
+              "rejected"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "bamf.list_likeness_photos"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Add Likeness Photo"
+      },
+      "description": "Save a photo of the creator to their likeness library from an HTTPS URL or a data URL, then label it. Always persist any creator photo you use so the next post can reuse it. Real photos are accepted; set is_ai_generated for AI images, which wait as pending for the creator's approval. Never publishes.",
+      "inputSchema": {
+        "properties": {
+          "creator_id": {
+            "type": "string"
+          },
+          "data_url": {
+            "description": "PNG, JPEG or WebP data URL.",
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "is_ai_generated": {
+            "default": false,
+            "type": "boolean"
+          },
+          "scene": {
+            "description": "Scene the photo shows, e.g. 'in a coffee shop'.",
+            "type": "string"
+          },
+          "url": {
+            "format": "uri",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "bamf.add_likeness_photo"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Update Likeness Photo"
+      },
+      "description": "Accept or reject a likeness photo and/or correct its labels (shot, setting, mood, clothing, quality, is_person). AI photos are used in designs only after acceptance; marking is_person false moves the image out of the likeness set (never deleted).",
+      "inputSchema": {
+        "properties": {
+          "comment": {
+            "type": "string"
+          },
+          "creator_id": {
+            "type": "string"
+          },
+          "decision": {
+            "enum": [
+              "accepted",
+              "rejected"
+            ],
+            "type": "string"
+          },
+          "labels": {
+            "description": "Partial labels to merge, e.g. { shot: 'candid', setting: 'coffee shop' }.",
+            "type": "object"
+          },
+          "photo_id": {
+            "type": "string"
+          },
+          "relabel": {
+            "description": "Re-run the vision labeller.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "photo_id"
+        ],
+        "type": "object"
+      },
+      "name": "bamf.update_likeness_photo"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Request Likeness Scenes"
+      },
+      "description": "Generate 2-4 new photos of the creator in named scenes (at a desk, in a coffee shop, in a Waymo, after a run) from their accepted real photos. Results land as pending AI photos for the creator to accept; nothing is used before that. Costs about $0.15 per image.",
+      "inputSchema": {
+        "properties": {
+          "creator_id": {
+            "type": "string"
+          },
+          "feedback": {
+            "description": "Free-text direction for the new takes, e.g. 'daytime, more natural, less posed'.",
+            "type": "string"
+          },
+          "post_text": {
+            "description": "Infer the scene from a post when scenes is omitted.",
+            "type": "string"
+          },
+          "scenes": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 4,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "name": "bamf.request_likeness_scenes"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Design Post"
+      },
+      "description": "Designing in the background: picks an approved reference, writes slot copy from the post, places the creator's real photo and official app logos, proofreads, and leaves a draft for review. Poll bamf.get_design. Never schedules or publishes. Costs credits.",
+      "inputSchema": {
+        "properties": {
+          "creator_id": {
+            "type": "string"
+          },
+          "post_id": {
+            "description": "Post to design. Provide post_id or source_post_id.",
+            "type": "string"
+          },
+          "qa": {
+            "description": "Mark as a QA run so the draft stays out of the review queue.",
+            "type": "boolean"
+          },
+          "reference_id": {
+            "description": "Approved design reference to match.",
+            "type": "string"
+          },
+          "source_post_id": {
+            "type": "string"
+          },
+          "template": {
+            "enum": [
+              "tweet_card_dark",
+              "tweet_card_light",
+              "chart_post",
+              "stats_over_photo",
+              "app_icon_grid",
+              "highlighted_quote",
+              "model_base"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "creator_id"
+        ],
+        "type": "object"
+      },
+      "name": "bamf.design_post"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Design"
+      },
+      "description": "Read a design's status, image, matched reference, template and layers (likeness, art, text). Poll after bamf.design_post. Read-only.",
+      "inputSchema": {
+        "properties": {
+          "post_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "post_id"
+        ],
+        "type": "object"
+      },
+      "name": "bamf.get_design"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Replace Design Layer"
+      },
+      "description": "Swap one layer of a layer-built design without changing the rest: likeness + photo_id (an accepted photo from bamf.list_likeness_photos; a pending AI photo is used but flagged), likeness + new_candid (requests new candid photos, pending), art (new art for the art layer only), or text + slots (rerender, no model call).",
+      "inputSchema": {
+        "properties": {
+          "layer": {
+            "enum": [
+              "likeness",
+              "art",
+              "text"
+            ],
+            "type": "string"
+          },
+          "new_candid": {
+            "description": "Describe the candid photo to request.",
+            "type": "string"
+          },
+          "photo_id": {
+            "type": "string"
+          },
+          "post_id": {
+            "type": "string"
+          },
+          "prompt": {
+            "description": "Direction for new art.",
+            "type": "string"
+          },
+          "slots": {
+            "description": "Text slot values to rerender.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "post_id",
+          "layer"
+        ],
+        "type": "object"
+      },
+      "name": "bamf.replace_design_layer"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Set Design Version"
+      },
+      "description": "Make one version of a layer-built design current (revert to an earlier version or promote a candidate). The post's image follows it. New versions only become current when they beat the current one; this is how you go back. List versions with bamf.get_design.",
+      "inputSchema": {
+        "properties": {
+          "post_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "version_id": {
+            "description": "A version id from bamf.get_design versions.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "post_id",
+          "version_id"
+        ],
+        "type": "object"
+      },
+      "name": "bamf.set_design_version"
     },
     {
       "annotations": {

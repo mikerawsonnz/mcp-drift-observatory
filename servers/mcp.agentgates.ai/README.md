@@ -6,16 +6,17 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.agentgates.ai/compute` | 3 | [`e136999eb934`](8e123eb71203886e049b.json) | 2026-11-11 |
+| `https://mcp.agentgates.ai/compute` | 3 | [`e0fcec0a1751`](8e123eb71203886e049b.json) | 2026-11-12 |
 
 ## Tools at `https://mcp.agentgates.ai/compute`
 
 - `compute_docs`: `Returns the Agentgates compute docs, read live (markdown written for an agent to follow in one pass): the plans with live prices, how to pa…`
-- `compute_plans`: `Lists the confidential virtual machines (Intel TDX, memory encrypted in use) Agentgates rents to agents by the hour: each plan's vCPU, memo…`
+- `compute_plans`: `Lists the virtual machines Agentgates rents to agents by the hour: confidential ones (Intel TDX, memory encrypted in use) and plain ones wi…`
 - `compute_quote`: `Gets the exact price of one machine without paying: sends the create request with no payment and returns the API's HTTP 402 offer, one leg…`
 
 ## Changes
 
+- 2026-11-12: [annotation changed, description changed, field changed, schema changed](../../deltas/2026-11-12/8e123eb71203886e049b.json): `26 field(s) changed`
 - 2026-11-11: [schema changed](../../deltas/2026-11-11/8e123eb71203886e049b.json): `7 field(s) changed`
 - 2026-11-07: [description changed, schema changed](../../deltas/2026-11-07/8e123eb71203886e049b.json): `7 field(s) changed`
 - 2026-11-06: [description changed, schema changed](../../deltas/2026-11-06/8e123eb71203886e049b.json): `47 field(s) changed`

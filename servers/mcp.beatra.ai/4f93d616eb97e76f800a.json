@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "f1893d8b7cdffbb1510b36035744826989f275af4c50a30716167202cf491d0c",
+  "full_hash": "fd2a0989a42ac6edf8596f2b406b6ac4f850c846dda597a751587cccd45b7dc7",
   "name": "ai.beatra/beatra",
-  "observed_at": "2026-11-09T02:02:41.133532Z",
+  "observed_at": "2026-11-12T02:03:01.094519Z",
   "sources": [
     "official"
   ],
-  "tool_count": 34,
+  "tool_count": 36,
   "tools": [
     {
       "annotations": {
@@ -700,7 +700,7 @@
               "gpt-image-2.5-flare",
               "gpt-image-2.5-sunburst",
               "gpt-image-2",
-              "image-01-live",
+              "minimax-h3-image",
               "wan2.7-image-pro",
               "wan2.7-image",
               "qwen-image-3.0-pro",
@@ -1401,7 +1401,7 @@
               "gpt-image-2.5-flare",
               "gpt-image-2.5-sunburst",
               "gpt-image-2",
-              "image-01-live",
+              "minimax-h3-image",
               "wan2.7-image-pro",
               "wan2.7-image",
               "qwen-image-3.0-pro",
@@ -2185,7 +2185,7 @@
               "gpt-image-2.5-flare",
               "gpt-image-2.5-sunburst",
               "gpt-image-2",
-              "image-01-live",
+              "minimax-h3-image",
               "wan2.7-image-pro",
               "wan2.7-image",
               "qwen-image-3.0-pro",
@@ -7850,7 +7850,7 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Join your own video clips into one MP4 with optional narration, ducked music, and burned-in subtitles. Set keep_audio on a clip to keep that clip's own sound, such as a lip-synced presenter take; other clips are muted. This call does not consume Beatra credits. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry.",
+      "description": "Join your own video clips into one MP4 with optional narration, ducked music, and burned-in subtitles. Set keep_audio on a clip to keep that clip's own sound, such as a lip-synced presenter take; other clips are muted. Call beatra.models.list with capability video_compose for the price. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry.",
       "inputSchema": {
         "$defs": {
           "ComposeClip": {
@@ -8841,9 +8841,116 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Generate music from a prompt, with optional lyrics or reference audio. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry.",
+      "description": "Generate songs or instrumentals from a prompt, lyrics, or reference audio; optionally set a target length in seconds, reuse a saved persona, or score from reference images, a video, or audio. Make lyric timing, cover art, a visualizer MP4, or a WAV for a chosen track afterwards with beatra.music.edit. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry.",
       "inputSchema": {
         "$defs": {
+          "McpMusicReferences": {
+            "properties": {
+              "audio": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "discriminator": {
+                        "mapping": {
+                          "artifact": "#/$defs/MediaInputArtifact",
+                          "data_uri": "#/$defs/MediaInputDataUri",
+                          "url": "#/$defs/MediaInputUrl"
+                        },
+                        "propertyName": "type"
+                      },
+                      "oneOf": [
+                        {
+                          "$ref": "#/$defs/MediaInputUrl"
+                        },
+                        {
+                          "$ref": "#/$defs/MediaInputArtifact"
+                        },
+                        {
+                          "$ref": "#/$defs/MediaInputDataUri"
+                        }
+                      ]
+                    },
+                    "maxItems": 4,
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Up to 4 audio clips, 6 seconds to 30 minutes each.",
+                "title": "Audio"
+              },
+              "images": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "discriminator": {
+                        "mapping": {
+                          "artifact": "#/$defs/MediaInputArtifact",
+                          "data_uri": "#/$defs/MediaInputDataUri",
+                          "url": "#/$defs/MediaInputUrl"
+                        },
+                        "propertyName": "type"
+                      },
+                      "oneOf": [
+                        {
+                          "$ref": "#/$defs/MediaInputUrl"
+                        },
+                        {
+                          "$ref": "#/$defs/MediaInputArtifact"
+                        },
+                        {
+                          "$ref": "#/$defs/MediaInputDataUri"
+                        }
+                      ]
+                    },
+                    "maxItems": 5,
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Up to 5 images, 10 MB each.",
+                "title": "Images"
+              },
+              "video": {
+                "anyOf": [
+                  {
+                    "discriminator": {
+                      "mapping": {
+                        "artifact": "#/$defs/MediaInputArtifact",
+                        "data_uri": "#/$defs/MediaInputDataUri",
+                        "url": "#/$defs/MediaInputUrl"
+                      },
+                      "propertyName": "type"
+                    },
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/MediaInputUrl"
+                      },
+                      {
+                        "$ref": "#/$defs/MediaInputArtifact"
+                      },
+                      {
+                        "$ref": "#/$defs/MediaInputDataUri"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "One video, up to 100 MB and 241 seconds.",
+                "title": "Video"
+              }
+            },
+            "title": "McpMusicReferences",
+            "type": "object"
+          },
           "MediaInputArtifact": {
             "properties": {
               "artifact_id": {
@@ -9131,6 +9238,38 @@
             "title": "Client Request Id",
             "type": "string"
           },
+          "duration_fit": {
+            "anyOf": [
+              {
+                "enum": [
+                  "approx",
+                  "exact"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "approx keeps the generated length; exact trims to the target with a short fade-out. Only with duration_seconds.",
+            "title": "Duration Fit"
+          },
+          "duration_seconds": {
+            "anyOf": [
+              {
+                "maximum": 360,
+                "minimum": 10,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Target length in seconds (10–360). Results of 30 seconds or longer land within about 10%; shorter targets are generated at 30 seconds and trimmed. Not combinable with references or reference_audio.",
+            "title": "Duration Seconds"
+          },
           "instrumental": {
             "default": false,
             "description": "When true, generate instrumental music without vocals.",
@@ -9176,6 +9315,21 @@
             "default": null,
             "description": "Options grouped by public music model family."
           },
+          "persona_id": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "A persona saved with beatra.music.edit operation=create_persona; the new song keeps that singer's voice and style.",
+            "title": "Persona Id"
+          },
           "prompt": {
             "description": "Style, mood, genre, and instrumentation. When lyrics are supplied (or Suno custom mode is on) this maps to the provider's style-conditioning field; otherwise it is the song description the model writes the song from. Either way it is not an instruction field: execution directives written here (for example \"do not omit anything\", \"sing it verbatim\", \"make chapter three differ from chapter one\") are not read as instructions and will not be obeyed. Put the words to be sung in `lyrics`, or set `instrumental` to true for a track with no vocals.",
             "maxLength": 2000,
@@ -9213,6 +9367,18 @@
             "default": null,
             "title": "Reference Audio"
           },
+          "references": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/McpMusicReferences"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Score from images (up to 5), one video (up to 241 seconds), or audio clips. Not combinable with duration_seconds, persona_id, or lyrics."
+          },
           "title": {
             "anyOf": [
               {
@@ -9231,7 +9397,7 @@
           "prompt",
           "client_request_id"
         ],
-        "title": "McpMusicGenerateInput",
+        "title": "McpMusicGenerateV15Input",
         "type": "object"
       },
       "name": "beatra.music.generate",
@@ -9556,11 +9722,1473 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Use before beatra.speech.synthesize to make speech sound natural and human. Beatra's AI Director reads the text and the user's optional instructions, then returns a script that is ready to synthesize, written in Beatra speech markup for the target voice and model: emotion, performance, sound effects, pauses and pronunciation. It never changes the words. Without voice or model it recommends one, with alternatives, each with a name, a preview link and a reason. Call beatra.speech.synthesize with each returned script's synthesis object as the arguments, unchanged, plus your own client_request_id; a script whose synthesis is null cannot be synthesized as is (read warnings). To try another voice within two days, call again with the same arguments, changing only voice (and model if needed): the earlier reading is reused and not charged again. This asynchronous task consumes Beatra credits: successful completion is charged afterward from actual tokens; nothing is charged when the result has directed false or reuses an earlier reading. To start, the balance must cover Beatra's estimate for the text (per 1,000 characters, counting at least 1,000) plus that of any other AI Director task in progress, also when an earlier reading is reused; an insufficient_balance refusal states the amount needed. An account runs at most 2 AI Director tasks at a time. Submit exactly once, then poll with beatra.tasks.get. Reuse client_request_id only for an identical retry.",
+      "description": "Revise a music track made by beatra.music.generate or an uploaded song: extend it, replace a time range, add vocals to an instrumental, or add accompaniment to a vocal; save a generated track's singer as a reusable persona; or make lyric timing (LRC and SRT), extra cover art, a visualizer MP4, or a WAV version of a chosen generated track. Every operation is a paid task; call beatra.models.list for its price. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry.",
+      "inputSchema": {
+        "$defs": {
+          "McpMusicVideoOptions": {
+            "properties": {
+              "author": {
+                "anyOf": [
+                  {
+                    "maxLength": 50,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Author name shown in the video, up to 50 characters.",
+                "title": "Author"
+              },
+              "brand_text": {
+                "anyOf": [
+                  {
+                    "maxLength": 50,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Brand text shown in the video, up to 50 characters.",
+                "title": "Brand Text"
+              }
+            },
+            "title": "McpMusicVideoOptions",
+            "type": "object"
+          },
+          "MediaInputArtifact": {
+            "properties": {
+              "artifact_id": {
+                "description": "ULID of a previously-uploaded artifact",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "type": {
+                "const": "artifact",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "artifact_id"
+            ],
+            "title": "MediaInputArtifact",
+            "type": "object"
+          },
+          "MediaInputDataUri": {
+            "properties": {
+              "data": {
+                "description": "Data URI (e.g. data:image/png;base64,...) — max 256KB encoded",
+                "maxLength": 262144,
+                "title": "Data",
+                "type": "string"
+              },
+              "type": {
+                "const": "data_uri",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "data"
+            ],
+            "title": "MediaInputDataUri",
+            "type": "object"
+          },
+          "MediaInputUrl": {
+            "properties": {
+              "type": {
+                "const": "url",
+                "title": "Type",
+                "type": "string"
+              },
+              "url": {
+                "description": "HTTPS URL. External URLs are downloaded and re-hosted to beatra CDN.",
+                "title": "Url",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "url"
+            ],
+            "title": "MediaInputUrl",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "client_request_id": {
+            "description": "Stable retry identity for this billable operation. Reuse only for the exact same generation arguments.",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Client Request Id",
+            "type": "string"
+          },
+          "continue_at_ms": {
+            "anyOf": [
+              {
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Where the extension starts, in milliseconds; defaults to one second before the end of the track.",
+            "title": "Continue At Ms"
+          },
+          "end_ms": {
+            "anyOf": [
+              {
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The range to replace, at least 10 seconds and at most half of the track.",
+            "title": "End Ms"
+          },
+          "full_lyrics": {
+            "anyOf": [
+              {
+                "maxLength": 5000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The whole song's lyrics after the change; defaults to the track's lyrics.",
+            "title": "Full Lyrics"
+          },
+          "instrumental": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "For uploaded audio: continue without vocals.",
+            "title": "Instrumental"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "lyrics_timing",
+                  "cover_image",
+                  "video_mp4",
+                  "wav"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "lyrics_timing (LRC and SRT), cover_image, video_mp4, or wav. One per call.",
+            "title": "Kind"
+          },
+          "lyrics": {
+            "anyOf": [
+              {
+                "maxLength": 5000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Lyrics to sing. Required for add_vocals.",
+            "title": "Lyrics"
+          },
+          "negative_prompt": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Styles to avoid.",
+            "title": "Negative Prompt"
+          },
+          "operation": {
+            "description": "extend, replace_section, add_vocals, add_instrumental, create_persona, or deliverable.",
+            "enum": [
+              "extend",
+              "replace_section",
+              "add_vocals",
+              "add_instrumental",
+              "create_persona",
+              "deliverable"
+            ],
+            "title": "Operation",
+            "type": "string"
+          },
+          "persona_description": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "What the singer sounds like.",
+            "title": "Persona Description"
+          },
+          "persona_name": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Name for the persona.",
+            "title": "Persona Name"
+          },
+          "persona_style": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional style notes, up to 200 characters.",
+            "title": "Persona Style"
+          },
+          "prompt": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Musical style for the new part. Required for add_instrumental; otherwise defaults to the track's style.",
+            "title": "Prompt"
+          },
+          "section_lyrics": {
+            "anyOf": [
+              {
+                "maxLength": 5000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The new lyrics for the replaced range.",
+            "title": "Section Lyrics"
+          },
+          "source": {
+            "description": "The track to work on: an artifact from beatra.music.generate, an uploaded file, or a URL.",
+            "discriminator": {
+              "mapping": {
+                "artifact": "#/$defs/MediaInputArtifact",
+                "data_uri": "#/$defs/MediaInputDataUri",
+                "url": "#/$defs/MediaInputUrl"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/MediaInputUrl"
+              },
+              {
+                "$ref": "#/$defs/MediaInputArtifact"
+              },
+              {
+                "$ref": "#/$defs/MediaInputDataUri"
+              }
+            ],
+            "title": "Source"
+          },
+          "start_ms": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The range to replace, at least 10 seconds and at most half of the track.",
+            "title": "Start Ms"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Title for the result; generated when omitted.",
+            "title": "Title"
+          },
+          "video_options": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/McpMusicVideoOptions"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "For video_mp4: author and brand_text shown in the video, up to 50 characters each."
+          },
+          "vocal_end_ms": {
+            "anyOf": [
+              {
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The 10–30 second vocal window the persona learns from; defaults to the first 30 seconds.",
+            "title": "Vocal End Ms"
+          },
+          "vocal_gender": {
+            "anyOf": [
+              {
+                "enum": [
+                  "m",
+                  "f"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "m or f; raises the chance of that voice.",
+            "title": "Vocal Gender"
+          },
+          "vocal_start_ms": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The 10–30 second vocal window the persona learns from; defaults to the first 30 seconds.",
+            "title": "Vocal Start Ms"
+          }
+        },
+        "required": [
+          "operation",
+          "source",
+          "client_request_id"
+        ],
+        "title": "McpMusicEditInput",
+        "type": "object"
+      },
+      "name": "beatra.music.edit",
+      "outputSchema": {
+        "$defs": {
+          "ArtifactLink": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Artifact Id"
+              },
+              "media_type": {
+                "title": "Media Type",
+                "type": "string"
+              },
+              "mime_type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Mime Type"
+              },
+              "path": {
+                "title": "Path",
+                "type": "string"
+              },
+              "url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Url"
+              }
+            },
+            "required": [
+              "media_type",
+              "path"
+            ],
+            "title": "ArtifactLink",
+            "type": "object"
+          },
+          "TaskError": {
+            "properties": {
+              "code": {
+                "description": "Stable machine-readable public error code.",
+                "title": "Code",
+                "type": "string"
+              },
+              "details": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Provider-neutral expected, received, supported, or candidate failure facts.",
+                "title": "Details"
+              },
+              "message": {
+                "description": "Human-readable safe failure reason.",
+                "title": "Message",
+                "type": "string"
+              },
+              "param": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "JSON Pointer to the relevant request or output field.",
+                "title": "Param"
+              },
+              "request_id": {
+                "description": "Request trace identifier for support and correlation.",
+                "title": "Request Id",
+                "type": "string"
+              },
+              "retryable": {
+                "description": "Whether the same logical request may succeed when retried unchanged.",
+                "title": "Retryable",
+                "type": "boolean"
+              },
+              "type": {
+                "description": "Stable public error family.",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "type",
+              "message",
+              "retryable",
+              "request_id"
+            ],
+            "title": "TaskError",
+            "type": "object"
+          },
+          "ToolError": {
+            "additionalProperties": true,
+            "description": "Stable MCP tool-error envelope embedded in structuredContent.\n\nSame branching vocabulary as the REST error envelope: `code` is a registry\nerror code (plus the OAuth-standard `insufficient_scope`), `retryable`\ntells the agent whether an identical retry can succeed, `param` is a JSON\nPointer to the offending argument, and `details` carries correction facts.",
+            "properties": {
+              "code": {
+                "title": "Code",
+                "type": "string"
+              },
+              "details": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Details"
+              },
+              "jsonrpc_code": {
+                "title": "Jsonrpc Code",
+                "type": "integer"
+              },
+              "message": {
+                "title": "Message",
+                "type": "string"
+              },
+              "param": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Param"
+              },
+              "retryable": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Retryable"
+              },
+              "type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Type"
+              }
+            },
+            "required": [
+              "code",
+              "jsonrpc_code",
+              "message"
+            ],
+            "title": "ToolError",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "artifacts": {
+            "items": {
+              "$ref": "#/$defs/ArtifactLink"
+            },
+            "title": "Artifacts",
+            "type": "array"
+          },
+          "billing": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Billing"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ToolError"
+              },
+              {
+                "$ref": "#/$defs/TaskError"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Error"
+          },
+          "resolved_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Resolved Model"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "task": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Task"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Task Id"
+          },
+          "terminal": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Terminal"
+          },
+          "usage": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Usage"
+          }
+        },
+        "title": "TaskToolOutput",
+        "type": "object"
+      },
+      "title": "Edit Music"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Process one audio file: trim, loop to a length, fade, normalize loudness, convert format, split into stems (vocals and accompaniment, or six stems), or isolate the voice from up to 2 minutes of audio; optional fade, loudness, and format finishing steps run in the same call. Every operation is a paid task, and trim, loop, fade, loudness, and format are limited to 50 calls a day. A six-stem split costs more than a two-stem one: call beatra.models.list for each price. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry.",
+      "inputSchema": {
+        "$defs": {
+          "MediaInputArtifact": {
+            "properties": {
+              "artifact_id": {
+                "description": "ULID of a previously-uploaded artifact",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "type": {
+                "const": "artifact",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "artifact_id"
+            ],
+            "title": "MediaInputArtifact",
+            "type": "object"
+          },
+          "MediaInputDataUri": {
+            "properties": {
+              "data": {
+                "description": "Data URI (e.g. data:image/png;base64,...) — max 256KB encoded",
+                "maxLength": 262144,
+                "title": "Data",
+                "type": "string"
+              },
+              "type": {
+                "const": "data_uri",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "data"
+            ],
+            "title": "MediaInputDataUri",
+            "type": "object"
+          },
+          "MediaInputUrl": {
+            "properties": {
+              "type": {
+                "const": "url",
+                "title": "Type",
+                "type": "string"
+              },
+              "url": {
+                "description": "HTTPS URL. External URLs are downloaded and re-hosted to beatra CDN.",
+                "title": "Url",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "url"
+            ],
+            "title": "MediaInputUrl",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "bitrate_kbps": {
+            "anyOf": [
+              {
+                "enum": [
+                  64,
+                  128,
+                  192,
+                  256,
+                  320
+                ],
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Bitrate for mp3, ogg, and m4a, sent together with format (m4a up to 256; ogg varies around this target). Default when omitted: 192 when format is sent; otherwise the source's bitrate rounded up to one of these values (192 when unknown).",
+            "title": "Bitrate Kbps"
+          },
+          "channels": {
+            "anyOf": [
+              {
+                "enum": [
+                  1,
+                  2
+                ],
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "1 for mono or 2 for stereo; keeps the input when omitted.",
+            "title": "Channels"
+          },
+          "client_request_id": {
+            "description": "Stable retry identity for this billable operation. Reuse only for the exact same generation arguments.",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Client Request Id",
+            "type": "string"
+          },
+          "crossfade_ms": {
+            "anyOf": [
+              {
+                "maximum": 3000,
+                "minimum": 50,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Crossfade at each loop seam, 50–3000 milliseconds.",
+            "title": "Crossfade Ms"
+          },
+          "end_ms": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Where the kept audio ends; send this or target_duration_ms.",
+            "title": "End Ms"
+          },
+          "end_with_fade": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Fade out the end of the loop (default true).",
+            "title": "End With Fade"
+          },
+          "fade_curve": {
+            "anyOf": [
+              {
+                "enum": [
+                  "tri",
+                  "exp",
+                  "log",
+                  "qsin"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "tri (linear), exp, log, or qsin.",
+            "title": "Fade Curve"
+          },
+          "fade_in_ms": {
+            "anyOf": [
+              {
+                "maximum": 30000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Fade length in milliseconds (0–30000).",
+            "title": "Fade In Ms"
+          },
+          "fade_out_ms": {
+            "anyOf": [
+              {
+                "maximum": 30000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Fade length in milliseconds (0–30000).",
+            "title": "Fade Out Ms"
+          },
+          "format": {
+            "anyOf": [
+              {
+                "enum": [
+                  "mp3",
+                  "wav",
+                  "ogg",
+                  "flac",
+                  "m4a",
+                  "ulaw_8k_wav"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "mp3, wav, ogg, flac, m4a, or ulaw_8k_wav (8 kHz telephone audio). When omitted: isolate_voice gives wav; trim keeps an uncompressed (PCM) source as wav; otherwise a lossless source becomes flac, MP3 stays mp3, Ogg Vorbis or Opus (WebM included) becomes ogg, AAC becomes m4a, any other codec follows its container's format (WAV stays wav, MP4 becomes m4a), and anything unrecognized becomes mp3.",
+            "title": "Format"
+          },
+          "loop_count": {
+            "anyOf": [
+              {
+                "maximum": 100,
+                "minimum": 2,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "How many times to repeat the loop window (2–100).",
+            "title": "Loop Count"
+          },
+          "loop_end_ms": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The part of the source to repeat, at least 4 seconds; defaults to the whole file.",
+            "title": "Loop End Ms"
+          },
+          "loop_start_ms": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The part of the source to repeat, at least 4 seconds; defaults to the whole file.",
+            "title": "Loop Start Ms"
+          },
+          "loudness_lufs": {
+            "anyOf": [
+              {
+                "maximum": -9,
+                "minimum": -30,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Integrated loudness target (−30 to −9 LUFS, default −14). Sending this or true_peak_db normalizes the loudness.",
+            "title": "Loudness Lufs"
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "enum": [
+                  "two_stem",
+                  "multi_stem"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "two_stem (vocals and accompaniment) or multi_stem (vocals, drums, bass, guitar, piano, other).",
+            "title": "Mode"
+          },
+          "operation": {
+            "description": "trim, loop, fade, normalize_loudness, convert_format, separate_stems, or isolate_voice.",
+            "enum": [
+              "trim",
+              "loop",
+              "fade",
+              "normalize_loudness",
+              "convert_format",
+              "separate_stems",
+              "isolate_voice"
+            ],
+            "title": "Operation",
+            "type": "string"
+          },
+          "sample_rate": {
+            "anyOf": [
+              {
+                "enum": [
+                  8000,
+                  16000,
+                  22050,
+                  24000,
+                  32000,
+                  44100,
+                  48000
+                ],
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Output sample rate in Hz. When omitted, the input rate is kept if it is one of these values, otherwise 48000.",
+            "title": "Sample Rate"
+          },
+          "source": {
+            "description": "The track to work on: an artifact from beatra.music.generate, an uploaded file, or a URL.",
+            "discriminator": {
+              "mapping": {
+                "artifact": "#/$defs/MediaInputArtifact",
+                "data_uri": "#/$defs/MediaInputDataUri",
+                "url": "#/$defs/MediaInputUrl"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/MediaInputUrl"
+              },
+              {
+                "$ref": "#/$defs/MediaInputArtifact"
+              },
+              {
+                "$ref": "#/$defs/MediaInputDataUri"
+              }
+            ],
+            "title": "Source"
+          },
+          "start_ms": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Where the kept audio starts, in milliseconds (default 0).",
+            "title": "Start Ms"
+          },
+          "target_duration_ms": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Length of the result in milliseconds (trim or loop).",
+            "title": "Target Duration Ms"
+          },
+          "true_peak_db": {
+            "anyOf": [
+              {
+                "maximum": 0,
+                "minimum": -9,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "True-peak ceiling (−9 to 0 dB, default −1). Sending it also normalizes the loudness to loudness_lufs.",
+            "title": "True Peak Db"
+          }
+        },
+        "required": [
+          "operation",
+          "source",
+          "client_request_id"
+        ],
+        "title": "McpAudioProcessInput",
+        "type": "object"
+      },
+      "name": "beatra.audio.process",
+      "outputSchema": {
+        "$defs": {
+          "ArtifactLink": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Artifact Id"
+              },
+              "media_type": {
+                "title": "Media Type",
+                "type": "string"
+              },
+              "mime_type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Mime Type"
+              },
+              "path": {
+                "title": "Path",
+                "type": "string"
+              },
+              "url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Url"
+              }
+            },
+            "required": [
+              "media_type",
+              "path"
+            ],
+            "title": "ArtifactLink",
+            "type": "object"
+          },
+          "TaskError": {
+            "properties": {
+              "code": {
+                "description": "Stable machine-readable public error code.",
+                "title": "Code",
+                "type": "string"
+              },
+              "details": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Provider-neutral expected, received, supported, or candidate failure facts.",
+                "title": "Details"
+              },
+              "message": {
+                "description": "Human-readable safe failure reason.",
+                "title": "Message",
+                "type": "string"
+              },
+              "param": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "JSON Pointer to the relevant request or output field.",
+                "title": "Param"
+              },
+              "request_id": {
+                "description": "Request trace identifier for support and correlation.",
+                "title": "Request Id",
+                "type": "string"
+              },
+              "retryable": {
+                "description": "Whether the same logical request may succeed when retried unchanged.",
+                "title": "Retryable",
+                "type": "boolean"
+              },
+              "type": {
+                "description": "Stable public error family.",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "type",
+              "message",
+              "retryable",
+              "request_id"
+            ],
+            "title": "TaskError",
+            "type": "object"
+          },
+          "ToolError": {
+            "additionalProperties": true,
+            "description": "Stable MCP tool-error envelope embedded in structuredContent.\n\nSame branching vocabulary as the REST error envelope: `code` is a registry\nerror code (plus the OAuth-standard `insufficient_scope`), `retryable`\ntells the agent whether an identical retry can succeed, `param` is a JSON\nPointer to the offending argument, and `details` carries correction facts.",
+            "properties": {
+              "code": {
+                "title": "Code",
+                "type": "string"
+              },
+              "details": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Details"
+              },
+              "jsonrpc_code": {
+                "title": "Jsonrpc Code",
+                "type": "integer"
+              },
+              "message": {
+                "title": "Message",
+                "type": "string"
+              },
+              "param": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Param"
+              },
+              "retryable": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Retryable"
+              },
+              "type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Type"
+              }
+            },
+            "required": [
+              "code",
+              "jsonrpc_code",
+              "message"
+            ],
+            "title": "ToolError",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "artifacts": {
+            "items": {
+              "$ref": "#/$defs/ArtifactLink"
+            },
+            "title": "Artifacts",
+            "type": "array"
+          },
+          "billing": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Billing"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ToolError"
+              },
+              {
+                "$ref": "#/$defs/TaskError"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Error"
+          },
+          "resolved_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Resolved Model"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "task": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Task"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Task Id"
+          },
+          "terminal": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Terminal"
+          },
+          "usage": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Usage"
+          }
+        },
+        "title": "TaskToolOutput",
+        "type": "object"
+      },
+      "title": "Process Audio"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Use before beatra.speech.synthesize to make speech sound natural and human. Beatra's Smart Voice Director reads the text and the user's optional instructions, then returns a script that is ready to synthesize, written in Beatra speech markup for the target voice and model: emotion, performance, sound effects, pauses and pronunciation. It never changes the words. Without voice or model it recommends one, with alternatives, each with a name, a preview link and a reason. Call beatra.speech.synthesize with each returned script's synthesis object as the arguments, unchanged, plus your own client_request_id; a script whose synthesis is null cannot be synthesized as is (read warnings). To try another voice within two days, call again with the same arguments, changing only voice (and model if needed): the earlier reading is reused and not charged again. This asynchronous task consumes Beatra credits: successful completion is charged afterward from actual tokens; nothing is charged when the result has directed false or reuses an earlier reading. To start, the balance must cover Beatra's estimate for the text (per 1,000 characters, counting at least 1,000) plus that of any other Smart Voice Director task in progress, also when an earlier reading is reused; an insufficient_balance refusal states the amount needed. An account runs at most 2 Smart Voice Director tasks at a time. Submit exactly once, then poll with beatra.tasks.get. Reuse client_request_id only for an identical retry.",
       "inputSchema": {
         "$defs": {
           "SpeechScriptContext": {
-            "description": "Text around the input. It only helps the director read the tone.",
+            "description": "Text around the input. It only helps the Smart Voice Director read the tone.",
             "properties": {
               "after": {
                 "anyOf": [
@@ -9595,7 +11223,7 @@
             "type": "object"
           }
         },
-        "description": "Text for the AI Director, optional instructions, and the voice and model to direct for.",
+        "description": "Text for the Smart Voice Director, optional instructions, and the voice and model to direct for.",
         "properties": {
           "client_request_id": {
             "description": "Stable retry identity for this billable operation. Reuse only for the exact same generation arguments.",
@@ -9617,7 +11245,7 @@
             "description": "Optional, advanced: the text around the input when a long text is directed in parts, used only to understand the tone. It is not annotated, read aloud or returned. The end of before is also suggested as previous_text when the target model supports it."
           },
           "input": {
-            "description": "Text to perform, in any supported language, 1 to 50,000 characters. It may already contain Beatra speech markup such as {pause 0.5} or {pron 行 hang2}; the AI Director keeps it and only adds to it. The words themselves are never changed.",
+            "description": "Text to perform, in any supported language, 1 to 50,000 characters. It may already contain Beatra speech markup such as {pause 0.5} or {pron 行 hang2}; the Smart Voice Director keeps it and only adds to it. The words themselves are never changed.",
             "maxLength": 50000,
             "minLength": 1,
             "title": "Input",
@@ -9634,7 +11262,7 @@
               }
             ],
             "default": null,
-            "description": "Optional requirements in natural language, in any language, up to 2,000 characters, for example \"a bit suspenseful, whisper the last line\". Without them the AI Director performs the text by its meaning.",
+            "description": "Optional requirements in natural language, in any language, up to 2,000 characters, for example \"a bit suspenseful, whisper the last line\". Without them the Smart Voice Director performs the text by its meaning.",
             "title": "Instructions"
           },
           "language": {
@@ -9669,7 +11297,7 @@
               }
             ],
             "default": null,
-            "description": "Optional voice to perform for: a voice_id from beatra.voices.list, a preset or one of your own cloned voices. Same meaning as voice in beatra.speech.synthesize. Omit it to let the AI Director recommend a voice.",
+            "description": "Optional voice to perform for: a voice_id from beatra.voices.list, a preset or one of your own cloned voices. Same meaning as voice in beatra.speech.synthesize. Omit it to let the Smart Voice Director recommend a voice.",
             "title": "Voice"
           }
         },
@@ -10158,7 +11786,7 @@
             "type": "number"
           },
           "subtitle_enable": {
-            "default": false,
+            "default": true,
             "description": "Request sentence-level subtitles with the audio. Subtitles are free; when present, output.subtitles carries the subtitle file URL and format.",
             "title": "Subtitle Enable",
             "type": "boolean"
@@ -10659,7 +12287,7 @@
             "type": "number"
           },
           "subtitle_enable": {
-            "default": false,
+            "default": true,
             "description": "Whether the create call would request subtitles",
             "title": "Subtitle Enable",
             "type": "boolean"
@@ -12097,6 +13725,11 @@
                 "title": "Status",
                 "type": "string"
               },
+              "subtitles": {
+                "default": false,
+                "title": "Subtitles",
+                "type": "boolean"
+              },
               "use_case": {
                 "items": {
                   "type": "string"
@@ -12928,6 +14561,11 @@
                 ],
                 "title": "Status",
                 "type": "string"
+              },
+              "subtitles": {
+                "default": false,
+                "title": "Subtitles",
+                "type": "boolean"
               },
               "use_case": {
                 "items": {
@@ -14001,7 +15639,19 @@
               "text_to_speech",
               "voice_clone",
               "image_to_text",
-              "video_to_text"
+              "video_to_text",
+              "music_extend",
+              "music_replace_section",
+              "music_add_vocals",
+              "music_add_instrumental",
+              "music_persona",
+              "music_lyrics_timing",
+              "music_cover_image",
+              "music_video",
+              "music_wav",
+              "audio_process",
+              "audio_stem_separation",
+              "audio_voice_isolation"
             ],
             "title": "Capability",
             "type": "string"
@@ -14016,7 +15666,7 @@
         "required": [
           "capability"
         ],
-        "title": "ModelListInput",
+        "title": "ModelListV15Input",
         "type": "object"
       },
       "name": "beatra.models.list",
@@ -15283,6 +16933,21 @@
                 ],
                 "default": null,
                 "title": "Billing Basis"
+              },
+              "dimensions": {
+                "anyOf": [
+                  {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Dimensions"
               },
               "estimate_formula": {
                 "default": "(unit_price_credits * billable_quantity) / scale",
@@ -18004,7 +19669,19 @@
                   "text_to_speech",
                   "voice_clone",
                   "image_to_text",
-                  "video_to_text"
+                  "video_to_text",
+                  "music_extend",
+                  "music_replace_section",
+                  "music_add_vocals",
+                  "music_add_instrumental",
+                  "music_persona",
+                  "music_lyrics_timing",
+                  "music_cover_image",
+                  "music_video",
+                  "music_wav",
+                  "audio_process",
+                  "audio_stem_separation",
+                  "audio_voice_isolation"
                 ],
                 "type": "string"
               },
@@ -18061,7 +19738,7 @@
             "title": "Status"
           }
         },
-        "title": "TaskListInput",
+        "title": "TaskListV15Input",
         "type": "object"
       },
       "name": "beatra.tasks.list",

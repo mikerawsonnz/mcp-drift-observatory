@@ -7,7 +7,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
 | `https://a2uicatalog.ai/mcp-docs` | 2 | [`40a8c2d85a07`](3c6cdbffd223af3533e0.json) | 2026-11-11 |
-| `https://a2uicatalog.ai/mcp` | 40 | [`6c265d1cc6d0`](57663a025cf9685e6622.json) | 2026-11-11 |
+| `https://a2uicatalog.ai/mcp` | 40 | [`7370576bd082`](57663a025cf9685e6622.json) | 2026-11-12 |
 
 ## Tools at `https://a2uicatalog.ai/mcp-docs`
 
@@ -59,7 +59,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-12: [field changed](../../deltas/2026-11-12/57663a025cf9685e6622.json): `14 field(s) changed`
 
 ## Check it from your agent
 

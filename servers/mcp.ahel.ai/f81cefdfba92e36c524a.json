@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "9bad498c660aa8c48f1aee3aa5b75de182ed795456903960e7e9122e60e1e52c",
+  "full_hash": "aff07a974b8a7a3008f1bb066a24f0fa7097293c50ba02af7a0a61844b8066a8",
   "name": "ai.ahel/ahel",
-  "observed_at": "2026-11-08T02:02:25.394566Z",
+  "observed_at": "2026-11-12T02:02:53.682507Z",
   "sources": [
     "official"
   ],
@@ -17,52 +17,18 @@
         }
       },
       "annotations": {
-        "destructiveHint": true,
-        "idempotentHint": false,
-        "openWorldHint": true,
-        "readOnlyHint": false,
-        "title": "List or call the team's own tools"
-      },
-      "description": "This team's own tools: the APIs and MCP servers the team added at ahel.ai/app/tools. Without tool, lists each one with its tools, their inputs and the exact call. With tool (\"<key>/<tool name>\" from that list) and arguments, calls it with the team's saved credentials, which never enter the chat. NOT for: Ahel's catalog of data tasks and provider tools, which is capability_search. If the transport times out, do not resubmit the work: call again with the same ids and poll.",
-      "inputSchema": {
-        "additionalProperties": false,
-        "properties": {
-          "arguments": {
-            "additionalProperties": true,
-            "description": "With tool: the tool's arguments, matching the inputs the list shows.",
-            "type": "object"
-          },
-          "tool": {
-            "description": "Optional: \"<key>/<tool name>\" from the list, to call that tool. Omit to list the team's own tools.",
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "name": "my_tools",
-      "title": "List or call the team's own tools"
-    },
-    {
-      "_meta": {
-        "ui": {
-          "visibility": [
-            "model"
-          ]
-        }
-      },
-      "annotations": {
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": true,
-        "title": "Search data tasks and provider tools"
+        "title": "Find an action"
       },
-      "description": "Search Ahel's catalog of data tasks and provider tools by words, a task id or a tool id: company and people enrichment, SEO, social, ads, e-commerce, reviews, AI generation, market and public data. Each result has its genuine task id or tool id, its platform, its status (ready, coming_soon meaning temporarily unavailable because Ahel has no provider for it yet, or unavailable while the run service is down) with the exact reason; a temporarily unavailable result may carry a market price seen elsewhere, for comparison. The same catalog, ids and statuses as the Catalog page on ahel.ai. Describe the job in plain words; results are ranked by how well they fit. When nothing fits it answers verdict none with the three nearest items: then call catalog_request. Free; changes nothing. NOT for: one item's exact inputs and prices, which is capability_inspect, or the team's own tools, which is my_tools.",
+      "description": "Find the action for a job, by the person's own words (\"work email of a person\", \"dentists in a city\") or by an action id. Use it first for any one-off data job. When a ready-made recipe fits the ask, the answer offers it first. Each result has its id, what it gives, whether it is ready and its price rule. Nothing fits: the answer says so and catalog_request asks Ahel to add it. Free; changes nothing. NOT for: the exact price of one run, which is capability_inspect.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
           "kind": {
-            "description": "Optional: only tasks or only provider tools.",
+            "description": "Optional: only actions (the value \"task\") or only provider tools.",
             "enum": [
               "task",
               "tool"
@@ -78,7 +44,7 @@
             "type": "string"
           },
           "query": {
-            "description": "Words to match, or an exact task id (companies.enrich) or tool id.",
+            "description": "The job in the person's own words, or an exact action id such as companies.enrich.",
             "type": "string"
           },
           "status": {
@@ -94,7 +60,7 @@
         "type": "object"
       },
       "name": "capability_search",
-      "title": "Search data tasks and provider tools"
+      "title": "Find an action"
     },
     {
       "_meta": {
@@ -109,9 +75,9 @@
         "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": true,
-        "title": "Inspect and price a task or tool"
+        "title": "Read and price an action"
       },
-      "description": "Read one task or provider tool from Ahel's catalog by its id: its exact inputs (Ahel's own contract, or the published reference input when Ahel has none), its status and exact reason, Ahel's price per provider (Unknown when Ahel has no rate), for a temporarily unavailable item the market prices seen elsewhere, for comparison, and the exact run_capability call when it can run. With arguments it also prices that exact run before anything runs: Ahel's quote, the most it may cost, the amount a run would reserve and whether the balance covers it; nothing is reserved, charged or started. With rows or rows_text (up to 100, for people.email.find or companies.register.search or companies.emails.from_website) it quotes a whole list instead: rows, rows that can run, each row's price and the most one row and the list may cost, the balance against it, and what each row that cannot run is missing. Free; changes nothing. NOT for: finding ids, which is capability_search, or running it, which is run_capability.",
+      "description": "One action by its id: its inputs, what it gives and its price rule. With arguments (the person's real inputs) it also prices that exact run: the most it can cost, what it usually costs, the balance, and a consent sentence to read to the person. Nothing runs and nothing is charged. With rows or rows_text (up to 100, for people.email.find or companies.register.search or companies.emails.from_website) it prices a whole list. Use it before every paid run. For builders: endpoint_ids or exclude_endpoint_ids add the provider list those take. Free. NOT for: finding the id, which is capability_search, or running, which is run_capability.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -134,7 +100,7 @@
             "type": "array"
           },
           "id": {
-            "description": "A task id or tool id from capability_search.",
+            "description": "An action id or tool id from capability_search.",
             "type": "string"
           },
           "max_items": {
@@ -142,7 +108,7 @@
             "type": "number"
           },
           "rows": {
-            "description": "A list for people.email.find or companies.register.search or companies.emails.from_website: 1 to 100 rows, each run once as its own run with its own exact cost. One object per row, such as {\"name\": \"Patrick Collison\", \"domain\": \"stripe.com\"} or {\"name\": \"Wise\", \"country\": \"GB\"}.",
+            "description": "A list for people.email.find or companies.register.search or companies.emails.from_website: 1 to 100 rows, each run once as its own run with its own exact cost. One object per row, such as {\"name\": \"Jane Doe\", \"domain\": \"example.com\"} or {\"name\": \"Example Ltd\", \"country\": \"GB\"}.",
             "items": {
               "type": "object"
             },
@@ -151,7 +117,7 @@
             "type": "array"
           },
           "rows_text": {
-            "description": "A list for people.email.find or companies.register.search or companies.emails.from_website: 1 to 100 rows, each run once as its own run with its own exact cost. Instead of rows: paste up to 100 rows as text, one per line (\"Patrick Collison, stripe.com\"; \"Wise, GB\") or a CSV with a header row (name, domain, linkedin_url; name, country).",
+            "description": "A list for people.email.find or companies.register.search or companies.emails.from_website: 1 to 100 rows, each run once as its own run with its own exact cost. Instead of rows: paste up to 100 rows as text, one per line (\"Jane Doe, example.com\"; \"Example Ltd, GB\") or a CSV with a header row (name, domain, linkedin_url; name, country).",
             "type": "string"
           },
           "timeout_seconds": {
@@ -165,7 +131,7 @@
         "type": "object"
       },
       "name": "capability_inspect",
-      "title": "Inspect and price a task or tool"
+      "title": "Read and price an action"
     },
     {
       "_meta": {
@@ -180,9 +146,9 @@
         "idempotentHint": false,
         "openWorldHint": true,
         "readOnlyHint": false,
-        "title": "Run a paid data task"
+        "title": "Run an action"
       },
-      "description": "Run one paid data capability (company data, people and contact data and the like) through Ahel's provider execution: it is quoted, the exact price is reserved from the workspace balance, and the run starts. Give id, a task id or tool id from capability_search: it runs only through the v2 capability Ahel's task map binds to it, and an item that is not ready is refused with its exact reason before anything is quoted. It then waits up to wait_seconds (default 20, at most 50; 0 answers at once): when the run finishes in that time, this same answer has its state, exact cost and rows, and generated images and audio as links; otherwise it answers the execution id, and capability_run_status reads the run. An answer with rows also has results_page and csv_url: give the person those links instead of writing the rows out again. Data collection only: a capability that writes or has a side effect is refused. Ahel picks the provider unless endpoint_ids pins one; exclude_endpoint_ids leaves providers out. Give max_cost_usd to hold the price: a run that would cost more is refused with nothing run or charged. Give idempotency_key so a retry after a lost answer is safe: the same key answers the same run, with no new charge. Give tag (such as a customer name) to see usage and cost by tag in Activity. A list: for people.email.find or companies.register.search or companies.emails.from_website, give rows (objects) or rows_text (paste up to 100 rows as text) instead of arguments: without confirm it answers the list's quote and runs nothing; with confirm true it runs every row once and answers the receipt (found, not found, failed, the exact total, the rows and a CSV link) and its run_id; run_id continues a run whose rows were still going. NOT for: the team's own tools, which is my_tools.",
+      "description": "Run one action, after the person agreed to the price capability_inspect gave. Give id, arguments and max_cost_usd from that price: a run that would cost more is refused with nothing charged. Only a delivered result is charged; a run that finds nothing costs nothing. It waits up to wait_seconds (default 20, at most 50; 0 answers at once) and answers the result in plain words with its rows; a longer run answers its execution_id for capability_run_status. An answer with rows has results_page and csv_url: give the person those links instead of writing the rows out again. idempotency_key makes a retry safe (the same key answers the same run, no new charge). Give tag (such as a customer name) to see usage and cost by tag in Activity. A list for people.email.find or companies.register.search or companies.emails.from_website: rows, or rows_text (paste up to 100 rows as text), instead of arguments; without confirm it answers the price of the list, with confirm true it runs it. NOT for: the same action over many inputs, which is run_batch, or a ready-made job, which is run_recipe.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -199,21 +165,21 @@
             "type": "boolean"
           },
           "endpoint_ids": {
-            "description": "Optional: run only on these providers, by the endpoint ids capability_inspect lists. Leave it out to let Ahel pick (the default).",
+            "description": "Optional, for builders: run only on these providers, by the endpoint ids capability_inspect lists when given endpoint ids. Leave it out to let Ahel pick (the default).",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "exclude_endpoint_ids": {
-            "description": "Optional: never use these providers, by the endpoint ids capability_inspect lists. Ahel picks among the rest.",
+            "description": "Optional, for builders: never use these providers, by the endpoint ids capability_inspect lists when given endpoint ids. Ahel picks among the rest.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "id": {
-            "description": "A task id or tool id from capability_search or capability_inspect.",
+            "description": "An action id or tool id from capability_search or capability_inspect.",
             "type": "string"
           },
           "idempotency_key": {
@@ -229,7 +195,7 @@
             "type": "number"
           },
           "rows": {
-            "description": "A list for people.email.find or companies.register.search or companies.emails.from_website: 1 to 100 rows, each run once as its own run with its own exact cost. One object per row, such as {\"name\": \"Patrick Collison\", \"domain\": \"stripe.com\"} or {\"name\": \"Wise\", \"country\": \"GB\"}.",
+            "description": "A list for people.email.find or companies.register.search or companies.emails.from_website: 1 to 100 rows, each run once as its own run with its own exact cost. One object per row, such as {\"name\": \"Jane Doe\", \"domain\": \"example.com\"} or {\"name\": \"Example Ltd\", \"country\": \"GB\"}.",
             "items": {
               "type": "object"
             },
@@ -238,7 +204,7 @@
             "type": "array"
           },
           "rows_text": {
-            "description": "A list for people.email.find or companies.register.search or companies.emails.from_website: 1 to 100 rows, each run once as its own run with its own exact cost. Instead of rows: paste up to 100 rows as text, one per line (\"Patrick Collison, stripe.com\"; \"Wise, GB\") or a CSV with a header row (name, domain, linkedin_url; name, country).",
+            "description": "A list for people.email.find or companies.register.search or companies.emails.from_website: 1 to 100 rows, each run once as its own run with its own exact cost. Instead of rows: paste up to 100 rows as text, one per line (\"Jane Doe, example.com\"; \"Example Ltd, GB\") or a CSV with a header row (name, domain, linkedin_url; name, country).",
             "type": "string"
           },
           "run_id": {
@@ -261,7 +227,7 @@
         "type": "object"
       },
       "name": "run_capability",
-      "title": "Run a paid data task"
+      "title": "Run an action"
     },
     {
       "_meta": {
@@ -276,14 +242,14 @@
         "idempotentHint": false,
         "openWorldHint": true,
         "readOnlyHint": false,
-        "title": "Run one task over many inputs"
+        "title": "Run one action over many inputs"
       },
-      "description": "Run one task over many inputs in one call: for repeated runs of the same task, one round trip rather than one per run. Priced the same per item as a single run, with no fee for batching: each item is quoted, reserved and charged on its own, and only a delivered result is charged. Give id and items, 1 to 100 objects of the task's inputs. Every item is checked first: a bad item is refused alone and the others run. Identical items run once and the answer maps back to each position. At most 5 run at once. max_cost_usd caps the whole batch: no item starts if what is charged, plus what is held, plus its own quote could pass it, and items left over answer not_started with nothing charged. A provider that is temporarily unavailable stops only the items it would serve. The answer comes within about 45 seconds: each item in input order has its position, state, rows, charged_usd, error and execution_id, then the totals. Items still going, and rows that did not fit, are read with capability_run_status. An item with rows also has results_page and csv_url: give the person those links instead of writing the rows out again. Sending the same call again the same UTC day answers the same runs with no new charge and starts what did not start; a new idempotency_key runs the items again. A task that is unknown or not ready refuses the whole call, free. NOT for: one run alone, which is run_capability.",
+      "description": "Run one action over many inputs in one call (1 to 100 items, each the action's inputs), such as a company lookup for 20 domains. Priced the same per item as a single run, with no fee for batching, and only delivered results are charged; max_cost_usd caps the whole batch. Price one item with capability_inspect first and tell the person the total before running. The answer comes within about 45 seconds with each item's state, rows and charge; an item with rows has results_page and csv_url: give the person those links instead of writing the rows out again; items not finished by then finish when the same call is sent again (nothing runs or is charged twice). NOT for: one run, which is run_capability, or a ready-made job, which is run_recipe.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
           "id": {
-            "description": "A task id or tool id from capability_search or capability_inspect. One task for the whole batch.",
+            "description": "An action id or tool id from capability_search or capability_inspect. One action for the whole batch.",
             "type": "string"
           },
           "idempotency_key": {
@@ -291,7 +257,7 @@
             "type": "string"
           },
           "items": {
-            "description": "1 to 100 objects, each the task's inputs for one run, by name, as run_capability's arguments.",
+            "description": "1 to 100 objects, each the action's inputs for one run, by name, as run_capability's arguments.",
             "items": {
               "type": "object"
             },
@@ -319,7 +285,52 @@
         "type": "object"
       },
       "name": "run_batch",
-      "title": "Run one task over many inputs"
+      "title": "Run one action over many inputs"
+    },
+    {
+      "_meta": {
+        "ui": {
+          "visibility": [
+            "model"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Run a ready-made recipe"
+      },
+      "description": "Run a recipe: a ready-made job of several actions, such as local businesses of one kind in one place with their emails, a company list with industry, size and register entry, checked work emails for a list of people, or a brief on a company and a person before a call. The first choice for a person who is not a developer. Without id: the list of recipes and their inputs. With id and inputs: the price of the whole job and a consent sentence; nothing runs. With max_cost_usd as well (once the person agrees): it runs under that total and answers the rows; a longer run answers a run_id, and run_id reads on. Only delivered results are charged. NOT for: one action alone, which is run_capability.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "A recipe id from this tool's own list, such as company-list. Left out, the answer is the list.",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "description": "Optional: your own key for this run, 8 to 64 letters, digits or hyphens. It becomes the run_id.",
+            "type": "string"
+          },
+          "inputs": {
+            "description": "The recipe's inputs, by name, as its entry in the list names them.",
+            "type": "object"
+          },
+          "max_cost_usd": {
+            "description": "The most the whole run may cost, in USD, such as \"0.50\". Left out, the answer is the price and nothing runs.",
+            "type": "string"
+          },
+          "run_id": {
+            "description": "With id: the run_id an earlier call answered, to read that run.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "run_recipe",
+      "title": "Run a ready-made recipe"
     },
     {
       "_meta": {
@@ -334,9 +345,9 @@
         "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": true,
-        "title": "Read a run's status and results"
+        "title": "Read a run"
       },
-      "description": "Without execution_id: the paid data capabilities this workspace can run, each with its providers and exact prices. With execution_id: that run's state, attempts and exact cost, settled once in the ledger when final; with results true, its rows and provenance (include_raw true adds the provider's own answer), and, when it has rows, results_page and csv_url: give the person those links instead of writing the rows out again. Generated images and audio come as a signed link (media_url, valid for days) with their type and size; a small one is also attached as an image or audio block. A long result answers as many rows as fit and says the offset that reads the rest. NOT for: finding a task or tool to run, which is capability_search.",
+      "description": "Read a run that was still going: give execution_id from run_capability and results true for its rows. Answers the result in plain words, the charge and the rows; an answer with rows has results_page and csv_url: give the person those links instead of writing the rows out again. Long results answer a next_offset. include_raw true adds the full record and the provider's own answer, for debugging. Free. NOT for: finding an action, which is capability_search.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -368,7 +379,7 @@
         "type": "object"
       },
       "name": "capability_run_status",
-      "title": "Read a run's status and results"
+      "title": "Read a run"
     },
     {
       "_meta": {
@@ -383,9 +394,9 @@
         "idempotentHint": false,
         "openWorldHint": false,
         "readOnlyHint": false,
-        "title": "Request a missing task or tool"
+        "title": "Ask for a missing action"
       },
-      "description": "Ask Ahel to add a data task or provider tool the catalog does not have yet: call it when capability_search answers verdict none and none of its nearest items fits. Give what you need in plain words, an example input, and the most you would pay for one call. Answers a request id; asking again for the same thing adds to that request instead of making a new one. Free; runs nothing and charges nothing. NOT for: finding what already exists, which is capability_search.",
+      "description": "Ask Ahel to add an action the catalog does not have, when capability_search finds nothing that fits. Give the job in plain words, one example input, and the most the person would pay for one run. Asking again adds to the same request. Free; runs and charges nothing. NOT for: finding what exists, which is capability_search.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -407,7 +418,7 @@
         "type": "object"
       },
       "name": "catalog_request",
-      "title": "Request a missing task or tool"
+      "title": "Ask for a missing action"
     },
     {
       "_meta": {
@@ -424,7 +435,7 @@
         "readOnlyHint": false,
         "title": "Rate a run or report a problem"
       },
-      "description": "Rate one run or one catalog request of this workspace good or bad, or, with no id, report anything about Ahel: confusing results or charges, unclear instructions, unhelpful errors, a workaround you needed. Report small annoyances too, even when the task succeeded, each issue once. Ahel reads every note to fix providers and the catalog. Leave out private information, keys and raw responses. Free; changes nothing else. NOT for: reading a run's state or rows, which is capability_run_status, or asking for a missing task, which is catalog_request.",
+      "description": "Tell Ahel what went wrong or right: rate one run or request good or bad by its id, or with no id report anything confusing (results, charges, instructions, errors, a workaround you needed). Report small annoyances too. Leave out private information and keys. Free. NOT for: reading a run, which is capability_run_status, or asking for a missing action, which is catalog_request.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -475,7 +486,7 @@
         "readOnlyHint": true,
         "title": "Read the prepaid balance"
       },
-      "description": "The workspace's prepaid balance in USD, what runs in flight hold, what settled runs used today and this month (shown to the Owner), any daily spend cap on the team API key this connection uses, and where to top up. Check it when a run is refused for funds, or before a job that will make many runs. Free; changes nothing. NOT for: the price of one run, which is capability_inspect.",
+      "description": "The workspace's prepaid balance, what running jobs have set aside, spending today and this month (for the Owner), any daily cap on this connection's key, and the top-up link. Use it when a run is refused for funds or before a large job. Free. NOT for: the price of one run, which is capability_inspect.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {},
@@ -499,7 +510,7 @@
         "readOnlyHint": false,
         "title": "Review a run's usefulness"
       },
-      "description": "Rate how useful one finished run of this workspace was, after you have used its result: useful, partly, not_useful, or not_sure when you cannot tell, with an optional reason about the result (missing rows, wrong data, stale). One review per run; reviewing it again replaces the earlier one. Ahel reads every review to rank and fix providers. Leave out private information, keys and raw rows. Free; changes nothing else. NOT for: a catalog request, or reporting something confusing or broken, which is feedback.",
+      "description": "Rate how useful one finished run was, after using its result: useful, partly, not_useful or not_sure, with an optional reason (missing rows, wrong data, stale). Reviewing again replaces the earlier one. Free. NOT for: reporting a problem, which is feedback.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -546,7 +557,7 @@
         "readOnlyHint": true,
         "title": "Get started with Ahel"
       },
-      "description": "How to start with Ahel: call this when the person asks what Ahel is, what it can do or how to begin. Returns what Ahel is, how the prepaid balance works, the three steps to find, price and run any data task or provider tool, and ready example prompts. Reads only; changes nothing. NOT for: finding a data task or provider tool for a specific ask, which is capability_search.",
+      "description": "Start here when the person is new, asks what Ahel can do, or has no clear job yet. Answers what Ahel does in plain words, the ready-made recipes to offer first, how paying works, and a question to ask the person. Free; changes nothing. NOT for: a clear one-off job, which is capability_search.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {},

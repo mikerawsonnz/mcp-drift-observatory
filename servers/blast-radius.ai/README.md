@@ -6,14 +6,14 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://blast-radius.ai/mcp` | 9 | [`f1cc8a17fdee`](6e0fc9f43e7d724c3c48.json) | 2026-11-07 |
+| `https://blast-radius.ai/mcp` | 9 | [`1e58b048aac0`](6e0fc9f43e7d724c3c48.json) | 2026-11-12 |
 
 ## Tools at `https://blast-radius.ai/mcp`
 
 - `ask_blast_radius`: `Ask a question about the Blast Radius brief and its recent news. Retrieval is semantic (embedding similarity): returns the closest memo sec…`
 - `assess_against_frontier_line`: `Stress-test a company, product, or thesis against the Blast Radius 'Frontier Line' framework, an adversarial business-model survivability a…`
 - `get_diligence_checklist`: `Get the structured Blast Radius diligence checklist: the key anti-patterns and durable-startup characteristics used to assess AI-first comp…`
-- `get_force_reading`: `Get one force's current weekly reading (with its week, direction, paragraphs, and cited story pages), up to ten of its latest events, and t…`
+- `get_force_reading`: `Get one force's current weekly reading (with its week, direction, paragraphs, and cited story pages), up to ten of its latest events, the m…`
 - `get_igv_quote`: `Get the current IGV (iShares Expanded Tech-Software ETF) quote, the SaaSpocalypse market signal referenced in the brief.`
 - `get_latest_update`: `Get this week's lede and the five force readings: the latest published weekly readings of the Blast Radius argument, each linked to the sto…`
 - `get_thesis`: `Get the durable Blast Radius thesis and key metrics, plus the current IGV software-ETF quote.`
@@ -22,6 +22,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-12: [description changed](../../deltas/2026-11-12/6e0fc9f43e7d724c3c48.json): `1 field(s) changed`
 - 2026-11-07: [description changed](../../deltas/2026-11-07/6e0fc9f43e7d724c3c48.json): `1 field(s) changed`
 - 2026-09-27: [count changed, description changed, tool added](../../deltas/2026-09-27/6e0fc9f43e7d724c3c48.json): `2 tool(s) added; 4 field(s) changed`
 - 2026-09-10: [description changed](../../deltas/2026-09-10/6e0fc9f43e7d724c3c48.json): `1 field(s) changed`

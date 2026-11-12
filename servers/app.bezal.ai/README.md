@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://app.bezal.ai/api/mcp` | 9 | [`4b61485295fc`](4cca1c526a32cc31d3b0.json) | 2026-11-11 |
+| `https://app.bezal.ai/api/mcp` | 9 | [`68384404d792`](4cca1c526a32cc31d3b0.json) | 2026-11-12 |
 
 ## Tools at `https://app.bezal.ai/api/mcp`
 
@@ -16,12 +16,13 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_reviews`: `Get reviews for a specific business: Bezal reviews (rating, text, verified flag, date and the reviewer as first name and last initial) plus…`
 - `get_service_catalog`: `Get services and pricing for a specific business. Falls back to the list of service names if no priced catalog exists.`
 - `list_categories`: `List all available business categories in the directory.`
-- `search_businesses`: `Search local business profiles on Bezal by name, category, or location. Every business includes name, category, city, state, rating, review…`
+- `search_businesses`: `Search local business profiles on Bezal by name, category, or location. Everyday words work too, so "tech help" finds IT Services and "plum…`
 - `search_by_city`: `Search for businesses in a specific city, optionally filtered by category. Every business includes name, category, city, state, rating, rev…`
 - `search_by_service`: `Find businesses that list a specific service, when you know the exact service rather than the category (for example "Drain cleaning" rather…`
 
 ## Changes
 
+- 2026-11-12: [description changed](../../deltas/2026-11-12/4cca1c526a32cc31d3b0.json): `1 field(s) changed`
 - 2026-11-11: [description changed](../../deltas/2026-11-11/4cca1c526a32cc31d3b0.json): `5 field(s) changed`
 - 2026-11-08: [schema changed](../../deltas/2026-11-08/4cca1c526a32cc31d3b0.json): `1 field(s) changed`
 - 2026-10-29: [annotation changed, count changed, description changed, field changed, tool removed](../../deltas/2026-10-29/4cca1c526a32cc31d3b0.json): `4 tool(s) removed; 32 field(s) changed`

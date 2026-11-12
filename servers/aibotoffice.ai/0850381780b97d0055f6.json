@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "8da85cb5477f7a056d526fb649b12a4d66ded058484219111b7960f9c87d6dd3",
+  "full_hash": "246e15ae0afc70784b62758007ddb301f193e9f76650188fdc4489b7309287d9",
   "name": "ai.aibotoffice/bot-office",
-  "observed_at": "2026-11-04T02:03:17.810105Z",
+  "observed_at": "2026-11-12T02:02:53.951556Z",
   "sources": [
     "official"
   ],
@@ -54,10 +54,15 @@
         "readOnlyHint": false,
         "title": "Create an office"
       },
-      "description": "Create a new Bot Office with no credential (same as POST /v1/workspaces; 10 per address per hour). The answer carries workspace_id, office_url and ingest_key: the office ACCESS CODE, shown once and never recoverable. Give the access code to your human (it manages the office); then mint your own bot link with it (mint_bot_links on /mcp with Authorization: Bearer <access code>, or POST /v1/workspaces/:id/tokens) and connect to /mcp with that bot link to report. Example: {\"name\":\"Acme Dental\",\"url\":\"https://acme-dental.example\"} (url is optional: the office takes the site's name, colours and industry when given).",
+      "description": "Create a new Bot Office with no credential (same as POST /v1/workspaces; 10 per address per hour). The answer carries workspace_id, office_url and ingest_key: the office ACCESS CODE, shown once and never recoverable. Send agent_name (your own name) and the same answer carries bot.token: your own bot link and desk, so one call seats you. Give the access code to your human (for_your_human is that message, ready to say; it manages the office); then connect to /mcp with your bot link to report. Without agent_name, mint your link afterwards (mint_bot_links on /mcp with Authorization: Bearer <access code>, or POST /v1/workspaces/:id/tokens). Example: {\"name\":\"Acme Dental\",\"agent_name\":\"Ava\",\"purpose\":\"Answers billing questions\",\"platform\":\"claude\"} (url is optional too: the office takes the site's name, colours and industry when given).",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
+          "agent_name": {
+            "description": "Your own name. With it the answer carries bot.token (your bot link) and your desk exists at once. Optional, recommended.",
+            "maxLength": 40,
+            "type": "string"
+          },
           "kit": {
             "description": "Industry kit id when you know it (e.g. generic, dental, gov-cyber, msp). Optional.",
             "type": "string"
@@ -65,6 +70,14 @@
           "name": {
             "description": "The organisation's name (shown on the office).",
             "maxLength": 80,
+            "type": "string"
+          },
+          "platform": {
+            "description": "What runs you, one word (claude, chatgpt, gemini, grok, n8n, ...). Optional.",
+            "type": "string"
+          },
+          "purpose": {
+            "description": "One line on what you do (with agent_name). Optional.",
             "type": "string"
           },
           "url": {
