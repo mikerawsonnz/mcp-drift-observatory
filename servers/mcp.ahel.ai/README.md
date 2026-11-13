@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.ahel.ai` | 11 | [`aff07a974b8a`](f81cefdfba92e36c524a.json) | 2026-11-12 |
+| `https://mcp.ahel.ai` | 11 | [`83f30791b4e1`](f81cefdfba92e36c524a.json) | 2026-11-13 |
 
 ## Tools at `https://mcp.ahel.ai`
 
@@ -20,10 +20,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `review`: `Rate how useful one finished run was, after using its result: useful, partly, not_useful or not_sure, with an optional reason (missing rows…`
 - `run_batch`: `Run one action over many inputs in one call (1 to 100 items, each the action's inputs), such as a company lookup for 20 domains. Priced the…`
 - `run_capability`: `Run one action, after the person agreed to the price capability_inspect gave. Give id, arguments and max_cost_usd from that price: a run th…`
-- `run_recipe`: `Run a recipe: a ready-made job of several actions, such as local businesses of one kind in one place with their emails, a company list with…`
+- `run_recipe`: `Run a recipe: a ready-made job of several actions, such as local businesses of one kind in one place with their emails (or only those with…`
 
 ## Changes
 
+- 2026-11-13: [description changed](../../deltas/2026-11-13/f81cefdfba92e36c524a.json): `1 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-12: [annotation changed, description changed, field changed, schema changed, tool added, tool removed](../../deltas/2026-11-12/f81cefdfba92e36c524a.json): `1 tool(s) added; 1 tool(s) removed; 34 field(s) changed`
 
 ## Check it from your agent

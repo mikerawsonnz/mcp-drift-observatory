@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://agent.autoposter.ai/mcp` | 16 | [`91cefdb8eaf4`](b4c1ac88f1fe4ef8d46e.json) | 2026-11-07 |
+| `https://agent.autoposter.ai/mcp` | 16 | [`8385e3281eb7`](b4c1ac88f1fe4ef8d46e.json) | 2026-11-13 |
 
 ## Tools at `https://agent.autoposter.ai/mcp`
 
@@ -29,6 +29,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-13: [annotation changed, description changed](../../deltas/2026-11-13/b4c1ac88f1fe4ef8d46e.json): `2 field(s) changed`
 - 2026-11-07: [count changed, schema changed, tool added](../../deltas/2026-11-07/b4c1ac88f1fe4ef8d46e.json): `2 tool(s) added; 24 field(s) changed`
 - 2026-11-05: [annotation changed, description changed, field changed, schema changed](../../deltas/2026-11-05/b4c1ac88f1fe4ef8d46e.json): `10 field(s) changed`
 - 2026-10-30: [schema changed](../../deltas/2026-10-30/b4c1ac88f1fe4ef8d46e.json): `2 field(s) changed`

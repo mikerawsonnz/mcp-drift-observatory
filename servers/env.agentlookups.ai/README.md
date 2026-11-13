@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://env.agentlookups.ai/mcp` | 4 | [`ab0ae41f25c1`](e4737c6c08d0e753c7d6.json) | 2026-11-01 |
+| `https://env.agentlookups.ai/mcp` | 4 | [`aa13bbba749e`](e4737c6c08d0e753c7d6.json) | 2026-11-13 |
 
 ## Tools at `https://env.agentlookups.ai/mcp`
 
@@ -17,6 +17,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-13: [description changed](../../deltas/2026-11-13/e4737c6c08d0e753c7d6.json): `1 field(s) changed`
 - 2026-11-01: [description changed](../../deltas/2026-11-01/e4737c6c08d0e753c7d6.json): `1 field(s) changed`
 - 2026-10-28: [description changed](../../deltas/2026-10-28/e4737c6c08d0e753c7d6.json): `3 field(s) changed`
 - 2026-10-27: [annotation changed, description changed, schema changed](../../deltas/2026-10-27/e4737c6c08d0e753c7d6.json): `17 field(s) changed; signals: length_more_than_doubled, url_introduced`

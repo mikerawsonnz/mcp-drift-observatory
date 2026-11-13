@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://service.agilex.ai/agilex-docs/mcp` | 5 | [`ab1f3fc00bea`](4f9bb92e8706287aa594.json) | 2026-11-05 |
+| `https://service.agilex.ai/agilex-docs/mcp` | 5 | [`a121ab437385`](4f9bb92e8706287aa594.json) | 2026-11-13 |
 
 ## Tools at `https://service.agilex.ai/agilex-docs/mcp`
 
@@ -18,6 +18,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-13: [description changed](../../deltas/2026-11-13/4f9bb92e8706287aa594.json): `1 field(s) changed`
 - 2026-11-05: [annotation changed, count changed, description changed, schema changed, tool added](../../deltas/2026-11-05/4f9bb92e8706287aa594.json): `1 tool(s) added; 27 field(s) changed`
 
 ## Check it from your agent

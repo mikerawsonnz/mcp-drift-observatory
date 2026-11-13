@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.beatra.ai/mcp` | 36 | [`fd2a0989a42a`](4f93d616eb97e76f800a.json) | 2026-11-12 |
+| `https://mcp.beatra.ai/mcp` | 37 | [`40fc38ef361a`](4f93d616eb97e76f800a.json) | 2026-11-13 |
 
 ## Tools at `https://mcp.beatra.ai/mcp`
 
@@ -43,12 +43,14 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `beatra.voices.activate`: `Activate a cloned voice whose clone result says activation is required (status pending_activation). Voices that are already ready, includin…`
 - `beatra.voices.clone`: `Clone a voice from a clean single-speaker sample. With the default engine (omit model or use 'auto') the cloned voice is ready for speech a…`
 - `beatra.voices.list`: `List preset and tenant-owned voices available for speech synthesis. By default only voices ready for speech are listed; pass status to incl…`
-- `beatra.voices.update`: `Rename one of this account's cloned voices, or make a voice (cloned or preset) the account's default. Call only when the user asked for tha…`
+- `beatra.voices.preview`: `Get or lazily synthesize a free fixed audition clip URL for a preset or account-owned cloned voice. Once generated for a cloned voice, the…`
+- `beatra.voices.update`: `Update one of this account's cloned voices (display_name, gender, age_group, use_case, persona, or language), or set/clear the account's de…`
 - `beatra.wallet.get`: `Read the current Beatra credit balance for this account, including the next expiring batch. Also returns how many unfinished creations this…`
 - `beatra.wallet.ledger`: `List this account's credit ledger newest first: charges, refunds, top-ups, and expiry. This call is read-only and does not charge. Page wit…`
 
 ## Changes
 
+- 2026-11-13: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-13/4f93d616eb97e76f800a.json): `1 tool(s) added; 252 field(s) changed`
 - 2026-11-12: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-12/4f93d616eb97e76f800a.json): `2 tool(s) added; 107 field(s) changed`
 - 2026-11-09: [count changed, schema changed, tool added](../../deltas/2026-11-09/4f93d616eb97e76f800a.json): `1 tool(s) added; 3 field(s) changed`
 - 2026-11-07: [description changed, schema changed](../../deltas/2026-11-07/4f93d616eb97e76f800a.json): `72 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**

@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "e0fcec0a1751513c654af670f59ade41023dee90c4c2bd9f51e8aa6152be4d8f",
+  "full_hash": "bc11b3f7e44e187abf1b7a426a8b7a80e56af3e697b15efc8b63c0f852f76414",
   "name": "ai.agentgates/compute",
-  "observed_at": "2026-11-12T02:02:52.131424Z",
+  "observed_at": "2026-11-13T02:02:44.444642Z",
   "sources": [
     "official"
   ],
@@ -16,7 +16,7 @@
         "readOnlyHint": true,
         "title": "Machine plans and prices"
       },
-      "description": "Lists the virtual machines Agentgates rents to agents by the hour: confidential ones (Intel TDX, memory encrypted in use) and plain ones with no proof (`proof: \"none\"`: the host can read them, for a lower price). Each plan's vCPU, memory, disk and traffic, the hours one payment may buy, and the live price of each block of hours on each payment network (USDC over x402). Read from the live catalog at call time. Free: no account, no wallet, no payment. Pass `plan` to read one plan.",
+      "description": "Lists the computers Agentgates rents to agents, by the hour (by the minute on a plan whose card carries minMinutes): confidential ones (Intel TDX, memory encrypted in use), for agents that hold keys, money or private data, and plain ones with no proof (`proof: \"none\"`: the host can read them, for a much lower price), for agents with nothing secret on them such as scrapers, crawlers and test runs. Each plan's vCPU, memory, disk and traffic, the hours one payment may buy, and the live price of each block of hours on each payment network (USDC over x402). Read from the live catalog at call time. Free: no account, no wallet, no payment. Pass `plan` to read one plan.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -221,6 +221,10 @@
                   "description": "Only on a plan that lists regions: where it runs, each at its own price. Send one as region to compute_quote.",
                   "items": {
                     "properties": {
+                      "dataIncludedGbPerHour": {
+                        "description": "On a plain plan's region: data out included for every hour bought there, in GB.",
+                        "type": "number"
+                      },
                       "fromUsdPerHour": {
                         "type": [
                           "string",
@@ -238,6 +242,18 @@
                           "string",
                           "null"
                         ]
+                      },
+                      "pauses": {
+                        "description": "On a plain plan's region: true when every machine there pauses.",
+                        "type": "boolean"
+                      },
+                      "resizes": {
+                        "description": "On a plain plan's region: true when every machine there resizes.",
+                        "type": "boolean"
+                      },
+                      "takesNewSetup": {
+                        "description": "On a plain plan's region: true when every machine there takes a new setup while it runs.",
+                        "type": "boolean"
                       }
                     },
                     "type": "object"
@@ -249,7 +265,7 @@
                   "type": "boolean"
                 },
                 "runsIn": {
-                  "description": "Only on a plain plan: where its machines run (no region to pick).",
+                  "description": "Only on a plain plan: where its machines run. When it also lists regions, send one as region to compute_quote; with none it goes where a machine can be made now at the lowest price.",
                   "items": {
                     "properties": {
                       "id": {
@@ -341,7 +357,7 @@
             "type": "integer"
           },
           "image": {
-            "description": "One container image, served on host port 8080, e.g. nginx:alpine. Or send compose.",
+            "description": "What it runs. A plan whose card in compute_plans lists images takes one of those (none: its default). Any other plan: one container image, served on host port 8080, e.g. nginx:alpine, or send compose.",
             "type": "string"
           },
           "machine_id": {

@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.athenahq.ai/api/mcp` | 132 | [`da6033aac2db`](d1c9dc97b241abc09e4e.json) | 2026-11-12 |
+| `https://api.athenahq.ai/api/mcp` | 132 | [`71968161350c`](d1c9dc97b241abc09e4e.json) | 2026-11-13 |
 
 ## Tools at `https://api.athenahq.ai/api/mcp`
 
@@ -74,6 +74,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-13: [description changed, schema changed](../../deltas/2026-11-13/d1c9dc97b241abc09e4e.json): `15 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-12: [description changed, schema changed](../../deltas/2026-11-12/d1c9dc97b241abc09e4e.json): `36 field(s) changed`
 - 2026-11-11: [count changed, tool added](../../deltas/2026-11-11/d1c9dc97b241abc09e4e.json): `4 tool(s) added`
 - 2026-11-10: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-10/d1c9dc97b241abc09e4e.json): `2 tool(s) added; 8 field(s) changed; signals: length_more_than_doubled`

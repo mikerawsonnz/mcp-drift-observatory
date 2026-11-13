@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "fd2a0989a42ac6edf8596f2b406b6ac4f850c846dda597a751587cccd45b7dc7",
+  "full_hash": "40fc38ef361aedcf07dc9ff661ba157d132074adafcdcb4cee9f62c21eb79d0f",
   "name": "ai.beatra/beatra",
-  "observed_at": "2026-11-12T02:03:01.094519Z",
+  "observed_at": "2026-11-13T02:02:55.918683Z",
   "sources": [
     "official"
   ],
-  "tool_count": 36,
+  "tool_count": 37,
   "tools": [
     {
       "annotations": {
@@ -12841,6 +12841,25 @@
           }
         },
         "properties": {
+          "age_group": {
+            "anyOf": [
+              {
+                "enum": [
+                  "child",
+                  "youth",
+                  "adult",
+                  "senior"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional speaker age group (child, youth, adult, or senior); inferred automatically when omitted and unambiguous.",
+            "title": "Age Group"
+          },
           "client_request_id": {
             "description": "Stable retry identity for this billable operation. Reuse only for the exact same generation arguments.",
             "maxLength": 128,
@@ -12859,6 +12878,24 @@
             "minLength": 1,
             "title": "Display Name",
             "type": "string"
+          },
+          "gender": {
+            "anyOf": [
+              {
+                "enum": [
+                  "male",
+                  "female",
+                  "neutral"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional speaker gender tag (male, female, or neutral); inferred automatically when omitted and unambiguous.",
+            "title": "Gender"
           },
           "language": {
             "anyOf": [
@@ -12901,6 +12938,20 @@
             "description": "Only for model doubao-voice-clone-2.0: {\"doubao\": {...}} with the model_options.doubao keys its clone card lists in controls. Ignored for every other model.",
             "title": "Model Options"
           },
+          "persona": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional short description of timbre, pace, and character (up to 200 characters).",
+            "title": "Persona"
+          },
           "prompt": {
             "anyOf": [
               {
@@ -12935,6 +12986,40 @@
               }
             ],
             "title": "Sample"
+          },
+          "use_case": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "audiobook",
+                    "narration",
+                    "news",
+                    "ads",
+                    "conversational",
+                    "business",
+                    "character",
+                    "ivr",
+                    "course",
+                    "podcast",
+                    "gaming",
+                    "shorts",
+                    "education",
+                    "support",
+                    "social"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 5,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional recommended scenarios for this cloned voice (up to 5 items).",
+            "title": "Use Case"
           }
         },
         "required": [
@@ -14840,13 +14925,32 @@
         "openWorldHint": false,
         "readOnlyHint": false
       },
-      "description": "Rename one of this account's cloned voices, or make a voice (cloned or preset) the account's default. Call only when the user asked for that change. This call is non-billable and cannot delete a voice; deleting happens in the Beatra console.",
+      "description": "Update one of this account's cloned voices (display_name, gender, age_group, use_case, persona, or language), or set/clear the account's default voice (make_default=true/false). Call only when the user asked for that change or to refine a newly cloned voice's metadata. Non-billable; deleting happens in the Beatra console.",
       "inputSchema": {
         "properties": {
+          "age_group": {
+            "anyOf": [
+              {
+                "enum": [
+                  "child",
+                  "youth",
+                  "adult",
+                  "senior"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Speaker age group (child, youth, adult, or senior) for a cloned voice; send null to clear.",
+            "title": "Age Group"
+          },
           "display_name": {
             "anyOf": [
               {
-                "maxLength": 40,
+                "maxLength": 255,
                 "minLength": 1,
                 "type": "string"
               },
@@ -14858,6 +14962,39 @@
             "description": "New name for one of this account's cloned voices.",
             "title": "Display Name"
           },
+          "gender": {
+            "anyOf": [
+              {
+                "enum": [
+                  "male",
+                  "female",
+                  "neutral"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Speaker gender tag (male, female, or neutral) for a cloned voice; send null to clear.",
+            "title": "Gender"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "maxLength": 32,
+                "minLength": 2,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Primary BCP-47 language code for a cloned voice; send null to clear.",
+            "title": "Language"
+          },
           "make_default": {
             "anyOf": [
               {
@@ -14868,8 +15005,56 @@
               }
             ],
             "default": null,
-            "description": "true makes this voice the account's default; false or omitted leaves the default as it is. Clearing the default is console-only.",
+            "description": "Omit unless the user asks to change the account's default voice. true sets this voice as the default; false removes it as the default when it is the current one.",
             "title": "Make Default"
+          },
+          "persona": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Short timbre, pace, and character description for a cloned voice (up to 200 chars); send null to clear.",
+            "title": "Persona"
+          },
+          "use_case": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "audiobook",
+                    "narration",
+                    "news",
+                    "ads",
+                    "conversational",
+                    "business",
+                    "character",
+                    "ivr",
+                    "course",
+                    "podcast",
+                    "gaming",
+                    "shorts",
+                    "education",
+                    "support",
+                    "social"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 5,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Recommended scenarios for a cloned voice (up to 5 items); send null or [] to clear.",
+            "title": "Use Case"
           },
           "voice_id": {
             "maxLength": 64,
@@ -14960,10 +15145,442 @@
             ],
             "title": "ToolError",
             "type": "object"
+          },
+          "Voice": {
+            "properties": {
+              "accent": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Accent"
+              },
+              "activation": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/VoiceActivation"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "age_group": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Age group: child, youth, adult, or senior",
+                "title": "Age Group"
+              },
+              "category": {
+                "enum": [
+                  "preset",
+                  "cloned"
+                ],
+                "title": "Category",
+                "type": "string"
+              },
+              "clone_model": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Clone Model"
+              },
+              "compatible_models": {
+                "description": "Models this voice currently resolves on (informational; 'auto' always works)",
+                "items": {
+                  "type": "string"
+                },
+                "title": "Compatible Models",
+                "type": "array"
+              },
+              "created_at": {
+                "anyOf": [
+                  {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Created At"
+              },
+              "display_name": {
+                "title": "Display Name",
+                "type": "string"
+              },
+              "expires_at": {
+                "anyOf": [
+                  {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Expires At"
+              },
+              "gender": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "male",
+                      "female",
+                      "neutral"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Gender"
+              },
+              "language": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Language"
+              },
+              "languages_supported": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Languages Supported",
+                "type": "array"
+              },
+              "persona": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Short description of how the voice sounds and where it fits",
+                "title": "Persona"
+              },
+              "preview": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/VoicePreview"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "preview_url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Preview Url"
+              },
+              "preview_url_scene": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Scene sample URL. Null until a sample has been published",
+                "title": "Preview Url Scene"
+              },
+              "retirement": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/VoiceRetirement"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Present when a retirement is scheduled or has taken effect."
+              },
+              "status": {
+                "default": "ready",
+                "enum": [
+                  "processing",
+                  "ready",
+                  "failed",
+                  "pending_activation",
+                  "expired"
+                ],
+                "title": "Status",
+                "type": "string"
+              },
+              "subtitles": {
+                "default": false,
+                "title": "Subtitles",
+                "type": "boolean"
+              },
+              "use_case": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Use Case",
+                "type": "array"
+              },
+              "voice_id": {
+                "description": "Opaque beatra voice handle",
+                "title": "Voice Id",
+                "type": "string"
+              }
+            },
+            "required": [
+              "voice_id",
+              "display_name",
+              "category"
+            ],
+            "title": "Voice",
+            "type": "object"
+          },
+          "VoiceActivation": {
+            "description": "What it costs to make a preview voice usable for speech.",
+            "properties": {
+              "price_credits": {
+                "title": "Price Credits",
+                "type": "integer"
+              },
+              "quote": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/VoiceActivationQuote"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The activation quote, on the clone task's result. Show the price and terms to the user and, with their consent, call activate once with quote.confirmation_token and confirm_credits = price_credits (valid for 24 hours; without a token, activate returns a new quote)."
+              },
+              "required": {
+                "title": "Required",
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "required",
+              "price_credits"
+            ],
+            "title": "VoiceActivation",
+            "type": "object"
+          },
+          "VoiceActivationQuote": {
+            "description": "The price of activating one preview voice. Nothing is charged until it is confirmed.",
+            "properties": {
+              "balance_credits": {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "title": "Balance Credits",
+                "type": "string"
+              },
+              "confirmation_token": {
+                "title": "Confirmation Token",
+                "type": "string"
+              },
+              "message": {
+                "title": "Message",
+                "type": "string"
+              },
+              "preview": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/VoicePreview"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "price_credits": {
+                "title": "Price Credits",
+                "type": "integer"
+              },
+              "sufficient_balance": {
+                "title": "Sufficient Balance",
+                "type": "boolean"
+              },
+              "terms": {
+                "additionalProperties": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "description": "The activation terms in zh, en and ja",
+                "title": "Terms",
+                "type": "object"
+              },
+              "terms_version": {
+                "title": "Terms Version",
+                "type": "string"
+              },
+              "token_expires_at": {
+                "format": "date-time",
+                "title": "Token Expires At",
+                "type": "string"
+              },
+              "voice_id": {
+                "title": "Voice Id",
+                "type": "string"
+              }
+            },
+            "required": [
+              "voice_id",
+              "price_credits",
+              "balance_credits",
+              "sufficient_balance",
+              "confirmation_token",
+              "token_expires_at",
+              "terms_version",
+              "terms",
+              "message"
+            ],
+            "title": "VoiceActivationQuote",
+            "type": "object"
+          },
+          "VoicePreview": {
+            "description": "The stored preview of a cloned voice that is not yet activated.",
+            "properties": {
+              "language": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Language"
+              },
+              "text": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Text"
+              },
+              "url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Url"
+              },
+              "version": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Version"
+              }
+            },
+            "title": "VoicePreview",
+            "type": "object"
+          },
+          "VoiceRetirement": {
+            "description": "A scheduled retirement. Synthesis with the voice still works until retire_at.",
+            "properties": {
+              "replacement_voice_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Recommended replacement voice_id, or null when none is named",
+                "title": "Replacement Voice Id"
+              },
+              "retire_at": {
+                "description": "When the voice stops working (ISO 8601 UTC)",
+                "format": "date-time",
+                "title": "Retire At",
+                "type": "string"
+              }
+            },
+            "required": [
+              "retire_at"
+            ],
+            "title": "VoiceRetirement",
+            "type": "object"
           }
         },
         "additionalProperties": false,
         "properties": {
+          "default_voice_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Default Voice Id"
+          },
           "display_name": {
             "anyOf": [
               {
@@ -14999,6 +15616,17 @@
             "default": null,
             "title": "Is Default"
           },
+          "voice": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Voice"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
           "voice_id": {
             "anyOf": [
               {
@@ -15016,6 +15644,168 @@
         "type": "object"
       },
       "title": "Update Voice"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "description": "Get or lazily synthesize a free fixed audition clip URL for a preset or account-owned cloned voice. Once generated for a cloned voice, the preview URL is cached permanently and also returned by beatra.voices.list.",
+      "inputSchema": {
+        "properties": {
+          "voice_id": {
+            "description": "Preset or account-owned cloned voice_id to audition.",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Voice Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "voice_id"
+        ],
+        "title": "VoicePreviewInput",
+        "type": "object"
+      },
+      "name": "beatra.voices.preview",
+      "outputSchema": {
+        "$defs": {
+          "ToolError": {
+            "additionalProperties": true,
+            "description": "Stable MCP tool-error envelope embedded in structuredContent.\n\nSame branching vocabulary as the REST error envelope: `code` is a registry\nerror code (plus the OAuth-standard `insufficient_scope`), `retryable`\ntells the agent whether an identical retry can succeed, `param` is a JSON\nPointer to the offending argument, and `details` carries correction facts.",
+            "properties": {
+              "code": {
+                "title": "Code",
+                "type": "string"
+              },
+              "details": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Details"
+              },
+              "jsonrpc_code": {
+                "title": "Jsonrpc Code",
+                "type": "integer"
+              },
+              "message": {
+                "title": "Message",
+                "type": "string"
+              },
+              "param": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Param"
+              },
+              "retryable": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Retryable"
+              },
+              "type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Type"
+              }
+            },
+            "required": [
+              "code",
+              "jsonrpc_code",
+              "message"
+            ],
+            "title": "ToolError",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ToolError"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "preview",
+                  "sample",
+                  "none"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Kind"
+          },
+          "preview_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Preview Url"
+          },
+          "voice_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Voice Id"
+          }
+        },
+        "title": "VoicePreviewOutput",
+        "type": "object"
+      },
+      "title": "Preview Voice"
     },
     {
       "annotations": {

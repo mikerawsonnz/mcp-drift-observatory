@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "b2985da1998772bf148ef1f10a397c6fc251261d75ca41c3badc977d23410a4a",
+  "full_hash": "2dc5c6730a6b696d7e2f87c97a9c39dbbfaf5e5204a515b1e551bb474a4afbf3",
   "name": "ai.bamf/bamf",
-  "observed_at": "2026-11-12T02:02:59.478939Z",
+  "observed_at": "2026-11-13T02:02:55.225989Z",
   "sources": [
     "official"
   ],
-  "tool_count": 170,
+  "tool_count": 177,
   "tools": [
     {
       "annotations": {
@@ -4614,10 +4614,17 @@
         "readOnlyHint": true,
         "title": "List Likeness Photos"
       },
-      "description": "List a creator's likeness photos with labels (shot, setting, mood, quality), Real/AI source and review status. Pass post_text and/or slot (avatar, stats_over_photo, personal_image) to get the best-fitting accepted photos ranked with a reason instead. Read-only.",
+      "description": "List a creator's likeness photos with labels (shot, setting, mood, quality), Real/AI source and review status. Pass post_text and/or slot (avatar, stats_over_photo, personal_image) to get the best-fitting accepted photos ranked with a reason instead. Pass include='identity' for the saved signature marks, sign-off arrangements, sign-off portraits and main references (use this to answer 'use a different signature style'). Read-only.",
       "inputSchema": {
         "properties": {
           "creator_id": {
+            "type": "string"
+          },
+          "include": {
+            "description": "identity: signature marks, sign-off arrangements and portraits, main references.",
+            "enum": [
+              "identity"
+            ],
             "type": "string"
           },
           "limit": {
@@ -4700,7 +4707,7 @@
         "readOnlyHint": false,
         "title": "Update Likeness Photo"
       },
-      "description": "Accept or reject a likeness photo and/or correct its labels (shot, setting, mood, clothing, quality, is_person). AI photos are used in designs only after acceptance; marking is_person false moves the image out of the likeness set (never deleted).",
+      "description": "Accept or reject a likeness photo and/or correct its labels (shot, setting, mood, clothing, quality, is_person). AI photos are used in designs only after acceptance; marking is_person false moves the image out of the likeness set (never deleted). Without photo_id, pass set to change the creator's defaults: signature_mark_url, signoff_arrangement or signoff_cutout_url (values from include='identity' only).",
       "inputSchema": {
         "properties": {
           "comment": {
@@ -4726,11 +4733,33 @@
           "relabel": {
             "description": "Re-run the vision labeller.",
             "type": "boolean"
+          },
+          "set": {
+            "description": "Change identity defaults instead of a photo.",
+            "properties": {
+              "signature_mark_url": {
+                "type": "string"
+              },
+              "signoff_arrangement": {
+                "enum": [
+                  "centred_compact",
+                  "centred_mark",
+                  "compact",
+                  "compact_handle",
+                  "inline",
+                  "mark_only",
+                  "side",
+                  "stacked"
+                ],
+                "type": "string"
+              },
+              "signoff_cutout_url": {
+                "type": "string"
+              }
+            },
+            "type": "object"
           }
         },
-        "required": [
-          "photo_id"
-        ],
         "type": "object"
       },
       "name": "bamf.update_likeness_photo"
@@ -4915,6 +4944,130 @@
         "type": "object"
       },
       "name": "bamf.set_design_version"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List Brand Fonts"
+      },
+      "description": "List a creator's brand fonts with family, role (heading, body, handwriting, accent, mono), usage and whether a font file is stored. Font files are private and never returned. Read-only.",
+      "inputSchema": {
+        "properties": {
+          "author_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "author_id"
+        ],
+        "type": "object"
+      },
+      "name": "bamf.list_brand_fonts"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Add Brand Font"
+      },
+      "description": "Add a font file to a creator's brand fonts from an HTTPS url or file_base64. Before calling, ask the user to confirm exactly: \"I have the right to use this font for my content\"; only then pass license_confirmed true. Font files are stored privately and are never public. Pass replace with an existing family name to overwrite it.",
+      "inputSchema": {
+        "properties": {
+          "author_id": {
+            "type": "string"
+          },
+          "family": {
+            "description": "Font family name; read from the file when omitted.",
+            "type": "string"
+          },
+          "file_base64": {
+            "description": "Base64 font file bytes. Provide url or file_base64.",
+            "type": "string"
+          },
+          "license_confirmed": {
+            "description": "Must be true, and only after the user confirmed they have the right to use this font for their content.",
+            "type": "boolean"
+          },
+          "note": {
+            "type": "string"
+          },
+          "replace": {
+            "description": "Existing family name to replace (keeps its role and usage unless given).",
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "heading",
+              "body",
+              "handwriting",
+              "accent",
+              "mono"
+            ],
+            "type": "string"
+          },
+          "url": {
+            "description": "HTTPS URL of the font file. Provide url or file_base64.",
+            "format": "uri",
+            "type": "string"
+          },
+          "usage": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "author_id",
+          "role",
+          "license_confirmed"
+        ],
+        "type": "object"
+      },
+      "name": "bamf.add_brand_font"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Set Brand Font Role"
+      },
+      "description": "Change the role, usage or note of an existing brand font by family name. Does not touch the font file.",
+      "inputSchema": {
+        "properties": {
+          "author_id": {
+            "type": "string"
+          },
+          "family": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "heading",
+              "body",
+              "handwriting",
+              "accent",
+              "mono"
+            ],
+            "type": "string"
+          },
+          "usage": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "author_id",
+          "family"
+        ],
+        "type": "object"
+      },
+      "name": "bamf.set_brand_font_role"
     },
     {
       "annotations": {
@@ -7401,6 +7554,163 @@
         "type": "object"
       },
       "name": "bamf.list_x_bookmarks"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List Saved Posts"
+      },
+      "description": "List posts the creator saved or bookmarked on any platform (X bookmarks sync automatically; LinkedIn, Instagram and shared links land here too) with BAMF folders, remix state and draft links. Use for 'what did I save', inspiration review, and picking a post to remix.",
+      "inputSchema": {
+        "properties": {
+          "creator_id": {
+            "type": "string"
+          },
+          "folder_id": {
+            "type": "string"
+          },
+          "limit": {
+            "default": 50,
+            "type": "number"
+          },
+          "platform": {
+            "enum": [
+              "linkedin",
+              "x",
+              "instagram",
+              "threads",
+              "tiktok",
+              "youtube",
+              "other"
+            ],
+            "type": "string"
+          },
+          "search": {
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "inbox",
+              "remix_queued",
+              "remixing",
+              "remixed",
+              "remix_failed",
+              "archived"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "bamf.list_saved_posts"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Save Post"
+      },
+      "description": "Save a social post to the creator's BAMF saved-posts inbox from a post URL and/or a screenshot URL. Use when the user says 'save this post' or shares a post. Set remix=true (or include 'remix this' in text) to also start a remix: the creator's own idea plus a BAMF house template, using the saved post for structure only. Never schedules or publishes.",
+      "inputSchema": {
+        "properties": {
+          "creator_id": {
+            "type": "string"
+          },
+          "folder_id": {
+            "type": "string"
+          },
+          "idea": {
+            "description": "The creator's own angle for the remix.",
+            "type": "string"
+          },
+          "notify_on_ready": {
+            "default": false,
+            "type": "boolean"
+          },
+          "remix": {
+            "default": false,
+            "type": "boolean"
+          },
+          "screenshot_url": {
+            "description": "Hosted screenshot of the post when there is no URL.",
+            "type": "string"
+          },
+          "text": {
+            "description": "The user's message, used for URL and intent detection.",
+            "type": "string"
+          },
+          "url": {
+            "description": "Post URL (LinkedIn, X, Instagram, Threads, TikTok, YouTube).",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "bamf.save_post"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Move Saved Post To Folder"
+      },
+      "description": "Move a saved post into a BAMF folder (created by name if missing). Folders work across platforms; moving into an auto-remix folder starts a remix.",
+      "inputSchema": {
+        "properties": {
+          "auto_remix": {
+            "description": "When creating a folder: posts landing in it are remixed automatically.",
+            "type": "boolean"
+          },
+          "folder_id": {
+            "type": "string"
+          },
+          "folder_name": {
+            "description": "Created if missing.",
+            "type": "string"
+          },
+          "platform_folder_name": {
+            "description": "When creating a folder: platform folders with this name (e.g. an X bookmark folder) land here.",
+            "type": "string"
+          },
+          "saved_post_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "saved_post_id"
+        ],
+        "type": "object"
+      },
+      "name": "bamf.move_to_folder"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Remix Saved Post"
+      },
+      "description": "Start a remix of a saved post: an async draft job built from the creator's own idea and a BAMF house template, with the saved post credited as Inspiration and used for structure only (never its wording or images). The draft lands in review; it is never scheduled. Poll bamf.get_job for progress.",
+      "inputSchema": {
+        "properties": {
+          "idea": {
+            "description": "The creator's own angle. Recommended.",
+            "type": "string"
+          },
+          "saved_post_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "saved_post_id"
+        ],
+        "type": "object"
+      },
+      "name": "bamf.remix_saved_post"
     },
     {
       "annotations": {

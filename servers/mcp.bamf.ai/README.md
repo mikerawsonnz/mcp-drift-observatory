@@ -6,10 +6,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.bamf.ai` | 170 | [`b2985da19987`](bcec739ff4350c4ddf27.json) | 2026-11-12 |
+| `https://mcp.bamf.ai` | 177 | [`2dc5c6730a6b`](bcec739ff4350c4ddf27.json) | 2026-11-13 |
 
 ## Tools at `https://mcp.bamf.ai`
 
+- `bamf.add_brand_font`: `Add a font file to a creator's brand fonts from an HTTPS url or file_base64. Before calling, ask the user to confirm exactly: "I have the r…`
 - `bamf.add_knowledge_doc`: `Add a knowledge or memory document to a creator space. API documentation: https://bamf.ai/docs/mcp/overview`
 - `bamf.add_likeness_photo`: `Save a photo of the creator to their likeness library from an HTTPS URL or a data URL, then label it. Always persist any creator photo you…`
 - `bamf.add_media`: `Register an external media URL as a BAMF media asset. API documentation: https://bamf.ai/docs/mcp/overview`
@@ -69,11 +70,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `bamf.get_design`: `Read a design's status, image, matched reference, template and layers (likeness, art, text). Poll after bamf.design_post. Read-only.`
 - `bamf.get_funnel_mix`: `Get a creator's TOF/MOF/BOF funnel mix from tagged LinkedIn posts: per-stage counts and performance, per-format stats, the resolved goal ta…`
 - `bamf.get_intelligence_processing_status`: `Read recent intelligence processing jobs for the authenticated creator, optionally limited to one resource.`
-- `bamf.get_intelligence_resource_context`: `Get source-linked evidence, facts, and relationships for one intelligence resource the authenticated creator can access.`
-- and 110 more in [bcec739ff4350c4ddf27.json](bcec739ff4350c4ddf27.json)
+- and 117 more in [bcec739ff4350c4ddf27.json](bcec739ff4350c4ddf27.json)
 
 ## Changes
 
+- 2026-11-13: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-13/bcec739ff4350c4ddf27.json): `7 tool(s) added; 19 field(s) changed; signals: imperative_language_introduced` **(notable)**
 - 2026-11-12: [count changed, schema changed, tool added](../../deltas/2026-11-12/bcec739ff4350c4ddf27.json): `10 tool(s) added; 13 field(s) changed`
 - 2026-11-07: [count changed, tool added](../../deltas/2026-11-07/bcec739ff4350c4ddf27.json): `3 tool(s) added`
 - 2026-11-06: [count changed, description changed, tool added](../../deltas/2026-11-06/bcec739ff4350c4ddf27.json): `3 tool(s) added; 2 field(s) changed; signals: length_more_than_doubled`

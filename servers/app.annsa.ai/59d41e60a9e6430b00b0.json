@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "2af0630df430b61d9c2b6d9597e4cc7d271cd1fb369f34f9a3ac49f04e0cddfd",
+  "full_hash": "ff812006067b574fd8cedd921a3406a08ae0dbfc0e6d0e243ab4d0be9816dc9a",
   "name": "ai.annsa/annsa",
-  "observed_at": "2026-11-12T02:02:56.728499Z",
+  "observed_at": "2026-11-13T02:02:51.417861Z",
   "sources": [
     "official"
   ],
@@ -426,7 +426,7 @@
       "inputSchema": {
         "properties": {
           "action": {
-            "description": "ship: Mark the priority shipped. It only records it; nothing deploys. retract undoes it. claim: Take a priority to work on. Starts a spec if there isn't one and gives you spec_id and holder_key. note: Leave a note on the spec about what you did or found. To correct an earlier note, send a new one with supersedes. handoff: Pass the work to another agent or a person, with a note for them. dispatch: Post @claude on the priority's GitHub issue so Claude picks it up there. The person stays assigned. A person's action. unclaim: Unclaim a priority so another agent can pick it up. close: Close the priority in one call, even if it's claimed or has a PR. It stays under Closed with your reason. write: Replace one section of the spec with new text. If the section belongs to someone else, your text is saved as a proposed change for them. verify: Record how you checked one Done When line, by proof kind: a test id for (proof: test), a URL for staging or prod. It doesn't block ship. escalate: Ask a person to decide something; it lands in their Needs you. Send topic, ask, trigger, principle and checked. One open ask per priority; the same topic updates it. resolve: Settle a routine question, like 'is this a duplicate of #N?', the way your principles already decide it. Each outcome fits one kind of question. Returns use_id so you can undo. undo: Reverse your own resolve, by use_id.",
+            "description": "ship: Mark the priority shipped. It only records it; nothing deploys. retract undoes it. claim: Take a priority to work on. Starts a spec if there isn't one and gives you spec_id and holder_key. note: Leave a note on the spec about what you did or found. To correct an earlier note, send a new one with supersedes. handoff: Pass the work to another agent or a person, with a note for them. dispatch: Post @claude on the priority's GitHub issue so Claude picks it up there. The person stays assigned. A person's action. unclaim: Unclaim a priority so another agent can pick it up. close: Close the priority in one call, even if it's claimed or has a PR. It stays under Closed with your reason. write: Replace one section of the spec with new text. If the section belongs to someone else, your text is saved as a proposed change for them. verify: Record how you checked one Done When line, by proof kind: a test id for (proof: test), a URL for staging or prod. For what a person sees, add media=true: you get a link to upload a screenshot that shows beside the line. It doesn't block ship. escalate: Ask a person to decide something; it lands in their Needs you. Send topic, ask, trigger, principle and checked. One open ask per priority; the same topic updates it. resolve: Settle a routine question, like 'is this a duplicate of #N?', the way your principles already decide it. Each outcome fits one kind of question. Returns use_id so you can undo. undo: Reverse your own resolve, by use_id.",
             "enum": [
               "ship",
               "claim",
@@ -504,6 +504,24 @@
           "learned": {
             "description": "For ship or escalate: what the next agent should know.",
             "maxLength": 10000,
+            "type": "string"
+          },
+          "media": {
+            "description": "For verify: true to attach a screenshot or video; the reply gives an upload link.",
+            "type": "boolean"
+          },
+          "media_bytes": {
+            "description": "For verify with media: file size in bytes (images 5 MB, video 25 MB).",
+            "minimum": 1,
+            "type": "integer"
+          },
+          "media_type": {
+            "description": "For verify with media: image/png, image/webp or video/mp4.",
+            "enum": [
+              "image/png",
+              "image/webp",
+              "video/mp4"
+            ],
             "type": "string"
           },
           "model": {
@@ -1153,7 +1171,7 @@
       "inputSchema": {
         "properties": {
           "action": {
-            "description": "set_stage: Move a priority to open, ready or closed. assign: Set who a spec is assigned to. A person's action. correct: Fix a title, detail or ruled-out entry. The old wording is kept. park: Take a priority off the list, with a reason, until someone unparks it. A person's action. unpark: Put a parked priority back on the list. retract: Unfile feedback, or mark a shipped priority as not shipped. A person's action; without confirm it only shows the plan. regroup: Move priorities between groups; the reply carries the undo. merge: Fold duplicate priorities into one. Their numbers are retired for good. Shipped priorities can't be merged. bet: List, create, update, delete or reorder bets, or place priorities on one. op says which. direction: Read, list, update or comment on a Direction page. op says which. set_severity: Set a priority's severity, P0 to P3. From an agent it's a proposal and needs a reason; a person's typed severity wins. cut: Close a release and write its changelog. op=publish marks its rows Shared. pick: Set a person's short list of priorities, in order. approve_findings: Let through agent findings held back by the daily limit. The owner's action. view: Save a board view. An agent's is a suggestion until a person keeps or dismisses it.",
+            "description": "set_stage: Move a priority to open, ready or closed. assign: Set who a spec is assigned to. A person's action. correct: Fix a title, detail or ruled-out entry. The old wording is kept. park: Take a priority off the list, with a reason, until someone unparks it. A person's action. unpark: Put a parked priority back on the list. retract: Unfile feedback, or mark a shipped priority as not shipped. A person's action; without confirm it only shows the plan. regroup: Move priorities between groups; the reply carries the undo. merge: Fold duplicates into one; their numbers retire. Any priority takes rows in; a shipped one can't fold away. bet: List, create, update, delete or reorder bets, or place priorities on one. op says which. direction: Read, list, update or comment on a Direction page. op says which. set_severity: Set a priority's severity, P0 to P3. From an agent it's a proposal and needs a reason; a person's typed severity wins. cut: Close a release and write its changelog. op: publish, or add. pick: Set a person's short list of priorities, in order. approve_findings: Let through agent findings held back by the daily limit. The owner's action. view: Save a board view. An agent's is a suggestion until a person keeps or dismisses it.",
             "enum": [
               "set_stage",
               "assign",
@@ -1277,6 +1295,10 @@
             },
             "type": "array"
           },
+          "heading": {
+            "description": "For direction update: write only the section under this heading.",
+            "type": "string"
+          },
           "into": {
             "description": "For merge: the priority that stays.",
             "type": "string"
@@ -1321,8 +1343,12 @@
             "description": "For a written bet: the number now. A person's.",
             "type": "number"
           },
+          "new_page": {
+            "description": "For direction update: true makes a new page from doc_title.",
+            "type": "boolean"
+          },
           "op": {
-            "description": "For bet: 'list', 'create' (title and metric_label; agents last), 'update' (bet_id), 'delete', 'reorder' (bet_ids) or 'place' (priority_ids). For direction: 'get', 'list', 'update' (document_text and reason), 'comment' (thread_id), or 'approve' and 'dismiss' (document_id and reason; a person's). For cut: 'publish', with release_number, channel and the live annsa.ai url. It marks the release's rows Shared and sends nothing. For view: 'list', 'create', 'update', 'delete', or 'keep' and 'dismiss' (a person's).",
+            "description": "For bet: 'list', 'create' (title and metric_label; agents last), 'update' (bet_id), 'delete', 'reorder' (bet_ids) or 'place' (priority_ids). For direction: 'get', 'list', 'update' (document_text and reason), 'comment' (thread_id), or 'approve' and 'dismiss' (document_id and reason; a person's). For cut: 'publish' (release_number, channel, live annsa.ai url) marks the rows Shared, sends nothing. 'add': shipped priority_ids into release_number. For view: 'list', 'create', 'update', 'delete', or 'keep' and 'dismiss' (a person's).",
             "enum": [
               "list",
               "create",
@@ -1335,6 +1361,7 @@
               "approve",
               "dismiss",
               "publish",
+              "add",
               "keep"
             ],
             "type": "string"
@@ -1391,7 +1418,7 @@
             "type": "string"
           },
           "priority_ids": {
-            "description": "For bet op=place or direction: the priorities.",
+            "description": "For bet place, cut add or direction.",
             "items": {
               "type": "string"
             },
@@ -1424,9 +1451,17 @@
             "type": "object"
           },
           "release_number": {
-            "description": "For cut op=publish: which release.",
+            "description": "For cut publish or add.",
             "minimum": 1,
             "type": "integer"
+          },
+          "section_mode": {
+            "description": "With heading: replace (default) or append.",
+            "enum": [
+              "replace",
+              "append"
+            ],
+            "type": "string"
           },
           "severity": {
             "description": "0 broken, 1 poor, 2 could be better, 3 minor. From an agent it's a proposal until a person sets it.",

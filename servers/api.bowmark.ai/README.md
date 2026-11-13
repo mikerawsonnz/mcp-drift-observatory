@@ -6,8 +6,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.bowmark.ai/mcp` | 29 | [`3fd9c0137f0d`](5f2d24be930573ed8878.json) | 2026-11-11 |
-| `https://api.bowmark.ai/mcp/registry` | 29 | [`3fd9c0137f0d`](e742a173e323c903336e.json) | 2026-11-11 |
+| `https://api.bowmark.ai/mcp` | 29 | [`a77433d05f73`](5f2d24be930573ed8878.json) | 2026-11-13 |
+| `https://api.bowmark.ai/mcp/registry` | 29 | [`a77433d05f73`](e742a173e323c903336e.json) | 2026-11-13 |
 
 ## Tools at `https://api.bowmark.ai/mcp`
 
@@ -75,6 +75,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-13: [description changed](../../deltas/2026-11-13/e742a173e323c903336e.json): `1 field(s) changed`
+- 2026-11-13: [description changed](../../deltas/2026-11-13/5f2d24be930573ed8878.json): `1 field(s) changed`
 - 2026-11-11: [count changed, tool removed](../../deltas/2026-11-11/e742a173e323c903336e.json): `6 tool(s) removed`
 - 2026-11-11: [count changed, tool removed](../../deltas/2026-11-11/5f2d24be930573ed8878.json): `6 tool(s) removed`
 - 2026-11-09: [description changed, schema changed](../../deltas/2026-11-09/5f2d24be930573ed8878.json): `444 field(s) changed; signals: url_introduced`
@@ -93,8 +95,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - 2026-11-02: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-02/5f2d24be930573ed8878.json): `2 tool(s) added; 24 field(s) changed; signals: imperative_language_introduced` **(notable)**
 - 2026-11-01: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-01/e742a173e323c903336e.json): `1 tool(s) added; 27 field(s) changed`
 - 2026-11-01: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-01/5f2d24be930573ed8878.json): `1 tool(s) added; 27 field(s) changed`
-- 2026-10-31: [annotation changed, schema changed](../../deltas/2026-10-31/e742a173e323c903336e.json): `14 field(s) changed`
-- 2026-10-31: [annotation changed, schema changed](../../deltas/2026-10-31/5f2d24be930573ed8878.json): `14 field(s) changed`
 
 ## Check it from your agent
 
