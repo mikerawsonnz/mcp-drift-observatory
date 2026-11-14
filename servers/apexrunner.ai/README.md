@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://apexrunner.ai/mcp` | 49 | [`f6f55ce94364`](d855f635094083c31457.json) | 2026-11-12 |
+| `https://apexrunner.ai/mcp` | 50 | [`7ccb61ad4718`](d855f635094083c31457.json) | 2026-11-14 |
 
 ## Tools at `https://apexrunner.ai/mcp`
 
@@ -18,11 +18,12 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `apex_evolution_insight`: `$0.007 — Raw output from APEX's AI evolution engine over its real trade history — win rates by regime and pair, discretionary vs grid perfo…`
 - `apex_pulse`: `$0.007 — Ultra-cheap $0.01 heartbeat signal for AI agents running health checks. Returns APEX system status, current BTC market regime, Fea…`
 - `apex_trial`: `$0.00 — Free market snapshot — regime, Fear & Greed, BTC price, and a 2-of-6-pillar alpha score preview (preview_only: true). No payment re…`
-- `arb_spread`: `$0.007 — Cross-exchange arb spread monitoring (Kraken vs Hyperliquid) for BTC, ETH, SOL. Returns spread %, direction, and viability vs 0.35…`
+- `arb_spread`: `$0.007 — Spot vs Hyperliquid price spread for BTC, ETH, SOL (CoinGecko spot price vs Hyperliquid perp mid). Returns spread %, direction, an…`
 - `bb_analysis`: `$0.007 — Bollinger Band analysis for a crypto pair. Returns band width, price position, squeeze detection, and EXPANDED/CONTRACTING/CONTRAC…`
 - `btc_dominance`: `$0.007 — BTC market dominance trend signal for crypto rotation strategy. Returns dominance %, direction, and altcoin rotation bias.`
 - `btc_price_tick`: `$0.007 — Ultra-minimal price tick at $0.01 — BTC/ETH/SOL/AVAX prices from Hyperliquid in minimal JSON. Designed for high-frequency bots tha…`
 - `capital_rotation_signal`: `$0.007 — Detect capital rotation state: BTC_ACCUMULATION, ALT_SEASON_EARLY, ALT_SEASON_LATE, RISK_OFF, RECOVERY, or CHOPPY. Based on BTC do…`
+- `check_trade_safety`: `$0.014 — Call this before opening a leveraged position so you don't walk into a crowded trade or a liquidation cascade — scores one propose…`
 - `combined_alpha`: `$0.007 — Combined alpha crypto trading score 0-100 for BTC, ETH, SOL, AVAX. Synthesizes trend confirmation, volume, Bollinger Bands, Hyperl…`
 - `crowded_trade_detector`: `$0.007 — Call this before entering a popular directional trade so you don't become the exit liquidity — scores crowding 0-100 per coin from…`
 - `dca_signal`: `$0.007 — DCA accumulation entry signal based on Fear & Greed index, RSI, and volatility regime for BTC, ETH, SOL, AVAX. Mirrors APEX Runner…`
@@ -62,7 +63,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-14: [count changed, description changed, tool added](../../deltas/2026-11-14/d855f635094083c31457.json): `1 tool(s) added; 1 field(s) changed`
 
 ## Check it from your agent
 

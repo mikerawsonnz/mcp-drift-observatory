@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.atmy.ai/mcp` | 11 | [`1604d6018f23`](5f23f4a4f55342a166a0.json) | 2026-11-09 |
+| `https://api.atmy.ai/mcp` | 12 | [`67e215fb5694`](5f23f4a4f55342a166a0.json) | 2026-11-14 |
 
 ## Tools at `https://api.atmy.ai/mcp`
 
@@ -16,6 +16,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_air_quality_monthly`: `The whole measurement history of a city from the Atmy Data Hub: PM2.5 per month with the month's weather from 2026-01, yearly means (comple…`
 - `get_city_forecast`: `The next hours of a city: temperature, wind, humidity, precipitation and the pollution accumulation index 0–100 (how strongly the weather k…`
 - `get_country_ranking`: `Cities of a country ranked by daily PM2.5 for the last completed day (Atmy Data Hub), most polluted or cleanest first.`
+- `get_home_environment`: `Greenery and emission sources around a point (a home): tree canopy share within 300 m, green land share and summer NDVI within 500 m with a…`
 - `get_sensor`: `One sensor by its id: location, network, license, quality check with rating and reasons, and the latest reading.`
 - `get_sensor_readings`: `Readings of one sensor: raw (the last 31 days, at most 7 days a call), 5-minute means (the same windows), hourly means (the last 366 days,…`
 - `get_sensors_average`: `The mean of up to 100 sensors per 5 minutes, hour or UTC day, each sensor counted once per bucket, with the number of sensors in each bucke…`
@@ -24,6 +25,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-14: [count changed, tool added](../../deltas/2026-11-14/5f23f4a4f55342a166a0.json): `1 tool(s) added`
 - 2026-11-09: [description changed, schema changed](../../deltas/2026-11-09/5f23f4a4f55342a166a0.json): `2 field(s) changed`
 - 2026-11-07: [description changed](../../deltas/2026-11-07/5f23f4a4f55342a166a0.json): `1 field(s) changed`
 - 2026-11-01: [schema changed](../../deltas/2026-11-01/5f23f4a4f55342a166a0.json): `1 field(s) changed`

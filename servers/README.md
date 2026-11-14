@@ -1,6 +1,6 @@
 # Observed MCP servers
 
-462 hosts whose MCP tool declarations we have observed. Each page lists the declared tools, every observed change, and an Atom feed of changes to that server.
+463 hosts whose MCP tool declarations we have observed. Each page lists the declared tools, every observed change, and an Atom feed of changes to that server.
 
 Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_alerts
 
@@ -18,7 +18,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [agent.autoposter.ai](agent.autoposter.ai/) (16 tools)
 - [agentblueprint.ai](agentblueprint.ai/) (4 tools)
 - [agentcv.ai](agentcv.ai/) (6 tools)
-- [agenticfabricationnetwork.ai](agenticfabricationnetwork.ai/) (14 tools)
+- [agenticfabricationnetwork.ai](agenticfabricationnetwork.ai/) (22 tools)
 - [agentmart.ciphyr.ai](agentmart.ciphyr.ai/) (133 tools)
 - [agentmash.ai](agentmash.ai/) (6 tools)
 - [agentplaybooks.ai](agentplaybooks.ai/) (50 tools)
@@ -32,12 +32,13 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [aibotoffice.ai](aibotoffice.ai/) (26 tools)
 - [aient.ai](aient.ai/) (2 tools)
 - [aiphotoanimator.ai](aiphotoanimator.ai/) (10 tools)
+- [airboxship.ai](airboxship.ai/) (3 tools)
 - [alcock.ai](alcock.ai/) (9 tools)
 - [aldro.ai](aldro.ai/) (8 tools)
 - [alexeysound.ae](alexeysound.ae/) (3 tools)
 - [analyticslegends.ai](analyticslegends.ai/) (25 tools)
 - [apexai.academy](apexai.academy/) (30 tools)
-- [apexrunner.ai](apexrunner.ai/) (49 tools)
+- [apexrunner.ai](apexrunner.ai/) (50 tools)
 - [api-v2.lifeclaw.agentese.ai](api-v2.lifeclaw.agentese.ai/) (16 tools)
 - [api.adadvisor.ai](api.adadvisor.ai/) (43 tools)
 - [api.agentrapay.ai](api.agentrapay.ai/) (6 tools)
@@ -48,9 +49,9 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [api.assistable.ai](api.assistable.ai/) (16 tools)
 - [api.atako.ai](api.atako.ai/) (4 tools)
 - [api.athenahq.ai](api.athenahq.ai/) (132 tools)
-- [api.atmy.ai](api.atmy.ai/) (11 tools)
+- [api.atmy.ai](api.atmy.ai/) (12 tools)
 - [api.bareun.ai](api.bareun.ai/) (6 tools)
-- [api.betslipdoctor.ai](api.betslipdoctor.ai/) (99 tools)
+- [api.betslipdoctor.ai](api.betslipdoctor.ai/) (100 tools)
 - [api.bluerate.ai](api.bluerate.ai/) (3 tools)
 - [api.bowmark.ai](api.bowmark.ai/) (58 tools)
 - [api.bumblebox.ai](api.bumblebox.ai/) (17 tools)

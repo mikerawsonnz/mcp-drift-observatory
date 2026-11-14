@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://app.bezal.ai/api/mcp` | 9 | [`68384404d792`](4cca1c526a32cc31d3b0.json) | 2026-11-12 |
+| `https://app.bezal.ai/api/mcp` | 9 | [`2200cb77ff3d`](4cca1c526a32cc31d3b0.json) | 2026-11-14 |
 
 ## Tools at `https://app.bezal.ai/api/mcp`
 
@@ -22,6 +22,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-14: [schema changed](../../deltas/2026-11-14/4cca1c526a32cc31d3b0.json): `1 field(s) changed`
 - 2026-11-12: [description changed](../../deltas/2026-11-12/4cca1c526a32cc31d3b0.json): `1 field(s) changed`
 - 2026-11-11: [description changed](../../deltas/2026-11-11/4cca1c526a32cc31d3b0.json): `5 field(s) changed`
 - 2026-11-08: [schema changed](../../deltas/2026-11-08/4cca1c526a32cc31d3b0.json): `1 field(s) changed`

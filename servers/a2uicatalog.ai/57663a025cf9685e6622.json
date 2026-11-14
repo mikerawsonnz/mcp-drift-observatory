@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "7370576bd0825040230ea63a74a55cca52d8bee95b5857cc004a5c912722dc28",
+  "full_hash": "f1a2d63e9dd6df445d440b36cd9180ce6c1b4f4952fc4905cfd26f0aac7b91be",
   "name": "ai.a2uicatalog/catalog",
-  "observed_at": "2026-11-12T02:02:50.250295Z",
+  "observed_at": "2026-11-14T02:02:38.449390Z",
   "sources": [
     "official"
   ],
@@ -137,15 +137,23 @@
         "readOnlyHint": true,
         "title": "find_atoms"
       },
-      "description": "Semantic search over the atom catalog: describe the UI piece you need in plain words and get the best-matching atoms, ranked best-first, each with a description and an example need. YOU choose from the list (the first entries are most likely, but check the descriptions), then call get_atom_schema for the one(s) you pick. Use this instead of scanning get_catalog when the vocabulary is large. Describe the need as a user would (e.g. \"let clients choose grooming services and see the total price\"), not by guessing an atom name.",
+      "description": "Semantic search over the atom catalog: describe the UI piece you need in plain words and get the best-matching atoms, ranked best-first, each with a description and an example need. YOU choose from the list (the first entries are most likely, but check the descriptions), then call get_atom_schema for the one(s) you pick. Use this instead of scanning get_catalog when the vocabulary is large. Describe the need as a user would (e.g. \"let clients choose grooming services and see the total price\"), not by guessing an atom name. Pass `renderer` to keep only atoms that renderer draws as intended (status drawn or native); each result then carries renderer_status.",
       "inputSchema": {
         "properties": {
+          "include_degraded": {
+            "description": "With renderer only: also keep atoms with status degraded (Flutter lowers them to Basic components, so they show but not as the atom intends). Default false.",
+            "type": "boolean"
+          },
           "k": {
             "description": "How many candidates to return (default 10, max 50). If none fits, rephrase the need or ask for more.",
             "type": "integer"
           },
           "need": {
             "description": "The UI piece you need, in plain words (one need per call)",
+            "type": "string"
+          },
+          "renderer": {
+            "description": "Optional renderer id: react, lit, angular, copilotkit, a2ui-vue, flutter or compose. Keeps only atoms whose measured status for it is drawn or native; atoms with no renderer data (not yet measured) are left out.",
             "type": "string"
           }
         },
@@ -195,6 +203,10 @@
                   "description": "An example need the atom fits.",
                   "type": "string"
                 },
+                "renderer_status": {
+                  "description": "With the renderer filter: that renderer's measured status for the atom (drawn, native or degraded).",
+                  "type": "string"
+                },
                 "score": {
                   "description": "Similarity score.",
                   "type": "number"
@@ -238,7 +250,7 @@
         "readOnlyHint": true,
         "title": "get_atom_schema"
       },
-      "description": "Return the PROP SHAPE (field names + what each field takes) for named atoms. get_catalog tells you an atom EXISTS; this tells you how to fill it. Call this before authoring any atom you have not used before — guessing prop names is the single most common cause of an atom rendering empty or wrong. Accepts several types at once, so a multi-atom surface resolves in one call.",
+      "description": "Return the PROP SHAPE (field names + what each field takes) for named atoms. get_catalog tells you an atom EXISTS; this tells you how to fill it. Call this before authoring any atom you have not used before — guessing prop names is the single most common cause of an atom rendering empty or wrong. Accepts several types at once, so a multi-atom surface resolves in one call. Each atom also carries `renderers`: renderer id -> measured status (web: drawn, drawn_with_differences, not_verified, not_supported, not_measured; flutter: native, degraded, not_supported, not_measured; compose: native, not_supported, not_measured). Only drawn and native mean it draws as intended; degraded = lowered to Basic components. renderers_matrix is the URL holding the reasons and evidence (atoms[<atom>][<renderer>]). Atoms not yet measured have no renderers.",
       "inputSchema": {
         "properties": {
           "types": {
@@ -260,12 +272,16 @@
         "properties": {
           "atoms": {
             "additionalProperties": true,
-            "description": "Prop shapes keyed by atom type; each value has fields, description and surfaces.",
+            "description": "Prop shapes keyed by atom type; each value has fields, description, surfaces and, when measured, renderers (renderer id -> status).",
             "properties": {},
             "type": "object"
           },
           "hint": {
             "description": "What to do about the unknown names.",
+            "type": "string"
+          },
+          "renderers_matrix": {
+            "description": "URL of the renderer matrix with the reasons and evidence behind each renderers status.",
             "type": "string"
           },
           "unknown": {
@@ -725,9 +741,9 @@
     {
       "_meta": {
         "ui": {
-          "resourceUri": "ui://a2uicatalog/view/156"
+          "resourceUri": "ui://a2uicatalog/view/157"
         },
-        "ui/resourceUri": "ui://a2uicatalog/view/156"
+        "ui/resourceUri": "ui://a2uicatalog/view/157"
       },
       "annotations": {
         "destructiveHint": false,
@@ -777,9 +793,9 @@
     {
       "_meta": {
         "ui": {
-          "resourceUri": "ui://a2uicatalog/view/156"
+          "resourceUri": "ui://a2uicatalog/view/157"
         },
-        "ui/resourceUri": "ui://a2uicatalog/view/156"
+        "ui/resourceUri": "ui://a2uicatalog/view/157"
       },
       "annotations": {
         "destructiveHint": false,
@@ -913,9 +929,9 @@
     {
       "_meta": {
         "ui": {
-          "resourceUri": "ui://a2uicatalog/view/156"
+          "resourceUri": "ui://a2uicatalog/view/157"
         },
-        "ui/resourceUri": "ui://a2uicatalog/view/156"
+        "ui/resourceUri": "ui://a2uicatalog/view/157"
       },
       "annotations": {
         "destructiveHint": false,
@@ -942,9 +958,9 @@
     {
       "_meta": {
         "ui": {
-          "resourceUri": "ui://a2uicatalog/view/156"
+          "resourceUri": "ui://a2uicatalog/view/157"
         },
-        "ui/resourceUri": "ui://a2uicatalog/view/156"
+        "ui/resourceUri": "ui://a2uicatalog/view/157"
       },
       "annotations": {
         "destructiveHint": false,
@@ -1184,9 +1200,9 @@
     {
       "_meta": {
         "ui": {
-          "resourceUri": "ui://a2uicatalog/view/156"
+          "resourceUri": "ui://a2uicatalog/view/157"
         },
-        "ui/resourceUri": "ui://a2uicatalog/view/156"
+        "ui/resourceUri": "ui://a2uicatalog/view/157"
       },
       "annotations": {
         "destructiveHint": false,
@@ -1670,9 +1686,9 @@
     {
       "_meta": {
         "ui": {
-          "resourceUri": "ui://a2uicatalog/view/156"
+          "resourceUri": "ui://a2uicatalog/view/157"
         },
-        "ui/resourceUri": "ui://a2uicatalog/view/156"
+        "ui/resourceUri": "ui://a2uicatalog/view/157"
       },
       "annotations": {
         "destructiveHint": false,
@@ -1703,9 +1719,9 @@
     {
       "_meta": {
         "ui": {
-          "resourceUri": "ui://a2uicatalog/view/156"
+          "resourceUri": "ui://a2uicatalog/view/157"
         },
-        "ui/resourceUri": "ui://a2uicatalog/view/156"
+        "ui/resourceUri": "ui://a2uicatalog/view/157"
       },
       "annotations": {
         "destructiveHint": false,

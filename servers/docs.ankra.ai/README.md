@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://docs.ankra.ai/mcp` | 3 | [`210a9869a62f`](e88cfce9285473e78a88.json) | 2026-11-07 |
+| `https://docs.ankra.ai/mcp` | 3 | [`2d1b5546ed67`](e88cfce9285473e78a88.json) | 2026-11-14 |
 
 ## Tools at `https://docs.ankra.ai/mcp`
 
@@ -16,7 +16,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-14: [description changed](../../deltas/2026-11-14/e88cfce9285473e78a88.json): `1 field(s) changed`
 
 ## Check it from your agent
 

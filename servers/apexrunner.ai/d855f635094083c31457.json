@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "f6f55ce943643bebd19202a39598bbe39555e554fc5e07d906fae1ae4a47cc88",
+  "full_hash": "7ccb61ad4718eac9a3b4541ed902327365a38dcc25d7cacc3a74d75c1bb6908b",
   "name": "ai.apexrunner/signals",
-  "observed_at": "2026-11-12T02:02:55.761213Z",
+  "observed_at": "2026-11-14T02:02:43.738078Z",
   "sources": [
     "official"
   ],
-  "tool_count": 49,
+  "tool_count": 50,
   "tools": [
     {
       "description": "FREE — no payment needed. Live crypto market snapshot: BTC price, Fear & Greed, BTC market regime, and a 2-of-6-pillar preview of the APEX alpha score, plus the current price of every paid tool. Call this first to confirm the connection works.",
@@ -91,7 +91,7 @@
       "name": "apex_composite"
     },
     {
-      "description": "$0.007 — Cross-exchange arb spread monitoring (Kraken vs Hyperliquid) for BTC, ETH, SOL. Returns spread %, direction, and viability vs 0.35% execution threshold.",
+      "description": "$0.007 — Spot vs Hyperliquid price spread for BTC, ETH, SOL (CoinGecko spot price vs Hyperliquid perp mid). Returns spread %, direction, and viability vs 0.35% threshold.",
       "inputSchema": {
         "properties": {},
         "type": "object"
@@ -575,6 +575,43 @@
         "type": "object"
       },
       "name": "execution_window_optimizer"
+    },
+    {
+      "description": "$0.014 — Call this before opening a leveraged position so you don't walk into a crowded trade or a liquidation cascade — scores one proposed trade (coin, long/short, size_usd) 0-100 for safety from Hyperliquid top-wallet crowding, funding, nearby liquidation clusters and size impact, and returns LOW_RISK, CAUTION or DANGER with the reasoning per factor. Params: coin=ETH, side=long, size_usd=5000",
+      "inputSchema": {
+        "properties": {
+          "coin": {
+            "description": "Asset to trade: BTC, ETH or SOL",
+            "enum": [
+              "BTC",
+              "ETH",
+              "SOL"
+            ],
+            "type": "string"
+          },
+          "side": {
+            "description": "Position side you intend to open: long or short",
+            "enum": [
+              "long",
+              "short"
+            ],
+            "type": "string"
+          },
+          "size_usd": {
+            "description": "Position notional in USD, 10-10000000",
+            "maximum": 10000000,
+            "minimum": 10,
+            "type": "number"
+          }
+        },
+        "required": [
+          "coin",
+          "side",
+          "size_usd"
+        ],
+        "type": "object"
+      },
+      "name": "check_trade_safety"
     },
     {
       "description": "$0.007 — Call this before entering a popular directional trade so you don't become the exit liquidity — scores crowding 0-100 per coin from Hyperliquid's top-20 leaderboard positions (long/short split, leverage) and returns a contrarian signal plus uncrowded opportunities.",

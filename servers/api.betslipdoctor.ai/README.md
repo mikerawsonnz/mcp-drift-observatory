@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.betslipdoctor.ai/api/mcp` | 99 | [`1b47a1de5ba7`](f29327f2a9147dd897c0.json) | 2026-11-11 |
+| `https://api.betslipdoctor.ai/api/mcp` | 100 | [`275e02399632`](f29327f2a9147dd897c0.json) | 2026-11-14 |
 
 ## Tools at `https://api.betslipdoctor.ai/api/mcp`
 
@@ -40,6 +40,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_doctor_parlays`: `Read the Doctor’s posted parlays for one league (e.g. LGUE_nfl): 2-3 legs on different games, each B+ or better when posted. Upcoming first…`
 - `get_doctor_picks`: `Read today’s saved Doctor picks and recent settled WON/LOST/PUSH results. Each item carries league (first leg’s league id), sport (first le…`
 - `get_doctor_quota`: `Read this account’s current app consult allowance, held and used amounts, and reset information. Does not reserve a consult.`
+- `get_game_file`: `Read the shared game file by event key, or by league and team for the next game on the slate.`
 - `get_grade_catalog`: `Read this account’s Grade research options and available capabilities, including in-play eligibility when enabled. Does not start a Grade.`
 - `get_grade_evidence`: `Return the evidence behind an owned completed Grade jobId: each claim checked (price, injury and lineup, matchup, form, line move, situatio…`
 - `get_grade_groups`: `Read the owned Grade job’s group scores as they become available. Status is pending, partial or final; partial scores can change and are no…`
@@ -69,11 +70,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `match_ticket_legs`: `For a betslip the customer showed you (screenshot, paste or their words): send each leg as printed (event, selection, market, period, line,…`
 - `notifications`: `This account's notification inbox and settings, the same as the app's bell. feed: GET notifications/feed params {filter all/mentions/verifi…`
 - `onboarding_preferences`: `Read the current league catalog and per-league team membership, or read/save your leagues and teams. Use original source-qualified IDs. Log…`
-- `open_doctor_conversation`: `Persist an app Doctor thread, optionally attached to an owned ticket, report or history item. Does not start a reply or spend a consult all…`
-- and 39 more in [f29327f2a9147dd897c0.json](f29327f2a9147dd897c0.json)
+- and 40 more in [f29327f2a9147dd897c0.json](f29327f2a9147dd897c0.json)
 
 ## Changes
 
+- 2026-11-14: [count changed, tool added](../../deltas/2026-11-14/f29327f2a9147dd897c0.json): `1 tool(s) added`
 - 2026-11-11: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-11/f29327f2a9147dd897c0.json): `1 tool(s) added; 51 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-10: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-10/f29327f2a9147dd897c0.json): `2 tool(s) added; 34 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-09: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-09/f29327f2a9147dd897c0.json): `2 tool(s) added; 118 field(s) changed; signals: length_more_than_doubled`
@@ -93,7 +94,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - 2026-10-19: [count changed, description changed, schema changed, tool added](../../deltas/2026-10-19/f29327f2a9147dd897c0.json): `6 tool(s) added; 71 field(s) changed`
 - 2026-10-18: [count changed, description changed, schema changed, tool added](../../deltas/2026-10-18/f29327f2a9147dd897c0.json): `10 tool(s) added; 478 field(s) changed; signals: length_more_than_doubled, url_introduced`
 - 2026-10-15: [annotation changed, description changed, field changed, schema changed](../../deltas/2026-10-15/f29327f2a9147dd897c0.json): `25 field(s) changed`
-- 2026-10-13: [schema changed](../../deltas/2026-10-13/f29327f2a9147dd897c0.json): `20 field(s) changed`
 
 ## Check it from your agent
 

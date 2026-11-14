@@ -6,37 +6,37 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.pantheon.ad/mcp` | 23 | [`58602f220b0d`](c385e5b261a52bf286e2.json) | 2026-11-11 |
+| `https://mcp.pantheon.ad/mcp` | 23 | [`02397adf7e8f`](c385e5b261a52bf286e2.json) | 2026-11-14 |
 
 ## Tools at `https://mcp.pantheon.ad/mcp`
 
-- `analyze_ad`: `Ads Intelligence: full AI analysis of one ad (emotional levers, biases, landing page coherence). Uses 1 Ads Intelligence credit. Runs in ba…`
-- `create_brand_voice`: `Create and save a Brand Voice from a public URL or a text (uses 1 Brand Voice credit, ~1 minute).`
-- `create_offer_brief`: `Create and save an Offer Brief from a public sales page URL or a text (uses 1 Offer Brief credit, ~1 minute).`
-- `get_active_ads_copy`: `Copy (body, caption, CTA) of currently active ads of the monitored creators.`
-- `get_competitor_active_ads`: `Active ads of a competitor the user has analyzed with Competitor Spy.`
-- `get_creative_analysis`: `Saved AI analysis of an ad (awareness, hooks, mechanism, triggers, landing page coherence), if analyze_ad was run on it.`
-- `get_job_status`: `Status and results of a background job started by an action tool.`
-- `get_market_creators_data`: `Aggregated stats of the creators/competitors the user monitors.`
-- `get_saved_ads`: `The user's swipe file, optionally filtered by competitor name.`
-- `get_strategic_avatar`: `Avatar research of a project (from list_projects): pain matrix, core wound, desire chain, objections, triggers, language and strategic synt…`
-- `get_top_performing_ads`: `Top performing (longest running) ads of the monitored creators.`
-- `list_analyzed_pages`: `List Facebook pages the user analyzed (competitor, inspiration or brand_campaigns), with status and ad counts.`
-- `list_brand_voices`: `List the user's Brand Voices (id, name).`
-- `list_offer_briefs`: `List the user's Offer Briefs (id, name).`
-- `list_projects`: `List the user's strategic projects (Avatar analyses) with their ids.`
-- `run_ad_copilot`: `Adapt a library ad into 3 copy variants for the user's Avatar, Offer Brief and Brand Voice (uses 1 Ad Copilot credit). Runs in background:…`
-- `run_brand_campaign_analysis`: `Scrape and analyze the user's own brand Meta campaigns page (uses 1 Brand Campaigns credit). Runs in background: poll get_job_status with t…`
-- `run_competitor_spy`: `Scrape and analyze all ads of a competitor's Facebook page (uses 1 Competitor Spy credit). Runs in background: poll get_job_status with the…`
-- `run_inspiration_search`: `Scrape and analyze a page outside the user's niche for inspiration (uses 1 Inspiration Search credit). Runs in background: poll get_job_sta…`
-- `run_magic_tool`: `Summarize, translate or extract contacts/links from a text (Magic Tools). Summaries and extractions are in the language of the text; transl…`
-- `run_persuasion_analysis`: `Persuasion analysis of an ad before launch: present and missing cognitive biases (uses 1 Persuasion Analysis credit). Runs in background: p…`
-- `run_sales_psychology`: `Sales Psychology report for a project's Avatar + an Offer Brief (uses 1 Sales Psychology credit). Runs in background: poll get_job_status w…`
-- `search_ads_library`: `Search the user's own Ads Library (ads collected by their searches) and this week's Top Ads by brand, niche, sector or copy. Returns ad ids…`
+- `analyze_ad`: `Run a full AI analysis of one ad: emotional levers, cognitive biases and landing page coherence. Uses 1 Ads Intelligence credit. Runs in th…`
+- `create_brand_voice`: `Create and save a Brand Voice from a public web page or a text written by the user (about 1 minute). Uses 1 Brand Voice credit.`
+- `create_offer_brief`: `Create and save an Offer Brief from a public sales page or a text describing the offer (about 1 minute). Uses 1 Offer Brief credit.`
+- `get_active_ads_copy`: `Get the copy (body text, caption and call to action) of the ads currently running on the Facebook pages the user follows. Use it to study w…`
+- `get_competitor_active_ads`: `Get up to 20 ads currently running for a competitor the user analyzed with Competitor Spy, found by page name.`
+- `get_creative_analysis`: `Read the saved AI analysis of one ad (awareness level, hooks, mechanism, emotional triggers, landing page coherence). Only available after…`
+- `get_job_status`: `Check a background job started by an action tool and get its result when it is done. Call it again later while the status is running or pen…`
+- `get_market_creators_data`: `Get summary statistics for the Facebook pages the user follows in Pantheon: total and active ads, audience, format mix and niche. Use it to…`
+- `get_saved_ads`: `Get up to 20 ads from the pages in the user's swipe file, optionally only those of one competitor. Includes media links and whether each ad…`
+- `get_strategic_avatar`: `Read the customer avatar research of a project: pain matrix, core wound, desire chain, objections, triggers, customer language and strategi…`
+- `get_top_performing_ads`: `Get the longest-running ads of the Facebook pages the user follows. An ad that keeps running for months is usually profitable, so these are…`
+- `list_analyzed_pages`: `List the Facebook pages the user analyzed in one section of Pantheon (competitors, inspiration or own brand campaigns), with analysis statu…`
+- `list_brand_voices`: `List the Brand Voices saved in the user's account. Use the ids with run_ad_copilot.`
+- `list_offer_briefs`: `List the Offer Briefs saved in the user's account. Use the ids with run_ad_copilot and run_sales_psychology.`
+- `list_projects`: `List the user's Pantheon projects (customer avatar analyses). Call it first to get the project_id needed by get_strategic_avatar, run_sales…`
+- `run_ad_copilot`: `Rewrite an ad from the library into 3 copy variants for the user's audience, offer and brand voice. Uses 1 Ad Copilot credit. Runs in the b…`
+- `run_brand_campaign_analysis`: `Collect and analyze the ads of the user's own brand Facebook page. Uses 1 Brand Campaigns credit. Runs in the background: call get_job_stat…`
+- `run_competitor_spy`: `Collect and analyze every ad of a competitor's Facebook page from the Meta Ad Library. Uses 1 Competitor Spy credit. Runs in the background…`
+- `run_inspiration_search`: `Collect and analyze the ads of a Facebook page outside the user's niche, to borrow ideas from other markets. Uses 1 Inspiration Search cred…`
+- `run_magic_tool`: `Summarize or translate a text, or extract its contacts and links (Magic Tools). Summaries and extractions keep the language of the text; tr…`
+- `run_persuasion_analysis`: `Check a draft ad before launch: which persuasion biases it uses and which are missing, with suggestions. Uses 1 Persuasion Analysis credit.…`
+- `run_sales_psychology`: `Write a sales psychology report that matches a project's customer avatar with an Offer Brief. Uses 1 Sales Psychology credit. Runs in the b…`
+- `search_ads_library`: `Search the ads in the user's own Ads Library (ads collected by their searches) and this week's Top Ads by brand, niche, sector or ad copy.…`
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-14: [annotation changed, description changed, field changed, schema changed](../../deltas/2026-11-14/c385e5b261a52bf286e2.json): `244 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**
 
 ## Check it from your agent
 
