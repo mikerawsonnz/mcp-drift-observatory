@@ -6,12 +6,14 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.beatra.ai/mcp` | 37 | [`40fc38ef361a`](4f93d616eb97e76f800a.json) | 2026-11-13 |
+| `https://mcp.beatra.ai/mcp` | 43 | [`a966c276e9d4`](4f93d616eb97e76f800a.json) | 2026-11-15 |
 
 ## Tools at `https://mcp.beatra.ai/mcp`
 
 - `beatra.assets.upload`: `Create a short-lived upload grant for an image, audio, or video file. Follow the returned HTTP PUT instructions; its response returns the a…`
+- `beatra.audio.generate_sfx`: `Generate sound effects, foley, or looping ambient beds from a text prompt (0.5 to 30 seconds). This billable call consumes Beatra credits a…`
 - `beatra.audio.process`: `Process one audio file: trim, loop to a length, fade, normalize loudness, convert format, split into stems (vocals and accompaniment, or si…`
+- `beatra.audio.transcribe`: `Transcribe an audio file into timed text, speaker-labeled segments, detected audio events, and downloadable JSON, SRT, and VTT subtitle art…`
 - `beatra.avatars.list`: `List the portraits this account saved as avatars for talking-presenter videos, the default first, each with its image artifact and paired v…`
 - `beatra.avatars.save`: `Save one image already in this account as a named avatar the user can reuse in later sessions. Call only after the user agreed to save it a…`
 - `beatra.images.edit`: `Edit images[0] as the base image; later images are ordered references and optional regions use normalized coordinates. Omit model unless th…`
@@ -25,9 +27,12 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `beatra.social.execute`: `Look up public social data and create a task. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly o…`
 - `beatra.social.tools.get`: `Read one public social data tool, including its arguments, schema_hash, and credit price. This call is not billable.`
 - `beatra.social.tools.search`: `Search public social data tools by platform, keyword, or capability_family. This call is not billable.`
+- `beatra.speech.convert`: `Convert spoken audio into a target Beatra voice while preserving phrasing and timing. Requires a voice whose capabilities.supports_speech_t…`
 - `beatra.speech.prepare_script`: `Use before beatra.speech.synthesize to make speech sound natural and human. Beatra's Smart Voice Director reads the text and the user's opt…`
 - `beatra.speech.synthesize`: `Synthesize speech using a Beatra voice ID. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly once…`
-- `beatra.speech.validate`: `Check a speech request before paying for it: parse the markup, list warnings, count weighted characters, and return the credit price. This…`
+- `beatra.speech.synthesize_dialogue`: `Synthesize a multi-speaker dialogue from 2 to 50 ordered turns in one audio take (up to 10 unique voices including up to 4 ready cloned voi…`
+- `beatra.speech.validate`: `Check a speech request before paying for it: parse the markup, list warnings, count weighted characters, estimate speech duration, and retu…`
+- `beatra.speech.validate_dialogue`: `Check a multi-speaker dialogue request before paying for it: verify voice eligibility (supports_dialogue=true) and cloned-voice limits, par…`
 - `beatra.tasks.cancel`: `Cancel a task created by this MCP connection. In-flight work is canceled only when the remote stop is confirmed; a 409 means continue polli…`
 - `beatra.tasks.get`: `Read a Beatra task created by this MCP connection.`
 - `beatra.tasks.list`: `List recent Beatra tasks created by this MCP connection.`
@@ -42,7 +47,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `beatra.videos.understand`: `Answer questions about one video limited to 50 MiB and 360 seconds. Upload a local video with beatra.assets.upload first and pass it as an…`
 - `beatra.voices.activate`: `Activate a cloned voice whose clone result says activation is required (status pending_activation). Voices that are already ready, includin…`
 - `beatra.voices.clone`: `Clone a voice from a clean single-speaker sample. With the default engine (omit model or use 'auto') the cloned voice is ready for speech a…`
-- `beatra.voices.list`: `List preset and tenant-owned voices available for speech synthesis. By default only voices ready for speech are listed; pass status to incl…`
+- `beatra.voices.delete`: `Permanently delete one of this account's cloned voices using mandatory 2-step confirmation. Call first with voice_id alone (no confirmation…`
+- `beatra.voices.list`: `List preset and tenant-owned voices available for speech synthesis and speech-to-speech conversion, with bilingual search and capability fi…`
 - `beatra.voices.preview`: `Get or lazily synthesize a free fixed audition clip URL for a preset or account-owned cloned voice. Once generated for a cloned voice, the…`
 - `beatra.voices.update`: `Update one of this account's cloned voices (display_name, gender, age_group, use_case, persona, or language), or set/clear the account's de…`
 - `beatra.wallet.get`: `Read the current Beatra credit balance for this account, including the next expiring batch. Also returns how many unfinished creations this…`
@@ -50,6 +56,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-15: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-15/4f93d616eb97e76f800a.json): `6 tool(s) added; 486 field(s) changed`
 - 2026-11-13: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-13/4f93d616eb97e76f800a.json): `1 tool(s) added; 252 field(s) changed`
 - 2026-11-12: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-12/4f93d616eb97e76f800a.json): `2 tool(s) added; 107 field(s) changed`
 - 2026-11-09: [count changed, schema changed, tool added](../../deltas/2026-11-09/4f93d616eb97e76f800a.json): `1 tool(s) added; 3 field(s) changed`

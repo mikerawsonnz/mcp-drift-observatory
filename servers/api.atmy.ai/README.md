@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.atmy.ai/mcp` | 12 | [`67e215fb5694`](5f23f4a4f55342a166a0.json) | 2026-11-14 |
+| `https://api.atmy.ai/mcp` | 12 | [`30199f4358bf`](5f23f4a4f55342a166a0.json) | 2026-11-15 |
 
 ## Tools at `https://api.atmy.ai/mcp`
 
@@ -25,6 +25,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-15: [description changed](../../deltas/2026-11-15/5f23f4a4f55342a166a0.json): `1 field(s) changed`
 - 2026-11-14: [count changed, tool added](../../deltas/2026-11-14/5f23f4a4f55342a166a0.json): `1 tool(s) added`
 - 2026-11-09: [description changed, schema changed](../../deltas/2026-11-09/5f23f4a4f55342a166a0.json): `2 field(s) changed`
 - 2026-11-07: [description changed](../../deltas/2026-11-07/5f23f4a4f55342a166a0.json): `1 field(s) changed`

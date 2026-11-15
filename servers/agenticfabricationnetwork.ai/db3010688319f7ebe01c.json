@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "41955da04970e1ac055fd7befcfd5dd9e0e059e12f363385fef2acfb38bfa21f",
+  "full_hash": "663b89bb2720269c7c67be655a9c812e48b3b5ab7a625a61f4441e8ee73d2374",
   "name": "ai.agenticfabricationnetwork/ufp",
-  "observed_at": "2026-11-14T02:02:40.264815Z",
+  "observed_at": "2026-11-15T02:02:30.613451Z",
   "sources": [
     "official"
   ],
@@ -221,7 +221,7 @@
             "type": "boolean"
           },
           "inserts": {
-            "description": "PEM-style hardware inserts pressed into holes of a sheet-metal part — one record per hole. `insert` is the species (nut | flush_nut | standoff | blind_standoff | stud) and `thread` its size (\"M4\", \"1/4-20\"); both are required. When known, add length_mm (standoff/stud post length), the hole's center (located_at_mm, part's own mm frame), its axis, the drilled diameter, and `points` — the signed unit vector the insert's functional side faces (flip = negate). Pass these when the user asks for press-in nuts/standoffs/studs; vendors with a hardware service price them.",
+            "description": "PEM-style hardware inserts pressed into holes of a sheet-metal part — one record per hole. `insert` is the species (nut | flush_nut | standoff | blind_standoff | stud) and `thread` its size (\"M4\", \"1/4-20\"); both are required. When known, add length_mm (standoff/stud post length), the hole's center (located_at_mm, part's own mm frame), its axis, the drilled diameter, and `points` — the signed unit vector the insert's functional side faces (flip = negate). Pass these when the user asks for press-in nuts/standoffs/studs; sheet-metal shops with a hardware service price them, and every other shop — on every process, 3D printing and laser cutting included — is left out with the reason rather than pricing the part without its hardware.",
             "items": {
               "additionalProperties": false,
               "properties": {
@@ -387,7 +387,7 @@
             "type": "string"
           },
           "processes": {
-            "description": "Only quote these fabrication processes — a constraint that narrows the auto-routing fan. Friendly terms accepted (\"sheet metal\", \"3d printing\", \"cnc\", \"laser\"); unmappable terms are reported, never an error. Usually OMIT: auto-routing quotes every process that can make the file. Pass it only when the user explicitly limits the process",
+            "description": "Only quote these fabrication processes — a constraint that narrows the auto-routing fan. Friendly terms accepted (\"sheet metal\", \"3d printing\", \"cnc\", \"laser\"); unmappable terms are reported, never an error. Usually OMIT: auto-routing quotes every process that can make the file. Pass it only when the user explicitly limits the process. One exception, for a flat part: a sheet-metal shop that laser-cuts flat stock is still returned under [\"laser\"] — its offer keeps process \"sheetmetal\" and carries also_processes [\"laser_cut\"] (one offer, listed under both; never two)",
             "items": {
               "minLength": 1,
               "type": "string"
@@ -554,7 +554,7 @@
             "type": "boolean"
           },
           "tapping": {
-            "description": "Tapped (threaded) holes for a sheet-metal part — one record per hole the user wants threads cut into. `thread` is the callout in the user's words (\"M6\", \"M4 x 0.7\", \"1/4-20\") and is all that's required; when known, add the hole's center in the part's own mm frame (located_at_mm), its unit axis, the pre-tap drilled diameter, and depth_mm so the shop taps the right hole. Pass these when the user asks for threaded/tapped holes; vendors with a tapping service price them.",
+            "description": "Tapped (threaded) holes for a sheet-metal or CNC-machined part — one record per hole the user wants threads cut into. `thread` is the callout in the user's words (\"M6\", \"M4 x 0.7\", \"1/4-20\") and is all that's required; when known, add the hole's center in the part's own mm frame (located_at_mm), its unit axis, the pre-tap drilled diameter, and depth_mm so the shop taps the right hole. Pass these when the user asks for threaded/tapped holes; shops whose connector can price and order threads on that process price them, and every other shop — on every process, 3D printing and laser cutting included — is left out with the reason rather than pricing the part without its threads. Take the threads off to see prices without them.",
             "items": {
               "additionalProperties": false,
               "properties": {
@@ -875,7 +875,7 @@
           "inserts": {
             "anyOf": [
               {
-                "description": "PEM-style hardware inserts pressed into holes of a sheet-metal part — one record per hole. `insert` is the species (nut | flush_nut | standoff | blind_standoff | stud) and `thread` its size (\"M4\", \"1/4-20\"); both are required. When known, add length_mm (standoff/stud post length), the hole's center (located_at_mm, part's own mm frame), its axis, the drilled diameter, and `points` — the signed unit vector the insert's functional side faces (flip = negate). Pass these when the user asks for press-in nuts/standoffs/studs; vendors with a hardware service price them.",
+                "description": "PEM-style hardware inserts pressed into holes of a sheet-metal part — one record per hole. `insert` is the species (nut | flush_nut | standoff | blind_standoff | stud) and `thread` its size (\"M4\", \"1/4-20\"); both are required. When known, add length_mm (standoff/stud post length), the hole's center (located_at_mm, part's own mm frame), its axis, the drilled diameter, and `points` — the signed unit vector the insert's functional side faces (flip = negate). Pass these when the user asks for press-in nuts/standoffs/studs; sheet-metal shops with a hardware service price them, and every other shop — on every process, 3D printing and laser cutting included — is left out with the reason rather than pricing the part without its hardware.",
                 "items": {
                   "additionalProperties": false,
                   "properties": {
@@ -997,7 +997,7 @@
             "type": "boolean"
           },
           "processes": {
-            "description": "Narrow this quote to specific fabrication processes (\"no, I meant in sheet metal\" → [\"sheet metal\"]). A CONSTRAINT, not a new quote: excluded lanes drop while warm vendor sessions survive, and further refines inherit the filter. Friendly terms accepted (\"sheet metal\", \"3d printing\", \"cnc\", \"laser\"); pass [\"any\"] to clear the filter and show every process again. When comparison scenarios are open and the user narrows the process, re-refine EVERY active scenario label with this same arg so all columns prune together",
+            "description": "Narrow this quote to specific fabrication processes (\"no, I meant in sheet metal\" → [\"sheet metal\"]). A CONSTRAINT, not a new quote: excluded lanes drop while warm vendor sessions survive, and further refines inherit the filter. Friendly terms accepted (\"sheet metal\", \"3d printing\", \"cnc\", \"laser\"); pass [\"any\"] to clear the filter and show every process again. When comparison scenarios are open and the user narrows the process, re-refine EVERY active scenario label with this same arg so all columns prune together. One exception, for a flat part: a sheet-metal shop that laser-cuts flat stock is still returned under [\"laser\"] — its offer keeps process \"sheetmetal\" and carries also_processes [\"laser_cut\"] (one offer, listed under both; never two)",
             "items": {
               "minLength": 1,
               "type": "string"
@@ -1254,7 +1254,7 @@
           "tapping": {
             "anyOf": [
               {
-                "description": "Tapped (threaded) holes for a sheet-metal part — one record per hole the user wants threads cut into. `thread` is the callout in the user's words (\"M6\", \"M4 x 0.7\", \"1/4-20\") and is all that's required; when known, add the hole's center in the part's own mm frame (located_at_mm), its unit axis, the pre-tap drilled diameter, and depth_mm so the shop taps the right hole. Pass these when the user asks for threaded/tapped holes; vendors with a tapping service price them.",
+                "description": "Tapped (threaded) holes for a sheet-metal or CNC-machined part — one record per hole the user wants threads cut into. `thread` is the callout in the user's words (\"M6\", \"M4 x 0.7\", \"1/4-20\") and is all that's required; when known, add the hole's center in the part's own mm frame (located_at_mm), its unit axis, the pre-tap drilled diameter, and depth_mm so the shop taps the right hole. Pass these when the user asks for threaded/tapped holes; shops whose connector can price and order threads on that process price them, and every other shop — on every process, 3D printing and laser cutting included — is left out with the reason rather than pricing the part without its threads. Take the threads off to see prices without them.",
                 "items": {
                   "additionalProperties": false,
                   "properties": {
@@ -1578,7 +1578,7 @@
           "inserts": {
             "anyOf": [
               {
-                "description": "PEM-style hardware inserts pressed into holes of a sheet-metal part — one record per hole. `insert` is the species (nut | flush_nut | standoff | blind_standoff | stud) and `thread` its size (\"M4\", \"1/4-20\"); both are required. When known, add length_mm (standoff/stud post length), the hole's center (located_at_mm, part's own mm frame), its axis, the drilled diameter, and `points` — the signed unit vector the insert's functional side faces (flip = negate). Pass these when the user asks for press-in nuts/standoffs/studs; vendors with a hardware service price them.",
+                "description": "PEM-style hardware inserts pressed into holes of a sheet-metal part — one record per hole. `insert` is the species (nut | flush_nut | standoff | blind_standoff | stud) and `thread` its size (\"M4\", \"1/4-20\"); both are required. When known, add length_mm (standoff/stud post length), the hole's center (located_at_mm, part's own mm frame), its axis, the drilled diameter, and `points` — the signed unit vector the insert's functional side faces (flip = negate). Pass these when the user asks for press-in nuts/standoffs/studs; sheet-metal shops with a hardware service price them, and every other shop — on every process, 3D printing and laser cutting included — is left out with the reason rather than pricing the part without its hardware.",
                 "items": {
                   "additionalProperties": false,
                   "properties": {
@@ -1700,7 +1700,7 @@
             "type": "boolean"
           },
           "processes": {
-            "description": "Narrow this quote to specific fabrication processes (\"no, I meant in sheet metal\" → [\"sheet metal\"]). A CONSTRAINT, not a new quote: excluded lanes drop while warm vendor sessions survive, and further refines inherit the filter. Friendly terms accepted (\"sheet metal\", \"3d printing\", \"cnc\", \"laser\"); pass [\"any\"] to clear the filter and show every process again. When comparison scenarios are open and the user narrows the process, re-refine EVERY active scenario label with this same arg so all columns prune together",
+            "description": "Narrow this quote to specific fabrication processes (\"no, I meant in sheet metal\" → [\"sheet metal\"]). A CONSTRAINT, not a new quote: excluded lanes drop while warm vendor sessions survive, and further refines inherit the filter. Friendly terms accepted (\"sheet metal\", \"3d printing\", \"cnc\", \"laser\"); pass [\"any\"] to clear the filter and show every process again. When comparison scenarios are open and the user narrows the process, re-refine EVERY active scenario label with this same arg so all columns prune together. One exception, for a flat part: a sheet-metal shop that laser-cuts flat stock is still returned under [\"laser\"] — its offer keeps process \"sheetmetal\" and carries also_processes [\"laser_cut\"] (one offer, listed under both; never two)",
             "items": {
               "minLength": 1,
               "type": "string"
@@ -1957,7 +1957,7 @@
           "tapping": {
             "anyOf": [
               {
-                "description": "Tapped (threaded) holes for a sheet-metal part — one record per hole the user wants threads cut into. `thread` is the callout in the user's words (\"M6\", \"M4 x 0.7\", \"1/4-20\") and is all that's required; when known, add the hole's center in the part's own mm frame (located_at_mm), its unit axis, the pre-tap drilled diameter, and depth_mm so the shop taps the right hole. Pass these when the user asks for threaded/tapped holes; vendors with a tapping service price them.",
+                "description": "Tapped (threaded) holes for a sheet-metal or CNC-machined part — one record per hole the user wants threads cut into. `thread` is the callout in the user's words (\"M6\", \"M4 x 0.7\", \"1/4-20\") and is all that's required; when known, add the hole's center in the part's own mm frame (located_at_mm), its unit axis, the pre-tap drilled diameter, and depth_mm so the shop taps the right hole. Pass these when the user asks for threaded/tapped holes; shops whose connector can price and order threads on that process price them, and every other shop — on every process, 3D printing and laser cutting included — is left out with the reason rather than pricing the part without its threads. Take the threads off to see prices without them.",
                 "items": {
                   "additionalProperties": false,
                   "properties": {
@@ -2803,7 +2803,7 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
-      "description": "The LIVE catalog of what the fabrication network can do RIGHT NOW — no quote needed. Returns the services ledger (tapping, inserts, welding, bending, finishes… with each shop's own size/material/thickness windows), the network's sheet gauge ladder, the stocked hardware combinations (species x thread) with stocked lengths and shop counts — the most-stocked length is the steering default for an unspecified length — the finish options with their stocked color menus, and per-process manufacturability rules. This is live state, not a spec sheet: it changes as connectors join, leave, or have capability branches toggled, so call it fresh when the user asks what's possible (materials, gauges, hardware, colors, services) rather than answering from memory.",
+      "description": "The LIVE catalog of what the fabrication network can do RIGHT NOW — no quote needed. Returns the services ledger (tapping, inserts, welding, bending, finishes… with each shop's own size/material/thickness windows), the network's sheet gauge ladder, the stocked hardware combinations (species x thread) with stocked lengths and shop counts — the most-stocked length is the steering default for an unspecified length — the finish options with their stocked color menus, every colour the network can make a part in (network_catalog.colors: per colour family, how many shops stock a material in it and how many coat in it, with the shades — ask for one by passing the family word as `color` with no finish), the material groups a picker shows (network_catalog.material_groups: Plastics, Metals, Woods, Foams, Rubbers, Composites, Paper cork and fabric… with the stock families live under each and the words that ask for them), and per-process manufacturability rules. This is live state, not a spec sheet: it changes as connectors join, leave, or have capability branches toggled, so call it fresh when the user asks what's possible (materials, gauges, hardware, colors, services) rather than answering from memory.",
       "execution": {
         "taskSupport": "forbidden"
       },

@@ -1,0 +1,591 @@
+{
+  "canon_version": "1",
+  "full_hash": "276c5a2b363e103dd3911012f414272375f2807b4bb80dc1ae6b269405181d4e",
+  "name": "ai.arcangel/trademark-search",
+  "observed_at": "2026-11-15T02:02:33.662156Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 3,
+  "tools": [
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "bot:read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Check trademark availability"
+      },
+      "description": "Check whether a brand, product or company name is available as a trademark. Searches the USPTO register and scores similar marks by conflict risk. Free, no account needed. Signed-in Arcangel users can set full_report for a full clearance search (US + EU/WIPO, dead marks, domains, common-law). Results include a link to file the trademark with Arcangel AI.",
+      "icons": [
+        {
+          "mimeType": "image/png",
+          "sizes": [
+            "750x750"
+          ],
+          "src": "https://www.arcangel.ai/apple-touch-icon.png"
+        }
+      ],
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "classes": {
+            "description": "Nice classes (1-45). Use suggest_nice_classes if unsure.",
+            "items": {
+              "maximum": 45,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "maxItems": 10,
+            "type": "array"
+          },
+          "full_report": {
+            "description": "Full clearance report. Requires Sign in with Arcangel.",
+            "type": "boolean"
+          },
+          "goods_services": {
+            "description": "What the mark will be used for, e.g. \"organic skincare\". Improves class matching.",
+            "maxLength": 500,
+            "type": "string"
+          },
+          "mark": {
+            "description": "The word mark to check, e.g. \"Lumora\".",
+            "maxLength": 120,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "mark"
+        ],
+        "type": "object"
+      },
+      "name": "check_trademark",
+      "outputSchema": {
+        "properties": {
+          "conflicts": {
+            "description": "Closest conflicts, highest risk first.",
+            "items": {
+              "properties": {
+                "classes": {
+                  "description": "Nice classes, e.g. \"IC 042\".",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "mark": {
+                  "type": "string"
+                },
+                "owner": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "register": {
+                  "description": "Source register, e.g. USPTO, EUIPO, WIPO.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "risk": {
+                  "description": "CRITICAL, HIGH, MEDIUM, LOW or INFO.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "serial": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "status": {
+                  "description": "Register status, e.g. REGISTERED or a pending status.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "url": {
+                  "description": "Public record link.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "mark",
+                "risk",
+                "status",
+                "owner",
+                "classes",
+                "register",
+                "serial",
+                "url"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "conflicts_total": {
+            "description": "All conflicts found, across every part.",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "file_url": {
+            "description": "Link to file this mark with Arcangel AI.",
+            "type": "string"
+          },
+          "highest_risk": {
+            "enum": [
+              "CRITICAL",
+              "HIGH",
+              "MEDIUM",
+              "LOW",
+              "INFO",
+              null
+            ],
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "mark": {
+            "type": "string"
+          },
+          "part": {
+            "description": "Which part of the report this is.",
+            "minimum": 1,
+            "type": "integer"
+          },
+          "parts": {
+            "description": "How many parts the report has. If part < parts, call get_trademark_check with part + 1.",
+            "minimum": 1,
+            "type": "integer"
+          },
+          "report": {
+            "enum": [
+              "quick",
+              "full"
+            ],
+            "type": "string"
+          },
+          "retry_after_seconds": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "risk_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "Number of conflicting marks per risk level.",
+            "type": "object"
+          },
+          "scope": {
+            "description": "What was searched.",
+            "type": "string"
+          },
+          "search_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "signed_in": {
+            "description": "Whether the caller is signed in with Arcangel (needed for full reports).",
+            "type": "boolean"
+          },
+          "status": {
+            "description": "running: call get_trademark_check with search_id after retry_after_seconds.",
+            "enum": [
+              "complete",
+              "running"
+            ],
+            "type": "string"
+          },
+          "verdict": {
+            "description": "Plain-language summary of the register findings.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "mark",
+          "status",
+          "report",
+          "scope",
+          "verdict",
+          "highest_risk",
+          "risk_counts",
+          "conflicts",
+          "search_id",
+          "retry_after_seconds",
+          "signed_in",
+          "file_url",
+          "part",
+          "parts",
+          "conflicts_total"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "bot:read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Check trademark availability"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          },
+          {
+            "scopes": [
+              "bot:read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Get a trademark check result"
+      },
+      "description": "Get the result of a trademark check that was still running, or the next part of a long full report. Pass the search_id that check_trademark returned, and part when the report says it continues.",
+      "icons": [
+        {
+          "mimeType": "image/png",
+          "sizes": [
+            "750x750"
+          ],
+          "src": "https://www.arcangel.ai/apple-touch-icon.png"
+        }
+      ],
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "part": {
+            "description": "Which part of a long full report to return. Defaults to 1.",
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "search_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "search_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_trademark_check",
+      "outputSchema": {
+        "properties": {
+          "conflicts": {
+            "description": "Closest conflicts, highest risk first.",
+            "items": {
+              "properties": {
+                "classes": {
+                  "description": "Nice classes, e.g. \"IC 042\".",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "mark": {
+                  "type": "string"
+                },
+                "owner": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "register": {
+                  "description": "Source register, e.g. USPTO, EUIPO, WIPO.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "risk": {
+                  "description": "CRITICAL, HIGH, MEDIUM, LOW or INFO.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "serial": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "status": {
+                  "description": "Register status, e.g. REGISTERED or a pending status.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "url": {
+                  "description": "Public record link.",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "mark",
+                "risk",
+                "status",
+                "owner",
+                "classes",
+                "register",
+                "serial",
+                "url"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "conflicts_total": {
+            "description": "All conflicts found, across every part.",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "file_url": {
+            "description": "Link to file this mark with Arcangel AI.",
+            "type": "string"
+          },
+          "highest_risk": {
+            "enum": [
+              "CRITICAL",
+              "HIGH",
+              "MEDIUM",
+              "LOW",
+              "INFO",
+              null
+            ],
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "mark": {
+            "type": "string"
+          },
+          "part": {
+            "description": "Which part of the report this is.",
+            "minimum": 1,
+            "type": "integer"
+          },
+          "parts": {
+            "description": "How many parts the report has. If part < parts, call get_trademark_check with part + 1.",
+            "minimum": 1,
+            "type": "integer"
+          },
+          "report": {
+            "enum": [
+              "quick",
+              "full"
+            ],
+            "type": "string"
+          },
+          "retry_after_seconds": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "risk_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "Number of conflicting marks per risk level.",
+            "type": "object"
+          },
+          "scope": {
+            "description": "What was searched.",
+            "type": "string"
+          },
+          "search_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "signed_in": {
+            "description": "Whether the caller is signed in with Arcangel (needed for full reports).",
+            "type": "boolean"
+          },
+          "status": {
+            "description": "running: call get_trademark_check with search_id after retry_after_seconds.",
+            "enum": [
+              "complete",
+              "running"
+            ],
+            "type": "string"
+          },
+          "verdict": {
+            "description": "Plain-language summary of the register findings.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "mark",
+          "status",
+          "report",
+          "scope",
+          "verdict",
+          "highest_risk",
+          "risk_counts",
+          "conflicts",
+          "search_id",
+          "retry_after_seconds",
+          "signed_in",
+          "file_url",
+          "part",
+          "parts",
+          "conflicts_total"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        },
+        {
+          "scopes": [
+            "bot:read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Get a trademark check result"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "type": "noauth"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Suggest trademark classes"
+      },
+      "description": "Suggest trademark (Nice) classes for a description of goods or services, e.g. \"mobile app for booking yoga classes\".",
+      "icons": [
+        {
+          "mimeType": "image/png",
+          "sizes": [
+            "750x750"
+          ],
+          "src": "https://www.arcangel.ai/apple-touch-icon.png"
+        }
+      ],
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "maxLength": 500,
+            "minLength": 3,
+            "type": "string"
+          }
+        },
+        "required": [
+          "description"
+        ],
+        "type": "object"
+      },
+      "name": "suggest_nice_classes",
+      "outputSchema": {
+        "properties": {
+          "classes": {
+            "items": {
+              "properties": {
+                "class": {
+                  "maximum": 45,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "class",
+                "name"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "description",
+          "classes"
+        ],
+        "type": "object"
+      },
+      "securitySchemes": [
+        {
+          "type": "noauth"
+        }
+      ],
+      "title": "Suggest trademark classes"
+    }
+  ],
+  "url": "https://mcp.arcangel.ai/trademark"
+}

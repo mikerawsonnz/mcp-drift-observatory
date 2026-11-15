@@ -1,6 +1,6 @@
 # Observed MCP servers
 
-463 hosts whose MCP tool declarations we have observed. Each page lists the declared tools, every observed change, and an Atom feed of changes to that server.
+465 hosts whose MCP tool declarations we have observed. Each page lists the declared tools, every observed change, and an Atom feed of changes to that server.
 
 Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_alerts
 
@@ -145,7 +145,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [blipsmith.ai](blipsmith.ai/) (5 tools)
 - [boltclaw.ai](boltclaw.ai/) (2 tools)
 - [boolsai.ai](boolsai.ai/) (2 tools)
-- [booqer.ai](booqer.ai/) (8 tools)
+- [booqer.ai](booqer.ai/) (9 tools)
 - [botappetit.ai](botappetit.ai/) (14 tools)
 - [bounty.brevium.ai](bounty.brevium.ai/) (13 tools)
 - [brainz.brownmatter.ai](brainz.brownmatter.ai/) (17 tools)
@@ -305,13 +305,14 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [mcp.ahel.ai](mcp.ahel.ai/) (11 tools)
 - [mcp.airshelf.ai](mcp.airshelf.ai/) (8 tools)
 - [mcp.alphacreek.ai](mcp.alphacreek.ai/) (5 tools)
+- [mcp.arcangel.ai](mcp.arcangel.ai/) (3 tools)
 - [mcp.arvx.ai](mcp.arvx.ai/) (3 tools)
 - [mcp.askwatch.ai](mcp.askwatch.ai/) (11 tools)
 - [mcp.augmap.ai](mcp.augmap.ai/) (10 tools)
 - [mcp.auralogs.ai](mcp.auralogs.ai/) (7 tools)
 - [mcp.bamf.ai](mcp.bamf.ai/) (177 tools)
 - [mcp.bcited.ai](mcp.bcited.ai/) (6 tools)
-- [mcp.beatra.ai](mcp.beatra.ai/) (37 tools)
+- [mcp.beatra.ai](mcp.beatra.ai/) (43 tools)
 - [mcp.bev-buyer.ai](mcp.bev-buyer.ai/) (9 tools)
 - [mcp.bev-cuvee.org](mcp.bev-cuvee.org/) (2 tools)
 - [mcp.biel.ai](mcp.biel.ai/) (1 tools)
@@ -326,6 +327,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [mcp.datadubai.ae](mcp.datadubai.ae/) (6 tools)
 - [mcp.demanddiscovery.ai](mcp.demanddiscovery.ai/) (10 tools)
 - [mcp.deployit.ai](mcp.deployit.ai/) (3 tools)
+- [mcp.discond.ae](mcp.discond.ae/) (8 tools)
 - [mcp.djzs.ai](mcp.djzs.ai/) (4 tools)
 - [mcp.dotsy.ai](mcp.dotsy.ai/) (91 tools)
 - [mcp.dreamlit.ai](mcp.dreamlit.ai/) (12 tools)

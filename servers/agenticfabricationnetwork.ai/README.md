@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://agenticfabricationnetwork.ai/mcp` | 22 | [`41955da04970`](db3010688319f7ebe01c.json) | 2026-11-14 |
+| `https://agenticfabricationnetwork.ai/mcp` | 22 | [`663b89bb2720`](db3010688319f7ebe01c.json) | 2026-11-15 |
 
 ## Tools at `https://agenticfabricationnetwork.ai/mcp`
 
@@ -35,6 +35,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-15: [description changed, schema changed](../../deltas/2026-11-15/db3010688319f7ebe01c.json): `10 field(s) changed`
 - 2026-11-14: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-14/db3010688319f7ebe01c.json): `8 tool(s) added; 232 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**
 - 2026-11-11: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-11/db3010688319f7ebe01c.json): `2 tool(s) added; 13 field(s) changed`
 - 2026-11-06: [annotation changed, description changed, schema changed](../../deltas/2026-11-06/db3010688319f7ebe01c.json): `460 field(s) changed`

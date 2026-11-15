@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://beliefstate.ai/v1/research/mcp` | 23 | [`689c1a888bad`](d29176e06366706dabab.json) | 2026-11-14 |
+| `https://beliefstate.ai/v1/research/mcp` | 23 | [`568343dc0d95`](d29176e06366706dabab.json) | 2026-11-15 |
 
 ## Tools at `https://beliefstate.ai/v1/research/mcp`
 
@@ -16,7 +16,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_catalysts`: `Retrieves evidence-linked catalysts for one company, research subject, investment case or the explicitly selected released corpus. Returns…`
 - `get_changes`: `Retrieves the ordered research change journal for a company, subject, case or explicitly selected released corpus. Returns dated events, ci…`
 - `get_companies`: `Find SEC-registered U.S. companies and selected verified international listings by symbol or name. Search by market, sector or exchange-qua…`
-- `get_company_facts`: `Retrieves retained financial facts, company references, segment metrics, operating KPIs and management guidance for one ticker. Select reco…`
+- `get_company_facts`: `Returns retained financial facts, company references, segment metrics, operating KPIs, management guidance and site milestones for one tick…`
 - `get_comparison`: `Retrieves a cited engine comparison of two distinct investment cases using their returned belief_id and compare_to_belief_id. Returns a cit…`
 - `get_context_assessment`: `Retrieves a dated engine context assessment by its returned assessment identifier, including permitted supporting evidence and coverage lim…`
 - `get_economic_calendar`: `Retrieves retained US economic events in one ticker research scope. Filter by event text, region, scheduled/reported/unconfirmed state and…`
@@ -36,6 +36,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-15: [description changed, schema changed](../../deltas/2026-11-15/d29176e06366706dabab.json): `2720 field(s) changed; signals: length_more_than_doubled, url_introduced`
 - 2026-11-14: [description changed, schema changed](../../deltas/2026-11-14/d29176e06366706dabab.json): `8006 field(s) changed; signals: length_more_than_doubled, url_introduced`
 - 2026-11-12: [schema changed](../../deltas/2026-11-12/d29176e06366706dabab.json): `3 field(s) changed`
 - 2026-11-11: [description changed, schema changed](../../deltas/2026-11-11/d29176e06366706dabab.json): `6011 field(s) changed; signals: length_more_than_doubled`

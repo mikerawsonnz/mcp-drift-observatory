@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.projectory.ae/mcp` | 6 | [`09d964fdb296`](fc2bf3f491231659286d.json) | 2026-11-03 |
+| `https://mcp.projectory.ae/mcp` | 6 | [`9396c3af55d5`](fc2bf3f491231659286d.json) | 2026-11-15 |
 
 ## Tools at `https://mcp.projectory.ae/mcp`
 
@@ -19,6 +19,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-15: [schema changed](../../deltas/2026-11-15/fc2bf3f491231659286d.json): `172 field(s) changed`
 - 2026-11-03: [count changed, tool added](../../deltas/2026-11-03/fc2bf3f491231659286d.json): `1 tool(s) added`
 
 ## Check it from your agent

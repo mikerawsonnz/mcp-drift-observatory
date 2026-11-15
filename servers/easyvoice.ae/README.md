@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://easyvoice.ae/api/mcp` | 7 | [`2aeacd40cba6`](193ec671f4b3c2ec3e1e.json) | 2026-10-27 |
+| `https://easyvoice.ae/api/mcp` | 7 | [`b39e461e60cc`](193ec671f4b3c2ec3e1e.json) | 2026-11-15 |
 
 ## Tools at `https://easyvoice.ae/api/mcp`
 
@@ -20,6 +20,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-15: [description changed](../../deltas/2026-11-15/193ec671f4b3c2ec3e1e.json): `1 field(s) changed`
 - 2026-10-27: [description changed, schema changed](../../deltas/2026-10-27/193ec671f4b3c2ec3e1e.json): `3 field(s) changed`
 - 2026-10-14: [description changed](../../deltas/2026-10-14/193ec671f4b3c2ec3e1e.json): `1 field(s) changed`
 
