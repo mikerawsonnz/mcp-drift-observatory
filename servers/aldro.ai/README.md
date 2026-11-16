@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://aldro.ai/mcp` | 8 | [`a3b5411b2b0f`](e2b5a9da07e20c62109e.json) | 2026-11-01 |
+| `https://aldro.ai/mcp` | 8 | [`42ef28a2bac9`](e2b5a9da07e20c62109e.json) | 2026-11-16 |
 
 ## Tools at `https://aldro.ai/mcp`
 
@@ -21,7 +21,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-16: [description changed](../../deltas/2026-11-16/e2b5a9da07e20c62109e.json): `1 field(s) changed`
 
 ## Check it from your agent
 

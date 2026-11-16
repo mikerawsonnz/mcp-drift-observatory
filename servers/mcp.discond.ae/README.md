@@ -6,22 +6,23 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.discond.ae/mcp` | 8 | [`0c398ab50b03`](cd7db03de9f0ecc82710.json) | 2026-11-15 |
+| `https://mcp.discond.ae/mcp` | 9 | [`6ee7bd3607ba`](cd7db03de9f0ecc82710.json) | 2026-11-16 |
 
 ## Tools at `https://mcp.discond.ae/mcp`
 
 - `discond_autocomplete_businesses`: `Typo-tolerant autocomplete of UAE merchant names on Discond. Returns matching merchant ids and names for partial or misspelled input.`
 - `discond_find_discounts`: `Search UAE merchants with live discounts on Discond by free text, place (emirate or area such as "Dubai Marina"), coordinates, discount pro…`
+- `discond_find_venues`: `Find UAE restaurants, cafés and other venues near an area or landmark (e.g. "Burj Khalifa", "Dubai Marina", "Yas Island") that fit a cuisin…`
 - `discond_get_business`: `Get one Discond merchant by id: name, categories, providers and link. When the user is signed in to Discond, its top live offers are includ…`
 - `discond_get_offer`: `Get one Discond offer by id: headline, terms, validity and redeem links. Requires the user to be signed in to Discond.`
 - `discond_list_categories`: `List Discond merchant categories with ids, optionally filtered by name.`
 - `discond_list_offers`: `List live Discond offers, filtered by merchant, branch, provider, category, validity or online-only, sorted by newest, expiring or biggest…`
 - `discond_list_providers`: `List the discount providers Discond covers (for example Fazaa, The Entertainer, Talabat) with ids and offer counts, optionally filtered by…`
-- `discond_resolve_place`: `Resolve a UAE place name to Discond place ids (emirate, community, settlement) or to a known area. A known area has level "area" and id 0;…`
+- `discond_resolve_place`: `Resolve a UAE place name to Discond place ids (emirate, community, settlement) or to a known area. A known area or landmark (Burj Khalifa,…`
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-16: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-16/cd7db03de9f0ecc82710.json): `1 tool(s) added; 3 field(s) changed`
 
 ## Check it from your agent
 

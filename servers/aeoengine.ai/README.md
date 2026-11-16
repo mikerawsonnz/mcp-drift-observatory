@@ -6,16 +6,18 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://aeoengine.ai/mcp` | 2 | [`53b5b43f0ce5`](b4551d53f9e6ab4923f1.json) | 2026-10-28 |
+| `https://aeoengine.ai/mcp` | 4 | [`ab40a7b301c8`](b4551d53f9e6ab4923f1.json) | 2026-11-16 |
 
 ## Tools at `https://aeoengine.ai/mcp`
 
 - `get_aeo_report_status`: `Poll a previously submitted AEO report job once. status is queued, preparing, needs_review or running (keep polling) or complete, partial o…`
 - `run_aeo_report`: `Run the free AI-visibility report for a website (ChatGPT, Perplexity, Gemini, Claude coverage, competitor gaps, prioritized fixes). Require…`
+- `site_audit_get`: `Read a site audit started with site_audit_start. format json (the default) returns the status and the report JSON. format md returns the Ma…`
+- `site_audit_start`: `Start a site audit for one public page. Returns audit_id; poll it with site_audit_get. Requires an agency key (the same key as run_aeo_repo…`
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-16: [count changed, tool added](../../deltas/2026-11-16/b4551d53f9e6ab4923f1.json): `2 tool(s) added`
 
 ## Check it from your agent
 

@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.pantheon.ad/mcp` | 23 | [`02397adf7e8f`](c385e5b261a52bf286e2.json) | 2026-11-14 |
+| `https://mcp.pantheon.ad/mcp` | 29 | [`8679d54fcb3f`](c385e5b261a52bf286e2.json) | 2026-11-16 |
 
 ## Tools at `https://mcp.pantheon.ad/mcp`
 
@@ -16,14 +16,18 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_active_ads_copy`: `Get the copy (body text, caption and call to action) of the ads currently running on the Facebook pages the user follows. Use it to study w…`
 - `get_competitor_active_ads`: `Get up to 20 ads currently running for a competitor the user analyzed with Competitor Spy, found by page name.`
 - `get_creative_analysis`: `Read the saved AI analysis of one ad (awareness level, hooks, mechanism, emotional triggers, landing page coherence). Only available after…`
+- `get_followed_creators_contents`: `Viral Content: posts of the creators the user follows, newest first (24 per page). times_author_median is how many times the post beat the…`
 - `get_job_status`: `Check a background job started by an action tool and get its result when it is done. Call it again later while the status is running or pen…`
 - `get_market_creators_data`: `Get summary statistics for the Facebook pages the user follows in Pantheon: total and active ads, audience, format mix and niche. Use it to…`
 - `get_saved_ads`: `Get up to 20 ads from the pages in the user's swipe file, optionally only those of one competitor. Includes media links and whether each ad…`
 - `get_strategic_avatar`: `Read the customer avatar research of a project: pain matrix, core wound, desire chain, objections, triggers, customer language and strategi…`
 - `get_top_performing_ads`: `Get the longest-running ads of the Facebook pages the user follows. An ad that keeps running for months is usually profitable, so these are…`
+- `get_viral_content`: `Viral Content: one post (caption, metrics) with the user's saved analysis in that language, if any, and the vocabulary of persuasion mechan…`
 - `list_analyzed_pages`: `List the Facebook pages the user analyzed in one section of Pantheon (competitors, inspiration or own brand campaigns), with analysis statu…`
 - `list_brand_voices`: `List the Brand Voices saved in the user's account. Use the ids with run_ad_copilot.`
+- `list_followed_creators`: `Viral Content: the creators the user follows (platform, author_key, name, number of collected posts, last post date) and their follow limit.`
 - `list_offer_briefs`: `List the Offer Briefs saved in the user's account. Use the ids with run_ad_copilot and run_sales_psychology.`
+- `list_pantheon_inbox`: `Links the user sent to the Pantheon Whiteboard inbox and has not used yet (newest first).`
 - `list_projects`: `List the user's Pantheon projects (customer avatar analyses). Call it first to get the project_id needed by get_strategic_avatar, run_sales…`
 - `run_ad_copilot`: `Rewrite an ad from the library into 3 copy variants for the user's audience, offer and brand voice. Uses 1 Ad Copilot credit. Runs in the b…`
 - `run_brand_campaign_analysis`: `Collect and analyze the ads of the user's own brand Facebook page. Uses 1 Brand Campaigns credit. Runs in the background: call get_job_stat…`
@@ -32,10 +36,13 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `run_magic_tool`: `Summarize or translate a text, or extract its contacts and links (Magic Tools). Summaries and extractions keep the language of the text; tr…`
 - `run_persuasion_analysis`: `Check a draft ad before launch: which persuasion biases it uses and which are missing, with suggestions. Uses 1 Persuasion Analysis credit.…`
 - `run_sales_psychology`: `Write a sales psychology report that matches a project's customer avatar with an Offer Brief. Uses 1 Sales Psychology credit. Runs in the b…`
+- `save_viral_analysis`: `Viral Content: save your 'why it works' analysis of a post (from get_viral_content) for the user, in one language. It appears in the app on…`
 - `search_ads_library`: `Search the ads in the user's own Ads Library (ads collected by their searches) and this week's Top Ads by brand, niche, sector or ad copy.…`
+- `send_to_pantheon`: `Send a link to the user's Pantheon. Without a destination Pantheon picks it from the link: a TikTok, Instagram, YouTube or LinkedIn profile…`
 
 ## Changes
 
+- 2026-11-16: [count changed, tool added](../../deltas/2026-11-16/c385e5b261a52bf286e2.json): `6 tool(s) added`
 - 2026-11-14: [annotation changed, description changed, field changed, schema changed](../../deltas/2026-11-14/c385e5b261a52bf286e2.json): `244 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**
 
 ## Check it from your agent

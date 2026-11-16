@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://app.annsa.ai/mcp` | 8 | [`06649c879a2f`](59d41e60a9e6430b00b0.json) | 2026-11-14 |
+| `https://app.annsa.ai/mcp` | 8 | [`c33bd8064ac7`](59d41e60a9e6430b00b0.json) | 2026-11-16 |
 
 ## Tools at `https://app.annsa.ai/mcp`
 
@@ -21,6 +21,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-16: [description changed, schema changed](../../deltas/2026-11-16/59d41e60a9e6430b00b0.json): `64 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-14: [field changed, schema changed](../../deltas/2026-11-14/59d41e60a9e6430b00b0.json): `17 field(s) changed`
 - 2026-11-13: [schema changed](../../deltas/2026-11-13/59d41e60a9e6430b00b0.json): `25 field(s) changed`
 - 2026-11-12: [schema changed](../../deltas/2026-11-12/59d41e60a9e6430b00b0.json): `10 field(s) changed`

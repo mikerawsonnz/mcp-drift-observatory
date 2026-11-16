@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.alphabazaar.ai/mcp` | 24 | [`96df9cf6beb9`](9edc0fb290126b4b5256.json) | 2026-11-13 |
+| `https://api.alphabazaar.ai/mcp` | 24 | [`6d997e47cc9f`](9edc0fb290126b4b5256.json) | 2026-11-16 |
 
 ## Tools at `https://api.alphabazaar.ai/mcp`
 
@@ -37,6 +37,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-16: [description changed](../../deltas/2026-11-16/9edc0fb290126b4b5256.json): `2 field(s) changed`
 - 2026-11-13: [description changed](../../deltas/2026-11-13/9edc0fb290126b4b5256.json): `1 field(s) changed`
 - 2026-11-10: [description changed, schema changed](../../deltas/2026-11-10/9edc0fb290126b4b5256.json): `12 field(s) changed; signals: url_introduced`
 - 2026-11-08: [description changed](../../deltas/2026-11-08/9edc0fb290126b4b5256.json): `1 field(s) changed`

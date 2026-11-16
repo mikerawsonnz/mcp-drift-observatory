@@ -6,8 +6,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.bowmark.ai/mcp` | 29 | [`6f1e6016d17a`](5f2d24be930573ed8878.json) | 2026-11-14 |
-| `https://api.bowmark.ai/mcp/registry` | 29 | [`6f1e6016d17a`](e742a173e323c903336e.json) | 2026-11-14 |
+| `https://api.bowmark.ai/mcp` | 29 | [`37311032d446`](5f2d24be930573ed8878.json) | 2026-11-16 |
+| `https://api.bowmark.ai/mcp/registry` | 29 | [`37311032d446`](e742a173e323c903336e.json) | 2026-11-16 |
 
 ## Tools at `https://api.bowmark.ai/mcp`
 
@@ -75,6 +75,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-16: [description changed, schema changed](../../deltas/2026-11-16/e742a173e323c903336e.json): `2 field(s) changed`
+- 2026-11-16: [description changed, schema changed](../../deltas/2026-11-16/5f2d24be930573ed8878.json): `2 field(s) changed`
 - 2026-11-14: [schema changed](../../deltas/2026-11-14/5f2d24be930573ed8878.json): `6 field(s) changed`
 - 2026-11-14: [schema changed](../../deltas/2026-11-14/e742a173e323c903336e.json): `6 field(s) changed`
 - 2026-11-13: [description changed](../../deltas/2026-11-13/e742a173e323c903336e.json): `1 field(s) changed`
@@ -93,8 +95,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - 2026-11-04: [annotation changed, description changed, field changed, schema changed](../../deltas/2026-11-04/5f2d24be930573ed8878.json): `29 field(s) changed`
 - 2026-11-03: [description changed, field changed, schema changed](../../deltas/2026-11-03/e742a173e323c903336e.json): `14 field(s) changed`
 - 2026-11-03: [description changed, field changed, schema changed](../../deltas/2026-11-03/5f2d24be930573ed8878.json): `14 field(s) changed`
-- 2026-11-02: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-02/e742a173e323c903336e.json): `2 tool(s) added; 24 field(s) changed; signals: imperative_language_introduced` **(notable)**
-- 2026-11-02: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-02/5f2d24be930573ed8878.json): `2 tool(s) added; 24 field(s) changed; signals: imperative_language_introduced` **(notable)**
 
 ## Check it from your agent
 
