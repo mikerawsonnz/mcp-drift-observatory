@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "82437ffe051b08d1aef97b1666ce7bbac34c14cdcaed81514fe61285b6cdb656",
+  "full_hash": "fc95636e20fcb94be1146484d8db40beb511b5f69fcf23dc3c51011883424db7",
   "name": "ai.arcreport/ask",
-  "observed_at": "2026-11-16T02:02:15.840117Z",
+  "observed_at": "2026-11-17T02:01:46.020040Z",
   "sources": [
     "official"
   ],
-  "tool_count": 6,
+  "tool_count": 7,
   "tools": [
     {
       "annotations": {
@@ -16,7 +16,7 @@
         "readOnlyHint": true,
         "title": "Before checkout"
       },
-      "description": "Call this right before your agent tries to check out at a store, or when a user asks \"can my agent check out at <store>?\". Returns a one-line answer, reaches_checkout (true, false, or null when not shown either way: no agent catalog found and no browser test is null, not a no), protocol_route, browser_route, best_route (the best saved way in), up to 3 blockers, checked_at, the Agent Readiness Grade (grade, with expired when over 30 days old; grade_note when not graded, which is not a mark against the store), alternatives_hint when the grade is D or F or expired (a find_stores call with min_grade B in the same category), and a full_record link. Example: before_checkout({\"url\":\"https://allbirds.com\"}) → {\"answer\":\"Yes: a saved check reached checkout via cart_link…\",\"reaches_checkout\":true,…}. reaches_checkout false or unknown is not a no. Saved checks only: no store fetch, no scan, no login. Advisory; ARC stops before payment. Every answer carries checked_at (the saved check it rests on; for a list, the oldest) and stale (true when that check is 24 hours old or older, or has no time). Errors: {error:{code, message, next_step}}.",
+      "description": "Call this right before your agent tries to check out at a store, or when a user asks \"can my agent check out at <store>?\". Not for an attempt that already happened (log it with report_outcome), the reason an agent keeps failing (why_blocked_and_fix), or choosing between 2 or more stores (compare). Returns a one-line answer, reaches_checkout (true only when a checkout link came back or a shopper reached checkout; false when a route was measured and did not reach checkout; null when not shown either way: no agent catalog found and no browser test is null, and so is a product added to the cart with no shopper reaching checkout; null is not a no), protocol_route, browser_route, standard_shoppers when ARC's standard shoppers tried the store (a dated label, \"ARC's standard shoppers: N of M reached checkout, <date>\": a lower bound, not a verdict; ARC stops before payment and never places an order), best_route (the best saved way in), up to 3 blockers, checked_at, the Agent Readiness Grade (grade, with expired when over 30 days old; grade_note when not graded, which is not a mark against the store), alternatives_hint when the grade is D or F or expired (a find_stores call with min_grade B in the same category), and a full_record link. Example: before_checkout({\"url\":\"https://allbirds.com\"}) → {\"answer\":\"A saved check got a checkout link back at allbirds.com via storefront_mcp (6 hours ago).\",\"reaches_checkout\":true,…}. The answer leads with the dated fact; once the record is not current it starts \"Last known on <date>.\". reaches_checkout false or unknown is not a no. Saved checks only: no store fetch, no scan, no login. Advisory; ARC stops before payment. Every answer carries checked_at (the saved check it rests on; for a list, the oldest) and stale (true when that check is 24 hours old or older, or has no time). Errors: {error:{code, message, next_step}}.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -110,7 +110,7 @@
         "readOnlyHint": false,
         "title": "Report the outcome"
       },
-      "description": "Call this right after your agent tried to check out at a store, whatever happened, so the next agent knows. Free, no login. Omit contributor_key and ARC issues one; send it on later reports. No personal data: emails, phones, addresses, card numbers and IPs are rejected or stripped. Example: report_outcome({\"store_domain\":\"allbirds.com\",\"agent_family\":\"browser\",\"agent_name\":\"my-agent\",\"timestamp\":\"2026-11-05T10:00:00Z\",\"furthest_step\":\"checkout\",\"blocker\":\"none\"}) → {\"ok\":true,\"status\":\"unverified\",…}. A report stays private until 3 independent contributors agree. Same as POST /api/outcomes and report_checkout on /api/mcp. checked_at and stale are null on this answer: a report is not one of ARC's checks. Errors: {error:{code, message, next_step}}.",
+      "description": "Call this right after your agent tried to check out at a store, to log, record or report what happened: it reached checkout, a captcha stopped it, it got as far as shipping, anything. Use it for any attempt that already happened, so the next agent knows; before_checkout is only for before an attempt. Free, no login. Omit contributor_key and ARC issues one; send it on later reports. No personal data: emails, phones, addresses, card numbers and IPs are rejected or stripped. Example: report_outcome({\"store_domain\":\"allbirds.com\",\"agent_family\":\"browser\",\"agent_name\":\"my-agent\",\"timestamp\":\"2026-11-05T10:00:00Z\",\"furthest_step\":\"checkout\",\"blocker\":\"none\"}) → {\"ok\":true,\"status\":\"unverified\",…}. A report stays private until 3 independent contributors agree. Same as POST /api/outcomes and report_checkout on /api/mcp. checked_at and stale are null on this answer: a report is not one of ARC's checks. Errors: {error:{code, message, next_step}}.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -119,7 +119,7 @@
             "type": "string"
           },
           "agent_name": {
-            "description": "Name of the agent that tried the checkout. No personal name.",
+            "description": "Optional. Name of the agent that tried the checkout. No personal name. Omit it and ARC records \"not recorded\".",
             "type": "string"
           },
           "blocker": {
@@ -158,15 +158,13 @@
             "type": "string"
           },
           "timestamp": {
-            "description": "ISO 8601 time of the attempt, within the last 14 days.",
+            "description": "Optional. ISO 8601 time of the attempt, within the last 14 days. Omit it and ARC uses the time it received the report.",
             "type": "string"
           }
         },
         "required": [
           "store_domain",
           "agent_family",
-          "agent_name",
-          "timestamp",
           "furthest_step",
           "blocker"
         ],
@@ -183,7 +181,7 @@
         "readOnlyHint": true,
         "title": "Store record"
       },
-      "description": "Call this when a user asks what ARC recorded for a store, or you need the citable store page. Returns the store page's verdict, checked_at (the day of the check), stale, category, the recorded fix, record_url (claimed, served, date and method as JSON) and links to the page, its JSON and Markdown. Example: store_record({\"store\":\"allbirds.com\"}) → {\"verdict\":\"…\",\"page_url\":\"https://www.arcreport.ai/stores/allbirds.com\",…}. Reads the published snapshot behind /stores/<host>. Saved checks only: no store fetch, no scan, no login. Advisory; ARC stops before payment. Every answer carries checked_at (the saved check it rests on; for a list, the oldest) and stale (true when that check is 24 hours old or older, or has no time). Errors: {error:{code, message, next_step}}.",
+      "description": "Call this when a user asks what ARC recorded for a store, or you need the citable store page. Returns the store page's verdict, checked_at (the day of the check), stale, category, tried (ARC's standard shoppers' newest dated run, or \"Not measured\"), the recorded fix, record_url (claimed, served, date and method as JSON) and links to the page, its JSON and Markdown. Example: store_record({\"store\":\"allbirds.com\"}) → {\"verdict\":\"…\",\"page_url\":\"https://www.arcreport.ai/stores/allbirds.com\",…}. Reads the published snapshot behind /stores/<host>. Saved checks only: no store fetch, no scan, no login. Advisory; ARC stops before payment. Every answer carries checked_at (the saved check it rests on; for a list, the oldest) and stale (true when that check is 24 hours old or older, or has no time). Errors: {error:{code, message, next_step}}.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -208,7 +206,7 @@
         "readOnlyHint": true,
         "title": "Compare stores"
       },
-      "description": "Call this when you must choose between a few stores for the same item and want the one where an agent is most likely to reach checkout. Pass 2 to 10 store domains or URLs. Returns one short row per store (reaches_checkout, best_route, checked_at, grade), and pick: among stores whose saved check reached checkout in the last 30 days, the one with the best current Agent Readiness Grade (expired after current of the same letter, not graded last); null when no store has such evidence. A row with stale: true is more than 24 hours old: re-check right before the attempt. Rows are ordered only by saved checkout evidence, its freshness and published grade, never by anything else. Example: compare({\"stores\":[\"allbirds.com\",\"gymshark.com\"]}) → {\"pick\":\"allbirds.com\",\"stores\":[…]}. Each store counts as one precheck read. Saved checks only: no store fetch, no scan, no login. Advisory; ARC stops before payment. Every answer carries checked_at (the saved check it rests on; for a list, the oldest) and stale (true when that check is 24 hours old or older, or has no time). Errors: {error:{code, message, next_step}}.",
+      "description": "Call this when a user names 2 or more stores for the same item and asks which one to use, or when you must choose between a few stores and want the one where an agent is most likely to reach checkout. Use it instead of calling before_checkout once per store. Pass 2 to 10 store domains or URLs. Returns one short row per store (reaches_checkout, best_route, checked_at, grade), and pick: among stores whose saved check reached checkout in the last 30 days, the one with the best current Agent Readiness Grade (expired after current of the same letter, not graded last); null when no store has such evidence. A row with stale: true is more than 24 hours old: re-check right before the attempt. Rows are ordered only by saved checkout evidence, its freshness and published grade, never by anything else. Example: compare({\"stores\":[\"allbirds.com\",\"gymshark.com\"]}) → {\"pick\":\"allbirds.com\",\"stores\":[…]}. Each store counts as one precheck read. Saved checks only: no store fetch, no scan, no login. Advisory; ARC stops before payment. Every answer carries checked_at (the saved check it rests on; for a list, the oldest) and stale (true when that check is 24 hours old or older, or has no time). Errors: {error:{code, message, next_step}}.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -229,6 +227,54 @@
       },
       "name": "compare",
       "title": "Compare stores"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Merchant guide"
+      },
+      "description": "Call this when a person at a store (a CEO, a marketing or e-commerce manager, or a developer) asks where their store is on the journey to AI assistants, what to do next on their platform, or how stores in their category compare. Not for an agent about to check out: use before_checkout for that. Returns the store's place on ARC's journey map (arc-journey/v1: 5 stages, each met, not met or \"Not measured\" with its date; not measured is not a no, and there is no score or grade), the next 3 steps for its platform at the chosen depth with source links and an as-of date (a platform fact ARC has not sourced says \"Not yet documented by ARC\"), how many stores ARC checked in its category and on its platform and how many meet each stage (counts with denominators and the snapshot date), and up to 5 named stores that meet the furthest stage (ordered only by stage reached, then the newest reading). role: ceo, manager or developer sets depth (basics, detail or implement) unless depth is given. Send platform alone for the platform guide with no store. Example: guide({\"store\":\"gymshark.com\",\"role\":\"manager\"}) → {\"answer\":\"gymshark.com: Meets stages 1, 2, 3 and 4. Not met: stage 5. Saved check 16 Oct 2026.\",\"stages\":[…],\"next_steps\":[…],\"comparison\":{…},\"examples\":{…}}. Saved checks only: no store fetch, no scan, no login. Advisory; ARC stops before payment. Every answer carries checked_at (the saved check it rests on; for a list, the oldest) and stale (true when that check is 24 hours old or older, or has no time). Errors: {error:{code, message, next_step}}.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "description": "Category for a platform-only call, such as footwear or apparel. A store uses its own category.",
+            "type": "string"
+          },
+          "depth": {
+            "description": "How much detail. Default from role, else basics.",
+            "enum": [
+              "basics",
+              "detail",
+              "implement"
+            ],
+            "type": "string"
+          },
+          "platform": {
+            "description": "shopify, magento, salesforce, woocommerce, bigcommerce, wix, squarespace or other. Overrides the platform ARC detected.",
+            "type": "string"
+          },
+          "role": {
+            "description": "Who is asking. Sets depth: ceo basics, manager detail, developer implement.",
+            "enum": [
+              "ceo",
+              "manager",
+              "developer"
+            ],
+            "type": "string"
+          },
+          "store": {
+            "description": "Store domain or URL, such as gymshark.com. Leave out and send platform for the platform guide alone.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "guide",
+      "title": "Merchant guide"
     }
   ],
   "url": "https://www.arcreport.ai/api/ask"

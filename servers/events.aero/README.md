@@ -6,18 +6,19 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://events.aero/mcp/events` | 5 | [`20963c3b870e`](0ab3287c5fc33c6e22e5.json) | 2026-10-11 |
+| `https://events.aero/mcp/events` | 5 | [`e65a3524d9d4`](0ab3287c5fc33c6e22e5.json) | 2026-11-17 |
 
 ## Tools at `https://events.aero/mcp/events`
 
 - `featured-events`: `The events Events.Aero is featuring right now, the same selection as the lead row of the home page, optionally for one country. Each includ…`
-- `get-event`: `Get one public event by its sqid or slug (from search-events or featured-events): dates, venue, price, how to book or RSVP, organiser conta…`
+- `get-event`: `Get one public event by its ID or slug (from search-events or featured-events): dates, venue, price, how to book or RSVP, organiser contact…`
 - `list-countries`: `The countries Events.Aero lists events in, with the code to pass to other tools and each country's public home and events pages.`
 - `list-event-types`: `The kinds of aviation event on Events.Aero (airshow, fly-in, workshop and so on), with the value to pass to search-events and the public pa…`
 - `search-events`: `Search upcoming public aviation events on Events.Aero (airshows, fly-ins, workshops and more). Filter by free text, event type, country, da…`
 
 ## Changes
 
+- 2026-11-17: [description changed, schema changed](../../deltas/2026-11-17/0ab3287c5fc33c6e22e5.json): `2 field(s) changed`
 - 2026-10-11: [schema changed](../../deltas/2026-10-11/0ab3287c5fc33c6e22e5.json): `4 field(s) changed`
 
 ## Check it from your agent

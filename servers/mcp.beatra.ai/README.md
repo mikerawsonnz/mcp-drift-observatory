@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.beatra.ai/mcp` | 43 | [`a966c276e9d4`](4f93d616eb97e76f800a.json) | 2026-11-15 |
+| `https://mcp.beatra.ai/mcp` | 43 | [`7aa7a8a0f4e0`](4f93d616eb97e76f800a.json) | 2026-11-17 |
 
 ## Tools at `https://mcp.beatra.ai/mcp`
 
@@ -56,6 +56,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-17: [schema changed](../../deltas/2026-11-17/4f93d616eb97e76f800a.json): `8 field(s) changed`
 - 2026-11-15: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-15/4f93d616eb97e76f800a.json): `6 tool(s) added; 486 field(s) changed`
 - 2026-11-13: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-13/4f93d616eb97e76f800a.json): `1 tool(s) added; 252 field(s) changed`
 - 2026-11-12: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-12/4f93d616eb97e76f800a.json): `2 tool(s) added; 107 field(s) changed`

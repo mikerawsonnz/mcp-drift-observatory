@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://prices.brainy.ae/mcp/v2` | 26 | [`d04ccd90cf77`](9443ab886276db8be110.json) | 2026-11-06 |
+| `https://prices.brainy.ae/mcp/v2` | 26 | [`e36f41101079`](9443ab886276db8be110.json) | 2026-11-17 |
 | `https://prices.brainy.ae/mcp` | 19 | [`23e8b3cbe91c`](f6d1febd0eda9114989e.json) | 2026-11-02 |
 
 ## Tools at `https://prices.brainy.ae/mcp/v2`
@@ -62,6 +62,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-17: [schema changed](../../deltas/2026-11-17/9443ab886276db8be110.json): `336 field(s) changed`
 - 2026-11-06: [schema changed](../../deltas/2026-11-06/9443ab886276db8be110.json): `17 field(s) changed`
 - 2026-11-03: [description changed](../../deltas/2026-11-03/9443ab886276db8be110.json): `7 field(s) changed`
 - 2026-11-02: [description changed](../../deltas/2026-11-02/f6d1febd0eda9114989e.json): `1 field(s) changed`

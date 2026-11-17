@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.discond.ae/mcp` | 9 | [`6ee7bd3607ba`](cd7db03de9f0ecc82710.json) | 2026-11-16 |
+| `https://mcp.discond.ae/mcp` | 9 | [`978ca2d08008`](cd7db03de9f0ecc82710.json) | 2026-11-17 |
 
 ## Tools at `https://mcp.discond.ae/mcp`
 
@@ -22,6 +22,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-17: [schema changed](../../deltas/2026-11-17/cd7db03de9f0ecc82710.json): `35 field(s) changed; signals: imperative_language_introduced` **(notable)**
 - 2026-11-16: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-16/cd7db03de9f0ecc82710.json): `1 tool(s) added; 3 field(s) changed`
 
 ## Check it from your agent

@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://booqer.ai/mcp` | 9 | [`17e03c90f530`](9bb78baa139078dd6da5.json) | 2026-11-15 |
+| `https://booqer.ai/mcp` | 9 | [`b68c92cdd82b`](9bb78baa139078dd6da5.json) | 2026-11-17 |
 
 ## Tools at `https://booqer.ai/mcp`
 
@@ -22,6 +22,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-17: [description changed, schema changed](../../deltas/2026-11-17/9bb78baa139078dd6da5.json): `3 field(s) changed`
 - 2026-11-15: [annotation changed, count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-15/9bb78baa139078dd6da5.json): `1 tool(s) added; 5 field(s) changed; signals: imperative_language_introduced` **(notable)**
 
 ## Check it from your agent

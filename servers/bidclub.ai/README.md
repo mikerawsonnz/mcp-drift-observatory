@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://bidclub.ai/api/mcp` | 6 | [`9d5946707d97`](aec34e730ed613f0048d.json) | 2026-09-19 |
+| `https://bidclub.ai/api/mcp` | 6 | [`ef4bfc8d9e50`](aec34e730ed613f0048d.json) | 2026-11-17 |
 
 ## Tools at `https://bidclub.ai/api/mcp`
 
@@ -19,6 +19,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-17: [description changed](../../deltas/2026-11-17/aec34e730ed613f0048d.json): `1 field(s) changed`
 - 2026-09-19: [schema changed](../../deltas/2026-09-19/aec34e730ed613f0048d.json): `27 field(s) changed`
 
 ## Check it from your agent

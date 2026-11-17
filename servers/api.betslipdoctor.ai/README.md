@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.betslipdoctor.ai/api/mcp` | 100 | [`275e02399632`](f29327f2a9147dd897c0.json) | 2026-11-14 |
+| `https://api.betslipdoctor.ai/api/mcp` | 100 | [`723367691228`](f29327f2a9147dd897c0.json) | 2026-11-17 |
 
 ## Tools at `https://api.betslipdoctor.ai/api/mcp`
 
@@ -74,6 +74,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-17: [description changed, schema changed](../../deltas/2026-11-17/f29327f2a9147dd897c0.json): `16 field(s) changed`
 - 2026-11-14: [count changed, tool added](../../deltas/2026-11-14/f29327f2a9147dd897c0.json): `1 tool(s) added`
 - 2026-11-11: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-11/f29327f2a9147dd897c0.json): `1 tool(s) added; 51 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-10: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-10/f29327f2a9147dd897c0.json): `2 tool(s) added; 34 field(s) changed; signals: length_more_than_doubled`
@@ -93,7 +94,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - 2026-10-22: [count changed, description changed, schema changed, tool added, tool removed](../../deltas/2026-10-22/f29327f2a9147dd897c0.json): `21 tool(s) added; 7 tool(s) removed; 63 field(s) changed`
 - 2026-10-19: [count changed, description changed, schema changed, tool added](../../deltas/2026-10-19/f29327f2a9147dd897c0.json): `6 tool(s) added; 71 field(s) changed`
 - 2026-10-18: [count changed, description changed, schema changed, tool added](../../deltas/2026-10-18/f29327f2a9147dd897c0.json): `10 tool(s) added; 478 field(s) changed; signals: length_more_than_doubled, url_introduced`
-- 2026-10-15: [annotation changed, description changed, field changed, schema changed](../../deltas/2026-10-15/f29327f2a9147dd897c0.json): `25 field(s) changed`
 
 ## Check it from your agent
 

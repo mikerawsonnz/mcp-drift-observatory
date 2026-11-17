@@ -6,15 +6,16 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://www.arcreport.ai/api/ask` | 6 | [`82437ffe051b`](5990de195db11012fcfb.json) | 2026-11-16 |
-| `https://www.arcreport.ai/api/mcp` | 19 | [`a8a583a5f7fb`](5b7f6412bf3c3e91b70c.json) | 2026-11-16 |
+| `https://www.arcreport.ai/api/ask` | 7 | [`fc95636e20fc`](5990de195db11012fcfb.json) | 2026-11-17 |
+| `https://www.arcreport.ai/api/mcp` | 19 | [`d77cc168ce66`](5b7f6412bf3c3e91b70c.json) | 2026-11-17 |
 
 ## Tools at `https://www.arcreport.ai/api/ask`
 
-- `before_checkout`: `Call this right before your agent tries to check out at a store, or when a user asks "can my agent check out at <store>?". Returns a one-li…`
-- `compare`: `Call this when you must choose between a few stores for the same item and want the one where an agent is most likely to reach checkout. Pas…`
+- `before_checkout`: `Call this right before your agent tries to check out at a store, or when a user asks "can my agent check out at <store>?". Not for an attem…`
+- `compare`: `Call this when a user names 2 or more stores for the same item and asks which one to use, or when you must choose between a few stores and…`
 - `find_stores`: `Call this when you need to pick a store for a product need and want one where a saved check shows an agent reached checkout. Filters: categ…`
-- `report_outcome`: `Call this right after your agent tried to check out at a store, whatever happened, so the next agent knows. Free, no login. Omit contributo…`
+- `guide`: `Call this when a person at a store (a CEO, a marketing or e-commerce manager, or a developer) asks where their store is on the journey to A…`
+- `report_outcome`: `Call this right after your agent tried to check out at a store, to log, record or report what happened: it reached checkout, a captcha stop…`
 - `store_record`: `Call this when a user asks what ARC recorded for a store, or you need the citable store page. Returns the store page's verdict, checked_at…`
 - `why_blocked_and_fix`: `Call this after before_checkout says reaches_checkout is false or null, or when an agent got stuck at a store and you want the reason and t…`
 
@@ -42,6 +43,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-17: [schema changed](../../deltas/2026-11-17/5b7f6412bf3c3e91b70c.json): `6 field(s) changed; signals: length_more_than_doubled`
+- 2026-11-17: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-17/5990de195db11012fcfb.json): `1 tool(s) added; 10 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**
 - 2026-11-16: [description changed, schema changed](../../deltas/2026-11-16/5b7f6412bf3c3e91b70c.json): `6 field(s) changed`
 - 2026-11-16: [count changed, description changed, schema changed, tool removed](../../deltas/2026-11-16/5990de195db11012fcfb.json): `19 tool(s) removed; 7 field(s) changed`
 - 2026-11-07: [description changed, schema changed](../../deltas/2026-11-07/5b7f6412bf3c3e91b70c.json): `9 field(s) changed; signals: length_more_than_doubled`

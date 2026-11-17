@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "a966c276e9d4287c343a2eaa4d832d0ce714395d7145a5d3ab61fb6e0b845fd0",
+  "full_hash": "7aa7a8a0f4e05c5f9513281e8e8fb5e1f6eac804f8167c9b793917519252e3d1",
   "name": "ai.beatra/beatra",
-  "observed_at": "2026-11-15T02:02:38.605523Z",
+  "observed_at": "2026-11-17T02:01:51.992056Z",
   "sources": [
     "official"
   ],
@@ -11688,7 +11688,7 @@
             "type": "string"
           },
           "input": {
-            "description": "Text to synthesize. It may contain speech markup such as {pause 0.5}, {laugh}, {pron 行 hang2} or {sub W3C 万维网联盟}; read the vocabulary and limits from the model card (beatra.models.list). Some models also accept inline emotion and performance markup, listed under script_markup on their card; other models skip it with a warning. Malformed markup is corrected or skipped with a markup_adjusted warning instead of failing the request. Some models accept fewer characters; read constraints.input_max_characters on the model card (ElevenLabs models: 10,000).",
+            "description": "Text to synthesize. It may contain speech markup such as {pause 0.5}, {laugh}, {pron 行 hang2} or {sub W3C 万维网联盟}; read the vocabulary and limits from the model card (beatra.models.list). Some models also accept inline emotion and performance markup, listed under script_markup on their card; other models skip it with a warning. Malformed markup is corrected or skipped with a markup_adjusted warning instead of failing the request. Each model has its own single-request limit (constraints.input_max_characters, and cjk_input_max_characters where present, on the model card); longer text is refused with a message that says how to split it.",
             "maxLength": 50000,
             "minLength": 1,
             "title": "Input",
@@ -12200,7 +12200,7 @@
             "type": "string"
           },
           "input": {
-            "description": "Text to synthesize. It may contain speech markup such as {pause 0.5}, {laugh}, {pron 行 hang2} or {sub W3C 万维网联盟}; read the vocabulary and limits from the model card (beatra.models.list). Some models also accept inline emotion and performance markup, listed under script_markup on their card; other models skip it with a warning. Malformed markup is corrected or skipped with a markup_adjusted warning instead of failing the request. Some models accept fewer characters; read constraints.input_max_characters on the model card (ElevenLabs models: 10,000).",
+            "description": "Text to synthesize. It may contain speech markup such as {pause 0.5}, {laugh}, {pron 行 hang2} or {sub W3C 万维网联盟}; read the vocabulary and limits from the model card (beatra.models.list). Some models also accept inline emotion and performance markup, listed under script_markup on their card; other models skip it with a warning. Malformed markup is corrected or skipped with a markup_adjusted warning instead of failing the request. Each model has its own single-request limit (constraints.input_max_characters, and cjk_input_max_characters where present, on the model card); longer text is refused with a message that says how to split it.",
             "maxLength": 50000,
             "minLength": 1,
             "title": "Input",
@@ -21943,6 +21943,19 @@
               "billing_character_weights": {
                 "$ref": "#/$defs/SpeechCharacterWeights"
               },
+              "cjk_input_max_characters": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Most Chinese, Japanese or Korean characters (Han, kana, Hangul) one request reads; longer text is refused before charge, because the model cuts off longer speech before the end. Null when the model has no such limit.",
+                "title": "Cjk Input Max Characters"
+              },
               "direction_max_characters": {
                 "anyOf": [
                   {
@@ -21978,7 +21991,8 @@
                 "type": "array"
               },
               "input_max_characters": {
-                "default": 50000,
+                "default": 10000,
+                "description": "Most Unicode code points one request accepts in the original text; most models also hold the text after markup is applied to it (constraints.limitations says how each model counts). Longer text is refused before charge with a message that says how to split it.",
                 "exclusiveMinimum": 0,
                 "title": "Input Max Characters",
                 "type": "integer"

@@ -6,17 +6,20 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.arcangel.ai/trademark` | 3 | [`276c5a2b363e`](51dbd3b220397cebf7d7.json) | 2026-11-15 |
+| `https://mcp.arcangel.ai/trademark` | 6 | [`e65e5d413755`](51dbd3b220397cebf7d7.json) | 2026-11-17 |
 
 ## Tools at `https://mcp.arcangel.ai/trademark`
 
 - `check_trademark`: `Check whether a brand, product or company name is available as a trademark. Searches the USPTO register and scores similar marks by conflic…`
+- `get_trademark_application`: `Show what a trademark application draft still needs before it can be signed and paid for: missing fields, files to upload (logo, specimens)…`
 - `get_trademark_check`: `Get the result of a trademark check that was still running, or the next part of a long full report. Pass the search_id that check_trademark…`
+- `start_trademark_application`: `Start a US trademark application on Arcangel AI as a draft in the signed-in user's account. Pass what is known (the mark, goods or services…`
 - `suggest_nice_classes`: `Suggest trademark (Nice) classes for a description of goods or services, e.g. "mobile app for booking yoga classes".`
+- `update_trademark_application`: `Fill in or change fields on a trademark application draft (owner, address, mark details, classes, use dates, statements). Only fields passe…`
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-17: [count changed, field changed, tool added](../../deltas/2026-11-17/51dbd3b220397cebf7d7.json): `3 tool(s) added; 6 field(s) changed`
 
 ## Check it from your agent
 

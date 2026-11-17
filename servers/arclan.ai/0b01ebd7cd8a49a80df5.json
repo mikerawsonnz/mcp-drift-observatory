@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "60d213d2248995111407ed1d0767e25f56c4af7ca15a0df125d1e2608b17e154",
+  "full_hash": "cb8170f3ca6a1c09a5b1a35f9ef34618ce34dcb478d9a37bf4942cb9be632cc2",
   "name": "ai.arclan/registry",
-  "observed_at": "2026-08-20T09:11:22.177929Z",
+  "observed_at": "2026-11-17T02:02:02.629987Z",
   "sources": [
     "official"
   ],
-  "tool_count": 4,
+  "tool_count": 6,
   "tools": [
     {
       "description": "Search the Arclan registry for MCP servers. By default returns only connectable servers (active, mcp_partial, auth_gated). Use status=stdio to browse local-only servers available for installation. Use status=all to query the full index. Use production_safe=true to restrict to servers with uptime > 97% and handshake success > 95%. Use read_only=true to restrict to servers with no write or exec tools. Use this before connecting to an MCP server to check its validation status and score. After using a server, call report_server to contribute reliability data.",
@@ -205,6 +205,30 @@
         "type": "object"
       },
       "name": "report_server"
+    },
+    {
+      "description": "Start GitHub sign-in to get an Arclan API key, without leaving MCP (OAuth device flow). Returns a verification URL and a short user_code — show both to the user and ask them to authorize in a browser. Then call complete_sign_in with the returned device_code to mint the key. A key raises your MCP rate limit above the keyless tier and tracks your usage.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "name": "sign_in"
+    },
+    {
+      "description": "Finish the GitHub sign-in started by sign_in and return a new Arclan API key. Pass the device_code from sign_in. If the user has not authorized in the browser yet, this returns status \"pending\" — wait poll_interval_seconds and call again. The api_key is shown ONCE; store it and send it as \"Authorization: Bearer <key>\".",
+      "inputSchema": {
+        "properties": {
+          "device_code": {
+            "description": "The device_code returned by sign_in",
+            "type": "string"
+          }
+        },
+        "required": [
+          "device_code"
+        ],
+        "type": "object"
+      },
+      "name": "complete_sign_in"
     }
   ],
   "url": "https://arclan.ai/mcp"

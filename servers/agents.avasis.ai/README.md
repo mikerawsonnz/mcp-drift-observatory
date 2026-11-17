@@ -6,18 +6,17 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://agents.avasis.ai/mcp` | 4 | [`5ad5d11cf497`](13be9a5c0441e3f603e0.json) | 2026-11-01 |
+| `https://agents.avasis.ai/mcp` | 3 | [`e82dd8e13813`](13be9a5c0441e3f603e0.json) | 2026-11-17 |
 
 ## Tools at `https://agents.avasis.ai/mcp`
 
-- `avasis_free_sample`: `Return a real, free sample of a paid product so you can see the exact keys before paying: sol-kit (Solana rug check complete kit), pm-kit (…`
-- `avasis_products`: `List every paid API route on this Avasis host (Solana token safety verdicts and complete rug-check kits, Polymarket odds kits, web page rea…`
-- `avasis_quote`: `Return the x402 payment requirements of a paid route (price, accepts[] with amount/asset/payTo/network, the pay URL with your inputs filled…`
-- `avasis_verdict_rubric`: `The published deterministic rules behind the SAFE / WARN / DANGER Solana token verdict: flag codes, severities, weights and grade threshold…`
+- `research_pack`: `Get a deterministic due-diligence report with evidence for every claim and explicit coverage gaps. Paid HTTP offer: $5.00 USDC. This tool r…`
+- `token_verdict`: `Screen a token's structural risks before investigating a trade. Paid HTTP offer: $0.02 USDC. This tool returns free x402 payment requiremen…`
+- `wallet_risk`: `Check a counterparty's known risk signals and recent USDC flows before interacting. Paid HTTP offer: $0.02 USDC. This tool returns free x40…`
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-17: [count changed, tool added, tool removed](../../deltas/2026-11-17/13be9a5c0441e3f603e0.json): `3 tool(s) added; 4 tool(s) removed`
 
 ## Check it from your agent
 
