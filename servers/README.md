@@ -1,6 +1,6 @@
 # Observed MCP servers
 
-468 hosts whose MCP tool declarations we have observed. Each page lists the declared tools, every observed change, and an Atom feed of changes to that server.
+471 hosts whose MCP tool declarations we have observed. Each page lists the declared tools, every observed change, and an Atom feed of changes to that server.
 
 Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_alerts
 
@@ -25,7 +25,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [agentroam.ai](agentroam.ai/) (11 tools)
 - [agents-mcp.ironshard.ai](agents-mcp.ironshard.ai/) (8 tools)
 - [agents.alphaquantlabs.ai](agents.alphaquantlabs.ai/) (2 tools)
-- [agents.avasis.ai](agents.avasis.ai/) (3 tools)
+- [agents.avasis.ai](agents.avasis.ai/) (5 tools)
 - [agentsec.kernora.ai](agentsec.kernora.ai/) (2 tools)
 - [agentsindex.ai](agentsindex.ai/) (11 tools)
 - [agentsrank.ai](agentsrank.ai/) (15 tools)
@@ -53,7 +53,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [api.athenahq.ai](api.athenahq.ai/) (132 tools)
 - [api.atmy.ai](api.atmy.ai/) (12 tools)
 - [api.bareun.ai](api.bareun.ai/) (6 tools)
-- [api.betslipdoctor.ai](api.betslipdoctor.ai/) (100 tools)
+- [api.betslipdoctor.ai](api.betslipdoctor.ai/) (102 tools)
 - [api.bittuitive.ai](api.bittuitive.ai/) (32 tools)
 - [api.bluerate.ai](api.bluerate.ai/) (3 tools)
 - [api.bowmark.ai](api.bowmark.ai/) (58 tools)
@@ -308,14 +308,15 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [mcp.ahel.ai](mcp.ahel.ai/) (11 tools)
 - [mcp.airshelf.ai](mcp.airshelf.ai/) (8 tools)
 - [mcp.alphacreek.ai](mcp.alphacreek.ai/) (5 tools)
-- [mcp.arcangel.ai](mcp.arcangel.ai/) (6 tools)
+- [mcp.arcangel.ai](mcp.arcangel.ai/) (9 tools)
 - [mcp.arvx.ai](mcp.arvx.ai/) (3 tools)
 - [mcp.askwatch.ai](mcp.askwatch.ai/) (11 tools)
 - [mcp.augmap.ai](mcp.augmap.ai/) (10 tools)
 - [mcp.auralogs.ai](mcp.auralogs.ai/) (7 tools)
-- [mcp.bamf.ai](mcp.bamf.ai/) (177 tools)
+- [mcp.bamf.ai](mcp.bamf.ai/) (179 tools)
+- [mcp.bazichart.ai](mcp.bazichart.ai/) (2 tools)
 - [mcp.bcited.ai](mcp.bcited.ai/) (6 tools)
-- [mcp.beatra.ai](mcp.beatra.ai/) (43 tools)
+- [mcp.beatra.ai](mcp.beatra.ai/) (47 tools)
 - [mcp.bev-buyer.ai](mcp.bev-buyer.ai/) (9 tools)
 - [mcp.bev-cuvee.org](mcp.bev-cuvee.org/) (2 tools)
 - [mcp.biel.ai](mcp.biel.ai/) (1 tools)
@@ -457,6 +458,8 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [verify.noevant.ai](verify.noevant.ai/) (5 tools)
 - [www.agentboard.ai](www.agentboard.ai/) (38 tools)
 - [www.ai-portal.ai](www.ai-portal.ai/) (4 tools)
+- [www.aim-shield.ai](www.aim-shield.ai/) (10 tools)
+- [www.almostimpossible.agency](www.almostimpossible.agency/) (6 tools)
 - [www.arcreport.ai](www.arcreport.ai/) (26 tools)
 - [www.beachclubs.ae](www.beachclubs.ae/) (4 tools)
 - [www.bordet.ai](www.bordet.ai/) (11 tools)

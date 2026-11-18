@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.bittuitive.ai/mcp` | 32 | [`439102b227be`](c0c8c3bdf1cbda3c2fcd.json) | 2026-11-17 |
+| `https://api.bittuitive.ai/mcp` | 32 | [`eecbc026b0e4`](c0c8c3bdf1cbda3c2fcd.json) | 2026-11-18 |
 
 ## Tools at `https://api.bittuitive.ai/mcp`
 
@@ -45,6 +45,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-18: [description changed, field changed, schema changed](../../deltas/2026-11-18/c0c8c3bdf1cbda3c2fcd.json): `4 field(s) changed`
 - 2026-11-17: [count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-17/c0c8c3bdf1cbda3c2fcd.json): `12 tool(s) added; 49 field(s) changed; signals: imperative_language_introduced, url_introduced` **(notable)**
 
 ## Check it from your agent

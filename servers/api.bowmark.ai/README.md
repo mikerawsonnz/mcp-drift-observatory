@@ -6,8 +6,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.bowmark.ai/mcp` | 29 | [`46f45d770bff`](5f2d24be930573ed8878.json) | 2026-11-17 |
-| `https://api.bowmark.ai/mcp/registry` | 29 | [`46f45d770bff`](e742a173e323c903336e.json) | 2026-11-17 |
+| `https://api.bowmark.ai/mcp` | 29 | [`efc88a038f2d`](5f2d24be930573ed8878.json) | 2026-11-18 |
+| `https://api.bowmark.ai/mcp/registry` | 29 | [`efc88a038f2d`](e742a173e323c903336e.json) | 2026-11-18 |
 
 ## Tools at `https://api.bowmark.ai/mcp`
 
@@ -33,7 +33,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `llm_detach`: `Detaches this chat at once, so open Bowmark pages' AI calls go back to Bowmark's own model instead of waiting for this chat.`
 - `llm_poll`: `Lets this chat answer the AI calls an open Bowmark page makes, so they cost nothing. Returns up to 5 pending jobs ({ jobId, system, prompt,…`
 - `logout_connection`: `Sign a saved login out by the 'id' 'list_connections' returned. Bowmark drops the cookies it held, and where the site supports it ('siteLog…`
-- `report`: `Record what was missing, wrong, or incomplete so Bowmark can build it. Call it yourself, in the same turn, without asking your user first:…`
+- `report`: `Record what was missing, wrong, or incomplete so Bowmark can build it. Ask your user first whether to send it. It changes nothing on any we…`
 - `request_secret`: `Create a named, empty slot for a secret and get back a link the user opens to fill it in. They type the value on a Bowmark page and choose…`
 - `run`: `**Executes the task on live websites** and returns the result. Call 'get_library' FIRST, then 'run({ script })'. From your app or a cron: P…`
 - `session_call`: `Runs ONE library function in a Bowmark session, so a flow that needs several calls in the SAME session can finish: a booking that texts the…`
@@ -65,7 +65,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `llm_detach`: `Detaches this chat at once, so open Bowmark pages' AI calls go back to Bowmark's own model instead of waiting for this chat.`
 - `llm_poll`: `Lets this chat answer the AI calls an open Bowmark page makes, so they cost nothing. Returns up to 5 pending jobs ({ jobId, system, prompt,…`
 - `logout_connection`: `Sign a saved login out by the 'id' 'list_connections' returned. Bowmark drops the cookies it held, and where the site supports it ('siteLog…`
-- `report`: `Record what was missing, wrong, or incomplete so Bowmark can build it. Call it yourself, in the same turn, without asking your user first:…`
+- `report`: `Record what was missing, wrong, or incomplete so Bowmark can build it. Ask your user first whether to send it. It changes nothing on any we…`
 - `request_secret`: `Create a named, empty slot for a secret and get back a link the user opens to fill it in. They type the value on a Bowmark page and choose…`
 - `run`: `**Executes the task on live websites** and returns the result. Call 'get_library' FIRST, then 'run({ script })'. From your app or a cron: P…`
 - `session_call`: `Runs ONE library function in a Bowmark session, so a flow that needs several calls in the SAME session can finish: a booking that texts the…`
@@ -75,6 +75,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-18: [description changed, schema changed](../../deltas/2026-11-18/e742a173e323c903336e.json): `2 field(s) changed`
+- 2026-11-18: [description changed, schema changed](../../deltas/2026-11-18/5f2d24be930573ed8878.json): `2 field(s) changed`
 - 2026-11-17: [description changed, schema changed](../../deltas/2026-11-17/e742a173e323c903336e.json): `4 field(s) changed`
 - 2026-11-17: [description changed, schema changed](../../deltas/2026-11-17/5f2d24be930573ed8878.json): `4 field(s) changed`
 - 2026-11-16: [description changed, schema changed](../../deltas/2026-11-16/e742a173e323c903336e.json): `2 field(s) changed`
@@ -93,8 +95,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - 2026-11-07: [annotation changed, count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-07/e742a173e323c903336e.json): `1 tool(s) added; 51 field(s) changed`
 - 2026-11-06: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-06/e742a173e323c903336e.json): `7 tool(s) added; 10 field(s) changed; signals: imperative_language_introduced` **(notable)**
 - 2026-11-06: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-06/5f2d24be930573ed8878.json): `7 tool(s) added; 10 field(s) changed; signals: imperative_language_introduced` **(notable)**
-- 2026-11-04: [annotation changed, description changed, field changed, schema changed](../../deltas/2026-11-04/e742a173e323c903336e.json): `29 field(s) changed`
-- 2026-11-04: [annotation changed, description changed, field changed, schema changed](../../deltas/2026-11-04/5f2d24be930573ed8878.json): `29 field(s) changed`
 
 ## Check it from your agent
 

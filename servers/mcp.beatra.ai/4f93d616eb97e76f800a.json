@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "7aa7a8a0f4e05c5f9513281e8e8fb5e1f6eac804f8167c9b793917519252e3d1",
+  "full_hash": "e17c8ba7db862d97200b19df3a016e01739d7e02ee7e225e29de1d0891760e37",
   "name": "ai.beatra/beatra",
-  "observed_at": "2026-11-17T02:01:51.992056Z",
+  "observed_at": "2026-11-18T02:02:42.458089Z",
   "sources": [
     "official"
   ],
-  "tool_count": 43,
+  "tool_count": 47,
   "tools": [
     {
       "annotations": {
@@ -9327,7 +9327,7 @@
               }
             ],
             "default": null,
-            "description": "A persona saved with beatra.music.edit operation=create_persona; the new song keeps that singer's voice and style.",
+            "description": "A singer from beatra.music.personas.list (saved from a song or created from the user's own voice); the new song keeps that singer's voice and style.",
             "title": "Persona Id"
           },
           "prompt": {
@@ -9722,7 +9722,7 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Revise a music track made by beatra.music.generate or an uploaded song: extend it, replace a time range, add vocals to an instrumental, or add accompaniment to a vocal; save a generated track's singer as a reusable persona; or make lyric timing (LRC and SRT), extra cover art, a visualizer MP4, or a WAV version of a chosen generated track. Every operation is a paid task; call beatra.models.list for its price. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry.",
+      "description": "Revise a music track made by beatra.music.generate or an uploaded song: extend it, replace a time range, add vocals to an instrumental, or add accompaniment to a vocal; or make lyric timing (LRC and SRT), extra cover art, a visualizer MP4, or a WAV version of a chosen generated track. To save a track's singer as a persona, use beatra.music.personas.create_from_song. Every operation is a paid task; call beatra.models.list for its price. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry.",
       "inputSchema": {
         "$defs": {
           "MediaInputArtifact": {
@@ -10089,7 +10089,7 @@
               }
             ],
             "default": null,
-            "description": "The 10–30 second vocal window the persona learns from; defaults to the first 30 seconds.",
+            "description": "The 10–30 second vocal window the persona learns from. Leave both out and Beatra picks the part where the singer is singing; send only one and the other is set 30 seconds away.",
             "title": "Vocal End Ms"
           },
           "vocal_gender": {
@@ -10120,7 +10120,7 @@
               }
             ],
             "default": null,
-            "description": "The 10–30 second vocal window the persona learns from; defaults to the first 30 seconds.",
+            "description": "The 10–30 second vocal window the persona learns from. Leave both out and Beatra picks the part where the singer is singing; send only one and the other is set 30 seconds away.",
             "title": "Vocal Start Ms"
           }
         },
@@ -10446,6 +10446,1808 @@
         "type": "object"
       },
       "title": "Edit Music"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "List the singers (personas) saved in this account: ones saved from a song made by beatra.music.generate (kind=style) and ones created from the user's own singing voice (kind=voice). In a new conversation, call this first instead of relying on a remembered persona_id, then pass persona_id to beatra.music.generate with model suno-6. This call is read-only and does not charge.",
+      "inputSchema": {
+        "properties": {
+          "cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "next_cursor from the previous page, to get the next one.",
+            "title": "Cursor"
+          },
+          "limit": {
+            "default": 50,
+            "description": "How many singers to return, 1 to 100; defaults to 50.",
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "title": "McpMusicPersonasListInput",
+        "type": "object"
+      },
+      "name": "beatra.music.personas.list",
+      "outputSchema": {
+        "$defs": {
+          "MusicPersonaPreview": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "duration_seconds": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Duration Seconds"
+              },
+              "url": {
+                "title": "Url",
+                "type": "string"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "url"
+            ],
+            "title": "MusicPersonaPreview",
+            "type": "object"
+          },
+          "MusicPersonaSourceSong": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "title": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Title"
+              }
+            },
+            "required": [
+              "artifact_id"
+            ],
+            "title": "MusicPersonaSourceSong",
+            "type": "object"
+          },
+          "MusicStylePersonaItem": {
+            "additionalProperties": false,
+            "properties": {
+              "created_at": {
+                "format": "date-time",
+                "title": "Created At",
+                "type": "string"
+              },
+              "description": {
+                "title": "Description",
+                "type": "string"
+              },
+              "kind": {
+                "const": "style",
+                "default": "style",
+                "title": "Kind",
+                "type": "string"
+              },
+              "name": {
+                "title": "Name",
+                "type": "string"
+              },
+              "persona_id": {
+                "title": "Persona Id",
+                "type": "string"
+              },
+              "source_song": {
+                "$ref": "#/$defs/MusicPersonaSourceSong"
+              },
+              "status": {
+                "const": "active",
+                "default": "active",
+                "title": "Status",
+                "type": "string"
+              }
+            },
+            "required": [
+              "persona_id",
+              "name",
+              "description",
+              "created_at",
+              "source_song"
+            ],
+            "title": "MusicStylePersonaItem",
+            "type": "object"
+          },
+          "MusicVoicePersonaItem": {
+            "additionalProperties": false,
+            "properties": {
+              "created_at": {
+                "format": "date-time",
+                "title": "Created At",
+                "type": "string"
+              },
+              "description": {
+                "title": "Description",
+                "type": "string"
+              },
+              "kind": {
+                "const": "voice",
+                "default": "voice",
+                "title": "Kind",
+                "type": "string"
+              },
+              "name": {
+                "title": "Name",
+                "type": "string"
+              },
+              "persona_id": {
+                "title": "Persona Id",
+                "type": "string"
+              },
+              "preview": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/MusicPersonaPreview"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "status": {
+                "const": "active",
+                "default": "active",
+                "title": "Status",
+                "type": "string"
+              }
+            },
+            "required": [
+              "persona_id",
+              "name",
+              "description",
+              "created_at"
+            ],
+            "title": "MusicVoicePersonaItem",
+            "type": "object"
+          },
+          "ToolError": {
+            "additionalProperties": true,
+            "description": "Stable MCP tool-error envelope embedded in structuredContent.\n\nSame branching vocabulary as the REST error envelope: `code` is a registry\nerror code (plus the OAuth-standard `insufficient_scope`), `retryable`\ntells the agent whether an identical retry can succeed, `param` is a JSON\nPointer to the offending argument, and `details` carries correction facts.",
+            "properties": {
+              "code": {
+                "title": "Code",
+                "type": "string"
+              },
+              "details": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Details"
+              },
+              "jsonrpc_code": {
+                "title": "Jsonrpc Code",
+                "type": "integer"
+              },
+              "message": {
+                "title": "Message",
+                "type": "string"
+              },
+              "param": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Param"
+              },
+              "retryable": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Retryable"
+              },
+              "type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Type"
+              }
+            },
+            "required": [
+              "code",
+              "jsonrpc_code",
+              "message"
+            ],
+            "title": "ToolError",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ToolError"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "items": {
+            "items": {
+              "discriminator": {
+                "mapping": {
+                  "style": "#/$defs/MusicStylePersonaItem",
+                  "voice": "#/$defs/MusicVoicePersonaItem"
+                },
+                "propertyName": "kind"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/MusicStylePersonaItem"
+                },
+                {
+                  "$ref": "#/$defs/MusicVoicePersonaItem"
+                }
+              ]
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Next Cursor"
+          }
+        },
+        "title": "McpMusicPersonasListOutput",
+        "type": "object"
+      },
+      "title": "List Singers"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Save the singer of a track made by beatra.music.generate as a reusable persona (kind=style). Beatra picks the part where the singer is singing unless you send vocal_start_ms and vocal_end_ms. The track must have vocals and be generated without uploaded audio or video. Pass the returned persona_id to beatra.music.generate with model suno-6. Limited to 50 a day; call beatra.models.list for the price. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry.",
+      "inputSchema": {
+        "$defs": {
+          "MediaInputArtifact": {
+            "properties": {
+              "artifact_id": {
+                "description": "ULID of a previously-uploaded artifact",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "type": {
+                "const": "artifact",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "artifact_id"
+            ],
+            "title": "MediaInputArtifact",
+            "type": "object"
+          },
+          "MediaInputDataUri": {
+            "properties": {
+              "data": {
+                "description": "Data URI (e.g. data:image/png;base64,...) — max 256KB encoded",
+                "maxLength": 262144,
+                "title": "Data",
+                "type": "string"
+              },
+              "type": {
+                "const": "data_uri",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "data"
+            ],
+            "title": "MediaInputDataUri",
+            "type": "object"
+          },
+          "MediaInputUrl": {
+            "properties": {
+              "type": {
+                "const": "url",
+                "title": "Type",
+                "type": "string"
+              },
+              "url": {
+                "description": "HTTPS URL. External URLs are downloaded and re-hosted to beatra CDN.",
+                "title": "Url",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "url"
+            ],
+            "title": "MediaInputUrl",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "client_request_id": {
+            "description": "Stable retry identity for this billable operation. Reuse only for the exact same generation arguments.",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Client Request Id",
+            "type": "string"
+          },
+          "persona_description": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "What the singer sounds like.",
+            "title": "Persona Description"
+          },
+          "persona_name": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Name for the persona.",
+            "title": "Persona Name"
+          },
+          "persona_style": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional style notes, up to 200 characters.",
+            "title": "Persona Style"
+          },
+          "source": {
+            "description": "A track with vocals made by beatra.music.generate: its artifact, or the URL Beatra returned for it.",
+            "discriminator": {
+              "mapping": {
+                "artifact": "#/$defs/MediaInputArtifact",
+                "data_uri": "#/$defs/MediaInputDataUri",
+                "url": "#/$defs/MediaInputUrl"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/MediaInputUrl"
+              },
+              {
+                "$ref": "#/$defs/MediaInputArtifact"
+              },
+              {
+                "$ref": "#/$defs/MediaInputDataUri"
+              }
+            ],
+            "title": "Source"
+          },
+          "vocal_end_ms": {
+            "anyOf": [
+              {
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The 10–30 second vocal window the persona learns from. Leave both out and Beatra picks the part where the singer is singing; send only one and the other is set 30 seconds away.",
+            "title": "Vocal End Ms"
+          },
+          "vocal_start_ms": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The 10–30 second vocal window the persona learns from. Leave both out and Beatra picks the part where the singer is singing; send only one and the other is set 30 seconds away.",
+            "title": "Vocal Start Ms"
+          }
+        },
+        "required": [
+          "source",
+          "client_request_id"
+        ],
+        "title": "McpCreatePersonaFromSongInput",
+        "type": "object"
+      },
+      "name": "beatra.music.personas.create_from_song",
+      "outputSchema": {
+        "$defs": {
+          "ArtifactLink": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Artifact Id"
+              },
+              "media_type": {
+                "title": "Media Type",
+                "type": "string"
+              },
+              "mime_type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Mime Type"
+              },
+              "path": {
+                "title": "Path",
+                "type": "string"
+              },
+              "url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Url"
+              }
+            },
+            "required": [
+              "media_type",
+              "path"
+            ],
+            "title": "ArtifactLink",
+            "type": "object"
+          },
+          "TaskError": {
+            "properties": {
+              "code": {
+                "description": "Stable machine-readable public error code.",
+                "title": "Code",
+                "type": "string"
+              },
+              "details": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Provider-neutral expected, received, supported, or candidate failure facts.",
+                "title": "Details"
+              },
+              "message": {
+                "description": "Human-readable safe failure reason.",
+                "title": "Message",
+                "type": "string"
+              },
+              "param": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "JSON Pointer to the relevant request or output field.",
+                "title": "Param"
+              },
+              "request_id": {
+                "description": "Request trace identifier for support and correlation.",
+                "title": "Request Id",
+                "type": "string"
+              },
+              "retryable": {
+                "description": "Whether the same logical request may succeed when retried unchanged.",
+                "title": "Retryable",
+                "type": "boolean"
+              },
+              "type": {
+                "description": "Stable public error family.",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "type",
+              "message",
+              "retryable",
+              "request_id"
+            ],
+            "title": "TaskError",
+            "type": "object"
+          },
+          "ToolError": {
+            "additionalProperties": true,
+            "description": "Stable MCP tool-error envelope embedded in structuredContent.\n\nSame branching vocabulary as the REST error envelope: `code` is a registry\nerror code (plus the OAuth-standard `insufficient_scope`), `retryable`\ntells the agent whether an identical retry can succeed, `param` is a JSON\nPointer to the offending argument, and `details` carries correction facts.",
+            "properties": {
+              "code": {
+                "title": "Code",
+                "type": "string"
+              },
+              "details": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Details"
+              },
+              "jsonrpc_code": {
+                "title": "Jsonrpc Code",
+                "type": "integer"
+              },
+              "message": {
+                "title": "Message",
+                "type": "string"
+              },
+              "param": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Param"
+              },
+              "retryable": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Retryable"
+              },
+              "type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Type"
+              }
+            },
+            "required": [
+              "code",
+              "jsonrpc_code",
+              "message"
+            ],
+            "title": "ToolError",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "artifacts": {
+            "items": {
+              "$ref": "#/$defs/ArtifactLink"
+            },
+            "title": "Artifacts",
+            "type": "array"
+          },
+          "billing": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Billing"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ToolError"
+              },
+              {
+                "$ref": "#/$defs/TaskError"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Error"
+          },
+          "resolved_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Resolved Model"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "task": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Task"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Task Id"
+          },
+          "terminal": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Terminal"
+          },
+          "usage": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Usage"
+          }
+        },
+        "title": "TaskToolOutput",
+        "type": "object"
+      },
+      "title": "Save Singer from Song"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Step 1 of 2 to create a singer from the user's own singing voice (kind=voice); only the user's own voice can be used. Send source, a 30–60 second a cappella recording of the user singing, with consent_attested=true after the user confirmed it is their own voice, and language, the language you are using with the user. The task returns a short phrase in that language, how many seconds the recording of it should be, and when it expires. Show the phrase to the user exactly as written, ask what to call the singer, and ask them to record just the phrase right away, reading every word aloud clearly and unhurried in a quiet place (no need to sing); then send the file to Beatra (upload it with beatra.assets.upload if it is not already an artifact or URL). You cannot record for them. Then call beatra.music.personas.verify_voice. To get a new phrase for the same enrollment, for example after it expires or after a failed check, send only enrollment_id; the singing recording is reused. This creates an asynchronous task: submit exactly once, then poll with beatra.tasks.get, and reuse the same client_request_id only for an identical retry. Getting a phrase is free; only activating a singer with beatra.music.personas.verify_voice consumes Beatra credits (call beatra.models.list for its price).",
+      "inputSchema": {
+        "$defs": {
+          "MediaInputArtifact": {
+            "properties": {
+              "artifact_id": {
+                "description": "ULID of a previously-uploaded artifact",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "type": {
+                "const": "artifact",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "artifact_id"
+            ],
+            "title": "MediaInputArtifact",
+            "type": "object"
+          },
+          "MediaInputDataUri": {
+            "properties": {
+              "data": {
+                "description": "Data URI (e.g. data:image/png;base64,...) — max 256KB encoded",
+                "maxLength": 262144,
+                "title": "Data",
+                "type": "string"
+              },
+              "type": {
+                "const": "data_uri",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "data"
+            ],
+            "title": "MediaInputDataUri",
+            "type": "object"
+          },
+          "MediaInputUrl": {
+            "properties": {
+              "type": {
+                "const": "url",
+                "title": "Type",
+                "type": "string"
+              },
+              "url": {
+                "description": "HTTPS URL. External URLs are downloaded and re-hosted to beatra CDN.",
+                "title": "Url",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "url"
+            ],
+            "title": "MediaInputUrl",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "client_request_id": {
+            "description": "Stable retry identity for this billable operation. Reuse only for the exact same generation arguments.",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Client Request Id",
+            "type": "string"
+          },
+          "consent_attested": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "With source only: set true only after the user confirmed that the singing is their own voice and agreed to create a singer from it. Only the user's own voice can be used.",
+            "title": "Consent Attested"
+          },
+          "enrollment_id": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Send alone to get a new phrase for an open enrollment, for example after the phrase expired or a check failed. The singing recording is reused.",
+            "title": "Enrollment Id"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "enum": [
+                  "en",
+                  "zh",
+                  "es",
+                  "fr",
+                  "pt",
+                  "de",
+                  "ja",
+                  "ko",
+                  "hi",
+                  "ru"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "With source only: the language of the phrase the user will read aloud: en, zh, es, fr, pt, de, ja, ko, hi, or ru. Send the language you are using with the user so they can read the phrase; when omitted, Beatra uses the account's language. Every new phrase for this enrollment stays in this language.",
+            "title": "Language"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "discriminator": {
+                  "mapping": {
+                    "artifact": "#/$defs/MediaInputArtifact",
+                    "data_uri": "#/$defs/MediaInputDataUri",
+                    "url": "#/$defs/MediaInputUrl"
+                  },
+                  "propertyName": "type"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/MediaInputUrl"
+                  },
+                  {
+                    "$ref": "#/$defs/MediaInputArtifact"
+                  },
+                  {
+                    "$ref": "#/$defs/MediaInputDataUri"
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "With source only, to start: a 30–60 second a cappella recording of the user singing: an uploaded file, an artifact, or a URL. Clean vocals without accompaniment work best.",
+            "title": "Source"
+          },
+          "vocal_end_ms": {
+            "anyOf": [
+              {
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "With source only, optional: the singing part of a longer recording, in milliseconds on whole seconds, 30–60 seconds long. Leave out to use the whole recording.",
+            "title": "Vocal End Ms"
+          },
+          "vocal_start_ms": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "With source only, optional: the singing part of a longer recording, in milliseconds on whole seconds, 30–60 seconds long. Leave out to use the whole recording.",
+            "title": "Vocal Start Ms"
+          }
+        },
+        "required": [
+          "client_request_id"
+        ],
+        "title": "McpEnrollVoiceInput",
+        "type": "object"
+      },
+      "name": "beatra.music.personas.enroll_voice",
+      "outputSchema": {
+        "$defs": {
+          "ArtifactLink": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Artifact Id"
+              },
+              "media_type": {
+                "title": "Media Type",
+                "type": "string"
+              },
+              "mime_type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Mime Type"
+              },
+              "path": {
+                "title": "Path",
+                "type": "string"
+              },
+              "url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Url"
+              }
+            },
+            "required": [
+              "media_type",
+              "path"
+            ],
+            "title": "ArtifactLink",
+            "type": "object"
+          },
+          "TaskError": {
+            "properties": {
+              "code": {
+                "description": "Stable machine-readable public error code.",
+                "title": "Code",
+                "type": "string"
+              },
+              "details": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Provider-neutral expected, received, supported, or candidate failure facts.",
+                "title": "Details"
+              },
+              "message": {
+                "description": "Human-readable safe failure reason.",
+                "title": "Message",
+                "type": "string"
+              },
+              "param": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "JSON Pointer to the relevant request or output field.",
+                "title": "Param"
+              },
+              "request_id": {
+                "description": "Request trace identifier for support and correlation.",
+                "title": "Request Id",
+                "type": "string"
+              },
+              "retryable": {
+                "description": "Whether the same logical request may succeed when retried unchanged.",
+                "title": "Retryable",
+                "type": "boolean"
+              },
+              "type": {
+                "description": "Stable public error family.",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "type",
+              "message",
+              "retryable",
+              "request_id"
+            ],
+            "title": "TaskError",
+            "type": "object"
+          },
+          "ToolError": {
+            "additionalProperties": true,
+            "description": "Stable MCP tool-error envelope embedded in structuredContent.\n\nSame branching vocabulary as the REST error envelope: `code` is a registry\nerror code (plus the OAuth-standard `insufficient_scope`), `retryable`\ntells the agent whether an identical retry can succeed, `param` is a JSON\nPointer to the offending argument, and `details` carries correction facts.",
+            "properties": {
+              "code": {
+                "title": "Code",
+                "type": "string"
+              },
+              "details": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Details"
+              },
+              "jsonrpc_code": {
+                "title": "Jsonrpc Code",
+                "type": "integer"
+              },
+              "message": {
+                "title": "Message",
+                "type": "string"
+              },
+              "param": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Param"
+              },
+              "retryable": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Retryable"
+              },
+              "type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Type"
+              }
+            },
+            "required": [
+              "code",
+              "jsonrpc_code",
+              "message"
+            ],
+            "title": "ToolError",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "artifacts": {
+            "items": {
+              "$ref": "#/$defs/ArtifactLink"
+            },
+            "title": "Artifacts",
+            "type": "array"
+          },
+          "billing": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Billing"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ToolError"
+              },
+              {
+                "$ref": "#/$defs/TaskError"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Error"
+          },
+          "resolved_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Resolved Model"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "task": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Task"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Task Id"
+          },
+          "terminal": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Terminal"
+          },
+          "usage": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Usage"
+          }
+        },
+        "title": "TaskToolOutput",
+        "type": "object"
+      },
+      "title": "Start Singer from Voice"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false
+      },
+      "description": "Step 2 of 2: send the user's recording of the phrase from beatra.music.personas.enroll_voice, and persona_name, the name the user chose, to activate a singer made from their own voice (kind=voice). The same person must record it soon after getting the phrase. When it succeeds, the task returns persona_id and, when available, a short sample song sung in that voice (preview). Pass persona_id to beatra.music.generate with model suno-6; songs will sound as close to that voice as the model can make them. If the check or the setup fails, the charge is refunded: get a new phrase with beatra.music.personas.enroll_voice and the same enrollment_id (the singing recording is reused), then record again. An account can keep up to 3 singers made from a voice; call beatra.models.list for the price. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry.",
+      "inputSchema": {
+        "$defs": {
+          "MediaInputArtifact": {
+            "properties": {
+              "artifact_id": {
+                "description": "ULID of a previously-uploaded artifact",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "type": {
+                "const": "artifact",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "artifact_id"
+            ],
+            "title": "MediaInputArtifact",
+            "type": "object"
+          },
+          "MediaInputDataUri": {
+            "properties": {
+              "data": {
+                "description": "Data URI (e.g. data:image/png;base64,...) — max 256KB encoded",
+                "maxLength": 262144,
+                "title": "Data",
+                "type": "string"
+              },
+              "type": {
+                "const": "data_uri",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "data"
+            ],
+            "title": "MediaInputDataUri",
+            "type": "object"
+          },
+          "MediaInputUrl": {
+            "properties": {
+              "type": {
+                "const": "url",
+                "title": "Type",
+                "type": "string"
+              },
+              "url": {
+                "description": "HTTPS URL. External URLs are downloaded and re-hosted to beatra CDN.",
+                "title": "Url",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "url"
+            ],
+            "title": "MediaInputUrl",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "client_request_id": {
+            "description": "Stable retry identity for this billable operation. Reuse only for the exact same generation arguments.",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Client Request Id",
+            "type": "string"
+          },
+          "enrollment_id": {
+            "description": "The enrollment_id returned by beatra.music.personas.enroll_voice.",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Enrollment Id",
+            "type": "string"
+          },
+          "persona_description": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "What the voice sounds like, up to 500 characters.",
+            "title": "Persona Description"
+          },
+          "persona_name": {
+            "description": "The name the user chose for the singer, up to 80 characters.",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Persona Name",
+            "type": "string"
+          },
+          "persona_style": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional style notes, up to 200 characters.",
+            "title": "Persona Style"
+          },
+          "verification_audio": {
+            "description": "The user's recording of just the phrase, made after the phrase was issued, as long as recording_seconds in the enrollment result allows: an uploaded file, an artifact, or a URL. Read every word aloud clearly and unhurried, in a quiet place, close to the microphone; there is no need to sing.",
+            "discriminator": {
+              "mapping": {
+                "artifact": "#/$defs/MediaInputArtifact",
+                "data_uri": "#/$defs/MediaInputDataUri",
+                "url": "#/$defs/MediaInputUrl"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/MediaInputUrl"
+              },
+              {
+                "$ref": "#/$defs/MediaInputArtifact"
+              },
+              {
+                "$ref": "#/$defs/MediaInputDataUri"
+              }
+            ],
+            "title": "Verification Audio"
+          }
+        },
+        "required": [
+          "enrollment_id",
+          "verification_audio",
+          "persona_name",
+          "client_request_id"
+        ],
+        "title": "McpVerifyVoiceInput",
+        "type": "object"
+      },
+      "name": "beatra.music.personas.verify_voice",
+      "outputSchema": {
+        "$defs": {
+          "ArtifactLink": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Artifact Id"
+              },
+              "media_type": {
+                "title": "Media Type",
+                "type": "string"
+              },
+              "mime_type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Mime Type"
+              },
+              "path": {
+                "title": "Path",
+                "type": "string"
+              },
+              "url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Url"
+              }
+            },
+            "required": [
+              "media_type",
+              "path"
+            ],
+            "title": "ArtifactLink",
+            "type": "object"
+          },
+          "TaskError": {
+            "properties": {
+              "code": {
+                "description": "Stable machine-readable public error code.",
+                "title": "Code",
+                "type": "string"
+              },
+              "details": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Provider-neutral expected, received, supported, or candidate failure facts.",
+                "title": "Details"
+              },
+              "message": {
+                "description": "Human-readable safe failure reason.",
+                "title": "Message",
+                "type": "string"
+              },
+              "param": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "JSON Pointer to the relevant request or output field.",
+                "title": "Param"
+              },
+              "request_id": {
+                "description": "Request trace identifier for support and correlation.",
+                "title": "Request Id",
+                "type": "string"
+              },
+              "retryable": {
+                "description": "Whether the same logical request may succeed when retried unchanged.",
+                "title": "Retryable",
+                "type": "boolean"
+              },
+              "type": {
+                "description": "Stable public error family.",
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "type",
+              "message",
+              "retryable",
+              "request_id"
+            ],
+            "title": "TaskError",
+            "type": "object"
+          },
+          "ToolError": {
+            "additionalProperties": true,
+            "description": "Stable MCP tool-error envelope embedded in structuredContent.\n\nSame branching vocabulary as the REST error envelope: `code` is a registry\nerror code (plus the OAuth-standard `insufficient_scope`), `retryable`\ntells the agent whether an identical retry can succeed, `param` is a JSON\nPointer to the offending argument, and `details` carries correction facts.",
+            "properties": {
+              "code": {
+                "title": "Code",
+                "type": "string"
+              },
+              "details": {
+                "anyOf": [
+                  {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Details"
+              },
+              "jsonrpc_code": {
+                "title": "Jsonrpc Code",
+                "type": "integer"
+              },
+              "message": {
+                "title": "Message",
+                "type": "string"
+              },
+              "param": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Param"
+              },
+              "retryable": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Retryable"
+              },
+              "type": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Type"
+              }
+            },
+            "required": [
+              "code",
+              "jsonrpc_code",
+              "message"
+            ],
+            "title": "ToolError",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "artifacts": {
+            "items": {
+              "$ref": "#/$defs/ArtifactLink"
+            },
+            "title": "Artifacts",
+            "type": "array"
+          },
+          "billing": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Billing"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ToolError"
+              },
+              {
+                "$ref": "#/$defs/TaskError"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Error"
+          },
+          "resolved_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Resolved Model"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "task": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Task"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Task Id"
+          },
+          "terminal": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Terminal"
+          },
+          "usage": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Usage"
+          }
+        },
+        "title": "TaskToolOutput",
+        "type": "object"
+      },
+      "title": "Activate Singer from Voice"
     },
     {
       "annotations": {
@@ -20187,7 +21989,9 @@
               "music_lyrics_timing",
               "music_cover_image",
               "music_video",
-              "music_wav"
+              "music_wav",
+              "music_voice_enrollment",
+              "music_voice_persona"
             ],
             "title": "Capability",
             "type": "string"
@@ -20202,7 +22006,7 @@
         "required": [
           "capability"
         ],
-        "title": "ModelListV15Input",
+        "title": "ModelListVoiceInput",
         "type": "object"
       },
       "name": "beatra.models.list",
@@ -24470,7 +26274,9 @@
                   "music_lyrics_timing",
                   "music_cover_image",
                   "music_video",
-                  "music_wav"
+                  "music_wav",
+                  "music_voice_enrollment",
+                  "music_voice_persona"
                 ],
                 "type": "string"
               },
@@ -24524,7 +26330,7 @@
             "title": "Status"
           }
         },
-        "title": "TaskListV15Input",
+        "title": "TaskListVoiceInput",
         "type": "object"
       },
       "name": "beatra.tasks.list",

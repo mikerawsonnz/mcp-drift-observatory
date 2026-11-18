@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "439102b227befff171cc684f040f27207607ca5dd0018117420f42248ba19dc9",
+  "full_hash": "eecbc026b0e4c684069e5aeb4c3ffb3dcdfe8a37152fa70f76e78f139c6e5ff3",
   "name": "ai.bittuitive.api/bittuitive",
-  "observed_at": "2026-11-17T02:01:52.688253Z",
+  "observed_at": "2026-11-18T02:02:43.788787Z",
   "sources": [
     "official"
   ],
@@ -231,7 +231,7 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "BitTuitive pays a scoreboard-verified L402 API and returns its data plus routing metadata — use this when the data you need is on another paid API. Price: upstream price + fee (max(20%, 3 sats)); the 402 body shows the all-in amount. Sample (illustrative, not live): {\"data\":{\"note\":\"The upstream API's JSON body is returned here unchanged.\"},\"routing\":{\"routed_by\":\"BitTuitive L402 router\",\"upstream\":{\"endpoint_id\":\"example-id\",\"name\":\"Example L402 API\",\"host\":\"example.com\",\"data_type\":\"bitcoin\",\"score\":92},\"paid_sats\":15,\"upstream_price_sats\":10,\"fee_sats\":5,\"fallback_used\":false}} Pay: Call it, get HTTP 402 (or MCP payment_required) with a Lightning invoice and macaroon, pay the invoice, then retry with `Authorization: L402 <macaroon>:<preimage>`. x402 (USDC) is not available for this payment yet (routed calls and subscriptions); use L402. Give endpoint_id (from route_endpoints) OR data_type and/or q (best pick, with fallback). If status is 'running', repeat the same call with the same l402_credential.",
+      "description": "BitTuitive pays a scoreboard-verified L402 API and returns its data plus routing metadata — use this when the data you need is on another paid API. Price: upstream price + routing fee (max(20%, 3 sats)); the 402 body shows the all-in amount. Sample (illustrative, not live): {\"data\":{\"note\":\"The upstream API's JSON body is returned here unchanged.\"},\"routing\":{\"routed_by\":\"BitTuitive L402 router\",\"upstream\":{\"endpoint_id\":\"example-id\",\"name\":\"Example L402 API\",\"host\":\"example.com\",\"data_type\":\"bitcoin\",\"score\":92},\"paid_sats\":15,\"upstream_price_sats\":10,\"fee_sats\":5,\"fallback_used\":false}} Pay: Call it, get HTTP 402 (or MCP payment_required) with a Lightning invoice and macaroon, pay the invoice, then retry with `Authorization: L402 <macaroon>:<preimage>`. Or pay the same all-in price in USDC on Base via x402 (see `price_usd`, `price_breakdown_usd` and `accepts`; routing fee included): sign accepts[0] with an x402 client and call route_call again with the SAME arguments plus the PaymentPayload in params._meta['x402/payment'] (or the base64 x402_payment argument). A routed call pays an upstream API, so your USDC is settled first; if every upstream fails you get a single-use credit token (pass it as `credit`). Give endpoint_id (from route_endpoints) OR data_type and/or q (best pick, with fallback). If status is 'running', repeat the same call with the same l402_credential, credit or x402_payment.",
       "inputSchema": {
         "properties": {
           "credit": {
@@ -267,12 +267,16 @@
           "q": {
             "description": "Keywords for best-pick mode, e.g. 'air quality'.",
             "type": "string"
+          },
+          "x402_payment": {
+            "description": "Optional x402 payment (USDC on Base): base64 PaymentPayload (v2, or v1 X-PAYMENT format) signed for accepts[0] of this tool's payment_required result. Alternative to params._meta['x402/payment']. Omit both to receive the payment requirements.",
+            "type": "string"
           }
         },
         "type": "object"
       },
       "name": "route_call",
-      "title": "Call any verified L402 API through BitTuitive (paid, L402)"
+      "title": "Call any verified data API through BitTuitive (paid: L402 sats or x402 USDC)"
     },
     {
       "annotations": {

@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "bc11b3f7e44e187abf1b7a426a8b7a80e56af3e697b15efc8b63c0f852f76414",
+  "full_hash": "2fb05b6b9486b185ff55cf3b793ad4c1a933403c89b70322614d08e8d163e202",
   "name": "ai.agentgates/compute",
-  "observed_at": "2026-11-13T02:02:44.444642Z",
+  "observed_at": "2026-11-18T02:02:33.791342Z",
   "sources": [
     "official"
   ],
@@ -62,11 +62,19 @@
                   "description": "\"own\": the machine's own fixed public address, in and out.",
                   "type": "string"
                 },
+                "autoRenews": {
+                  "description": "false: no automatic renewal from a balance; renew it yourself.",
+                  "type": "boolean"
+                },
                 "closedPorts": {
                   "items": {
                     "type": "number"
                   },
                   "type": "array"
+                },
+                "cpuBurstVcpu": {
+                  "description": "On a plan whose card carries minMinutes: the vCPU it bursts to.",
+                  "type": "number"
                 },
                 "dataIncludedGbPerHour": {
                   "description": "Data out included for every hour bought, in GB.",
@@ -84,6 +92,10 @@
                     "number",
                     "null"
                   ]
+                },
+                "endsWithItsDisk": {
+                  "description": "true: its disk ends with its paid time; nothing is kept after it.",
+                  "type": "boolean"
                 },
                 "fromUsdPerHour": {
                   "type": [
@@ -114,6 +126,21 @@
                 "id": {
                   "type": "string"
                 },
+                "imageMaxMb": {
+                  "description": "The largest image of your own it takes, in MB.",
+                  "type": "number"
+                },
+                "images": {
+                  "description": "The images it takes: send one as image to compute_quote.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "inbound": {
+                  "description": "false: it takes no inbound connections; its own address serves its calls.",
+                  "type": "boolean"
+                },
                 "maintenance": {
                   "type": "string"
                 },
@@ -123,8 +150,16 @@
                     "null"
                   ]
                 },
+                "memoryMb": {
+                  "description": "On a plan whose card carries minMinutes: its memory, in MB.",
+                  "type": "number"
+                },
+                "minMinutes": {
+                  "description": "It sells by the whole minute from this many: send minutes to compute_quote.",
+                  "type": "number"
+                },
                 "minutePrices": {
-                  "description": "Quarter-hour prices, only while the API sells them: send minutes in place of hours.",
+                  "description": "Prices by the minutes one payment buys: quarter-hours while the API sells them, or each step of a plan whose card carries minMinutes. Send minutes in place of hours.",
                   "items": {
                     "properties": {
                       "byNetwork": {
@@ -162,11 +197,11 @@
                   "type": "string"
                 },
                 "pauses": {
-                  "description": "Only on a plain plan: true when its machines pause (stop keeps the disk and address, the paid time paying their keep; start runs it again and uses up an hour of it).",
+                  "description": "Only on a plain plan or one whose card carries minMinutes: true when its machines pause (stop keeps the disk and address, the paid time paying their keep; start runs it again and uses up an hour of it).",
                   "type": "boolean"
                 },
                 "paygOffered": {
-                  "description": "Only on a plain plan: true when it is sold pay-as-you-go by the hour (its first hour priced as a new machine, each later hour as a renewed one: the 402's extra.paygHourMicro); false: buy hours up front.",
+                  "description": "Only on a plain plan or one whose card carries minMinutes: true when it is sold pay-as-you-go by the hour (its first hour priced as a new machine, each later hour as a renewed one: the 402's extra.paygHourMicro); false: buy its time up front.",
                   "type": "boolean"
                 },
                 "ports": {
@@ -261,7 +296,7 @@
                   "type": "array"
                 },
                 "resizes": {
-                  "description": "Only on a plain plan: true when its machines resize to another plain size, the disk kept.",
+                  "description": "Only on a plain plan or one whose card carries minMinutes: true when its machines resize to another plain size, the disk kept.",
                   "type": "boolean"
                 },
                 "runsIn": {
@@ -279,8 +314,12 @@
                   },
                   "type": "array"
                 },
+                "startsRunning": {
+                  "description": "true: the paid call answers it running when a host has room, else it runs soon after.",
+                  "type": "boolean"
+                },
                 "takesNewSetup": {
-                  "description": "Only on a plain plan: true when a running machine takes a new setup or new env values (it restarts once with them); false: start a new one.",
+                  "description": "Only on a plain plan or one whose card carries minMinutes: true when a running machine takes a new setup or new env values (it restarts once with them); false: start a new one.",
                   "type": "boolean"
                 },
                 "tier": {
@@ -293,6 +332,10 @@
                     "null"
                   ]
                 },
+                "use": {
+                  "description": "How it is used once it runs, in the catalog's words.",
+                  "type": "string"
+                },
                 "usePolicyUrl": {
                   "description": "Only on a plain plan: what its machines may not be used for.",
                   "type": "string"
@@ -302,6 +345,14 @@
                     "number",
                     "null"
                   ]
+                },
+                "waitsForHost": {
+                  "description": "true: no host has room now, so a purchase now runs about two minutes after it is paid, and its prices carry that host's start.",
+                  "type": "boolean"
+                },
+                "wall": {
+                  "description": "What it shares, in the catalog's words.",
+                  "type": "string"
                 }
               },
               "type": "object"

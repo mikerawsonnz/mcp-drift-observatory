@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "723367691228b8c16a2a8742a936af93c7633b99e90884f6a8d407aa4134b7e4",
+  "full_hash": "518adce8026028182c8e4c4cb70461501e66bab34ed446546afbdb1297e13a22",
   "name": "ai.betslipdoctor/mcp",
-  "observed_at": "2026-11-17T02:01:53.521968Z",
+  "observed_at": "2026-11-18T02:02:42.762691Z",
   "sources": [
     "official"
   ],
-  "tool_count": 100,
+  "tool_count": 102,
   "tools": [
     {
       "_meta": {
@@ -13794,7 +13794,7 @@
         "readOnlyHint": false,
         "title": "Doctor: decisions, reply buttons, memory"
       },
-      "description": "The Doctor actions beside the conversation, as the app does them. Record a decision only when the customer says what they did; change memory consent only when they ask. Delete and forget preview until confirmed; reuse the same commandKey on a retry. desk: GET desk optional params {placed: comma-separated pick ids}; the Doctor’s Desk: open picks (label, book, price, edge, paper stake in units, bet link), the picks named in placed (open or settled) and the Desk’s record; a free plan gets locked rows (league and start time only) and the record; desk_price: GET desk/price params {pickId}; the book’s price right now against the posted price: state same|better|worse|gone and whether it is still a pick. Paid plans; decision: GET doctor/messages/{messageId}/decision optional params {beforeRevision}; returns the saved reply reference and responseRevision; record_decision: POST doctor/messages/{messageId}/decision body {messageId, messageDigest, threadId, binding:{ticketId, reportId, history}, expectedRevision, confirmation: SAVE_RESPONSE, decision: followed|changed|skipped|unknown, modifiedTicketId?}; use the exact reference and responseRevision from decision; binding values can be null; subject to the app Doctor action access gate; saved_reply: GET doctor/messages/{messageId}/saved-reply params {messageDigest, threadId, ticketId?, reportId?, historyKind?, historyId?}; omit null bindings, include ticketId with reportId, and send historyKind and historyId together; grade_this: POST doctor/messages/{messageId}/grade-quote app body; compare_books: POST doctor/messages/{messageId}/book-prices app body; revise_ticket: POST doctor/messages/{messageId}/revisions app body; book_check: GET doctor/book-comparisons/{comparisonId}; delete_thread: POST doctor/threads/{threadId}/delete (confirmation DELETE); memory_status: GET doctor/memory; memory_context: GET doctor/memory/context; memory_consent: POST doctor/memory/consent body {enabled, expectedGeneration, confirmation}; use memory_status.generation and ALLOW_HONCHO_MEMORY when enabling or DISABLE_HONCHO_MEMORY when disabling; enabling requires notes memory enabled; memory_forget_all: POST doctor/memory/forget body {expectedGeneration}; use memory_status.generation; confirmed notes remain and vendor erasure can be pending (confirmation FORGET_RECALLED_MEMORY); notes_consent: POST memory/consent body {enabled, expectedGeneration}; use memory_status.generation; the switch controls both notes and automatic Doctor memory, without deleting notes. Confirm the requested change with the customer before a write. A valid write is sent without a separate MCP preview unless the action says otherwise.",
+      "description": "The Doctor actions beside the conversation, as the app does them. Record a decision only when the customer says what they did; change memory consent only when they ask. Delete and forget preview until confirmed; reuse the same commandKey on a retry. desk: GET desk optional params {placed: comma-separated pick ids}; the Doctor’s Desk: open picks with a real Grade of B or better (label, book, price, edge, paper stake in units, bet link, grade), the picks named in placed (open or settled) and the Desk’s record; Free and Starter get locked rows (league and start time only) and the record; desk_price: GET desk/price params {pickId}; the book’s price right now against the posted price: state same|better|worse|gone and whether it is still a pick. Pro and up; desk_report: GET desk/report params {pickId}; the Grade report behind a Desk pick’s letter (grade.report true). Pro and up; decision: GET doctor/messages/{messageId}/decision optional params {beforeRevision}; returns the saved reply reference and responseRevision; record_decision: POST doctor/messages/{messageId}/decision body {messageId, messageDigest, threadId, binding:{ticketId, reportId, history}, expectedRevision, confirmation: SAVE_RESPONSE, decision: followed|changed|skipped|unknown, modifiedTicketId?}; use the exact reference and responseRevision from decision; binding values can be null; subject to the app Doctor action access gate; saved_reply: GET doctor/messages/{messageId}/saved-reply params {messageDigest, threadId, ticketId?, reportId?, historyKind?, historyId?}; omit null bindings, include ticketId with reportId, and send historyKind and historyId together; grade_this: POST doctor/messages/{messageId}/grade-quote app body; compare_books: POST doctor/messages/{messageId}/book-prices app body; revise_ticket: POST doctor/messages/{messageId}/revisions app body; book_check: GET doctor/book-comparisons/{comparisonId}; delete_thread: POST doctor/threads/{threadId}/delete (confirmation DELETE); memory_status: GET doctor/memory; memory_context: GET doctor/memory/context; memory_consent: POST doctor/memory/consent body {enabled, expectedGeneration, confirmation}; use memory_status.generation and ALLOW_HONCHO_MEMORY when enabling or DISABLE_HONCHO_MEMORY when disabling; enabling requires notes memory enabled; memory_forget_all: POST doctor/memory/forget body {expectedGeneration}; use memory_status.generation; confirmed notes remain and vendor erasure can be pending (confirmation FORGET_RECALLED_MEMORY); notes_consent: POST memory/consent body {enabled, expectedGeneration}; use memory_status.generation; the switch controls both notes and automatic Doctor memory, without deleting notes. Confirm the requested change with the customer before a write. A valid write is sent without a separate MCP preview unless the action says otherwise.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -13802,6 +13802,7 @@
             "enum": [
               "desk",
               "desk_price",
+              "desk_report",
               "decision",
               "record_decision",
               "saved_reply",
@@ -14287,6 +14288,95 @@
         }
       ],
       "title": "Read a pasted betslip"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "tail.read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Read the Desk"
+      },
+      "description": "The Desk tab as the app reads it (GET desk). picks: the open Desk picks whose real Grade is B or better (B, B+, A-, A, A+), each with label, matchup, book, price, edge, paper stake in units, bet link and grade {letter, score, jobId, report: true}; picks with no Grade yet or a lower Grade are not on the Desk. Optional placed: pick ids the customer placed, returned as bets (open or settled) with their Grade whatever its letter. record: every settled Desk pick. Pro and up get the picks; Free and Starter get locked rows (league and start time only), the same count, and the record. Reads only; nothing is placed.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "placed": {
+            "description": "Pick ids the customer placed.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 100,
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_desk",
+      "securitySchemes": [
+        {
+          "scopes": [
+            "tail.read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Read the Desk"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "reports.read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Read a Desk pick’s Grade report"
+      },
+      "description": "The full Grade report behind one Desk pick’s letter (GET desk/report), the same report the app opens from the pick: {version, pickId, grade {letter, score, jobId}, report}. Use a pickId from get_desk whose grade.report is true. Pro and up only (desk_plan_required for Free and Starter); desk_pick_not_found for an unknown pick, desk_report_not_ready while the pick has no finished Grade. Reads only.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "pickId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pickId"
+        ],
+        "type": "object"
+      },
+      "name": "get_desk_report",
+      "securitySchemes": [
+        {
+          "scopes": [
+            "reports.read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Read a Desk pick’s Grade report"
     },
     {
       "_meta": {

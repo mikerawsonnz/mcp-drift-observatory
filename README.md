@@ -5,33 +5,27 @@ servers: what tools each one **declared**, byte-exactly, and when that declarati
 
 One commit per crawl cycle. A change to a server's tool surface appears as a diff.
 
-## Latest crawl: 2026-11-17 02:02 UTC
+## Latest crawl: 2026-11-18 02:03 UTC
 
-21 of 253 observable servers changed their declared tools. Attempted 279: 253 observable, 20 auth-walled, 2 unreachable, 4 blocked.
+15 of 258 observable servers changed their declared tools. Attempted 285: 258 observable, 20 auth-walled, 7 unreachable, 0 blocked.
 
-- [ad.pantheon/mcp](deltas/2026-11-17/c385e5b261a52bf286e2.json): count changed, tool added; 5 tool(s) added
-- [ae.brainy/grocery-prices](deltas/2026-11-17/9443ab886276db8be110.json): schema changed; 336 field(s) changed
-- [ae.discond/discond](deltas/2026-11-17/cd7db03de9f0ecc82710.json): schema changed; 35 field(s) changed; signals: imperative_language_introduced **(notable)**
-- [aero.events/events](deltas/2026-11-17/0ab3287c5fc33c6e22e5.json): description changed, schema changed; 2 field(s) changed
-- [ai.agentboard/agentboard](deltas/2026-11-17/89334b6ae3243e4e2df6.json): count changed, description changed, tool added; 1 tool(s) added; 8 field(s) changed; signals: length_more_than_doubled
-- [ai.agentsrank/agentsrank](deltas/2026-11-17/e901088f2b853a367dca.json): count changed, description changed, schema changed, tool added; 3 tool(s) added; 13 field(s) changed; signals: length_more_than_doubled
-- [ai.annsa/annsa](deltas/2026-11-17/59d41e60a9e6430b00b0.json): schema changed; 6 field(s) changed
-- [ai.appgoat/mcp](deltas/2026-11-17/9aff2500785fcb6529f4.json): description changed, schema changed; 9 field(s) changed
-- [ai.arcangel/trademark-search](deltas/2026-11-17/51dbd3b220397cebf7d7.json): count changed, field changed, tool added; 3 tool(s) added; 6 field(s) changed
-- [ai.arclan/registry](deltas/2026-11-17/0b01ebd7cd8a49a80df5.json): count changed, tool added; 2 tool(s) added
-- [ai.arcreport/ask](deltas/2026-11-17/5990de195db11012fcfb.json): count changed, description changed, schema changed, tool added; 1 tool(s) added; 10 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled **(notable)**
-- [ai.arcreport/mcp](deltas/2026-11-17/5b7f6412bf3c3e91b70c.json): schema changed; 6 field(s) changed; signals: length_more_than_doubled
-- [ai.athenahq/mcp](deltas/2026-11-17/d1c9dc97b241abc09e4e.json): description changed, schema changed; 15 field(s) changed
-- [ai.avasis.agents/avasis](deltas/2026-11-17/13be9a5c0441e3f603e0.json): count changed, tool added, tool removed; 3 tool(s) added; 4 tool(s) removed
-- [ai.beatra/beatra](deltas/2026-11-17/4f93d616eb97e76f800a.json): schema changed; 8 field(s) changed
-- [ai.betslipdoctor/mcp](deltas/2026-11-17/f29327f2a9147dd897c0.json): description changed, schema changed; 16 field(s) changed
-- [ai.bidclub/bidclub](deltas/2026-11-17/aec34e730ed613f0048d.json): description changed; 1 field(s) changed
-- [ai.bittuitive.api/bittuitive](deltas/2026-11-17/c0c8c3bdf1cbda3c2fcd.json): count changed, description changed, field changed, schema changed, tool added; 12 tool(s) added; 49 field(s) changed; signals: imperative_language_introduced, url_introduced **(notable)**
-- [ai.booqer/booqer](deltas/2026-11-17/9bb78baa139078dd6da5.json): description changed, schema changed; 3 field(s) changed
-- [ai.bowmark/bowmark](deltas/2026-11-17/5f2d24be930573ed8878.json): description changed, schema changed; 4 field(s) changed
-- [ai.bowmark/bowmark](deltas/2026-11-17/e742a173e323c903336e.json): description changed, schema changed; 4 field(s) changed
+- [ae.brainy/grocery-prices](deltas/2026-11-18/f6d1febd0eda9114989e.json): schema changed; 9 field(s) changed
+- [ae.brainy/grocery-prices](deltas/2026-11-18/9443ab886276db8be110.json): schema changed; 9 field(s) changed
+- [ai.agentgates/compute](deltas/2026-11-18/8e123eb71203886e049b.json): schema changed; 30 field(s) changed
+- [ai.ahel/ahel](deltas/2026-11-18/f81cefdfba92e36c524a.json): description changed; 1 field(s) changed; signals: imperative_language_introduced **(notable)**
+- [ai.annsa/annsa](deltas/2026-11-18/59d41e60a9e6430b00b0.json): schema changed; 28 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled **(notable)**
+- [ai.arcangel/trademark-search](deltas/2026-11-18/51dbd3b220397cebf7d7.json): count changed, description changed, field changed, schema changed, tool added; 3 tool(s) added; 20 field(s) changed
+- [ai.athenahq/mcp](deltas/2026-11-18/d1c9dc97b241abc09e4e.json): schema changed; 1 field(s) changed
+- [ai.avasis.agents/avasis](deltas/2026-11-18/13be9a5c0441e3f603e0.json): count changed, tool added; 2 tool(s) added
+- [ai.bamf/bamf](deltas/2026-11-18/bcec739ff4350c4ddf27.json): count changed, tool added; 2 tool(s) added
+- [ai.beatra/beatra](deltas/2026-11-18/4f93d616eb97e76f800a.json): count changed, description changed, schema changed, tool added; 4 tool(s) added; 10 field(s) changed; signals: imperative_language_introduced **(notable)**
+- [ai.beliefstate/investor-research](deltas/2026-11-18/d29176e06366706dabab.json): schema changed; 4012 field(s) changed; signals: length_more_than_doubled, url_introduced
+- [ai.betslipdoctor/mcp](deltas/2026-11-18/f29327f2a9147dd897c0.json): count changed, description changed, schema changed, tool added; 2 tool(s) added; 15 field(s) changed
+- [ai.bittuitive.api/bittuitive](deltas/2026-11-18/c0c8c3bdf1cbda3c2fcd.json): description changed, field changed, schema changed; 4 field(s) changed
+- [ai.bowmark/bowmark](deltas/2026-11-18/5f2d24be930573ed8878.json): description changed, schema changed; 2 field(s) changed
+- [ai.bowmark/bowmark](deltas/2026-11-18/e742a173e323c903336e.json): description changed, schema changed; 2 field(s) changed
 
-Changes per day: [2026-11-11](deltas/2026-11-11/) 15, [2026-11-12](deltas/2026-11-12/) 17, [2026-11-13](deltas/2026-11-13/) 13, [2026-11-14](deltas/2026-11-14/) 18, [2026-11-15](deltas/2026-11-15/) 9, [2026-11-16](deltas/2026-11-16/) 11, [2026-11-17](deltas/2026-11-17/) 21
+Changes per day: [2026-11-12](deltas/2026-11-12/) 17, [2026-11-13](deltas/2026-11-13/) 13, [2026-11-14](deltas/2026-11-14/) 18, [2026-11-15](deltas/2026-11-15/) 9, [2026-11-16](deltas/2026-11-16/) 11, [2026-11-17](deltas/2026-11-17/) 21, [2026-11-18](deltas/2026-11-18/) 15
 
 ## What this is
 

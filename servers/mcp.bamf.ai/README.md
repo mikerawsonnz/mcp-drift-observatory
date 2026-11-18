@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.bamf.ai` | 177 | [`2dc5c6730a6b`](bcec739ff4350c4ddf27.json) | 2026-11-13 |
+| `https://mcp.bamf.ai` | 179 | [`64d6d1461e69`](bcec739ff4350c4ddf27.json) | 2026-11-18 |
 
 ## Tools at `https://mcp.bamf.ai`
 
@@ -24,6 +24,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `bamf.cancel_outreach_campaign`: `Cancel a prepared, approved, or queued campaign without invoking a provider.`
 - `bamf.cancel_outreach_discovery`: `Request cancellation of one scoped outreach discovery session. This cancels discovery only and never mutates a provider campaign.`
 - `bamf.check_linkedin_session`: `Check a client's LinkedIn login status in BAMF Connect and Multilogin. Agency staff keys only. Read-only.`
+- `bamf.create_client_access_link`: `Create a one-time client access link (7 days) plus a short ready-to-paste message for SMS, WhatsApp, email or Slack. The client opens it to…`
 - `bamf.create_idea`: `Create a content idea for a creator space.`
 - `bamf.create_interview_link`: `Create a secure hosted content-interview link for a creator. It returns ready-to-share copy for BAMF.ai, Slack, WhatsApp, or another connec…`
 - `bamf.create_interview_transcript`: `Save an interview transcript as a BAMF knowledge document and optionally queue interview-specific knowledge processing.`
@@ -69,11 +70,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `bamf.get_creator_context`: `Return the comprehensive creator context bundle for one creator space: knowledge docs, voice profile, AI analyses, integrations, interviews…`
 - `bamf.get_design`: `Read a design's status, image, matched reference, template and layers (likeness, art, text). Poll after bamf.design_post. Read-only.`
 - `bamf.get_funnel_mix`: `Get a creator's TOF/MOF/BOF funnel mix from tagged LinkedIn posts: per-stage counts and performance, per-format stats, the resolved goal ta…`
-- `bamf.get_intelligence_processing_status`: `Read recent intelligence processing jobs for the authenticated creator, optionally limited to one resource.`
-- and 117 more in [bcec739ff4350c4ddf27.json](bcec739ff4350c4ddf27.json)
+- and 119 more in [bcec739ff4350c4ddf27.json](bcec739ff4350c4ddf27.json)
 
 ## Changes
 
+- 2026-11-18: [count changed, tool added](../../deltas/2026-11-18/bcec739ff4350c4ddf27.json): `2 tool(s) added`
 - 2026-11-13: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-13/bcec739ff4350c4ddf27.json): `7 tool(s) added; 19 field(s) changed; signals: imperative_language_introduced` **(notable)**
 - 2026-11-12: [count changed, schema changed, tool added](../../deltas/2026-11-12/bcec739ff4350c4ddf27.json): `10 tool(s) added; 13 field(s) changed`
 - 2026-11-07: [count changed, tool added](../../deltas/2026-11-07/bcec739ff4350c4ddf27.json): `3 tool(s) added`

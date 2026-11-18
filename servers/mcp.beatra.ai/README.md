@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.beatra.ai/mcp` | 43 | [`7aa7a8a0f4e0`](4f93d616eb97e76f800a.json) | 2026-11-17 |
+| `https://mcp.beatra.ai/mcp` | 47 | [`e17c8ba7db86`](4f93d616eb97e76f800a.json) | 2026-11-18 |
 
 ## Tools at `https://mcp.beatra.ai/mcp`
 
@@ -24,6 +24,10 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `beatra.models.list`: `List models currently selectable for one Beatra generation capability, including live supported controls, constraints, customer credit pric…`
 - `beatra.music.edit`: `Revise a music track made by beatra.music.generate or an uploaded song: extend it, replace a time range, add vocals to an instrumental, or…`
 - `beatra.music.generate`: `Generate songs or instrumentals from a prompt, lyrics, or reference audio; optionally set a target length in seconds, reuse a saved persona…`
+- `beatra.music.personas.create_from_song`: `Save the singer of a track made by beatra.music.generate as a reusable persona (kind=style). Beatra picks the part where the singer is sing…`
+- `beatra.music.personas.enroll_voice`: `Step 1 of 2 to create a singer from the user's own singing voice (kind=voice); only the user's own voice can be used. Send source, a 30–60…`
+- `beatra.music.personas.list`: `List the singers (personas) saved in this account: ones saved from a song made by beatra.music.generate (kind=style) and ones created from…`
+- `beatra.music.personas.verify_voice`: `Step 2 of 2: send the user's recording of the phrase from beatra.music.personas.enroll_voice, and persona_name, the name the user chose, to…`
 - `beatra.social.execute`: `Look up public social data and create a task. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly o…`
 - `beatra.social.tools.get`: `Read one public social data tool, including its arguments, schema_hash, and credit price. This call is not billable.`
 - `beatra.social.tools.search`: `Search public social data tools by platform, keyword, or capability_family. This call is not billable.`
@@ -56,6 +60,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-18: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-18/4f93d616eb97e76f800a.json): `4 tool(s) added; 10 field(s) changed; signals: imperative_language_introduced` **(notable)**
 - 2026-11-17: [schema changed](../../deltas/2026-11-17/4f93d616eb97e76f800a.json): `8 field(s) changed`
 - 2026-11-15: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-15/4f93d616eb97e76f800a.json): `6 tool(s) added; 486 field(s) changed`
 - 2026-11-13: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-13/4f93d616eb97e76f800a.json): `1 tool(s) added; 252 field(s) changed`

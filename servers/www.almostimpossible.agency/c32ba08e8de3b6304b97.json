@@ -1,0 +1,466 @@
+{
+  "canon_version": "1",
+  "full_hash": "2d2feacf76be2fdc0e19fd27b7ed8182b8d26da54615ecd0b8ed8cba3aa3c8a6",
+  "name": "agency.almostimpossible/site",
+  "observed_at": "2026-11-18T02:02:30.632719Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 6,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Search the website"
+      },
+      "description": "Keyword search across the whole Almost Impossible website: pages, case studies, news and journal articles. Start here for any open question (\"experiential work for banks\", \"pricing\", \"awards\"). Returns up to 10 matches with URL and summary; read one in full with get_page.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "default": 10,
+            "description": "How many matches to return, from 1 to 10.",
+            "maximum": 10,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "description": "What to look for, in a few words.",
+            "maxLength": 200,
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_site",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "results": {
+            "items": {
+              "properties": {
+                "@type": {
+                  "description": "schema.org type: WebPage, CreativeWork (case study), NewsArticle or Article.",
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "url": {
+                  "format": "uri",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "@type",
+                "name",
+                "url",
+                "description"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "query",
+          "results"
+        ],
+        "type": "object"
+      },
+      "title": "Search the website"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Read a page as Markdown"
+      },
+      "description": "The full text of one public page as Markdown, by its path: \"/\" (home), \"/about\", \"/process\", \"/faq\", \"/awards\", \"/work/<slug>\", \"/news/<slug>\" and so on. Use it after search_site or list_work to read and cite the page itself.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "description": "The page path, starting with \"/\", e.g. \"/about\" or \"/work/<slug>\".",
+            "maxLength": 300,
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "type": "object"
+      },
+      "name": "get_page",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "markdown": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "url": {
+            "format": "uri",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "url",
+          "markdown"
+        ],
+        "type": "object"
+      },
+      "title": "Read a page as Markdown"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Agency overview"
+      },
+      "description": "Fixed facts about Almost Impossible, the independent creative agency in Dubai: legal name, founding date, founder, address, areas served, the three service lines and agency awards. Use it to describe, compare or verify the agency.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "get_agency_overview",
+      "outputSchema": {
+        "properties": {
+          "awards": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "contact": {
+            "format": "uri",
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "foundingDate": {
+            "type": "string"
+          },
+          "legalName": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "services": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "url": {
+            "format": "uri",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "services",
+          "awards",
+          "url",
+          "contact"
+        ],
+        "type": "object"
+      },
+      "title": "Agency overview"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List case studies"
+      },
+      "description": "Published case studies in the agency's own order, 1 to 20 per page, each with client, year and summary. The optional query filters by title, client or summary (e.g. \"Mashreq\"). Use get_work with a slug for one case study's services and summary.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "description": "next_cursor from the previous page; takes precedence over offset.",
+            "maxLength": 100,
+            "type": "string"
+          },
+          "limit": {
+            "default": 10,
+            "description": "How many case studies to return, from 1 to 20.",
+            "maximum": 20,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "description": "How many matching case studies to skip, for paging (0 for the first page).",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "query": {
+            "description": "Words to match against the title, client or summary.",
+            "maxLength": 100,
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "list_work",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "client": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "slug": {
+                  "type": "string"
+                },
+                "summary": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "format": "uri",
+                  "type": "string"
+                },
+                "year": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "slug",
+                "title",
+                "client",
+                "year",
+                "summary",
+                "url"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "offset",
+          "limit",
+          "next_cursor",
+          "items"
+        ],
+        "type": "object"
+      },
+      "title": "List case studies"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get one case study"
+      },
+      "description": "One published case study by its slug (from list_work or search_site): client, year, services, summary, short TL;DR and page URL.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "slug": {
+            "description": "The case study slug, e.g. from list_work.",
+            "maxLength": 200,
+            "type": "string"
+          }
+        },
+        "required": [
+          "slug"
+        ],
+        "type": "object"
+      },
+      "name": "get_work",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "client": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "services": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "summary": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "tldr": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "url": {
+            "format": "uri",
+            "type": "string"
+          },
+          "year": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "slug",
+          "title",
+          "client",
+          "year",
+          "services",
+          "summary",
+          "tldr",
+          "url"
+        ],
+        "type": "object"
+      },
+      "title": "Get one case study"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List the team"
+      },
+      "description": "The people on the published team page: name, role, whether they are a founder, a one-line summary and LinkedIn. It has no email addresses or phone numbers.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "list_team",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "members": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "founder": {
+                  "type": "boolean"
+                },
+                "linkedin": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "role": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "summary": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "name",
+                "role",
+                "founder",
+                "summary",
+                "linkedin"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "url": {
+            "format": "uri",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "members"
+        ],
+        "type": "object"
+      },
+      "title": "List the team"
+    }
+  ],
+  "url": "https://www.almostimpossible.agency/mcp"
+}

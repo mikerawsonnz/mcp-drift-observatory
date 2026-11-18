@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "e65e5d413755c090157df4459da858f8337abd02dea6c940f90f0e3b9eee53fe",
+  "full_hash": "f256832a9aad902761d596d0fc90d4fe6f3e2b9583851ca144fa9e0a1b909de8",
   "name": "ai.arcangel/trademark-search",
-  "observed_at": "2026-11-17T02:01:45.866881Z",
+  "observed_at": "2026-11-18T02:02:38.245142Z",
   "sources": [
     "official"
   ],
-  "tool_count": 6,
+  "tool_count": 9,
   "tools": [
     {
       "_meta": {
@@ -22,9 +22,9 @@
           }
         ],
         "ui": {
-          "resourceUri": "ui://arcangel/trademark-v1.html"
+          "resourceUri": "ui://arcangel/trademark-v2.html"
         },
-        "ui/resourceUri": "ui://arcangel/trademark-v1.html"
+        "ui/resourceUri": "ui://arcangel/trademark-v2.html"
       },
       "annotations": {
         "destructiveHint": false,
@@ -279,11 +279,7 @@
             ],
             "type": "oauth2"
           }
-        ],
-        "ui": {
-          "resourceUri": "ui://arcangel/trademark-v1.html"
-        },
-        "ui/resourceUri": "ui://arcangel/trademark-v1.html"
+        ]
       },
       "annotations": {
         "destructiveHint": false,
@@ -520,9 +516,9 @@
           }
         ],
         "ui": {
-          "resourceUri": "ui://arcangel/trademark-v1.html"
+          "resourceUri": "ui://arcangel/trademark-v2.html"
         },
-        "ui/resourceUri": "ui://arcangel/trademark-v1.html"
+        "ui/resourceUri": "ui://arcangel/trademark-v2.html"
       },
       "annotations": {
         "destructiveHint": false,
@@ -610,9 +606,9 @@
           }
         ],
         "ui": {
-          "resourceUri": "ui://arcangel/trademark-v1.html"
+          "resourceUri": "ui://arcangel/trademark-v2.html"
         },
-        "ui/resourceUri": "ui://arcangel/trademark-v1.html"
+        "ui/resourceUri": "ui://arcangel/trademark-v2.html"
       },
       "annotations": {
         "destructiveHint": false,
@@ -621,7 +617,7 @@
         "readOnlyHint": false,
         "title": "Start a trademark application"
       },
-      "description": "Start a US trademark application on Arcangel AI as a draft in the signed-in user's account. Pass what is known (the mark, goods or services, classes, owner); the rest can be added later with update_trademark_application. Returns the draft id and what it still needs. Requires Sign in with Arcangel. Signing and payment happen on arcangel.ai.",
+      "description": "Start a US trademark application on Arcangel AI as a draft in the signed-in user's account. Pass what is known (the mark, goods or services, classes, owner); the rest can be added later with update_trademark_application. If a company owns the mark, pass the id of a saved company (list_companies) as company_id. Returns the draft id and what it still needs. Requires Sign in with Arcangel. Signing and payment happen on arcangel.ai.",
       "icons": [
         {
           "mimeType": "image/png",
@@ -662,6 +658,13 @@
             "description": "Owner city.",
             "maxLength": 100,
             "type": "string"
+          },
+          "company_id": {
+            "description": "Id of a saved company (list_companies) that owns the mark. Fills the company name, state of registration and address from the saved profile, so do not also send those. null unlinks it.",
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "company_jurisdiction": {
             "description": "State or country where the company is organized, e.g. Delaware.",
@@ -856,11 +859,7 @@
             ],
             "type": "oauth2"
           }
-        ],
-        "ui": {
-          "resourceUri": "ui://arcangel/trademark-v1.html"
-        },
-        "ui/resourceUri": "ui://arcangel/trademark-v1.html"
+        ]
       },
       "annotations": {
         "destructiveHint": true,
@@ -869,7 +868,7 @@
         "readOnlyHint": false,
         "title": "Update a trademark application"
       },
-      "description": "Fill in or change fields on a trademark application draft (owner, address, mark details, classes, use dates, statements). Only fields passed are changed. Returns what the draft still needs. Requires Sign in with Arcangel.",
+      "description": "Fill in or change fields on a trademark application draft (owner, address, mark details, classes, use dates, statements). Only fields passed are changed. Returns what the draft still needs, as text. The Arcangel card already in the chat refreshes itself, so there is no need to call get_trademark_application afterwards. Requires Sign in with Arcangel.",
       "icons": [
         {
           "mimeType": "image/png",
@@ -910,6 +909,13 @@
             "description": "Owner city.",
             "maxLength": 100,
             "type": "string"
+          },
+          "company_id": {
+            "description": "Id of a saved company (list_companies) that owns the mark. Fills the company name, state of registration and address from the saved profile, so do not also send those. null unlinks it.",
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "company_jurisdiction": {
             "description": "State or country where the company is organized, e.g. Delaware.",
@@ -1111,9 +1117,9 @@
           }
         ],
         "ui": {
-          "resourceUri": "ui://arcangel/trademark-v1.html"
+          "resourceUri": "ui://arcangel/trademark-v2.html"
         },
-        "ui/resourceUri": "ui://arcangel/trademark-v1.html"
+        "ui/resourceUri": "ui://arcangel/trademark-v2.html"
       },
       "annotations": {
         "destructiveHint": false,
@@ -1156,6 +1162,279 @@
         }
       ],
       "title": "Check a trademark application"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "bot:read"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List saved companies"
+      },
+      "description": "List the companies saved in the signed-in Arcangel account, with their ids. Call this before asking for company details on a trademark application: if the owner is already saved, pass its id as company_id to start_trademark_application or update_trademark_application. Requires Sign in with Arcangel.",
+      "icons": [
+        {
+          "mimeType": "image/png",
+          "sizes": [
+            "750x750"
+          ],
+          "src": "https://www.arcangel.ai/apple-touch-icon.png"
+        }
+      ],
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "list_companies",
+      "securitySchemes": [
+        {
+          "scopes": [
+            "bot:read"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "List saved companies"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "bot:read",
+              "bot:write"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Save a company"
+      },
+      "description": "Save a company profile in the signed-in Arcangel account, as on the Companies page, so it can own trademark applications. Every field except address_line2 is required: ask the user for each one, never guess. Returns the new company id; link it to a draft with company_id. Requires Sign in with Arcangel.",
+      "icons": [
+        {
+          "mimeType": "image/png",
+          "sizes": [
+            "750x750"
+          ],
+          "src": "https://www.arcangel.ai/apple-touch-icon.png"
+        }
+      ],
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "address_line1": {
+            "description": "Company street address (no P.O. boxes).",
+            "maxLength": 200,
+            "type": "string"
+          },
+          "address_line2": {
+            "description": "Suite or unit. null clears it.",
+            "maxLength": 200,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "city": {
+            "description": "City.",
+            "maxLength": 100,
+            "type": "string"
+          },
+          "country": {
+            "description": "Country of the address, e.g. United States.",
+            "maxLength": 100,
+            "type": "string"
+          },
+          "entity_type": {
+            "description": "c_corp, s_corp, llc, llp, lp (limited partnership), general_partnership, sole_proprietorship, nonprofit or other.",
+            "enum": [
+              "c_corp",
+              "s_corp",
+              "llc",
+              "llp",
+              "lp",
+              "general_partnership",
+              "sole_proprietorship",
+              "nonprofit",
+              "other"
+            ],
+            "type": "string"
+          },
+          "legal_name": {
+            "description": "Registered legal name, e.g. \"Lumora Labs LLC\".",
+            "maxLength": 200,
+            "type": "string"
+          },
+          "postal_code": {
+            "description": "Postal or ZIP code.",
+            "maxLength": 20,
+            "type": "string"
+          },
+          "registered_state": {
+            "description": "US state where the company is registered (formed), e.g. Delaware. Can differ from the address.",
+            "maxLength": 100,
+            "type": "string"
+          },
+          "state_province": {
+            "description": "State or province of the address.",
+            "maxLength": 100,
+            "type": "string"
+          }
+        },
+        "required": [
+          "legal_name",
+          "entity_type",
+          "registered_state",
+          "address_line1",
+          "city",
+          "state_province",
+          "postal_code",
+          "country"
+        ],
+        "type": "object"
+      },
+      "name": "create_company",
+      "securitySchemes": [
+        {
+          "scopes": [
+            "bot:read",
+            "bot:write"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Save a company"
+    },
+    {
+      "_meta": {
+        "securitySchemes": [
+          {
+            "scopes": [
+              "bot:read",
+              "bot:write"
+            ],
+            "type": "oauth2"
+          }
+        ]
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Edit a saved company"
+      },
+      "description": "Change fields on a saved company (id from list_companies). Only the fields passed change. A draft already linked to the company picks up the change when company_id is passed again or the draft is opened on arcangel.ai. Requires Sign in with Arcangel.",
+      "icons": [
+        {
+          "mimeType": "image/png",
+          "sizes": [
+            "750x750"
+          ],
+          "src": "https://www.arcangel.ai/apple-touch-icon.png"
+        }
+      ],
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "address_line1": {
+            "description": "Company street address (no P.O. boxes).",
+            "maxLength": 200,
+            "type": "string"
+          },
+          "address_line2": {
+            "description": "Suite or unit. null clears it.",
+            "maxLength": 200,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "city": {
+            "description": "City.",
+            "maxLength": 100,
+            "type": "string"
+          },
+          "country": {
+            "description": "Country of the address, e.g. United States.",
+            "maxLength": 100,
+            "type": "string"
+          },
+          "entity_type": {
+            "description": "c_corp, s_corp, llc, llp, lp (limited partnership), general_partnership, sole_proprietorship, nonprofit or other.",
+            "enum": [
+              "c_corp",
+              "s_corp",
+              "llc",
+              "llp",
+              "lp",
+              "general_partnership",
+              "sole_proprietorship",
+              "nonprofit",
+              "other"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "description": "Company id from list_companies.",
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "legal_name": {
+            "description": "Registered legal name, e.g. \"Lumora Labs LLC\".",
+            "maxLength": 200,
+            "type": "string"
+          },
+          "postal_code": {
+            "description": "Postal or ZIP code.",
+            "maxLength": 20,
+            "type": "string"
+          },
+          "registered_state": {
+            "description": "US state where the company is registered (formed), e.g. Delaware. Can differ from the address.",
+            "maxLength": 100,
+            "type": "string"
+          },
+          "state_province": {
+            "description": "State or province of the address.",
+            "maxLength": 100,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "update_company",
+      "securitySchemes": [
+        {
+          "scopes": [
+            "bot:read",
+            "bot:write"
+          ],
+          "type": "oauth2"
+        }
+      ],
+      "title": "Edit a saved company"
     }
   ],
   "url": "https://mcp.arcangel.ai/trademark"

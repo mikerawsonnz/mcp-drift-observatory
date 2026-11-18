@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.agentgates.ai/compute` | 3 | [`bc11b3f7e44e`](8e123eb71203886e049b.json) | 2026-11-13 |
+| `https://mcp.agentgates.ai/compute` | 3 | [`2fb05b6b9486`](8e123eb71203886e049b.json) | 2026-11-18 |
 
 ## Tools at `https://mcp.agentgates.ai/compute`
 
@@ -16,6 +16,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-18: [schema changed](../../deltas/2026-11-18/8e123eb71203886e049b.json): `30 field(s) changed`
 - 2026-11-13: [description changed, schema changed](../../deltas/2026-11-13/8e123eb71203886e049b.json): `11 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-12: [annotation changed, description changed, field changed, schema changed](../../deltas/2026-11-12/8e123eb71203886e049b.json): `26 field(s) changed`
 - 2026-11-11: [schema changed](../../deltas/2026-11-11/8e123eb71203886e049b.json): `7 field(s) changed`

@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://beliefstate.ai/v1/research/mcp` | 23 | [`7942e59a4d74`](d29176e06366706dabab.json) | 2026-11-16 |
+| `https://beliefstate.ai/v1/research/mcp` | 23 | [`a79615867b1f`](d29176e06366706dabab.json) | 2026-11-18 |
 
 ## Tools at `https://beliefstate.ai/v1/research/mcp`
 
@@ -36,6 +36,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-18: [schema changed](../../deltas/2026-11-18/d29176e06366706dabab.json): `4012 field(s) changed; signals: length_more_than_doubled, url_introduced`
 - 2026-11-16: [schema changed](../../deltas/2026-11-16/d29176e06366706dabab.json): `28 field(s) changed`
 - 2026-11-15: [description changed, schema changed](../../deltas/2026-11-15/d29176e06366706dabab.json): `2720 field(s) changed; signals: length_more_than_doubled, url_introduced`
 - 2026-11-14: [description changed, schema changed](../../deltas/2026-11-14/d29176e06366706dabab.json): `8006 field(s) changed; signals: length_more_than_doubled, url_introduced`
