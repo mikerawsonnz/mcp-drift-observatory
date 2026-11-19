@@ -1,6 +1,6 @@
 # Observed MCP servers
 
-471 hosts whose MCP tool declarations we have observed. Each page lists the declared tools, every observed change, and an Atom feed of changes to that server.
+472 hosts whose MCP tool declarations we have observed. Each page lists the declared tools, every observed change, and an Atom feed of changes to that server.
 
 Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_alerts
 
@@ -18,7 +18,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [agent.autoposter.ai](agent.autoposter.ai/) (16 tools)
 - [agentblueprint.ai](agentblueprint.ai/) (4 tools)
 - [agentcv.ai](agentcv.ai/) (6 tools)
-- [agenticfabricationnetwork.ai](agenticfabricationnetwork.ai/) (22 tools)
+- [agenticfabricationnetwork.ai](agenticfabricationnetwork.ai/) (23 tools)
 - [agentmart.ciphyr.ai](agentmart.ciphyr.ai/) (133 tools)
 - [agentmash.ai](agentmash.ai/) (6 tools)
 - [agentplaybooks.ai](agentplaybooks.ai/) (50 tools)
@@ -53,8 +53,8 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [api.athenahq.ai](api.athenahq.ai/) (132 tools)
 - [api.atmy.ai](api.atmy.ai/) (12 tools)
 - [api.bareun.ai](api.bareun.ai/) (6 tools)
-- [api.betslipdoctor.ai](api.betslipdoctor.ai/) (102 tools)
-- [api.bittuitive.ai](api.bittuitive.ai/) (32 tools)
+- [api.betslipdoctor.ai](api.betslipdoctor.ai/) (106 tools)
+- [api.bittuitive.ai](api.bittuitive.ai/) (34 tools)
 - [api.bluerate.ai](api.bluerate.ai/) (3 tools)
 - [api.bowmark.ai](api.bowmark.ai/) (58 tools)
 - [api.bumblebox.ai](api.bumblebox.ai/) (17 tools)
@@ -449,6 +449,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [the-stall.intuitek.ai](the-stall.intuitek.ai/) (302 tools)
 - [thebureauoflostcontext.agency](thebureauoflostcontext.agency/) (5 tools)
 - [thirdhemisphere.agency](thirdhemisphere.agency/) (12 tools)
+- [tipline.brainy.ae](tipline.brainy.ae/) (4 tools)
 - [tools.campaignpack.ai](tools.campaignpack.ai/) (13 tools)
 - [traced-llm-mcp-proxy.getvda.ai](traced-llm-mcp-proxy.getvda.ai/) (2 tools)
 - [traced-llm-proxy-anthropic.getvda.ai](traced-llm-proxy-anthropic.getvda.ai/) (2 tools)

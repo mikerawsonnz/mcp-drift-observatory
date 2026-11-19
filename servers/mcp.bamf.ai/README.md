@@ -6,11 +6,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.bamf.ai` | 179 | [`64d6d1461e69`](bcec739ff4350c4ddf27.json) | 2026-11-18 |
+| `https://mcp.bamf.ai` | 179 | [`a28ce95eb85c`](bcec739ff4350c4ddf27.json) | 2026-11-19 |
 
 ## Tools at `https://mcp.bamf.ai`
 
-- `bamf.add_brand_font`: `Add a font file to a creator's brand fonts from an HTTPS url or file_base64. Before calling, ask the user to confirm exactly: "I have the r…`
+- `bamf.add_brand_font`: `Add a font file to a creator's brand fonts. When a design uses a font the creator has, upload it here and use it by name; never substitute…`
 - `bamf.add_knowledge_doc`: `Add a knowledge or memory document to a creator space. API documentation: https://bamf.ai/docs/mcp/overview`
 - `bamf.add_likeness_photo`: `Save a photo of the creator to their likeness library from an HTTPS URL or a data URL, then label it. Always persist any creator photo you…`
 - `bamf.add_media`: `Register an external media URL as a BAMF media asset. API documentation: https://bamf.ai/docs/mcp/overview`
@@ -74,6 +74,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-19: [description changed, schema changed](../../deltas/2026-11-19/bcec739ff4350c4ddf27.json): `10 field(s) changed; signals: imperative_language_introduced` **(notable)**
 - 2026-11-18: [count changed, tool added](../../deltas/2026-11-18/bcec739ff4350c4ddf27.json): `2 tool(s) added`
 - 2026-11-13: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-13/bcec739ff4350c4ddf27.json): `7 tool(s) added; 19 field(s) changed; signals: imperative_language_introduced` **(notable)**
 - 2026-11-12: [count changed, schema changed, tool added](../../deltas/2026-11-12/bcec739ff4350c4ddf27.json): `10 tool(s) added; 13 field(s) changed`

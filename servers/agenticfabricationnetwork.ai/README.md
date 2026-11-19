@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://agenticfabricationnetwork.ai/mcp` | 22 | [`663b89bb2720`](db3010688319f7ebe01c.json) | 2026-11-15 |
+| `https://agenticfabricationnetwork.ai/mcp` | 23 | [`317b16e88cc4`](db3010688319f7ebe01c.json) | 2026-11-19 |
 
 ## Tools at `https://agenticfabricationnetwork.ai/mcp`
 
@@ -16,7 +16,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `create_cart`: `Start a cart, for a user who wants several parts and one payment. Pass items to put parts in at once; each is named by quote_id (a quote yo…`
 - `create_checkout`: `Create the order and get a hosted payment link for a chosen offer. Call this as soon as the user picks an offer + shipping speed. This tool…`
 - `finalize_quote`: `ONLY for the case where a quote response came back with an EMPTY board and told you to call this: waits for the vendors to answer (up to ~4…`
-- `fork_cart`: `Copy a cart: the same parts in the same order, each configured and picked as it was. Use it when the user opens a shared cart, so that noth…`
+- `fork_cart`: `Copy a cart: the same parts in the same order, each configured and picked as it was (a copy made for a link keeps a part's pick only when i…`
 - `get_cart`: `Read a cart: every part with its quote, the rules on it (constraints_asked), its pick (selection) and what the pick comes to — the shop, th…`
 - `get_fabrication_quote`: `Get fabrication price and delivery offers for a design file or an existing AFN part number. Supports 3D printing, CNC machining, sheet meta…`
 - `get_material_guide`: `Honest, cited material intelligence for material-choice / strength / durability / heat / outdoor questions ("my PLA part broke, what's stro…`
@@ -24,6 +24,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_order_status`: `Check status, ETA and tracking for a UFP order. Pass a checkout id (co_…, from checkout_cart) in order_id to get every order of that cart c…`
 - `get_price_curve`: `How the per-unit price moves with quantity for a quote you already have: for every shop on the board, the item price per unit at each quant…`
 - `get_shop_gauges`: `Every sheet thickness (gauge) ONE named shop stocks right now, per material — read live off the shop's declared catalog, no quote needed. C…`
+- `get_shop_offerings`: `What ONE named shop sells right now, read live off the shop's own declared catalog: per process, every stock with its own colours and thick…`
 - `leave_review`: `Record the user's verified-purchase review of how a UFP order turned out. YOUR JOB IS TO STRUCTURE THE FEEDBACK: turn what the user actuall…`
 - `poll_quote`: `INTERNAL — the offer board calls this to refresh itself while vendors finish pricing. Never call this yourself. The board you were given is…`
 - `preview_quote`: `INTERNAL client rail — the routing half of refine_quote with NOTHING committed: takes the same arguments as refine_quote and answers how ma…`
@@ -35,6 +36,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-19: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-19/db3010688319f7ebe01c.json): `1 tool(s) added; 55 field(s) changed`
 - 2026-11-15: [description changed, schema changed](../../deltas/2026-11-15/db3010688319f7ebe01c.json): `10 field(s) changed`
 - 2026-11-14: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-14/db3010688319f7ebe01c.json): `8 tool(s) added; 232 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**
 - 2026-11-11: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-11/db3010688319f7ebe01c.json): `2 tool(s) added; 13 field(s) changed`

@@ -6,18 +6,19 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://bizmoon.ai/api/mcp` | 5 | [`4dcea0ac454a`](60513f782b423d70a731.json) | 2026-09-19 |
+| `https://bizmoon.ai/api/mcp` | 5 | [`4e21573433df`](60513f782b423d70a731.json) | 2026-11-19 |
 
 ## Tools at `https://bizmoon.ai/api/mcp`
 
 - `changes_since`: `Everything published since a given date, optionally for one jurisdiction, newest first. Designed for scheduled or recurring agents: store t…`
-- `get_regulatory_change`: `Fetch one regulatory document by id: title, jurisdiction, agencies, category, published and effective dates, AI summary, full description,…`
+- `get_regulatory_change`: `Fetch one regulatory document by id: title, jurisdiction, agencies, category, published and effective dates, AI summary, and full descripti…`
 - `list_jurisdictions`: `List every jurisdiction and official register Bizmoon monitors, with the most recent publication date, and when the source was last checked…`
 - `search_funding_programs`: `Search federal and state grant and incentive programs (grants.gov plus state economic development agencies) by keyword, jurisdiction, agenc…`
 - `search_regulatory_changes`: `Search US federal and state regulatory documents ingested from official registers, with AI summaries, agencies, effective dates, and source…`
 
 ## Changes
 
+- 2026-11-19: [description changed](../../deltas/2026-11-19/60513f782b423d70a731.json): `4 field(s) changed`
 - 2026-09-19: [annotation changed, description changed, schema changed](../../deltas/2026-09-19/60513f782b423d70a731.json): `13 field(s) changed`
 
 ## Check it from your agent

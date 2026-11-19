@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "663b89bb2720269c7c67be655a9c812e48b3b5ab7a625a61f4441e8ee73d2374",
+  "full_hash": "317b16e88cc4c17845c80ff3f982b5d12f64ddc46c35a0e9649652b31c70d6f1",
   "name": "ai.agenticfabricationnetwork/ufp",
-  "observed_at": "2026-11-15T02:02:30.613451Z",
+  "observed_at": "2026-11-19T02:03:22.667298Z",
   "sources": [
     "official"
   ],
-  "tool_count": 22,
+  "tool_count": 23,
   "tools": [
     {
       "_meta": {
@@ -425,8 +425,11 @@
           },
           "selection": {
             "additionalProperties": false,
-            "description": "The pick: the ONE option to order, named by what it is rather than by an offer id (ids change when a quote is priced again). vendor = the shop as it appears on offers (friendly names accepted); spec = the resolved options the option must carry, each optional — material, color, finish, thickness_in (leave one out, or null, and it does not narrow the pick); process and quantity likewise optional; shipping_speed = the word the shipping option itself goes by (\"standard\", \"express\", \"ground\"), omitted = the cheapest speed. Storing a pick changes no price and never asks every shop. CHOOSING STARTS THAT ONE SHOP'S CHECK: on a quote you already have, a pick that comes to exactly one option whose shop answered more than 15 minutes ago (or was never asked) has that one shop asked to confirm it, and the answer already says so. Every quote read then carries selection and selection_match { status \"one\" | \"none\" | \"many\", matched, offer_id, shipping_option_id, speed_fallback, confirmed_until, check { state \"running\" | \"fresh\" | \"not_started\", code, retry_after_s }, price_changed }: check \"fresh\" = the shop's answer is under 15 minutes old; \"running\" = that shop is being asked now; \"not_started\" = nobody is being asked and code says why (\"ask_limited\" = the pick is kept and the shop is asked when the user pays; \"quote_expired\" = these answers are over 24 hours old: call reopen_quote, the pick is kept). Usually OMIT: pass it when the user has settled on one option, or to order by create_checkout with selection true",
+            "description": "The pick: the ONE option to order, named by what it is rather than by an offer id (ids change when a quote is priced again). vendor = the shop as it appears on offers (friendly names accepted); spec = the resolved options the option must carry, each optional — material, color, finish, thickness_in (leave one out, or null, and it does not narrow the pick); process and quantity likewise optional; shipping_speed = the word the shipping option itself goes by (\"standard\", \"express\", \"ground\"), omitted = the cheapest speed; confirmed = true once the user has settled on this option (added it to a cart, or is paying) — a pick without it is only the option being looked at, and a cart shared by a link carries a part's pick only when it is confirmed. Storing a pick changes no price and never asks every shop. CHOOSING STARTS THAT ONE SHOP'S CHECK: on a quote you already have, a pick that comes to exactly one option whose shop answered more than 15 minutes ago (or was never asked) has that one shop asked to confirm it, and the answer already says so. Every quote read then carries selection and selection_match { status \"one\" | \"none\" | \"many\", matched, offer_id, shipping_option_id, speed_fallback, confirmed_until, check { state \"running\" | \"fresh\" | \"not_started\", code, retry_after_s }, price_changed }: check \"fresh\" = the shop's answer is under 15 minutes old; \"running\" = that shop is being asked now; \"not_started\" = nobody is being asked and code says why (\"ask_limited\" = the pick is kept and the shop is asked when the user pays; \"quote_expired\" = these answers are over 24 hours old: call reopen_quote, the pick is kept). Usually OMIT: pass it when the user has settled on one option, or to order by create_checkout with selection true",
             "properties": {
+              "confirmed": {
+                "type": "boolean"
+              },
               "process": {
                 "$ref": "#/properties/process"
               },
@@ -627,6 +630,10 @@
             },
             "maxItems": 32,
             "type": "array"
+          },
+          "vendors_exact": {
+            "description": "How the names in vendors and vendors_exclude are read. Usually OMIT: a name then reaches every connector of the shop it names (\"SendCutSend\" covers its sheet, laser and CNC connectors), which is what a person means by a shop. Pass true only when the lists hold offer `vendor` slugs copied from this network's own answers and each must mean that one connector: a term that is exactly a connector slug is then that connector alone ([\"sendcutsend\", \"sendcutsend-laser\"] leaves \"sendcutsend-cnc\" out), while any other word still resolves as a name. The answer's constraints_asked.vendors / vendors_exclude are the connectors the lists came to, and listed_vendors names each of them",
+            "type": "boolean"
           },
           "vendors_exclude": {
             "description": "Shops to leave out (\"anyone but Slant 3D\", \"not A3D or Fictiv\") — shop names as they appear on offers; friendly names accepted (\"A3D\", \"slant 3d\"), and a name that matches no shop is reported, never an error. A shop on this list is never asked and never shown. Works beside vendors: the shops shown are the vendors list (or everyone) minus this list, so a shop named on both is left out. Usually OMIT: pass it only when the user names shops they do not want",
@@ -1088,6 +1095,9 @@
               {
                 "additionalProperties": false,
                 "properties": {
+                  "confirmed": {
+                    "type": "boolean"
+                  },
                   "process": {
                     "enum": [
                       "fdm_print",
@@ -1196,7 +1206,7 @@
                 "type": "null"
               }
             ],
-            "description": "The pick: the ONE option to order, named by what it is rather than by an offer id (ids change when a quote is priced again). vendor = the shop as it appears on offers (friendly names accepted); spec = the resolved options the option must carry, each optional — material, color, finish, thickness_in (leave one out, or null, and it does not narrow the pick); process and quantity likewise optional; shipping_speed = the word the shipping option itself goes by (\"standard\", \"express\", \"ground\"), omitted = the cheapest speed. Storing a pick changes no price and never asks every shop. CHOOSING STARTS THAT ONE SHOP'S CHECK: on a quote you already have, a pick that comes to exactly one option whose shop answered more than 15 minutes ago (or was never asked) has that one shop asked to confirm it, and the answer already says so. Every quote read then carries selection and selection_match { status \"one\" | \"none\" | \"many\", matched, offer_id, shipping_option_id, speed_fallback, confirmed_until, check { state \"running\" | \"fresh\" | \"not_started\", code, retry_after_s }, price_changed }: check \"fresh\" = the shop's answer is under 15 minutes old; \"running\" = that shop is being asked now; \"not_started\" = nobody is being asked and code says why (\"ask_limited\" = the pick is kept and the shop is asked when the user pays; \"quote_expired\" = these answers are over 24 hours old: call reopen_quote, the pick is kept). Usually OMIT: pass it when the user has settled on one option, or to order by create_checkout with selection true. On refine_quote: an object stores the pick, null clears it, omitted keeps the one the quote has. Sent alone it is stored on the SAME quote at once (the same quote id comes back, nothing re-prices, no shop is asked); sent with other changes it rides onto the new quote"
+            "description": "The pick: the ONE option to order, named by what it is rather than by an offer id (ids change when a quote is priced again). vendor = the shop as it appears on offers (friendly names accepted); spec = the resolved options the option must carry, each optional — material, color, finish, thickness_in (leave one out, or null, and it does not narrow the pick); process and quantity likewise optional; shipping_speed = the word the shipping option itself goes by (\"standard\", \"express\", \"ground\"), omitted = the cheapest speed; confirmed = true once the user has settled on this option (added it to a cart, or is paying) — a pick without it is only the option being looked at, and a cart shared by a link carries a part's pick only when it is confirmed. Storing a pick changes no price and never asks every shop. CHOOSING STARTS THAT ONE SHOP'S CHECK: on a quote you already have, a pick that comes to exactly one option whose shop answered more than 15 minutes ago (or was never asked) has that one shop asked to confirm it, and the answer already says so. Every quote read then carries selection and selection_match { status \"one\" | \"none\" | \"many\", matched, offer_id, shipping_option_id, speed_fallback, confirmed_until, check { state \"running\" | \"fresh\" | \"not_started\", code, retry_after_s }, price_changed }: check \"fresh\" = the shop's answer is under 15 minutes old; \"running\" = that shop is being asked now; \"not_started\" = nobody is being asked and code says why (\"ask_limited\" = the pick is kept and the shop is asked when the user pays; \"quote_expired\" = these answers are over 24 hours old: call reopen_quote, the pick is kept). Usually OMIT: pass it when the user has settled on one option, or to order by create_checkout with selection true. On refine_quote: an object stores the pick, null clears it, omitted keeps the one the quote has. Sent alone it is stored on the SAME quote at once (the same quote id comes back, nothing re-prices, no shop is asked); sent with other changes it rides onto the new quote"
           },
           "ship_to_zip": {
             "description": "Destination US ZIP code, exactly as the user stated it — use this when the user provides their ZIP after a quote priced to the assumed central-US destination (routing.ship_to); the refined prices become theirs. NEVER guess or invent a ZIP",
@@ -1334,13 +1344,17 @@
             "type": "boolean"
           },
           "vendors": {
-            "description": "Only these specific vendors/makers (\"only show A3D Manufacturing\", \"just Slant 3D and Fictiv\") — an INCLUDE list of vendor names as they appear on offers. A CONSTRAINT like processes: other vendors' offers drop instantly (nothing re-prices), further refines inherit the filter, and [\"any\"] clears it to show every vendor again. Friendly names accepted (\"A3D\", \"slant 3d\"); unmatched names are reported, never an error. This is THE way to answer \"show me everything vendor X offers\" — the filtered quote lists that vendor's complete lineup",
+            "description": "Only these specific vendors/makers (\"only show A3D Manufacturing\", \"just Slant 3D and Fictiv\") — an INCLUDE list of vendor names as they appear on offers. A CONSTRAINT like processes: other vendors' offers drop instantly (nothing re-prices), further refines inherit the filter, and [\"any\"] clears it to show every vendor again. Friendly names accepted (\"A3D\", \"slant 3d\"); unmatched names are reported, never an error. Use it only when the user asks to SEE only that vendor; a question about what a vendor offers is answered with get_shop_offerings and leaves the board alone",
             "items": {
               "minLength": 1,
               "type": "string"
             },
             "maxItems": 32,
             "type": "array"
+          },
+          "vendors_exact": {
+            "description": "How the names in vendors and vendors_exclude are read. Usually OMIT: a name then reaches every connector of the shop it names (\"SendCutSend\" covers its sheet, laser and CNC connectors), which is what a person means by a shop. Pass true only when the lists hold offer `vendor` slugs copied from this network's own answers and each must mean that one connector: a term that is exactly a connector slug is then that connector alone ([\"sendcutsend\", \"sendcutsend-laser\"] leaves \"sendcutsend-cnc\" out), while any other word still resolves as a name. The answer's constraints_asked.vendors / vendors_exclude are the connectors the lists came to, and listed_vendors names each of them",
+            "type": "boolean"
           },
           "vendors_exclude": {
             "description": "Shops to leave out (\"anyone but Slant 3D\", \"not A3D or Fictiv\") — shop names as they appear on offers; friendly names accepted (\"A3D\", \"slant 3d\"), and a name that matches no shop is reported, never an error. A shop on this list is never asked and never shown. Works beside vendors: the shops shown are the vendors list (or everyone) minus this list, so a shop named on both is left out. Usually OMIT: pass it only when the user names shops they do not want. On a refine: naming more shops answers at once from what the quote holds (no shop is asked); [\"any\"] or clear [\"vendors_exclude\"] removes the list, and the shops that come back are priced then",
@@ -1791,6 +1805,9 @@
               {
                 "additionalProperties": false,
                 "properties": {
+                  "confirmed": {
+                    "type": "boolean"
+                  },
                   "process": {
                     "enum": [
                       "fdm_print",
@@ -1899,7 +1916,7 @@
                 "type": "null"
               }
             ],
-            "description": "The pick: the ONE option to order, named by what it is rather than by an offer id (ids change when a quote is priced again). vendor = the shop as it appears on offers (friendly names accepted); spec = the resolved options the option must carry, each optional — material, color, finish, thickness_in (leave one out, or null, and it does not narrow the pick); process and quantity likewise optional; shipping_speed = the word the shipping option itself goes by (\"standard\", \"express\", \"ground\"), omitted = the cheapest speed. Storing a pick changes no price and never asks every shop. CHOOSING STARTS THAT ONE SHOP'S CHECK: on a quote you already have, a pick that comes to exactly one option whose shop answered more than 15 minutes ago (or was never asked) has that one shop asked to confirm it, and the answer already says so. Every quote read then carries selection and selection_match { status \"one\" | \"none\" | \"many\", matched, offer_id, shipping_option_id, speed_fallback, confirmed_until, check { state \"running\" | \"fresh\" | \"not_started\", code, retry_after_s }, price_changed }: check \"fresh\" = the shop's answer is under 15 minutes old; \"running\" = that shop is being asked now; \"not_started\" = nobody is being asked and code says why (\"ask_limited\" = the pick is kept and the shop is asked when the user pays; \"quote_expired\" = these answers are over 24 hours old: call reopen_quote, the pick is kept). Usually OMIT: pass it when the user has settled on one option, or to order by create_checkout with selection true. On refine_quote: an object stores the pick, null clears it, omitted keeps the one the quote has. Sent alone it is stored on the SAME quote at once (the same quote id comes back, nothing re-prices, no shop is asked); sent with other changes it rides onto the new quote"
+            "description": "The pick: the ONE option to order, named by what it is rather than by an offer id (ids change when a quote is priced again). vendor = the shop as it appears on offers (friendly names accepted); spec = the resolved options the option must carry, each optional — material, color, finish, thickness_in (leave one out, or null, and it does not narrow the pick); process and quantity likewise optional; shipping_speed = the word the shipping option itself goes by (\"standard\", \"express\", \"ground\"), omitted = the cheapest speed; confirmed = true once the user has settled on this option (added it to a cart, or is paying) — a pick without it is only the option being looked at, and a cart shared by a link carries a part's pick only when it is confirmed. Storing a pick changes no price and never asks every shop. CHOOSING STARTS THAT ONE SHOP'S CHECK: on a quote you already have, a pick that comes to exactly one option whose shop answered more than 15 minutes ago (or was never asked) has that one shop asked to confirm it, and the answer already says so. Every quote read then carries selection and selection_match { status \"one\" | \"none\" | \"many\", matched, offer_id, shipping_option_id, speed_fallback, confirmed_until, check { state \"running\" | \"fresh\" | \"not_started\", code, retry_after_s }, price_changed }: check \"fresh\" = the shop's answer is under 15 minutes old; \"running\" = that shop is being asked now; \"not_started\" = nobody is being asked and code says why (\"ask_limited\" = the pick is kept and the shop is asked when the user pays; \"quote_expired\" = these answers are over 24 hours old: call reopen_quote, the pick is kept). Usually OMIT: pass it when the user has settled on one option, or to order by create_checkout with selection true. On refine_quote: an object stores the pick, null clears it, omitted keeps the one the quote has. Sent alone it is stored on the SAME quote at once (the same quote id comes back, nothing re-prices, no shop is asked); sent with other changes it rides onto the new quote"
           },
           "ship_to_zip": {
             "description": "Destination US ZIP code, exactly as the user stated it — use this when the user provides their ZIP after a quote priced to the assumed central-US destination (routing.ship_to); the refined prices become theirs. NEVER guess or invent a ZIP",
@@ -2037,13 +2054,17 @@
             "type": "boolean"
           },
           "vendors": {
-            "description": "Only these specific vendors/makers (\"only show A3D Manufacturing\", \"just Slant 3D and Fictiv\") — an INCLUDE list of vendor names as they appear on offers. A CONSTRAINT like processes: other vendors' offers drop instantly (nothing re-prices), further refines inherit the filter, and [\"any\"] clears it to show every vendor again. Friendly names accepted (\"A3D\", \"slant 3d\"); unmatched names are reported, never an error. This is THE way to answer \"show me everything vendor X offers\" — the filtered quote lists that vendor's complete lineup",
+            "description": "Only these specific vendors/makers (\"only show A3D Manufacturing\", \"just Slant 3D and Fictiv\") — an INCLUDE list of vendor names as they appear on offers. A CONSTRAINT like processes: other vendors' offers drop instantly (nothing re-prices), further refines inherit the filter, and [\"any\"] clears it to show every vendor again. Friendly names accepted (\"A3D\", \"slant 3d\"); unmatched names are reported, never an error. Use it only when the user asks to SEE only that vendor; a question about what a vendor offers is answered with get_shop_offerings and leaves the board alone",
             "items": {
               "minLength": 1,
               "type": "string"
             },
             "maxItems": 32,
             "type": "array"
+          },
+          "vendors_exact": {
+            "description": "How the names in vendors and vendors_exclude are read. Usually OMIT: a name then reaches every connector of the shop it names (\"SendCutSend\" covers its sheet, laser and CNC connectors), which is what a person means by a shop. Pass true only when the lists hold offer `vendor` slugs copied from this network's own answers and each must mean that one connector: a term that is exactly a connector slug is then that connector alone ([\"sendcutsend\", \"sendcutsend-laser\"] leaves \"sendcutsend-cnc\" out), while any other word still resolves as a name. The answer's constraints_asked.vendors / vendors_exclude are the connectors the lists came to, and listed_vendors names each of them",
+            "type": "boolean"
           },
           "vendors_exclude": {
             "description": "Shops to leave out (\"anyone but Slant 3D\", \"not A3D or Fictiv\") — shop names as they appear on offers; friendly names accepted (\"A3D\", \"slant 3d\"), and a name that matches no shop is reported, never an error. A shop on this list is never asked and never shown. Works beside vendors: the shops shown are the vendors list (or everyone) minus this list, so a shop named on both is left out. Usually OMIT: pass it only when the user names shops they do not want. On a refine: naming more shops answers at once from what the quote holds (no shop is asked); [\"any\"] or clear [\"vendors_exclude\"] removes the list, and the shops that come back are priced then",
@@ -2398,7 +2419,7 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Copy a cart: the same parts in the same order, each configured and picked as it was. Use it when the user opens a shared cart, so that nothing they change reaches the cart it was copied from; work on the cart_id this returns from then on. By default the copy is a NEW cart; pass into_cart_id (an open cart the user already holds) to add the copied parts to that cart instead — one call, and that cart is the answer. Use it with for_link true when the user wants to share their own cart: the copy is then a shared cart (status \"shared\") that can only be read and copied, and its cart_id is the one to hand out — never hand out the cart_id of the cart the user is working on. Pass item_ids to copy only those parts (one part shared by itself is a cart of one). Each part of the answer says quoted_anew: true when a new quote was made for it, false when the shared quote was copied. WHAT EACH WAY COSTS IN SHOP CONTACT: no shop is asked to make any copy, and the answer comes back at once with every part priced. A for_link copy never contacts a shop, then or later. A copy with recheck false never contacts a shop either — use it when you only want to read what is in a shared cart. Any other copy (the default, for a user who opened a shared cart to act on it) asks nobody when the cart's answers are under 24 hours old: each part comes with its shops' answers as they stand. Only a part whose answers are older than 24 hours is asked about again after the copy answers — its shops, as an ordinary quote of that part would ask them, one part at a time — and if anyone got answers for this same part and request in the last 24 hours those are copied instead with nobody asked. Never copy the same cart twice to refresh it — read the copy you have. LIMITS: copies are limited per caller a minute and a day, and the quotes the re-check will really start count against the caller's quote limit (a part whose shops are already being asked, or are queued to be asked, for another copy of the same request starts none); when you act for a person and say so (on_behalf_of), that person has their own counts of copies and of re-check quotes, a minute and a day; over a limit the answer is rate_limited with the seconds to wait, nothing is made and no shop is asked — wait, do not retry at once. A cart id that matches no cart answers \"unknown cart\" and nothing else. When it is the into_cart_id cart that is not known, the answer is an error with error \"into_cart_unknown\": nothing was copied — copy again without into_cart_id to get a new cart. A SHARED CART: status \"shared\" means the cart came by a link and can only be read and copied. Never change it, pick on its parts' quotes, run check_offer on them or check it out — each of those is refused (cart_shared). Copy it with fork_cart and work on the copy, which is the user's own cart. A COPIED CART: copied true is present on a cart that was copied from a shared one; a cart never says which cart it was copied from. Each part's price_source says whose prices it shows: \"shared\" = recent shop prices that were copied with nobody asked — the prices of the person who shared the cart as they stood when it was copied, or the shops' own answers to this same part and request from the last 24 hours; \"instant\" = our instant prices, because the shared prices could not be copied (they were too old, or still coming in) — no shop has been asked about that part on this quote yet; \"own\" = this cart's own quote of the part, its shops asked. A pick that travelled with the cart but matches no option now reads selection_match.status \"none\": that part is still to choose. The buyer, the address, the email and any coupon never travel with a cart. PARTS OLDER THAN 24 HOURS: a shop's answer is shown for 24 hours. A cart copied with fork_cart inside them asks nobody: every part comes with its answers as they stand. A part whose answers are OLDER than 24 hours shows our instant prices first, and (unless the copy was for_link or recheck false) its shops are then asked about it again, one part at a time. Each such part's recheck says where it stands: \"queued\" = priced, its shops are asked when its turn comes; \"asking\" = its shops are being asked now; \"done\" = the shops' answers are in. A part with no recheck is under 24 hours old and nothing is pending for it. A part's quote_id CHANGES when its turn comes, so read quote_id off get_cart every time and never keep an old one. Until every such part reads done, tell the user the prices and dates may still move, and read the cart again; do not start a second copy to hurry it. A picked part goes first and its picked option is confirmed with its shop as part of it. HOW A CART WORKS: each part in a cart IS a quote — its material, finish, quantity, rules and its pick (selection) live on that part's quote, and nothing is kept twice. To change a part, call refine_quote on its quote_id and pass cart_item_id: the cart follows the part to the new quote by itself. To pick the option to order for a part, store the pick on its quote (refine_quote selection). The cart_id is the only key to the cart — whoever holds it can read and change it — so give it only to the user it belongs to, and never put it in a link you did not get from the network.",
+      "description": "Copy a cart: the same parts in the same order, each configured and picked as it was (a copy made for a link keeps a part's pick only when it was stored with confirmed: true). Use it when the user opens a shared cart, so that nothing they change reaches the cart it was copied from; work on the cart_id this returns from then on. By default the copy is a NEW cart; pass into_cart_id (an open cart the user already holds) to add the copied parts to that cart instead — one call, and that cart is the answer. Use it with for_link true when the user wants to share their own cart: the copy is then a shared cart (status \"shared\") that can only be read and copied, and its cart_id is the one to hand out — never hand out the cart_id of the cart the user is working on. Pass item_ids to copy only those parts (one part shared by itself is a cart of one). Each part of the answer says quoted_anew: true when a new quote was made for it, false when the shared quote was copied. WHAT EACH WAY COSTS IN SHOP CONTACT: no shop is asked to make any copy, and the answer comes back at once with every part priced. A for_link copy never contacts a shop, then or later. A copy with recheck false never contacts a shop either — use it when you only want to read what is in a shared cart. Any other copy (the default, for a user who opened a shared cart to act on it) asks nobody when the cart's answers are under 24 hours old: each part comes with its shops' answers as they stand. Only a part whose answers are older than 24 hours is asked about again after the copy answers — its shops, as an ordinary quote of that part would ask them, one part at a time — and if anyone got answers for this same part and request in the last 24 hours those are copied instead with nobody asked. Never copy the same cart twice to refresh it — read the copy you have. LIMITS: copies are limited per caller a minute and a day, and the quotes the re-check will really start count against the caller's quote limit (a part whose shops are already being asked, or are queued to be asked, for another copy of the same request starts none); when you act for a person and say so (on_behalf_of), that person has their own counts of copies and of re-check quotes, a minute and a day; over a limit the answer is rate_limited with the seconds to wait, nothing is made and no shop is asked — wait, do not retry at once. A cart id that matches no cart answers \"unknown cart\" and nothing else. When it is the into_cart_id cart that is not known, the answer is an error with error \"into_cart_unknown\": nothing was copied — copy again without into_cart_id to get a new cart. A SHARED CART: status \"shared\" means the cart came by a link and can only be read and copied. Never change it, pick on its parts' quotes, run check_offer on them or check it out — each of those is refused (cart_shared). Copy it with fork_cart and work on the copy, which is the user's own cart. A COPIED CART: copied true is present on a cart that was copied from a shared one; a cart never says which cart it was copied from. Each part's price_source says whose prices it shows: \"shared\" = recent shop prices that were copied with nobody asked — the prices of the person who shared the cart as they stood when it was copied, or the shops' own answers to this same part and request from the last 24 hours; \"instant\" = our instant prices, because the shared prices could not be copied (they were too old, or still coming in) — no shop has been asked about that part on this quote yet; \"own\" = this cart's own quote of the part, its shops asked. A pick that travelled with the cart but matches no option now reads selection_match.status \"none\": that part is still to choose. The buyer, the address, the email and any coupon never travel with a cart. PARTS OLDER THAN 24 HOURS: a shop's answer is shown for 24 hours. A cart copied with fork_cart inside them asks nobody: every part comes with its answers as they stand. A part whose answers are OLDER than 24 hours shows our instant prices first, and (unless the copy was for_link or recheck false) its shops are then asked about it again, one part at a time. Each such part's recheck says where it stands: \"queued\" = priced, its shops are asked when its turn comes; \"asking\" = its shops are being asked now; \"done\" = the shops' answers are in. A part with no recheck is under 24 hours old and nothing is pending for it. A part's quote_id CHANGES when its turn comes, so read quote_id off get_cart every time and never keep an old one. Until every such part reads done, tell the user the prices and dates may still move, and read the cart again; do not start a second copy to hurry it. A picked part goes first and its picked option is confirmed with its shop as part of it. HOW A CART WORKS: each part in a cart IS a quote — its material, finish, quantity, rules and its pick (selection) live on that part's quote, and nothing is kept twice. To change a part, call refine_quote on its quote_id and pass cart_item_id: the cart follows the part to the new quote by itself. To pick the option to order for a part, store the pick on its quote (refine_quote selection). The cart_id is the only key to the cart — whoever holds it can read and change it — so give it only to the user it belongs to, and never put it in a link you did not get from the network.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -2411,7 +2432,7 @@
             "type": "string"
           },
           "for_link": {
-            "description": "true = make the copy a shared cart, to hand out in a link: it can be read and copied, never changed or checked out, and it never contacts a shop. Omit when the user is opening a cart someone shared",
+            "description": "true = make the copy a shared cart, to hand out in a link: it can be read and copied, never changed or checked out, and it never contacts a shop. A part's pick travels in a link only when it was stored with confirmed: true (the user chose it, not just looked at it); any other pick is left out of the copy. Omit when the user is opening a cart someone shared",
             "type": "boolean"
           },
           "into_cart_id": {
@@ -2803,7 +2824,7 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
-      "description": "The LIVE catalog of what the fabrication network can do RIGHT NOW — no quote needed. Returns the services ledger (tapping, inserts, welding, bending, finishes… with each shop's own size/material/thickness windows), the network's sheet gauge ladder, the stocked hardware combinations (species x thread) with stocked lengths and shop counts — the most-stocked length is the steering default for an unspecified length — the finish options with their stocked color menus, every colour the network can make a part in (network_catalog.colors: per colour family, how many shops stock a material in it and how many coat in it, with the shades — ask for one by passing the family word as `color` with no finish), the material groups a picker shows (network_catalog.material_groups: Plastics, Metals, Woods, Foams, Rubbers, Composites, Paper cork and fabric… with the stock families live under each and the words that ask for them), and per-process manufacturability rules. This is live state, not a spec sheet: it changes as connectors join, leave, or have capability branches toggled, so call it fresh when the user asks what's possible (materials, gauges, hardware, colors, services) rather than answering from memory.",
+      "description": "The LIVE catalog of what the fabrication network can do RIGHT NOW — no quote needed. Returns the services ledger (tapping, inserts, welding, bending, finishes… with each shop's own size/material/thickness windows), the network's sheet gauge ladder, the stocked hardware combinations (species x thread) with stocked lengths and shop counts — the most-stocked length is the steering default for an unspecified length — the finish options with their stocked color menus, every colour the network can make a part in (network_catalog.colors: per colour family, how many shops stock a material in it and how many coat in it, with the shades — ask for one by passing the family word as `color` with no finish), the material groups a picker shows (network_catalog.material_groups: Plastics, Metals, Woods, Foams, Rubbers, Composites, Paper cork and fabric… with the stock families live under each and the words that ask for them), and per-process manufacturability rules. This is live state, not a spec sheet: it changes as connectors join, leave, or have capability branches toggled, so call it fresh when the user asks what's possible (materials, gauges, hardware, colors, services) rather than answering from memory. PICKER COUNTS: pass `selection` (what the user has already picked: processes, materials, thickness_in, colors, finishes, finish_colors, vendors, vendors_exclude, each a list where any value will do) and the answer adds network_catalog.facets: for every material group and member, gauge rung, colour family, finish and finish colour the catalog lists, `shops` = how many shops the user can order from today declare they make the whole selection plus that option, and `maybe` = further shops whose catalog is silent on part of it (they might); each count sets that dimension's own picks aside. Only an option with shops 0 AND maybe 0 is impossible with the selection; never read a missing count as zero. facets.shops answers each shop against the selection (yes / no / unknown). The counts come from the shops' declared catalogs, nobody is contacted, and nothing on a quote changes. Without `selection` the answer is the same as before.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -2814,12 +2835,137 @@
           "process": {
             "description": "Advisory scope (\"sheetmetal\") — v1 returns the whole catalog either way; filter what you relay",
             "type": "string"
+          },
+          "selection": {
+            "additionalProperties": false,
+            "description": "What is already picked, in a quote's own words, e.g. { \"materials\": [\"acrylic\"], \"colors\": [\"green\"], \"vendors\": [\"SendCutSend\"] }. When present the answer adds network_catalog.facets (shop counts per option for this selection). Add \"vendors_exact\": true only when the shop lists hold offer `vendor` slugs that must each mean that one connector (a name otherwise covers every connector of the shop). Omit it for the plain catalog",
+            "properties": {
+              "colors": {
+                "items": {
+                  "maxLength": 48,
+                  "type": "string"
+                },
+                "maxItems": 32,
+                "type": "array"
+              },
+              "finish_colors": {
+                "items": {
+                  "maxLength": 48,
+                  "type": "string"
+                },
+                "maxItems": 32,
+                "type": "array"
+              },
+              "finishes": {
+                "items": {
+                  "maxLength": 48,
+                  "type": "string"
+                },
+                "maxItems": 16,
+                "type": "array"
+              },
+              "materials": {
+                "items": {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                "maxItems": 64,
+                "type": "array"
+              },
+              "processes": {
+                "items": {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                "maxItems": 32,
+                "type": "array"
+              },
+              "thickness_in": {
+                "anyOf": [
+                  {
+                    "exclusiveMinimum": 0,
+                    "type": "number"
+                  },
+                  {
+                    "items": {
+                      "exclusiveMinimum": 0,
+                      "type": "number"
+                    },
+                    "maxItems": 32,
+                    "type": "array"
+                  }
+                ]
+              },
+              "vendors": {
+                "items": {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                "maxItems": 64,
+                "type": "array"
+              },
+              "vendors_exact": {
+                "type": "boolean"
+              },
+              "vendors_exclude": {
+                "items": {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                "maxItems": 64,
+                "type": "array"
+              }
+            },
+            "type": "object"
           }
         },
         "type": "object"
       },
       "name": "get_network_capabilities",
       "title": "Network capabilities"
+    },
+    {
+      "_meta": {
+        "openai/toolInvocation/invoked": "Fetched shop offerings",
+        "openai/toolInvocation/invoking": "Reading what the shop offers…",
+        "openai/widgetAccessible": true,
+        "ui": {
+          "visibility": [
+            "model",
+            "app"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "What ONE named shop sells right now, read live off the shop's own declared catalog: per process, every stock with its own colours and thicknesses, and every finish with the stocks it goes on and its colours. No quote needed, nobody is contacted, and the user's board does not change. Call it when the user asks what a specific maker offers (\"what colours of acrylic does SendCutSend have?\", \"what else do they do?\"). One shop name covers every process it sells. A stock listed with no colours means the shop does not list colours for it, never that it has none. Never answer such a question from the offers on a quote (they show what was offered for one ask, not everything the shop sells) and never from memory.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "material": {
+            "description": "Narrow the list to one material or family (\"acrylic\", \"mild steel\")",
+            "type": "string"
+          },
+          "shop": {
+            "description": "The shop as the user or the offer cards name it (\"SendCutSend\", \"sendcutsend\")",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "shop"
+        ],
+        "type": "object"
+      },
+      "name": "get_shop_offerings",
+      "title": "What a shop offers"
     },
     {
       "_meta": {

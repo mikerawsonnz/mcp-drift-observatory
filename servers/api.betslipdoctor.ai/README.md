@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.betslipdoctor.ai/api/mcp` | 102 | [`518adce80260`](f29327f2a9147dd897c0.json) | 2026-11-18 |
+| `https://api.betslipdoctor.ai/api/mcp` | 106 | [`13b5969a9b4b`](f29327f2a9147dd897c0.json) | 2026-11-19 |
 
 ## Tools at `https://api.betslipdoctor.ai/api/mcp`
 
@@ -33,7 +33,10 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_bettor_profile`: `Read this authenticated account’s bettor model, optionally filtered by topic: confirmed notes and revisions, separately attributed Honcho i…`
 - `get_box_score`: `Read the in-play or final score and box score for one game (eventId from search_markets or the board), the same read as the app’s Live game…`
 - `get_crowd_parlay`: `Read the crowd parlay (the app’s Heat Check card): the one parlay bettors are on most right now, built in code, 2 to 4 legs on different ga…`
-- `get_desk`: `The Desk tab as the app reads it (GET desk). picks: the open Desk picks whose real Grade is B or better (B, B+, A-, A, A+), each with label…`
+- `get_desk`: `v1.5 Kalshi: a Kalshi pick’s link opens Kalshi’s board for the game (linkKind "game") and linkMarket names the one Kalshi market that is th…`
+- `get_desk_arbitrage`: `The Desk’s open sure-win pairs (GET desk/arbitrage): two bets on the two sides of the same bet at the same line at two different books whos…`
+- `get_desk_evidence`: `One Desk pick’s number and the evidence that moved its Grade (GET desk/evidence): {pickId, label, book, oddsAmerican, fairPct (the Desk’s o…`
+- `get_desk_expired`: `Desk picks that left the Queue because their edge is gone (expiredWhy "edge") or because their Grade came back D or F (expiredWhy "grade"),…`
 - `get_desk_report`: `The full Grade report behind one Desk pick’s letter (GET desk/report), the same report the app opens from the pick: {version, pickId, grade…`
 - `get_doctor_conversation`: `Read the owned threadId, saved user messages, Doctor answers and jobs; optional before pages older messages. Does not generate a new answer.`
 - `get_doctor_events`: `Read saved events for the owned Doctor jobId, optionally after a sequence. While a reply is written, doctor_research_progress events say ho…`
@@ -51,6 +54,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_grade_report`: `Return the verified saved report for a completed Grade this account owns, by jobId. Returns unavailable until the saved report is readable;…`
 - `get_history_summary`: `The authenticated account's app History summary (GET history/summary): record, stake and net over the chosen range, with its source, curren…`
 - `get_league_order`: `Read BetSlip Doctor’s league order right now: the same leagues in the same order as the app’s league strip (its Home and Odds chips: games…`
+- `get_oddstrader_reading`: `OddsTrader’s own published numbers for one NBA, NFL or NHL game or over/under player prop, labelled as OddsTrader’s (not BSD’s): for a game…`
 - `get_plan`: `Read this account’s BetSlip Doctor plan exactly as the app shows it: the plan (free, starter, pro or elite), where it is paid (paymentSourc…`
 - `get_player_research`: `Research a player and his prop the way the Doctor does: his last 5 and last 10 games against his season average and tonight’s line (overs,…`
 - `get_saved_reports`: `Read the saved Grade jobs and reports behind list_grade_jobs, get_grade_job, get_grade_progress, get_grade_groups, get_grade_report, get_gr…`
@@ -66,14 +70,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `list_connected_agents`: `List the agents (OAuth apps) connected to your BetSlip Doctor account: name, scopes, connected and last used.`
 - `list_doctor_conversations`: `Read this account’s saved app Doctor threads. Does not generate an answer.`
 - `list_grade_jobs`: `Read the authenticated account’s current Grade library, with optional limit 1-20 and account-bound cursor. Each row’s headline is its Rocky…`
-- `list_linkable_sportsbooks`: `List the sportsbooks this account can link, the same list as the app’s Settings > Sportsbooks picker: each book (bookId, name, abbr) with t…`
-- `list_sportsbooks`: `Read this account’s linked sportsbooks exactly as the app shows them: whether sportsbook linking is allowed, each account (accountId, book,…`
-- `look_up_fact`: `Use the jobId of a Doctor consult already started after the customer accepted its quote. Send a planned fact, public subject names, league,…`
-- `match_ticket_legs`: `For a betslip the customer showed you (screenshot, paste or their words): send each leg as printed (event, selection, market, period, line,…`
-- and 42 more in [f29327f2a9147dd897c0.json](f29327f2a9147dd897c0.json)
+- and 46 more in [f29327f2a9147dd897c0.json](f29327f2a9147dd897c0.json)
 
 ## Changes
 
+- 2026-11-19: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-19/f29327f2a9147dd897c0.json): `4 tool(s) added; 9 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-18: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-18/f29327f2a9147dd897c0.json): `2 tool(s) added; 15 field(s) changed`
 - 2026-11-17: [description changed, schema changed](../../deltas/2026-11-17/f29327f2a9147dd897c0.json): `16 field(s) changed`
 - 2026-11-14: [count changed, tool added](../../deltas/2026-11-14/f29327f2a9147dd897c0.json): `1 tool(s) added`
@@ -93,7 +94,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - 2026-10-24: [description changed, schema changed](../../deltas/2026-10-24/f29327f2a9147dd897c0.json): `736 field(s) changed`
 - 2026-10-23: [annotation changed, count changed, description changed, field changed, schema changed, tool added, tool removed](../../deltas/2026-10-23/f29327f2a9147dd897c0.json): `6 tool(s) added; 1 tool(s) removed; 1913 field(s) changed; signals: length_more_than_doubled`
 - 2026-10-22: [count changed, description changed, schema changed, tool added, tool removed](../../deltas/2026-10-22/f29327f2a9147dd897c0.json): `21 tool(s) added; 7 tool(s) removed; 63 field(s) changed`
-- 2026-10-19: [count changed, description changed, schema changed, tool added](../../deltas/2026-10-19/f29327f2a9147dd897c0.json): `6 tool(s) added; 71 field(s) changed`
 
 ## Check it from your agent
 

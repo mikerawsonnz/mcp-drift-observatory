@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.bittuitive.ai/mcp` | 32 | [`eecbc026b0e4`](c0c8c3bdf1cbda3c2fcd.json) | 2026-11-18 |
+| `https://api.bittuitive.ai/mcp` | 34 | [`04a6890401c9`](c0c8c3bdf1cbda3c2fcd.json) | 2026-11-19 |
 
 ## Tools at `https://api.bittuitive.ai/mcp`
 
@@ -20,17 +20,19 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_btc_oracle`: `BTC price plus hash rate, mempool, difficulty, fees and block height — use this for a compact network snapshot. Price: 50 sats (Lightning)…`
 - `get_btc_price`: `Live BTC price in USD/EUR with 24h change, cached up to 60 seconds — use this when you only need the spot price and a one-minute quote is e…`
 - `get_btc_price_fresh`: `Fresh BTC spot in USD/EUR with 24h change, cached at most 10 seconds — use this instead of btc_price when you need a tighter quote (btc_pri…`
+- `get_btc_price_lite`: `BTC price in whole US dollars, refreshed at most every 5 minutes (3 sats) — use this when you only need a rough spot price; no EUR or 24h c…`
 - `get_btc_pro`: `Oracle data plus Lightning Network capacity/channels and daily mining revenue — use this for ecosystem-level stats. Price: 100 sats (Lightn…`
 - `get_btc_signals`: `Fear & Greed, BTC/gold, % from ATH, momentum, volatility and 24h transactions (dominance, NVT and active addresses are null without a licen…`
 - `get_feed`: `Return one feed by id.`
 - `get_mailbox`: `List or fetch mailbox items (payloads stored when a webhook is not used or has failed). Items are kept for 72 hours.`
-- `get_market_insights`: `Ranked agent demand, willingness-to-pay, unmet searches, routed-call volume and supply–demand gaps (aggregates only) — use this to see what…`
+- `get_market_insights`: `Ranked agent demand, willingness-to-pay, unmet searches, routed-call volume, the payment conversion funnel and supply–demand gaps (aggregat…`
 - `get_stock_filings`: `Latest 10-K, 10-Q and 8-K filings with document links from SEC EDGAR for one US ticker. Not endorsed by the SEC. Price: 10 sats (Lightning)…`
 - `get_stock_fundamentals`: `SEC EDGAR company facts (revenue, net income, EPS, shares, cash, debt) and ticker-to-CIK mapping for one US ticker. Not endorsed by the SEC…`
 - `get_travel_airport`: `One US airport (airport=SFO required): FAA delay/closure events plus current NOAA weather and NWS alerts. Not for navigation. Not endorsed…`
 - `get_weather_alerts`: `Active NWS alerts for a US point, city, ZIP, or state=XX (US only) — use this to check warnings. Price: 10 sats (Lightning) or $0.01 USDC o…`
 - `get_weather_current`: `Current conditions for lat/lon or a US city/ZIP (NOAA NWS in the US; MET Norway elsewhere) — use this for a point weather check. Price: 10…`
 - `get_weather_forecast`: `Hourly plus 7-day forecast for lat/lon or a US city/ZIP — use this to plan the next hours or days. Price: 30 sats (Lightning) or $0.025 USD…`
+- `get_weather_now`: `Temperature (F), wind and a text summary for a US city/ZIP or lat/lon, about 1 km resolution, cached up to 15 minutes (5 sats) — use this f…`
 - `list_feeds`: `List this account's feeds and the prepaid sat balance.`
 - `pause_feed`: `Pause a feed so it will not deliver until resumed.`
 - `request_data`: `Free. Tell BitTuitive what data you want (data_type, description, an example query, and the max price in sats you would pay). This records…`
@@ -40,11 +42,12 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `scoreboard_categories`: `Free. Per data type (bitcoin, crypto, stocks, weather, traffic, other): counts, average score and the top endpoints.`
 - `scoreboard_endpoint`: `Free. Score components, probe stats and recent probe history for one scoreboard entry (id from best_endpoint/scoreboard_search).`
 - `scoreboard_search`: `Free. Search/browse the scoreboard of paid agent APIs with filters; sorted by score.`
-- `topup`: `Issue a Lightning invoice to add sats to the prepaid BitFeed balance (minimum 100). Pay the invoice, then call again or GET the check_url t…`
+- `topup`: `Add prepaid balance. Lightning: pass amount_sats (minimum 100) to get an invoice; pay it, then call again with payment_hash (or GET the che…`
 - `update_feed`: `Patch interval, trigger, params, webhook_url or mailbox on an existing feed.`
 
 ## Changes
 
+- 2026-11-19: [count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-19/c0c8c3bdf1cbda3c2fcd.json): `2 tool(s) added; 31 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-18: [description changed, field changed, schema changed](../../deltas/2026-11-18/c0c8c3bdf1cbda3c2fcd.json): `4 field(s) changed`
 - 2026-11-17: [count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-17/c0c8c3bdf1cbda3c2fcd.json): `12 tool(s) added; 49 field(s) changed; signals: imperative_language_introduced, url_introduced` **(notable)**
 

@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "e17c8ba7db862d97200b19df3a016e01739d7e02ee7e225e29de1d0891760e37",
+  "full_hash": "1a9ea57b268014d8bd589bb65738f1555f4d8abd05c194ecdcd23bf5d1b8fdee",
   "name": "ai.beatra/beatra",
-  "observed_at": "2026-11-18T02:02:42.458089Z",
+  "observed_at": "2026-11-19T02:03:31.236781Z",
   "sources": [
     "official"
   ],
@@ -17117,7 +17117,7 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Clone a voice from a clean single-speaker sample. With the default engine (omit model or use 'auto') the cloned voice is ready for speech as soon as the task succeeds. A few explicitly selected models need a separate paid activation before the voice can be used; the result explains the next step. Call only after the user explicitly confirms they have the rights to clone it, and set consent_attested=true. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry.",
+      "description": "Clone a voice from a clean single-speaker sample. By default the clone is charged once and the voice is ready for speech as soon as the task succeeds. Set preview_first=true to hear it before paying: the clone and a short fixed preview are free, the voice waits (status pending_activation) up to 3 days, and beatra.voices.activate charges the clone price only after the user agrees; a preview that is not activated is deleted automatically. Offer preview_first when the user wants to hear the result first or the balance is too low for a paid clone. Call only after the user explicitly confirms they have the rights to clone it, and set consent_attested=true. This call consumes Beatra credits unless preview_first=true. It creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry.",
       "inputSchema": {
         "$defs": {
           "MediaInputArtifact": {
@@ -17301,7 +17301,6 @@
             "enum": [
               "auto",
               "minimax-voice-clone",
-              "doubao-voice-clone-2.0",
               "elevenlabs-voice-clone"
             ],
             "title": "Model",
@@ -17318,7 +17317,7 @@
               }
             ],
             "default": null,
-            "description": "Only for model doubao-voice-clone-2.0: {\"doubao\": {...}} with the model_options.doubao keys its clone card lists in controls. Ignored for every other model.",
+            "description": "Model-specific options. Only keys listed in the selected model's card controls (beatra.models.list) are used; leave it unset in normal use.",
             "title": "Model Options"
           },
           "persona": {
@@ -17334,6 +17333,19 @@
             "default": null,
             "description": "Optional short description of timbre, pace, and character (up to 200 characters).",
             "title": "Persona"
+          },
+          "preview_first": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional. true: hear the voice before paying. The clone and a short fixed preview are free; the voice waits (status pending_activation) up to 3 days until beatra.voices.activate charges the model's clone price once, and it is deleted automatically if not activated. Omit it for the normal clone, charged once and ready at once. Supported by minimax-voice-clone and elevenlabs-voice-clone (and auto). At most 3 previews started per account per UTC day and 5 waiting at once. Set language to the sample's spoken language so the fixed preview sentence matches it.",
+            "title": "Preview First"
           },
           "prompt": {
             "anyOf": [
@@ -17736,7 +17748,7 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Activate a cloned voice whose clone result says activation is required (status pending_activation). Voices that are already ready, including every MiniMax clone, every ElevenLabs clone, and every preset voice, never need this; calling it on them charges nothing and changes nothing. The clone result already carries the quote (activation.quote: price, terms, preview, confirmation_token). Only after the user explicitly agrees to the price and terms, call once with voice_id, confirmation_token and confirm_credits; this consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get; reuse the same client_request_id only for an identical retry. Called without confirmation_token (the token is gone or older than 24 hours), it returns a new quote and charges nothing.",
+      "description": "Activate a cloned voice whose clone result says activation is required (status pending_activation), such as a clone made with preview_first=true. Voices that are already ready, including every preset voice and every clone made without preview_first, never need this; calling it on them charges nothing and changes nothing. The clone result already carries the quote (activation.quote: price, terms, preview, confirmation_token). Only after the user explicitly agrees to the price and terms, call once with voice_id, confirmation_token and confirm_credits; this consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get; reuse the same client_request_id only for an identical retry. Called without confirmation_token (the token is gone or older than 24 hours), it returns a new quote and charges nothing.",
       "inputSchema": {
         "description": "Activate a cloned voice that waits for activation: one call with the clone result's quote, after the user agrees.",
         "properties": {
@@ -18664,7 +18676,7 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
-      "description": "List preset and tenant-owned voices available for speech synthesis and speech-to-speech conversion, with bilingual search and capability filters. By default only ready voices are listed (or any status when looking up a specific voice_id); pass status to list pending_activation or expired voices.",
+      "description": "List preset and tenant-owned voices available for speech synthesis and speech-to-speech conversion, with bilingual search and capability filters. By default only ready voices are listed (or any status when looking up a specific voice_id); pass status to list pending_activation (free previews waiting for activation) or expired voices.",
       "inputSchema": {
         "properties": {
           "age_group": {
@@ -20444,7 +20456,7 @@
         "openWorldHint": false,
         "readOnlyHint": false
       },
-      "description": "Permanently delete one of this account's cloned voices using mandatory 2-step confirmation. Call first with voice_id alone (no confirmation_token) to inspect the voice and receive a short-lived confirmation_token and irreversible_notice; ask the user for explicit confirmation, then call again with confirmation_token to permanently delete the voice. Non-billable.",
+      "description": "Permanently delete one of this account's cloned voices using mandatory 2-step confirmation. Call first with voice_id alone (no confirmation_token) to inspect the voice and receive a short-lived confirmation_token and irreversible_notice; ask the user for explicit confirmation, then call again with confirmation_token to permanently delete the voice. Deleting a free preview does not give back a preview: it still counts toward the daily and 3-day limits until it would have expired. Non-billable.",
       "inputSchema": {
         "properties": {
           "confirmation_token": {
@@ -21195,7 +21207,7 @@
         "openWorldHint": false,
         "readOnlyHint": false
       },
-      "description": "Get or lazily synthesize a free fixed audition clip URL for a preset or account-owned cloned voice. Once generated for a cloned voice, the preview URL is cached permanently and also returned by beatra.voices.list.",
+      "description": "Get or lazily synthesize a free fixed audition clip URL for a preset or account-owned cloned voice. Once generated for a cloned voice, the preview URL is cached permanently and also returned by beatra.voices.list. For a free preview waiting for activation it returns the stored preview and never synthesizes.",
       "inputSchema": {
         "properties": {
           "voice_id": {
@@ -21998,7 +22010,7 @@
           },
           "include_activation_required": {
             "default": false,
-            "description": "Also list voice clone models that are not in the default list: models whose voices need a separate paid activation before use, and models that must be chosen explicitly and are never picked by auto.",
+            "description": "Also list clone models that need a separate paid activation after a free training, if any are offered. Previews made with preview_first need no flag.",
             "title": "Include Activation Required",
             "type": "boolean"
           }
@@ -25482,6 +25494,11 @@
               "preview_available": {
                 "default": false,
                 "title": "Preview Available",
+                "type": "boolean"
+              },
+              "preview_first_supported": {
+                "default": false,
+                "title": "Preview First Supported",
                 "type": "boolean"
               },
               "prompt_accepted": {

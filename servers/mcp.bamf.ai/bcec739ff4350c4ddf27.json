@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "64d6d1461e69d634b942b2dbe217c34ac1038b547e77d3b58d27c26b4514e7b8",
+  "full_hash": "a28ce95eb85cb4fec37ef6da5ef1365f52b2380bb71a49731e69ce79bf00d685",
   "name": "ai.bamf/bamf",
-  "observed_at": "2026-11-18T02:02:41.792099Z",
+  "observed_at": "2026-11-19T02:03:30.121548Z",
   "sources": [
     "official"
   ],
@@ -2451,6 +2451,10 @@
           "reference_version": {
             "description": "Index into image_history from bamf.list_post_versions.",
             "type": "number"
+          },
+          "source_image_url": {
+            "description": "Optional base image to edit instead of the image the post shows now. Must be this post's current image, an image_history entry or one of its design versions (bamf.list_post_versions). Use it right after choosing a new base so the edit cannot land on the older image.",
+            "type": "string"
           }
         },
         "required": [
@@ -5028,7 +5032,7 @@
         "readOnlyHint": false,
         "title": "Add Brand Font"
       },
-      "description": "Add a font file to a creator's brand fonts from an HTTPS url or file_base64. Before calling, ask the user to confirm exactly: \"I have the right to use this font for my content\"; only then pass license_confirmed true. Font files are stored privately and are never public. Pass replace with an existing family name to overwrite it.",
+      "description": "Add a font file to a creator's brand fonts. When a design uses a font the creator has, upload it here and use it by name; never substitute a look-alike and never ask about licences. Upload each weight/style file of a family; they are stored as faces of one family. Accepts an HTTPS url or file_base64. Font files are stored privately and are never public. Pass replace with an existing family name to overwrite the whole family.",
       "inputSchema": {
         "properties": {
           "author_id": {
@@ -5043,7 +5047,7 @@
             "type": "string"
           },
           "license_confirmed": {
-            "description": "Must be true, and only after the user confirmed they have the right to use this font for their content.",
+            "description": "Deprecated and ignored.",
             "type": "boolean"
           },
           "note": {
@@ -5074,8 +5078,7 @@
         },
         "required": [
           "author_id",
-          "role",
-          "license_confirmed"
+          "role"
         ],
         "type": "object"
       },
@@ -5234,6 +5237,12 @@
             ],
             "type": "string"
           },
+          "feedback": {
+            "description": "What to change versus the last output. Required to re-run a post (post_id) that already has design outputs; otherwise the run is refused with library_rerun_needs_feedback.",
+            "maxLength": 1000,
+            "minLength": 8,
+            "type": "string"
+          },
           "format": {
             "description": "With engine=claude_design. motion_infographic returns an animated infographic: poster PNG plus GIF and MP4 (gif_url, mp4_url on bamf.get_job), rendered by the same motion pipeline as the BAMF app.",
             "enum": [
@@ -5362,6 +5371,7 @@
             "type": "array"
           },
           "styleReferenceImageUrls": {
+            "description": "HTTPS design reference pixels. The first one is rebuilt with the new copy (reference-matched design pipeline).",
             "items": {
               "type": "string"
             },

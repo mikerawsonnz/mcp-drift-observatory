@@ -6,8 +6,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://prices.brainy.ae/mcp/v2` | 26 | [`7dd396b3489d`](9443ab886276db8be110.json) | 2026-11-18 |
-| `https://prices.brainy.ae/mcp` | 19 | [`a0ef0844fd26`](f6d1febd0eda9114989e.json) | 2026-11-18 |
+| `https://prices.brainy.ae/mcp/v2` | 26 | [`dcccc052edc5`](9443ab886276db8be110.json) | 2026-11-19 |
+| `https://prices.brainy.ae/mcp` | 19 | [`ccc32cd46b2e`](f6d1febd0eda9114989e.json) | 2026-11-19 |
 
 ## Tools at `https://prices.brainy.ae/mcp/v2`
 
@@ -20,7 +20,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `fixed_monthly_costs`: `Monthly fixed costs for a household profile, with assumptions. Not a full budget.`
 - `free_zone_companies`: `Free zone company setup: package prices, annual/monthly cost, visas.`
 - `fuel_prices`: `UAE petrol/diesel prices this month and last, change, 50/70 L tank cost, history.`
-- `fx_rates`: `Dated CBUAE AED exchange rates. Not bank quotes.`
+- `fx_rates`: `Dated ECB-based AED FX rates. Not bank quotes.`
 - `grocery_compare_list`: `Cheapest store for a list: subtotals, delivery fees, minimums. items: ["milk"]. Observed + labelled estimates.`
 - `grocery_products`: `Dubai supermarket prices: per-store pack/unit offers, dates, history. Give query (product name), e.g. milk, or product_id. Not MOET.`
 - `grocery_stores`: `Grocery stores: delivery fees, free-delivery thresholds, minimum orders.`
@@ -62,6 +62,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-19: [description changed](../../deltas/2026-11-19/9443ab886276db8be110.json): `1 field(s) changed`
+- 2026-11-19: [description changed](../../deltas/2026-11-19/f6d1febd0eda9114989e.json): `1 field(s) changed`
 - 2026-11-18: [schema changed](../../deltas/2026-11-18/9443ab886276db8be110.json): `9 field(s) changed`
 - 2026-11-18: [schema changed](../../deltas/2026-11-18/f6d1febd0eda9114989e.json): `9 field(s) changed`
 - 2026-11-17: [schema changed](../../deltas/2026-11-17/9443ab886276db8be110.json): `336 field(s) changed`
