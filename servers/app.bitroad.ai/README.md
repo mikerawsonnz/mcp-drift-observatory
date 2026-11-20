@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://app.bitroad.ai/api/v1/mcp` | 93 | [`1c6007b9aa08`](e36f79dd929c8eb0f088.json) | 2026-11-13 |
+| `https://app.bitroad.ai/api/v1/mcp` | 93 | [`d479efd07432`](e36f79dd929c8eb0f088.json) | 2026-11-20 |
 
 ## Tools at `https://app.bitroad.ai/api/v1/mcp`
 
@@ -74,6 +74,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-20: [description changed, schema changed](../../deltas/2026-11-20/e36f79dd929c8eb0f088.json): `5 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-13: [description changed](../../deltas/2026-11-13/e36f79dd929c8eb0f088.json): `2 field(s) changed`
 - 2026-11-12: [count changed, description changed, tool added](../../deltas/2026-11-12/e36f79dd929c8eb0f088.json): `2 tool(s) added; 4 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-10: [count changed, tool added](../../deltas/2026-11-10/e36f79dd929c8eb0f088.json): `13 tool(s) added`

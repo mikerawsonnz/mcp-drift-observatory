@@ -6,8 +6,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://prices.brainy.ae/mcp/v2` | 26 | [`dcccc052edc5`](9443ab886276db8be110.json) | 2026-11-19 |
-| `https://prices.brainy.ae/mcp` | 19 | [`ccc32cd46b2e`](f6d1febd0eda9114989e.json) | 2026-11-19 |
+| `https://prices.brainy.ae/mcp/v2` | 26 | [`fd6221e73a1e`](9443ab886276db8be110.json) | 2026-11-20 |
+| `https://prices.brainy.ae/mcp` | 19 | [`0fff72bfa2c0`](f6d1febd0eda9114989e.json) | 2026-11-20 |
 
 ## Tools at `https://prices.brainy.ae/mcp/v2`
 
@@ -62,6 +62,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-20: [schema changed](../../deltas/2026-11-20/f6d1febd0eda9114989e.json): `33 field(s) changed`
+- 2026-11-20: [schema changed](../../deltas/2026-11-20/9443ab886276db8be110.json): `42 field(s) changed`
 - 2026-11-19: [description changed](../../deltas/2026-11-19/9443ab886276db8be110.json): `1 field(s) changed`
 - 2026-11-19: [description changed](../../deltas/2026-11-19/f6d1febd0eda9114989e.json): `1 field(s) changed`
 - 2026-11-18: [schema changed](../../deltas/2026-11-18/9443ab886276db8be110.json): `9 field(s) changed`
@@ -80,8 +82,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - 2026-10-07: [description changed, schema changed](../../deltas/2026-10-07/9443ab886276db8be110.json): `7087 field(s) changed`
 - 2026-10-07: [description changed, schema changed](../../deltas/2026-10-07/f6d1febd0eda9114989e.json): `610 field(s) changed`
 - 2026-10-05: [schema changed](../../deltas/2026-10-05/f6d1febd0eda9114989e.json): `31 field(s) changed`
-- 2026-10-04: [count changed, description changed, schema changed, tool added](../../deltas/2026-10-04/f6d1febd0eda9114989e.json): `2 tool(s) added; 40 field(s) changed`
-- 2026-10-03: [count changed, description changed, schema changed, tool added](../../deltas/2026-10-03/f6d1febd0eda9114989e.json): `13 tool(s) added; 9 field(s) changed`
 
 ## Check it from your agent
 

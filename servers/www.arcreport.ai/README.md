@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://www.arcreport.ai/api/ask` | 7 | [`bba1c85b32d4`](5990de195db11012fcfb.json) | 2026-11-19 |
+| `https://www.arcreport.ai/api/ask` | 7 | [`1ff3119ed1c1`](5990de195db11012fcfb.json) | 2026-11-20 |
 | `https://www.arcreport.ai/api/mcp` | 19 | [`d77cc168ce66`](5b7f6412bf3c3e91b70c.json) | 2026-11-17 |
 
 ## Tools at `https://www.arcreport.ai/api/ask`
@@ -43,6 +43,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-20: [description changed](../../deltas/2026-11-20/5990de195db11012fcfb.json): `2 field(s) changed`
 - 2026-11-19: [description changed, schema changed](../../deltas/2026-11-19/5990de195db11012fcfb.json): `6 field(s) changed`
 - 2026-11-17: [schema changed](../../deltas/2026-11-17/5b7f6412bf3c3e91b70c.json): `6 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-17: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-17/5990de195db11012fcfb.json): `1 tool(s) added; 10 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**

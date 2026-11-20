@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.beatra.ai/mcp` | 47 | [`1a9ea57b2680`](4f93d616eb97e76f800a.json) | 2026-11-19 |
+| `https://mcp.beatra.ai/mcp` | 47 | [`e65a4c24014f`](4f93d616eb97e76f800a.json) | 2026-11-20 |
 
 ## Tools at `https://mcp.beatra.ai/mcp`
 
@@ -49,7 +49,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `beatra.videos.generate_from_references`: `Generate from ordered image, video, and audio references. Use animate for one strict opening image and interpolate for strict first and las…`
 - `beatra.videos.interpolate`: `Generate toward a required last frame, optionally constrained by a first frame and driving audio. Use animate when only a first frame exist…`
 - `beatra.videos.understand`: `Answer questions about one video limited to 50 MiB and 360 seconds. Upload a local video with beatra.assets.upload first and pass it as an…`
-- `beatra.voices.activate`: `Activate a cloned voice whose clone result says activation is required (status pending_activation), such as a clone made with preview_first…`
+- `beatra.voices.activate`: `Activate a cloned voice that waits for activation (status pending_activation), such as a free preview made with preview_first=true: one cal…`
 - `beatra.voices.clone`: `Clone a voice from a clean single-speaker sample. By default the clone is charged once and the voice is ready for speech as soon as the tas…`
 - `beatra.voices.delete`: `Permanently delete one of this account's cloned voices using mandatory 2-step confirmation. Call first with voice_id alone (no confirmation…`
 - `beatra.voices.list`: `List preset and tenant-owned voices available for speech synthesis and speech-to-speech conversion, with bilingual search and capability fi…`
@@ -60,6 +60,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-20: [description changed, schema changed](../../deltas/2026-11-20/4f93d616eb97e76f800a.json): `180 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-19: [description changed, schema changed](../../deltas/2026-11-19/4f93d616eb97e76f800a.json): `16 field(s) changed`
 - 2026-11-18: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-18/4f93d616eb97e76f800a.json): `4 tool(s) added; 10 field(s) changed; signals: imperative_language_introduced` **(notable)**
 - 2026-11-17: [schema changed](../../deltas/2026-11-17/4f93d616eb97e76f800a.json): `8 field(s) changed`

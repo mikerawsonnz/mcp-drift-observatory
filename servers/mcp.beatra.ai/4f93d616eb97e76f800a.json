@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "1a9ea57b268014d8bd589bb65738f1555f4d8abd05c194ecdcd23bf5d1b8fdee",
+  "full_hash": "e65a4c24014f6bebe1d7c287f2cf1c8809931660b57b7998d69a8c76373f4f3b",
   "name": "ai.beatra/beatra",
-  "observed_at": "2026-11-19T02:03:31.236781Z",
+  "observed_at": "2026-11-20T02:03:21.415015Z",
   "sources": [
     "official"
   ],
@@ -17117,7 +17117,7 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Clone a voice from a clean single-speaker sample. By default the clone is charged once and the voice is ready for speech as soon as the task succeeds. Set preview_first=true to hear it before paying: the clone and a short fixed preview are free, the voice waits (status pending_activation) up to 3 days, and beatra.voices.activate charges the clone price only after the user agrees; a preview that is not activated is deleted automatically. Offer preview_first when the user wants to hear the result first or the balance is too low for a paid clone. Call only after the user explicitly confirms they have the rights to clone it, and set consent_attested=true. This call consumes Beatra credits unless preview_first=true. It creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry.",
+      "description": "Clone a voice from a clean single-speaker sample. By default the clone is charged once and the voice is ready for speech as soon as the task succeeds. Set preview_first=true to hear it before paying: the clone and a short fixed preview are free, the voice waits (status pending_activation) up to 3 days, and one beatra.voices.activate call charges the clone price and makes it ready; a preview that is not activated is deleted automatically. Offer preview_first when the user asks to hear the voice before paying, or when a paid clone is refused for insufficient balance and the refusal offers it. Call only after the user explicitly confirms they have the rights to clone it, and set consent_attested=true. This call consumes Beatra credits unless preview_first=true. It creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry.",
       "inputSchema": {
         "$defs": {
           "MediaInputArtifact": {
@@ -17748,9 +17748,9 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Activate a cloned voice whose clone result says activation is required (status pending_activation), such as a clone made with preview_first=true. Voices that are already ready, including every preset voice and every clone made without preview_first, never need this; calling it on them charges nothing and changes nothing. The clone result already carries the quote (activation.quote: price, terms, preview, confirmation_token). Only after the user explicitly agrees to the price and terms, call once with voice_id, confirmation_token and confirm_credits; this consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get; reuse the same client_request_id only for an identical retry. Called without confirmation_token (the token is gone or older than 24 hours), it returns a new quote and charges nothing.",
+      "description": "Activate a cloned voice that waits for activation (status pending_activation), such as a free preview made with preview_first=true: one call charges the clone price, and the voice is ready for speech when the task succeeds and stays on this account until it is deleted. The voice activated is the one in the preview. If activation fails, the charge is refunded automatically; after it succeeds it is not refunded, and an activated voice that is deleted cannot be restored. If the balance is too low, nothing is charged and the reply gives the top-up link. A voice that is already ready, including every preset voice and every clone made without preview_first, needs nothing: the call charges nothing and changes nothing. This call consumes Beatra credits unless the voice is already ready. It creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry.",
       "inputSchema": {
-        "description": "Activate a cloned voice that waits for activation: one call with the clone result's quote, after the user agrees.",
+        "description": "Activate a cloned voice that waits for activation: one call charges the activation price.",
         "properties": {
           "client_request_id": {
             "description": "Stable retry identity for this billable operation. Reuse only for the exact same generation arguments.",
@@ -17759,37 +17759,8 @@
             "title": "Client Request Id",
             "type": "string"
           },
-          "confirm_credits": {
-            "anyOf": [
-              {
-                "minimum": 0,
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "The quoted price_credits, repeated to confirm the user agreed to exactly that price.",
-            "title": "Confirm Credits"
-          },
-          "confirmation_token": {
-            "anyOf": [
-              {
-                "maxLength": 1024,
-                "minLength": 1,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "The confirmation_token from the clone result's activation.quote (or a later quote); valid for 24 hours. Omit it to get a new quote; nothing is charged.",
-            "title": "Confirmation Token"
-          },
           "voice_id": {
-            "description": "The voice_id from the clone result.",
+            "description": "The voice_id of a voice waiting for activation (status pending_activation), from the clone result or beatra.voices.list.",
             "maxLength": 64,
             "minLength": 1,
             "title": "Voice Id",
@@ -18250,18 +18221,6 @@
                 "title": "Price Credits",
                 "type": "integer"
               },
-              "quote": {
-                "anyOf": [
-                  {
-                    "$ref": "#/$defs/VoiceActivationQuote"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "The activation quote, on the clone task's result. Show the price and terms to the user and, with their consent, call activate once with quote.confirmation_token and confirm_credits = price_credits (valid for 24 hours; without a token, activate returns a new quote)."
-              },
               "required": {
                 "title": "Required",
                 "type": "boolean"
@@ -18272,80 +18231,6 @@
               "price_credits"
             ],
             "title": "VoiceActivation",
-            "type": "object"
-          },
-          "VoiceActivationQuote": {
-            "description": "The price of activating one preview voice. Nothing is charged until it is confirmed.",
-            "properties": {
-              "balance_credits": {
-                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-                "title": "Balance Credits",
-                "type": "string"
-              },
-              "confirmation_token": {
-                "title": "Confirmation Token",
-                "type": "string"
-              },
-              "message": {
-                "title": "Message",
-                "type": "string"
-              },
-              "preview": {
-                "anyOf": [
-                  {
-                    "$ref": "#/$defs/VoicePreview"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null
-              },
-              "price_credits": {
-                "title": "Price Credits",
-                "type": "integer"
-              },
-              "sufficient_balance": {
-                "title": "Sufficient Balance",
-                "type": "boolean"
-              },
-              "terms": {
-                "additionalProperties": {
-                  "items": {
-                    "type": "string"
-                  },
-                  "type": "array"
-                },
-                "description": "The activation terms in zh, en and ja",
-                "title": "Terms",
-                "type": "object"
-              },
-              "terms_version": {
-                "title": "Terms Version",
-                "type": "string"
-              },
-              "token_expires_at": {
-                "format": "date-time",
-                "title": "Token Expires At",
-                "type": "string"
-              },
-              "voice_id": {
-                "title": "Voice Id",
-                "type": "string"
-              }
-            },
-            "required": [
-              "voice_id",
-              "price_credits",
-              "balance_credits",
-              "sufficient_balance",
-              "confirmation_token",
-              "token_expires_at",
-              "terms_version",
-              "terms",
-              "message"
-            ],
-            "title": "VoiceActivationQuote",
             "type": "object"
           },
           "VoiceCapabilities": {
@@ -18522,7 +18407,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "TaskToolOutput's fields plus the voice, the credits charged and the quote.",
+        "description": "TaskToolOutput's fields plus the voice and the credits charged.",
         "properties": {
           "artifacts": {
             "items": {
@@ -18564,19 +18449,6 @@
             ],
             "default": null,
             "title": "Error"
-          },
-          "quote": {
-            "anyOf": [
-              {
-                "additionalProperties": true,
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Quote"
           },
           "resolved_model": {
             "anyOf": [
@@ -19296,18 +19168,6 @@
                 "title": "Price Credits",
                 "type": "integer"
               },
-              "quote": {
-                "anyOf": [
-                  {
-                    "$ref": "#/$defs/VoiceActivationQuote"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "The activation quote, on the clone task's result. Show the price and terms to the user and, with their consent, call activate once with quote.confirmation_token and confirm_credits = price_credits (valid for 24 hours; without a token, activate returns a new quote)."
-              },
               "required": {
                 "title": "Required",
                 "type": "boolean"
@@ -19318,80 +19178,6 @@
               "price_credits"
             ],
             "title": "VoiceActivation",
-            "type": "object"
-          },
-          "VoiceActivationQuote": {
-            "description": "The price of activating one preview voice. Nothing is charged until it is confirmed.",
-            "properties": {
-              "balance_credits": {
-                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-                "title": "Balance Credits",
-                "type": "string"
-              },
-              "confirmation_token": {
-                "title": "Confirmation Token",
-                "type": "string"
-              },
-              "message": {
-                "title": "Message",
-                "type": "string"
-              },
-              "preview": {
-                "anyOf": [
-                  {
-                    "$ref": "#/$defs/VoicePreview"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null
-              },
-              "price_credits": {
-                "title": "Price Credits",
-                "type": "integer"
-              },
-              "sufficient_balance": {
-                "title": "Sufficient Balance",
-                "type": "boolean"
-              },
-              "terms": {
-                "additionalProperties": {
-                  "items": {
-                    "type": "string"
-                  },
-                  "type": "array"
-                },
-                "description": "The activation terms in zh, en and ja",
-                "title": "Terms",
-                "type": "object"
-              },
-              "terms_version": {
-                "title": "Terms Version",
-                "type": "string"
-              },
-              "token_expires_at": {
-                "format": "date-time",
-                "title": "Token Expires At",
-                "type": "string"
-              },
-              "voice_id": {
-                "title": "Voice Id",
-                "type": "string"
-              }
-            },
-            "required": [
-              "voice_id",
-              "price_credits",
-              "balance_credits",
-              "sufficient_balance",
-              "confirmation_token",
-              "token_expires_at",
-              "terms_version",
-              "terms",
-              "message"
-            ],
-            "title": "VoiceActivationQuote",
             "type": "object"
           },
           "VoiceCapabilities": {
@@ -20100,18 +19886,6 @@
                 "title": "Price Credits",
                 "type": "integer"
               },
-              "quote": {
-                "anyOf": [
-                  {
-                    "$ref": "#/$defs/VoiceActivationQuote"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "The activation quote, on the clone task's result. Show the price and terms to the user and, with their consent, call activate once with quote.confirmation_token and confirm_credits = price_credits (valid for 24 hours; without a token, activate returns a new quote)."
-              },
               "required": {
                 "title": "Required",
                 "type": "boolean"
@@ -20122,80 +19896,6 @@
               "price_credits"
             ],
             "title": "VoiceActivation",
-            "type": "object"
-          },
-          "VoiceActivationQuote": {
-            "description": "The price of activating one preview voice. Nothing is charged until it is confirmed.",
-            "properties": {
-              "balance_credits": {
-                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-                "title": "Balance Credits",
-                "type": "string"
-              },
-              "confirmation_token": {
-                "title": "Confirmation Token",
-                "type": "string"
-              },
-              "message": {
-                "title": "Message",
-                "type": "string"
-              },
-              "preview": {
-                "anyOf": [
-                  {
-                    "$ref": "#/$defs/VoicePreview"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null
-              },
-              "price_credits": {
-                "title": "Price Credits",
-                "type": "integer"
-              },
-              "sufficient_balance": {
-                "title": "Sufficient Balance",
-                "type": "boolean"
-              },
-              "terms": {
-                "additionalProperties": {
-                  "items": {
-                    "type": "string"
-                  },
-                  "type": "array"
-                },
-                "description": "The activation terms in zh, en and ja",
-                "title": "Terms",
-                "type": "object"
-              },
-              "terms_version": {
-                "title": "Terms Version",
-                "type": "string"
-              },
-              "token_expires_at": {
-                "format": "date-time",
-                "title": "Token Expires At",
-                "type": "string"
-              },
-              "voice_id": {
-                "title": "Voice Id",
-                "type": "string"
-              }
-            },
-            "required": [
-              "voice_id",
-              "price_credits",
-              "balance_credits",
-              "sufficient_balance",
-              "confirmation_token",
-              "token_expires_at",
-              "terms_version",
-              "terms",
-              "message"
-            ],
-            "title": "VoiceActivationQuote",
             "type": "object"
           },
           "VoiceCapabilities": {
@@ -20815,18 +20515,6 @@
                 "title": "Price Credits",
                 "type": "integer"
               },
-              "quote": {
-                "anyOf": [
-                  {
-                    "$ref": "#/$defs/VoiceActivationQuote"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "The activation quote, on the clone task's result. Show the price and terms to the user and, with their consent, call activate once with quote.confirmation_token and confirm_credits = price_credits (valid for 24 hours; without a token, activate returns a new quote)."
-              },
               "required": {
                 "title": "Required",
                 "type": "boolean"
@@ -20837,80 +20525,6 @@
               "price_credits"
             ],
             "title": "VoiceActivation",
-            "type": "object"
-          },
-          "VoiceActivationQuote": {
-            "description": "The price of activating one preview voice. Nothing is charged until it is confirmed.",
-            "properties": {
-              "balance_credits": {
-                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-                "title": "Balance Credits",
-                "type": "string"
-              },
-              "confirmation_token": {
-                "title": "Confirmation Token",
-                "type": "string"
-              },
-              "message": {
-                "title": "Message",
-                "type": "string"
-              },
-              "preview": {
-                "anyOf": [
-                  {
-                    "$ref": "#/$defs/VoicePreview"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null
-              },
-              "price_credits": {
-                "title": "Price Credits",
-                "type": "integer"
-              },
-              "sufficient_balance": {
-                "title": "Sufficient Balance",
-                "type": "boolean"
-              },
-              "terms": {
-                "additionalProperties": {
-                  "items": {
-                    "type": "string"
-                  },
-                  "type": "array"
-                },
-                "description": "The activation terms in zh, en and ja",
-                "title": "Terms",
-                "type": "object"
-              },
-              "terms_version": {
-                "title": "Terms Version",
-                "type": "string"
-              },
-              "token_expires_at": {
-                "format": "date-time",
-                "title": "Token Expires At",
-                "type": "string"
-              },
-              "voice_id": {
-                "title": "Voice Id",
-                "type": "string"
-              }
-            },
-            "required": [
-              "voice_id",
-              "price_credits",
-              "balance_credits",
-              "sufficient_balance",
-              "confirmation_token",
-              "token_expires_at",
-              "terms_version",
-              "terms",
-              "message"
-            ],
-            "title": "VoiceActivationQuote",
             "type": "object"
           },
           "VoiceCapabilities": {

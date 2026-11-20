@@ -6,47 +6,34 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.bittuitive.ai/mcp` | 34 | [`04a6890401c9`](c0c8c3bdf1cbda3c2fcd.json) | 2026-11-19 |
+| `https://api.bittuitive.ai/mcp` | 20 | [`2172913ae13a`](c0c8c3bdf1cbda3c2fcd.json) | 2026-11-20 |
 
 ## Tools at `https://api.bittuitive.ai/mcp`
 
-- `ack_mailbox`: `Mark a mailbox item as acked so it is hidden from the default list.`
-- `best_endpoint`: `Free. Find the highest-scoring paid agent API (L402/x402) for a need, e.g. 'bitcoin price', 'weather forecast', 'stock quotes'. Returns up…`
-- `bittuitive_pricing`: `Free. BitTuitive's paid endpoints, per-call prices in sats, subscription plans, and live status.`
-- `create_feed`: `Create a scheduled or trigger feed. Omit bitfeed_token to open a new prepaid account; the response includes a btf_ token that is not shown…`
-- `delete_feed`: `Permanently delete a feed.`
-- `get_airport_delays`: `US airport ground stops, delay programs, arrival/departure delays and closures from the FAA NAS Status snapshot (optional airport=SFO). Not…`
-- `get_balance`: `Return the prepaid sat balance and a low-balance notice when few deliveries remain.`
-- `get_btc_oracle`: `BTC price plus hash rate, mempool, difficulty, fees and block height — use this for a compact network snapshot. Price: 50 sats (Lightning)…`
-- `get_btc_price`: `Live BTC price in USD/EUR with 24h change, cached up to 60 seconds — use this when you only need the spot price and a one-minute quote is e…`
-- `get_btc_price_fresh`: `Fresh BTC spot in USD/EUR with 24h change, cached at most 10 seconds — use this instead of btc_price when you need a tighter quote (btc_pri…`
-- `get_btc_price_lite`: `BTC price in whole US dollars, refreshed at most every 5 minutes (3 sats) — use this when you only need a rough spot price; no EUR or 24h c…`
-- `get_btc_pro`: `Oracle data plus Lightning Network capacity/channels and daily mining revenue — use this for ecosystem-level stats. Price: 100 sats (Lightn…`
-- `get_btc_signals`: `Fear & Greed, BTC/gold, % from ATH, momentum, volatility and 24h transactions (dominance, NVT and active addresses are null without a licen…`
-- `get_feed`: `Return one feed by id.`
-- `get_mailbox`: `List or fetch mailbox items (payloads stored when a webhook is not used or has failed). Items are kept for 72 hours.`
-- `get_market_insights`: `Ranked agent demand, willingness-to-pay, unmet searches, routed-call volume, the payment conversion funnel and supply–demand gaps (aggregat…`
-- `get_stock_filings`: `Latest 10-K, 10-Q and 8-K filings with document links from SEC EDGAR for one US ticker. Not endorsed by the SEC. Price: 10 sats (Lightning)…`
-- `get_stock_fundamentals`: `SEC EDGAR company facts (revenue, net income, EPS, shares, cash, debt) and ticker-to-CIK mapping for one US ticker. Not endorsed by the SEC…`
-- `get_travel_airport`: `One US airport (airport=SFO required): FAA delay/closure events plus current NOAA weather and NWS alerts. Not for navigation. Not endorsed…`
-- `get_weather_alerts`: `Active NWS alerts for a US point, city, ZIP, or state=XX (US only) — use this to check warnings. Price: 10 sats (Lightning) or $0.01 USDC o…`
-- `get_weather_current`: `Current conditions for lat/lon or a US city/ZIP (NOAA NWS in the US; MET Norway elsewhere) — use this for a point weather check. Price: 10…`
-- `get_weather_forecast`: `Hourly plus 7-day forecast for lat/lon or a US city/ZIP — use this to plan the next hours or days. Price: 30 sats (Lightning) or $0.025 USD…`
-- `get_weather_now`: `Temperature (F), wind and a text summary for a US city/ZIP or lat/lon, about 1 km resolution, cached up to 15 minutes (5 sats) — use this f…`
-- `list_feeds`: `List this account's feeds and the prepaid sat balance.`
-- `pause_feed`: `Pause a feed so it will not deliver until resumed.`
-- `request_data`: `Free. Tell BitTuitive what data you want (data_type, description, an example query, and the max price in sats you would pay). This records…`
-- `resume_feed`: `Resume a paused feed. Fails if the prepaid balance is zero or the feed has expired.`
-- `route_call`: `BitTuitive pays a scoreboard-verified L402 API and returns its data plus routing metadata — use this when the data you need is on another p…`
-- `route_endpoints`: `Free. Every scoreboard-verified L402 API the BitTuitive router can call on your behalf right now, grouped by data type, with upstream price…`
-- `scoreboard_categories`: `Free. Per data type (bitcoin, crypto, stocks, weather, traffic, other): counts, average score and the top endpoints.`
-- `scoreboard_endpoint`: `Free. Score components, probe stats and recent probe history for one scoreboard entry (id from best_endpoint/scoreboard_search).`
-- `scoreboard_search`: `Free. Search/browse the scoreboard of paid agent APIs with filters; sorted by score.`
-- `topup`: `Add prepaid balance. Lightning: pass amount_sats (minimum 100) to get an invoice; pay it, then call again with payment_hash (or GET the che…`
-- `update_feed`: `Patch interval, trigger, params, webhook_url or mailbox on an existing feed.`
+- `ack_feed_mailbox_item`: `Use this when you have processed a mailbox item, so it stops appearing in the default list. Does not delete it (it still expires after 72 h…`
+- `browse_scoreboard`: `Use this when you want to survey the market instead of getting one pick: list paid agent APIs by score with filters (view="search": q, data…`
+- `buy_credits`: `Use this when you will make many calls or run feeds and want to pay once instead of per call. Omit credit_token to open a new account: the…`
+- `call_routed_api`: `Use this when you want data from another paid API without handling its invoice: pay ONE BitTuitive invoice (sats, or the same all-in price…`
+- `create_feed`: `Use this when an agent would otherwise poll: get data pushed on a schedule (e.g. hourly BTC price) or when a trigger fires (BTC moves 2%, p…`
+- `delete_feed`: `Use this when you no longer want a feed. PERMANENTLY deletes the feed definition and stops all future deliveries; this cannot be undone (cr…`
+- `find_best_endpoint`: `Use this when your task needs a paid data API you have not picked yet (e.g. 'bitcoin price', 'air quality', 'stock fundamentals') and you w…`
+- `get_airport_data`: `Use this when a travel agent must know whether a US airport has delays, a ground stop or a closure before booking, rebooking or telling a u…`
+- `get_btc_data`: `Use this when an agent needs Bitcoin data: the current BTC price (trading and treasury bots, pricing an invoice in USD, spotting a >2% move…`
+- `get_credit_balance`: `Use this when you want to know how much prepaid balance (sats and USDC) is left before running more calls or feeds. Read-only. Example: get…`
+- `get_feed_mailbox`: `Use this when you want the deliveries stored for you (a feed without a webhook, or one whose webhook failed): lists unacknowledged items, o…`
+- `get_feeds`: `Use this when you need to check your feeds: without feed_id it lists every feed and the prepaid sats balance; with feed_id it returns that…`
+- `get_market_insights`: `Use this when you are deciding what data to build, source or price, or want to know what other AI agents ask for and pay for: ranked reques…`
+- `get_pricing`: `Use this when you need current prices before spending: per-call sats and USDC for every BitTuitive data endpoint, credit bundles, subscript…`
+- `get_scoreboard_entry`: `Use this when you need due diligence before you pay or route: given an id from find_best_endpoint or browse_scoreboard, returns the score c…`
+- `get_stock_data`: `Use this when a research agent needs US company financials or SEC filings for a ticker (SEC EDGAR): revenue, EPS and debt, or the latest 10…`
+- `get_weather`: `Use this when an agent needs US weather (NOAA NWS; MET Norway elsewhere): current conditions, a 7-day forecast or severe-weather alerts for…`
+- `list_routable_apis`: `Use this when you need data BitTuitive does not sell directly and want it paid for you: lists every scoreboard-verified L402 API the router…`
+- `request_data`: `Use this when no tool covers the data you need (e.g. air quality, crypto OHLC, flight prices): records one demand signal (data_type, descri…`
+- `update_feed`: `Use this when you want to change a feed: interval, trigger, params, webhook_url, mailbox, or pause/resume it with 'state'. Only the fields…`
 
 ## Changes
 
+- 2026-11-20: [annotation changed, count changed, description changed, field changed, schema changed, tool added, tool removed](../../deltas/2026-11-20/c0c8c3bdf1cbda3c2fcd.json): `15 tool(s) added; 29 tool(s) removed; 56 field(s) changed; signals: credential_shaped_string_introduced, imperative_language_introduced, le…` **(notable)**
 - 2026-11-19: [count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-19/c0c8c3bdf1cbda3c2fcd.json): `2 tool(s) added; 31 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-18: [description changed, field changed, schema changed](../../deltas/2026-11-18/c0c8c3bdf1cbda3c2fcd.json): `4 field(s) changed`
 - 2026-11-17: [count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-17/c0c8c3bdf1cbda3c2fcd.json): `12 tool(s) added; 49 field(s) changed; signals: imperative_language_introduced, url_introduced` **(notable)**

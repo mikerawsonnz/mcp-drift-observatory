@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.pantheon.ad/mcp` | 34 | [`7c10bb5c671f`](c385e5b261a52bf286e2.json) | 2026-11-17 |
+| `https://mcp.pantheon.ad/mcp` | 36 | [`4b8517e74eee`](c385e5b261a52bf286e2.json) | 2026-11-20 |
 
 ## Tools at `https://mcp.pantheon.ad/mcp`
 
@@ -41,12 +41,15 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `run_magic_tool`: `Summarize or translate a text, or extract its contacts and links (Magic Tools). Summaries and extractions keep the language of the text; tr…`
 - `run_persuasion_analysis`: `Check a draft ad before launch: which persuasion biases it uses and which are missing, with suggestions. Uses 1 Persuasion Analysis credit.…`
 - `run_sales_psychology`: `Write a sales psychology report that matches a project's customer avatar with an Offer Brief. Uses 1 Sales Psychology credit. Runs in the b…`
+- `save_live_ads`: `Save ads found by search_meta_ads_live in the user's Pantheon library, only when the user asks. They are stored like the ads of a personal…`
 - `save_viral_analysis`: `Viral Content: save your 'why it works' analysis of a post (from get_viral_content) for the user, in one language. It appears in the app on…`
 - `search_ads_library`: `Search the ads in the user's own Ads Library (ads collected by their searches) and this week's Top Ads by brand, niche, sector or ad copy.…`
+- `search_meta_ads_live`: `Search the Meta Ad Library right now by keyword, in any market and language: the ads currently running, one per Facebook page, the longest…`
 - `send_to_pantheon`: `Send a link to the user's Pantheon. Without a destination Pantheon picks it from the link: a TikTok, Instagram, YouTube or LinkedIn profile…`
 
 ## Changes
 
+- 2026-11-20: [count changed, field changed, schema changed, tool added](../../deltas/2026-11-20/c385e5b261a52bf286e2.json): `2 tool(s) added; 4 field(s) changed`
 - 2026-11-17: [count changed, tool added](../../deltas/2026-11-17/c385e5b261a52bf286e2.json): `5 tool(s) added`
 - 2026-11-16: [count changed, tool added](../../deltas/2026-11-16/c385e5b261a52bf286e2.json): `6 tool(s) added`
 - 2026-11-14: [annotation changed, description changed, field changed, schema changed](../../deltas/2026-11-14/c385e5b261a52bf286e2.json): `244 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**

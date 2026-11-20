@@ -5,24 +5,27 @@ servers: what tools each one **declared**, byte-exactly, and when that declarati
 
 One commit per crawl cycle. A change to a server's tool surface appears as a diff.
 
-## Latest crawl: 2026-11-19 02:03 UTC
+## Latest crawl: 2026-11-20 02:03 UTC
 
-12 of 260 observable servers changed their declared tools. Attempted 290: 260 observable, 26 auth-walled, 3 unreachable, 1 blocked.
+15 of 263 observable servers changed their declared tools. Attempted 364: 263 observable, 79 auth-walled, 15 unreachable, 7 blocked.
 
-- [Integration Agent](deltas/2026-11-19/b7e55bf8230ad605a287.json): annotation changed, description changed, field changed; 41 field(s) changed
-- [ae.brainy/grocery-prices](deltas/2026-11-19/f6d1febd0eda9114989e.json): description changed; 1 field(s) changed
-- [ae.brainy/grocery-prices](deltas/2026-11-19/9443ab886276db8be110.json): description changed; 1 field(s) changed
-- [ai.agentgates/compute](deltas/2026-11-19/8e123eb71203886e049b.json): schema changed; 3 field(s) changed
-- [ai.agenticfabricationnetwork/ufp](deltas/2026-11-19/db3010688319f7ebe01c.json): count changed, description changed, schema changed, tool added; 1 tool(s) added; 55 field(s) changed
-- [ai.annsa/annsa](deltas/2026-11-19/59d41e60a9e6430b00b0.json): schema changed; 7 field(s) changed
-- [ai.arcreport/ask](deltas/2026-11-19/5990de195db11012fcfb.json): description changed, schema changed; 6 field(s) changed
-- [ai.bamf/bamf](deltas/2026-11-19/bcec739ff4350c4ddf27.json): description changed, schema changed; 10 field(s) changed; signals: imperative_language_introduced **(notable)**
-- [ai.beatra/beatra](deltas/2026-11-19/4f93d616eb97e76f800a.json): description changed, schema changed; 16 field(s) changed
-- [ai.betslipdoctor/mcp](deltas/2026-11-19/f29327f2a9147dd897c0.json): count changed, description changed, schema changed, tool added; 4 tool(s) added; 9 field(s) changed; signals: length_more_than_doubled
-- [ai.bittuitive.api/bittuitive](deltas/2026-11-19/c0c8c3bdf1cbda3c2fcd.json): count changed, description changed, field changed, schema changed, tool added; 2 tool(s) added; 31 field(s) changed; signals: length_more_than_doubled
-- [ai.bizmoon/regulatory](deltas/2026-11-19/60513f782b423d70a731.json): description changed; 4 field(s) changed
+- [ad.pantheon/mcp](deltas/2026-11-20/c385e5b261a52bf286e2.json): count changed, field changed, schema changed, tool added; 2 tool(s) added; 4 field(s) changed
+- [ae.brainy/grocery-prices](deltas/2026-11-20/9443ab886276db8be110.json): schema changed; 42 field(s) changed
+- [ae.brainy/grocery-prices](deltas/2026-11-20/f6d1febd0eda9114989e.json): schema changed; 33 field(s) changed
+- [ae.discond/discond](deltas/2026-11-20/cd7db03de9f0ecc82710.json): description changed, schema changed; 10 field(s) changed
+- [ai.agentgates/compute](deltas/2026-11-20/8e123eb71203886e049b.json): schema changed; 17 field(s) changed; signals: credential_shaped_string_introduced **(notable)**
+- [ai.agenticfabricationnetwork/ufp](deltas/2026-11-20/db3010688319f7ebe01c.json): field changed; 6 field(s) changed
+- [ai.agentsrank/agentsrank](deltas/2026-11-20/e901088f2b853a367dca.json): count changed, description changed, tool added; 5 tool(s) added; 1 field(s) changed
+- [ai.annsa/annsa](deltas/2026-11-20/59d41e60a9e6430b00b0.json): schema changed; 20 field(s) changed; signals: length_more_than_doubled
+- [ai.appgoat/mcp](deltas/2026-11-20/9aff2500785fcb6529f4.json): description changed; 2 field(s) changed
+- [ai.arcreport/ask](deltas/2026-11-20/5990de195db11012fcfb.json): description changed; 2 field(s) changed
+- [ai.beatra/beatra](deltas/2026-11-20/4f93d616eb97e76f800a.json): description changed, schema changed; 180 field(s) changed; signals: length_more_than_doubled
+- [ai.bitroad/bitroad](deltas/2026-11-20/e36f79dd929c8eb0f088.json): description changed, schema changed; 5 field(s) changed; signals: length_more_than_doubled
+- [ai.bittuitive.api/bittuitive](deltas/2026-11-20/c0c8c3bdf1cbda3c2fcd.json): annotation changed, count changed, description changed, field changed, schema changed, tool added, tool removed; 15 tool(s) added; 29 tool(s) removed; 56 field(s) changed; signals: credential_shaped_string_introduced, imperative_language_introduced, length_more_than_doubled **(notable)**
+- [ai.bowmark/bowmark](deltas/2026-11-20/5f2d24be930573ed8878.json): description changed; 1 field(s) changed
+- [ai.bowmark/bowmark](deltas/2026-11-20/e742a173e323c903336e.json): description changed; 1 field(s) changed
 
-Changes per day: [2026-11-13](deltas/2026-11-13/) 13, [2026-11-14](deltas/2026-11-14/) 18, [2026-11-15](deltas/2026-11-15/) 9, [2026-11-16](deltas/2026-11-16/) 11, [2026-11-17](deltas/2026-11-17/) 21, [2026-11-18](deltas/2026-11-18/) 15, [2026-11-19](deltas/2026-11-19/) 12
+Changes per day: [2026-11-14](deltas/2026-11-14/) 18, [2026-11-15](deltas/2026-11-15/) 9, [2026-11-16](deltas/2026-11-16/) 11, [2026-11-17](deltas/2026-11-17/) 21, [2026-11-18](deltas/2026-11-18/) 15, [2026-11-19](deltas/2026-11-19/) 12, [2026-11-20](deltas/2026-11-20/) 15
 
 ## What this is
 

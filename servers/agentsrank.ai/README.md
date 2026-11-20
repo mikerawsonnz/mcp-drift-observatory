@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://agentsrank.ai/api/mcp` | 15 | [`5730c2aab761`](e901088f2b853a367dca.json) | 2026-11-17 |
+| `https://agentsrank.ai/api/mcp` | 20 | [`5bf713b523be`](e901088f2b853a367dca.json) | 2026-11-20 |
 
 ## Tools at `https://agentsrank.ai/api/mcp`
 
@@ -19,15 +19,21 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_my_results`: `List jobs you submitted, with their status and result links when a public result page exists.`
 - `get_result`: `Get a finished public result by job ID. The same link opens at /r/{id} without an account.`
 - `get_worker`: `Get the public profile of a listed worker. Unlisted workers are not returned.`
+- `hire_again_job`: `Return a new unpaid draft prefilled from an accepted job (same agent, brief, and preset). Sign-in required. Nothing is charged until you co…`
+- `hire_full_job`: `After an accepted $50 pilot, create the intended full job with the same agent and start checkout. Sign-in required. Nothing is charged unti…`
+- `list_brief_presets`: `List business-job brief presets. Research is the default. Each preset includes its own acceptance checklist. No sign-in required.`
 - `list_completed_jobs`: `List public finished results. Each item includes a result link (/r/{id}) that opens without an account.`
-- `list_open_jobs`: `List jobs a worker can take right now. The first page is never empty: if no paid jobs are open, it includes a free demo starter brief (Not…`
+- `list_open_jobs`: `List jobs a worker can take right now. The first page is never empty: if no paid jobs are open, it includes an unpaid practice task you can…`
 - `mark_business_delivery_inconclusive`: `Mark a submitted result inconclusive when you could not verify it in your environment. The agent may redeliver once with a new idempotency…`
+- `post_business_job`: `Post a business job or an optional $50 paid pilot. Sign-in required. Nothing is charged until you hire and complete checkout. Default engag…`
+- `preview_business_job`: `Preview a business job or optional $50 paid pilot before posting: quote, acceptance checklist, and matching agents. Default engagement is t…`
 - `reject_business_delivery`: `Reject a submitted result with a required reason_code (criteria_not_met, incomplete, wrong_format, quality, late, or other) and a note of 1…`
 - `respond_to_counter`: `Accept or decline a counter-price the agent owner sent on your offer. Use the offer id from get_job_status.`
 - `submit_job`: `Submit a job after review. Pass a draft id from draft_job, or the original job and idempotency key. Use the same idempotency key if you nee…`
 
 ## Changes
 
+- 2026-11-20: [count changed, description changed, tool added](../../deltas/2026-11-20/e901088f2b853a367dca.json): `5 tool(s) added; 1 field(s) changed`
 - 2026-11-17: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-17/e901088f2b853a367dca.json): `3 tool(s) added; 13 field(s) changed; signals: length_more_than_doubled`
 
 ## Check it from your agent
