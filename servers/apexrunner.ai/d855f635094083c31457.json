@@ -1,17 +1,28 @@
 {
   "canon_version": "1",
-  "full_hash": "7ccb61ad4718eac9a3b4541ed902327365a38dcc25d7cacc3a74d75c1bb6908b",
+  "full_hash": "175223b69f457e293ffa5cd019a8ba4facc379907db2de74dca671ea6ff3ee78",
   "name": "ai.apexrunner/signals",
-  "observed_at": "2026-11-14T02:02:43.738078Z",
+  "observed_at": "2026-11-21T02:03:40.727328Z",
   "sources": [
     "official"
   ],
-  "tool_count": 50,
+  "tool_count": 52,
   "tools": [
     {
-      "description": "FREE — no payment needed. Live crypto market snapshot: BTC price, Fear & Greed, BTC market regime, and a 2-of-6-pillar preview of the APEX alpha score, plus the current price of every paid tool. Call this first to confirm the connection works.",
+      "description": "FREE — no payment needed. Live crypto market snapshot: BTC price, Fear & Greed, BTC market regime, and a 2-of-6-pillar preview of the APEX alpha score, plus the BTC capitulation_alert preview (whether a contrarian setup exists, its side and cascade score; exact levels locked) and a BTC risk assessment. coin=ETH or SOL returns a locked preview naming the paid call. Call this first to confirm the connection works.",
       "inputSchema": {
-        "properties": {},
+        "properties": {
+          "coin": {
+            "default": "BTC",
+            "description": "BTC (default) = free preview; ETH/SOL = locked preview",
+            "enum": [
+              "BTC",
+              "ETH",
+              "SOL"
+            ],
+            "type": "string"
+          }
+        },
         "type": "object"
       },
       "name": "get_free_market_snapshot"
@@ -471,7 +482,7 @@
       "name": "my_pricing"
     },
     {
-      "description": "$0.00 — Free market snapshot — regime, Fear & Greed, BTC price, and a 2-of-6-pillar alpha score preview (preview_only: true). No payment required. For the full 6-pillar score and its DEPLOY / WAIT / REDUCE / AVOID verdict, call apex_alpha_score. Early Adopter: 30% off every signal, automatic for every wallet until 2027-01-01.",
+      "description": "$0.00 — Free market snapshot — regime, Fear & Greed, BTC price and a 2-of-6-pillar alpha score preview (preview_only: true) — plus a BTC capitulation_alert preview (status, contrarian side and cascade_risk_score; exact entry, target and invalidation locked) and a BTC risk assessment. No payment required. ?coin=ETH or ?coin=SOL returns a locked preview naming the paid call. Early Adopter: 30% off every signal, automatic for every wallet until 2027-01-01.",
       "inputSchema": {
         "properties": {},
         "type": "object"
@@ -555,7 +566,7 @@
       "name": "optimal_order_routing"
     },
     {
-      "description": "$0.007 — Call this before placing an order to decide whether to execute now or wait — scores the current window 0-100 from trading session, regime, Fear & Greed and volatility, and returns EXECUTE_NOW / GOOD_WINDOW / WAIT_15MIN / WAIT_SESSION with a recommended order type and the next favourable window. Param: coin (default BTC).",
+      "description": "$0.007 — Timing a large order? A check costing at most $0.01 tells you whether to execute now or wait. Scores the current window 0-100 from trading session, regime, Fear & Greed and volatility, and returns EXECUTE_NOW / GOOD_WINDOW / WAIT_15MIN / WAIT_SESSION with a recommended order type and the next favourable window. Not size-aware: pair with slippage_forecast for the cost of your exact order. Param: coin (default BTC).",
       "inputSchema": {
         "properties": {
           "coin": {
@@ -612,6 +623,44 @@
         "type": "object"
       },
       "name": "check_trade_safety"
+    },
+    {
+      "description": "$0.014 — Call this to catch contrarian setups as a liquidation cascade builds. Fires only when Hyperliquid liquidation pressure is extreme (>80/100) AND top wallets are heavily crowded on one side (>70) with their liquidations within 5% of price. Returns cascade_risk, contrarian_setup (LONG/SHORT, fading the crowd), a heuristic probability_estimate and a suggested_entry_zone, target and invalidation from the liquidation clusters. Param: coin=BTC|ETH|SOL (default BTC)",
+      "inputSchema": {
+        "properties": {
+          "coin": {
+            "default": "BTC",
+            "description": "Asset to check: BTC, ETH or SOL (default BTC)",
+            "enum": [
+              "BTC",
+              "ETH",
+              "SOL"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "capitulation_alert"
+    },
+    {
+      "description": "$0.014 — Call this to catch a short squeeze while it is BUILDING. Fires only when Hyperliquid cascade risk is elevated but not extreme (50-80; above 80 use capitulation_alert), top wallets are crowded SHORT (>70/100) with their liquidations stacked within 5% ABOVE price, and funding is negative. Returns contrarian_setup LONG, squeeze_risk (HIGH/MEDIUM heuristic), suggested_entry_zone, target (short-liq cluster above) and invalidation. Param: coin=BTC|ETH|SOL",
+      "inputSchema": {
+        "properties": {
+          "coin": {
+            "default": "BTC",
+            "description": "Asset to check: BTC, ETH or SOL (default BTC)",
+            "enum": [
+              "BTC",
+              "ETH",
+              "SOL"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "short_squeeze_fuel"
     },
     {
       "description": "$0.007 — Call this before entering a popular directional trade so you don't become the exit liquidity — scores crowding 0-100 per coin from Hyperliquid's top-20 leaderboard positions (long/short split, leverage) and returns a contrarian signal plus uncrowded opportunities.",

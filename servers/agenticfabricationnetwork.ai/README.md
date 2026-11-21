@@ -6,15 +6,15 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://agenticfabricationnetwork.ai/mcp` | 23 | [`5a817ef7d274`](db3010688319f7ebe01c.json) | 2026-11-20 |
+| `https://agenticfabricationnetwork.ai/mcp` | 23 | [`364e5b6ed5ef`](db3010688319f7ebe01c.json) | 2026-11-21 |
 
 ## Tools at `https://agenticfabricationnetwork.ai/mcp`
 
 - `add_to_cart`: `Put one more part in a cart. Name it ONE way: quote_id (a quote you already have — its shops are not asked again, and the part arrives conf…`
-- `check_offer`: `Run the shop's manufacturability check on ONE offer whose manufacturability_check.status is "unchecked" (the price stands from the shop's o…`
-- `checkout_cart`: `Order every part of a cart with ONE payment link. Each part needs a pick that comes to exactly one option (its selection_match reads "one")…`
+- `check_offer`: `Ask the shop to confirm one unchecked or checking offer. Use this when the user wants the check result before deciding. create_checkout and…`
+- `checkout_cart`: `Create one checkout for every selected cart part. Hosted payment uses one link; pay saved uses the card on the AFN key. Each part needs a p…`
 - `create_cart`: `Start a cart, for a user who wants several parts and one payment. Pass items to put parts in at once; each is named by quote_id (a quote yo…`
-- `create_checkout`: `Create the order and get a hosted payment link for a chosen offer. Call this as soon as the user picks an offer + shipping speed. This tool…`
+- `create_checkout`: `Create checkout for one chosen offer and shipping speed. Hosted payment is the default. Call this after the user chooses the offer and ship…`
 - `finalize_quote`: `ONLY for the case where a quote response came back with an EMPTY board and told you to call this: waits for the vendors to answer (up to ~4…`
 - `fork_cart`: `Copy a cart: the same parts in the same order, each configured and picked as it was (a copy made for a link keeps a part's pick only when i…`
 - `get_cart`: `Read a cart: every part with its quote, the rules on it (constraints_asked), its pick (selection) and what the pick comes to — the shop, th…`
@@ -36,6 +36,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-21: [annotation changed, description changed, schema changed](../../deltas/2026-11-21/db3010688319f7ebe01c.json): `17 field(s) changed`
 - 2026-11-20: [field changed](../../deltas/2026-11-20/db3010688319f7ebe01c.json): `6 field(s) changed`
 - 2026-11-19: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-19/db3010688319f7ebe01c.json): `1 tool(s) added; 55 field(s) changed`
 - 2026-11-15: [description changed, schema changed](../../deltas/2026-11-15/db3010688319f7ebe01c.json): `10 field(s) changed`

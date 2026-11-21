@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://botappetit.ai/mcp` | 14 | [`d845e0362e86`](e19ce61dadbaa55281fe.json) | 2026-11-06 |
+| `https://botappetit.ai/mcp` | 14 | [`5a972ed8cd08`](e19ce61dadbaa55281fe.json) | 2026-11-21 |
 
 ## Tools at `https://botappetit.ai/mcp`
 
@@ -17,7 +17,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `list_sites`: `List the sites the signed-in person follows in Bot Appétit, newest activity first, each with its latest site-scan score, the change since t…`
 - `page_history`: `List every stored Bot Appétit scan of one exact page, newest first, with the score at the time and how it moved since the scan before. Cost…`
 - `request_site_scan`: `A whole-site scan reads a representative sample of a site and needs a person with a Bot Appétit account, and an agent never creates one. Th…`
-- `scan_page`: `Check one web page for AEO, SEO and performance: can a machine consume it? Returns the findings by check and the report link. If the exact…`
+- `scan_page`: `Check one web page for AEO, SEO and performance: can a machine consume it? Returns the findings by check, with every item each check found…`
 - `set_pins`: `Pin or unpin pages on one of the signed-in person's sites. Pinned pages are scanned in every site scan of that site and count toward its sc…`
 - `set_rescan_settings`: `Turn the signed-in person's monthly re-scans of their sites on or off, and the email of each result on or off. Leave a field out to keep it…`
 - `share_site_scan`: `Create or stop the unlisted share link for one of the signed-in person's site scans. Site scans are private by default; a link lets anyone…`
@@ -27,6 +27,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-21: [description changed](../../deltas/2026-11-21/e19ce61dadbaa55281fe.json): `2 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-06: [annotation changed, description changed, field changed](../../deltas/2026-11-06/e19ce61dadbaa55281fe.json): `85 field(s) changed`
 
 ## Check it from your agent

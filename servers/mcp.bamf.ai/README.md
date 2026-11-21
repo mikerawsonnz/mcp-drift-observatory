@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.bamf.ai` | 179 | [`a28ce95eb85c`](bcec739ff4350c4ddf27.json) | 2026-11-19 |
+| `https://mcp.bamf.ai` | 180 | [`351fcd20cbd8`](bcec739ff4350c4ddf27.json) | 2026-11-21 |
 
 ## Tools at `https://mcp.bamf.ai`
 
@@ -17,6 +17,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `bamf.add_memory`: `Add a short durable memory to the creator's knowledge base.`
 - `bamf.admit_outreach_campaign_execution`: `Admit the exact queued campaign into executing state after rechecking current list, connector, fingerprint, and approval, returning canonic…`
 - `bamf.advance_onboarding`: `Finish or skip one BAMF Bot setup step and save it on the same record as the web onboarding, so the person can continue on bamf.ai or here.…`
+- `bamf.animate_design`: `Animate the post's current Claude design (same path as Animate with Claude in the editor) with a motion prompt. Returns a job; the MP4 is s…`
 - `bamf.approve_outreach_campaign`: `Approve the exact prepared campaign fingerprint until an explicit expiry. Approval alone never queues or sends.`
 - `bamf.archive_profile_package`: `Archive a saved Profile Studio package after exact approval. Archive is reversible through update_profile_package and never changes LinkedI…`
 - `bamf.boost_post`: `Apply engagement boost to a post. Published posts boost immediately; scheduled posts are armed for publish time. Requires the posts:boost s…`
@@ -69,11 +70,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `bamf.get_creator_analytics_report`: `Build a native, interactive LinkedIn analytics report across every creator space the signed-in BAMF account can access. Use for creator por…`
 - `bamf.get_creator_context`: `Return the comprehensive creator context bundle for one creator space: knowledge docs, voice profile, AI analyses, integrations, interviews…`
 - `bamf.get_design`: `Read a design's status, image, matched reference, template and layers (likeness, art, text). Poll after bamf.design_post. Read-only.`
-- `bamf.get_funnel_mix`: `Get a creator's TOF/MOF/BOF funnel mix from tagged LinkedIn posts: per-stage counts and performance, per-format stats, the resolved goal ta…`
-- and 119 more in [bcec739ff4350c4ddf27.json](bcec739ff4350c4ddf27.json)
+- and 120 more in [bcec739ff4350c4ddf27.json](bcec739ff4350c4ddf27.json)
 
 ## Changes
 
+- 2026-11-21: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-21/bcec739ff4350c4ddf27.json): `1 tool(s) added; 19 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-19: [description changed, schema changed](../../deltas/2026-11-19/bcec739ff4350c4ddf27.json): `10 field(s) changed; signals: imperative_language_introduced` **(notable)**
 - 2026-11-18: [count changed, tool added](../../deltas/2026-11-18/bcec739ff4350c4ddf27.json): `2 tool(s) added`
 - 2026-11-13: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-13/bcec739ff4350c4ddf27.json): `7 tool(s) added; 19 field(s) changed; signals: imperative_language_introduced` **(notable)**

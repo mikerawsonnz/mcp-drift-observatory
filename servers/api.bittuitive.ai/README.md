@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.bittuitive.ai/mcp` | 20 | [`2172913ae13a`](c0c8c3bdf1cbda3c2fcd.json) | 2026-11-20 |
+| `https://api.bittuitive.ai/mcp` | 21 | [`007bae66d206`](c0c8c3bdf1cbda3c2fcd.json) | 2026-11-21 |
 
 ## Tools at `https://api.bittuitive.ai/mcp`
 
@@ -22,17 +22,19 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_credit_balance`: `Use this when you want to know how much prepaid balance (sats and USDC) is left before running more calls or feeds. Read-only. Example: get…`
 - `get_feed_mailbox`: `Use this when you want the deliveries stored for you (a feed without a webhook, or one whose webhook failed): lists unacknowledged items, o…`
 - `get_feeds`: `Use this when you need to check your feeds: without feed_id it lists every feed and the prepaid sats balance; with feed_id it returns that…`
+- `get_fx_data`: `Use this when an agent needs official daily foreign-exchange reference rates for USD, EUR, CAD and common crosses, with a Data BitScore fro…`
 - `get_market_insights`: `Use this when you are deciding what data to build, source or price, or want to know what other AI agents ask for and pay for: ranked reques…`
 - `get_pricing`: `Use this when you need current prices before spending: per-call sats and USDC for every BitTuitive data endpoint, credit bundles, subscript…`
 - `get_scoreboard_entry`: `Use this when you need due diligence before you pay or route: given an id from find_best_endpoint or browse_scoreboard, returns the score c…`
 - `get_stock_data`: `Use this when a research agent needs US company financials or SEC filings for a ticker (SEC EDGAR): revenue, EPS and debt, or the latest 10…`
-- `get_weather`: `Use this when an agent needs US weather (NOAA NWS; MET Norway elsewhere): current conditions, a 7-day forecast or severe-weather alerts for…`
+- `get_weather`: `Use this when an agent needs weather (NOAA NWS and MET Norway, Data BitScored): current conditions, a 7-day forecast or severe-weather aler…`
 - `list_routable_apis`: `Use this when you need data BitTuitive does not sell directly and want it paid for you: lists every scoreboard-verified L402 API the router…`
 - `request_data`: `Use this when no tool covers the data you need (e.g. air quality, crypto OHLC, flight prices): records one demand signal (data_type, descri…`
 - `update_feed`: `Use this when you want to change a feed: interval, trigger, params, webhook_url, mailbox, or pause/resume it with 'state'. Only the fields…`
 
 ## Changes
 
+- 2026-11-21: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-21/c0c8c3bdf1cbda3c2fcd.json): `1 tool(s) added; 9 field(s) changed`
 - 2026-11-20: [annotation changed, count changed, description changed, field changed, schema changed, tool added, tool removed](../../deltas/2026-11-20/c0c8c3bdf1cbda3c2fcd.json): `15 tool(s) added; 29 tool(s) removed; 56 field(s) changed; signals: credential_shaped_string_introduced, imperative_language_introduced, le…` **(notable)**
 - 2026-11-19: [count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-19/c0c8c3bdf1cbda3c2fcd.json): `2 tool(s) added; 31 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-18: [description changed, field changed, schema changed](../../deltas/2026-11-18/c0c8c3bdf1cbda3c2fcd.json): `4 field(s) changed`

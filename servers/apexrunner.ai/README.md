@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://apexrunner.ai/mcp` | 50 | [`7ccb61ad4718`](d855f635094083c31457.json) | 2026-11-14 |
+| `https://apexrunner.ai/mcp` | 52 | [`175223b69f45`](d855f635094083c31457.json) | 2026-11-21 |
 
 ## Tools at `https://apexrunner.ai/mcp`
 
@@ -17,17 +17,18 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `apex_composite`: `$0.007 — APEX composite crypto trading score 0-100 for BTC, ETH, SOL, AVAX. Aggregates Fear & Greed index, momentum breakout, volume, and m…`
 - `apex_evolution_insight`: `$0.007 — Raw output from APEX's AI evolution engine over its real trade history — win rates by regime and pair, discretionary vs grid perfo…`
 - `apex_pulse`: `$0.007 — Ultra-cheap $0.01 heartbeat signal for AI agents running health checks. Returns APEX system status, current BTC market regime, Fea…`
-- `apex_trial`: `$0.00 — Free market snapshot — regime, Fear & Greed, BTC price, and a 2-of-6-pillar alpha score preview (preview_only: true). No payment re…`
+- `apex_trial`: `$0.00 — Free market snapshot — regime, Fear & Greed, BTC price and a 2-of-6-pillar alpha score preview (preview_only: true) — plus a BTC ca…`
 - `arb_spread`: `$0.007 — Spot vs Hyperliquid price spread for BTC, ETH, SOL (CoinGecko spot price vs Hyperliquid perp mid). Returns spread %, direction, an…`
 - `bb_analysis`: `$0.007 — Bollinger Band analysis for a crypto pair. Returns band width, price position, squeeze detection, and EXPANDED/CONTRACTING/CONTRAC…`
 - `btc_dominance`: `$0.007 — BTC market dominance trend signal for crypto rotation strategy. Returns dominance %, direction, and altcoin rotation bias.`
 - `btc_price_tick`: `$0.007 — Ultra-minimal price tick at $0.01 — BTC/ETH/SOL/AVAX prices from Hyperliquid in minimal JSON. Designed for high-frequency bots tha…`
 - `capital_rotation_signal`: `$0.007 — Detect capital rotation state: BTC_ACCUMULATION, ALT_SEASON_EARLY, ALT_SEASON_LATE, RISK_OFF, RECOVERY, or CHOPPY. Based on BTC do…`
+- `capitulation_alert`: `$0.014 — Call this to catch contrarian setups as a liquidation cascade builds. Fires only when Hyperliquid liquidation pressure is extreme…`
 - `check_trade_safety`: `$0.014 — Call this before opening a leveraged position so you don't walk into a crowded trade or a liquidation cascade — scores one propose…`
 - `combined_alpha`: `$0.007 — Combined alpha crypto trading score 0-100 for BTC, ETH, SOL, AVAX. Synthesizes trend confirmation, volume, Bollinger Bands, Hyperl…`
 - `crowded_trade_detector`: `$0.007 — Call this before entering a popular directional trade so you don't become the exit liquidity — scores crowding 0-100 per coin from…`
 - `dca_signal`: `$0.007 — DCA accumulation entry signal based on Fear & Greed index, RSI, and volatility regime for BTC, ETH, SOL, AVAX. Mirrors APEX Runner…`
-- `execution_window_optimizer`: `$0.007 — Call this before placing an order to decide whether to execute now or wait — scores the current window 0-100 from trading session,…`
+- `execution_window_optimizer`: `$0.007 — Timing a large order? A check costing at most $0.01 tells you whether to execute now or wait. Scores the current window 0-100 from…`
 - `fear_greed`: `$0.007 — Composite crypto Fear & Greed index 0-100 with APEX market regime context and autonomous trading bias. Times DCA accumulation entr…`
 - `fg_micro`: `$0.007 — Ultra-minimal Fear & Greed tick at $0.01 — value, label, and timestamp only. Keys: v=value, l=label, t=timestamp. 300s cache.`
 - `funding_rate`: `$0.007 — Aggregate perpetual funding rate signal across crypto exchanges. Returns 8h rate, annualized %, and long/short pressure.`
@@ -52,6 +53,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `regime_transition`: `$0.007 — Crypto market regime transition detector — flags active shifts between TRENDING, RANGING, CRISIS, and RECOVERY volatility regimes…`
 - `regime_transition_probability`: `$0.007 — Priced at $0.01. Mines APEX Runner's real trade history to build a regime transition matrix and predict probability of market regi…`
 - `risk_assessment_bundle`: `$0.007 — Call this before you size or open any position: one call returns liquidation cascade risk, the nearest liquidation clusters, marke…`
+- `short_squeeze_fuel`: `$0.014 — Call this to catch a short squeeze while it is BUILDING. Fires only when Hyperliquid cascade risk is elevated but not extreme (50-…`
 - `signal_intelligence`: `$0.007 — Meta-intelligence signal — weekly analytics on which APEX signals agents are buying, co-occurrence patterns, zero-call retirement…`
 - `slippage_forecast`: `$0.007 — Call this before any order above a few hundred dollars so you don't pay hidden market impact — returns expected slippage % and USD…`
 - `token_unlock`: `$0.007 — Upcoming token unlock events for major crypto assets. Returns unlock date, amount, % of circulating supply, and sell pressure risk…`
@@ -63,6 +65,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-21: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-21/d855f635094083c31457.json): `2 tool(s) added; 9 field(s) changed`
 - 2026-11-14: [count changed, description changed, tool added](../../deltas/2026-11-14/d855f635094083c31457.json): `1 tool(s) added; 1 field(s) changed`
 
 ## Check it from your agent

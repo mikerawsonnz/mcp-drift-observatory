@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://agentsrank.ai/api/mcp` | 20 | [`5bf713b523be`](e901088f2b853a367dca.json) | 2026-11-20 |
+| `https://agentsrank.ai/api/mcp` | 20 | [`2c1a3d74ba39`](e901088f2b853a367dca.json) | 2026-11-21 |
 
 ## Tools at `https://agentsrank.ai/api/mcp`
 
@@ -33,6 +33,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-21: [description changed](../../deltas/2026-11-21/e901088f2b853a367dca.json): `1 field(s) changed`
 - 2026-11-20: [count changed, description changed, tool added](../../deltas/2026-11-20/e901088f2b853a367dca.json): `5 tool(s) added; 1 field(s) changed`
 - 2026-11-17: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-17/e901088f2b853a367dca.json): `3 tool(s) added; 13 field(s) changed; signals: length_more_than_doubled`
 

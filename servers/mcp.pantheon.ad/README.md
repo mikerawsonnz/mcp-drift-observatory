@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.pantheon.ad/mcp` | 36 | [`4b8517e74eee`](c385e5b261a52bf286e2.json) | 2026-11-20 |
+| `https://mcp.pantheon.ad/mcp` | 37 | [`005f4af5fa4c`](c385e5b261a52bf286e2.json) | 2026-11-21 |
 
 ## Tools at `https://mcp.pantheon.ad/mcp`
 
@@ -43,12 +43,14 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `run_sales_psychology`: `Write a sales psychology report that matches a project's customer avatar with an Offer Brief. Uses 1 Sales Psychology credit. Runs in the b…`
 - `save_live_ads`: `Save ads found by search_meta_ads_live in the user's Pantheon library, only when the user asks. They are stored like the ads of a personal…`
 - `save_viral_analysis`: `Viral Content: save your 'why it works' analysis of a post (from get_viral_content) for the user, in one language. It appears in the app on…`
-- `search_ads_library`: `Search the ads in the user's own Ads Library (ads collected by their searches) and this week's Top Ads by brand, niche, sector or ad copy.…`
+- `search_ads_library`: `Search the ads already in Pantheon by brand, niche, sector or ad copy. This is the default way to find ads: unless the user explicitly asks…`
 - `search_meta_ads_live`: `Search the Meta Ad Library right now by keyword, in any market and language: the ads currently running, one per Facebook page, the longest…`
 - `send_to_pantheon`: `Send a link to the user's Pantheon. Without a destination Pantheon picks it from the link: a TikTok, Instagram, YouTube or LinkedIn profile…`
+- `show_ad_cards`: `Show ads of a search_meta_ads_live result to the user as cards in the chat (image or video, the whole ad copy, CTA, link to the Meta Ad Lib…`
 
 ## Changes
 
+- 2026-11-21: [count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-21/c385e5b261a52bf286e2.json): `1 tool(s) added; 17 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-20: [count changed, field changed, schema changed, tool added](../../deltas/2026-11-20/c385e5b261a52bf286e2.json): `2 tool(s) added; 4 field(s) changed`
 - 2026-11-17: [count changed, tool added](../../deltas/2026-11-17/c385e5b261a52bf286e2.json): `5 tool(s) added`
 - 2026-11-16: [count changed, tool added](../../deltas/2026-11-16/c385e5b261a52bf286e2.json): `6 tool(s) added`

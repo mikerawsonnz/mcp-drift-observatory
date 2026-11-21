@@ -6,16 +6,16 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.assistable.ai/mcp` | 16 | [`7f0e88d1f283`](3fd8dc5dfbb162dc18d8.json) | 2026-10-31 |
+| `https://api.assistable.ai/mcp` | 16 | [`108950d59712`](3fd8dc5dfbb162dc18d8.json) | 2026-11-21 |
 
 ## Tools at `https://api.assistable.ai/mcp`
 
 - `appointments_list`: `List appointments in a subaccount within an optional date range.`
 - `assistants_archive`: `Archive (soft-delete) an assistant.`
-- `assistants_create`: `Create an assistant. Required: subAccountId, name. Optional config blocks (llmConfig, voiceConfig, chatConfig) mirror the dashboard create…`
+- `assistants_create`: `Create an assistant. Required: name and a subaccount selected by subAccountId, subaccount_id, location_id, or the request header/key scope…`
 - `assistants_get`: `Fetch an assistant's full configuration by ID. The response includes voice_settings (greeting mode, opening messages, voicemail) and platfo…`
 - `assistants_list`: `List assistants in a subaccount (excludes archived by default). Note: voice_settings and platform_tools are returned only by assistants_get…`
-- `assistants_update`: `Patch an assistant. Only supplied fields change; nested config blocks are upserted. voice_settings updates call greeting mode, opening mess…`
+- `assistants_update`: `Patch an assistant. Only supplied fields change, including individual llmConfig prompt/model/temperature keys; temperature must be 0–2. Fla…`
 - `calls_get`: `Fetch a call (status, recording, transcript) by ID.`
 - `contacts_get`: `Fetch a contact by ID.`
 - `contacts_list`: `List contacts in a subaccount. meta.total is the number of matching contacts, so use it to answer how many contacts there are.`
@@ -29,6 +29,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-21: [description changed, schema changed](../../deltas/2026-11-21/3fd8dc5dfbb162dc18d8.json): `208 field(s) changed; signals: length_more_than_doubled`
 - 2026-10-31: [count changed, tool removed](../../deltas/2026-10-31/3fd8dc5dfbb162dc18d8.json): `2 tool(s) removed`
 - 2026-10-30: [count changed, tool removed](../../deltas/2026-10-30/3fd8dc5dfbb162dc18d8.json): `2 tool(s) removed`
 
