@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.bamf.ai` | 180 | [`351fcd20cbd8`](bcec739ff4350c4ddf27.json) | 2026-11-21 |
+| `https://mcp.bamf.ai` | 180 | [`30454942c1a3`](bcec739ff4350c4ddf27.json) | 2026-11-22 |
 
 ## Tools at `https://mcp.bamf.ai`
 
@@ -47,7 +47,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `bamf.ensure_proxy`: `Ensure a client's cloud-browser profile has a residential proxy (attaches one when missing, no-op when healthy). BAMF platform admin only.…`
 - `bamf.estimate_boost`: `Estimate the projected first-wave reach (people, reactions, comments) for boosting a creator's post.`
 - `bamf.find_competitor_ads`: `List the longest-running competitor ads (Meta, LinkedIn, TikTok) already tracked in the creator's workspace: advertiser, headline, copy, fo…`
-- `bamf.find_funnel_examples`: `Find top AI-tagged example posts for a funnel stage (and optional format) to model a draft on: inspiration library (by likes), post templat…`
+- `bamf.find_funnel_examples`: `Find top AI-tagged example posts for a funnel stage (and optional format) to model a draft on: inspiration library (by likes), or post temp…`
 - `bamf.finish_draft`: `Finish a draft before it is shown for approval: review the whole draft end to end (every platform version, tweet, slide and image) for cohe…`
 - `bamf.follow_creator`: `Follow a creator profile in a workspace.`
 - `bamf.generate_carousel`: `STYLE CARDS FIRST: before the first visual of a request, call bamf.list_style_options and show the user the 4 options as a labelled 2x2 of…`
@@ -74,6 +74,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-22: [description changed](../../deltas/2026-11-22/bcec739ff4350c4ddf27.json): `1 field(s) changed`
 - 2026-11-21: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-21/bcec739ff4350c4ddf27.json): `1 tool(s) added; 19 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-19: [description changed, schema changed](../../deltas/2026-11-19/bcec739ff4350c4ddf27.json): `10 field(s) changed; signals: imperative_language_introduced` **(notable)**
 - 2026-11-18: [count changed, tool added](../../deltas/2026-11-18/bcec739ff4350c4ddf27.json): `2 tool(s) added`

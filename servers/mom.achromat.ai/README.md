@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mom.achromat.ai/mcp` | 1 | [`0da1457e089b`](b8f5252d1461a57e0368.json) | 2026-10-23 |
+| `https://mom.achromat.ai/mcp` | 1 | [`99aaf83d7a4d`](b8f5252d1461a57e0368.json) | 2026-11-22 |
 
 ## Tools at `https://mom.achromat.ai/mcp`
 
@@ -14,7 +14,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-22: [schema changed](../../deltas/2026-11-22/b8f5252d1461a57e0368.json): `4 field(s) changed; signals: length_more_than_doubled`
 
 ## Check it from your agent
 
