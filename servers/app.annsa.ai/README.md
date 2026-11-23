@@ -6,11 +6,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://app.annsa.ai/mcp` | 8 | [`452e0e2adbcd`](59d41e60a9e6430b00b0.json) | 2026-11-20 |
+| `https://app.annsa.ai/mcp` | 8 | [`701788711226`](59d41e60a9e6430b00b0.json) | 2026-11-23 |
 
 ## Tools at `https://app.annsa.ai/mcp`
 
-- `annsa_ask`: `Ask Annsa a question in plain words. Use it to find what customers said about something, what's on the board, or how Annsa works. about pic…`
+- `annsa_ask`: `Ask Annsa a question in plain words. Finds what customers said, what's on the board, or how Annsa works. about picks where to look: feedbac…`
 - `annsa_board`: `Tidy the board. Use it to change a priority's stage or severity, merge duplicates, move priorities between groups, fix a title, place prior…`
 - `annsa_decide`: `Record what a person decided. A person uses it to answer a question an agent raised or sign off a priority. As an agent you can list princi…`
 - `annsa_file`: `Add something new to the board. Use it to file what a customer said, a bug or finding you found, or an idea. It attaches to the matching pr…`
@@ -21,6 +21,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-23: [description changed, schema changed](../../deltas/2026-11-23/59d41e60a9e6430b00b0.json): `13 field(s) changed`
 - 2026-11-20: [schema changed](../../deltas/2026-11-20/59d41e60a9e6430b00b0.json): `20 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-19: [schema changed](../../deltas/2026-11-19/59d41e60a9e6430b00b0.json): `7 field(s) changed`
 - 2026-11-18: [schema changed](../../deltas/2026-11-18/59d41e60a9e6430b00b0.json): `28 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**
@@ -40,7 +41,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - 2026-10-27: [description changed, schema changed](../../deltas/2026-10-27/59d41e60a9e6430b00b0.json): `163 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**
 - 2026-10-21: [schema changed](../../deltas/2026-10-21/59d41e60a9e6430b00b0.json): `1 field(s) changed`
 - 2026-10-20: [schema changed](../../deltas/2026-10-20/59d41e60a9e6430b00b0.json): `8 field(s) changed`
-- 2026-10-19: [schema changed](../../deltas/2026-10-19/59d41e60a9e6430b00b0.json): `18 field(s) changed`
 
 ## Check it from your agent
 

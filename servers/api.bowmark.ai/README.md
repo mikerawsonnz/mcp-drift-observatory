@@ -6,8 +6,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.bowmark.ai/mcp` | 29 | [`9eddbeea9ef9`](5f2d24be930573ed8878.json) | 2026-11-21 |
-| `https://api.bowmark.ai/mcp/registry` | 29 | [`9eddbeea9ef9`](e742a173e323c903336e.json) | 2026-11-21 |
+| `https://api.bowmark.ai/mcp` | 29 | [`c849bb252290`](5f2d24be930573ed8878.json) | 2026-11-23 |
+| `https://api.bowmark.ai/mcp/registry` | 29 | [`c849bb252290`](e742a173e323c903336e.json) | 2026-11-23 |
 
 ## Tools at `https://api.bowmark.ai/mcp`
 
@@ -75,6 +75,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-23: [schema changed](../../deltas/2026-11-23/e742a173e323c903336e.json): `2 field(s) changed; signals: imperative_language_introduced` **(notable)**
+- 2026-11-23: [schema changed](../../deltas/2026-11-23/5f2d24be930573ed8878.json): `2 field(s) changed; signals: imperative_language_introduced` **(notable)**
 - 2026-11-21: [description changed](../../deltas/2026-11-21/5f2d24be930573ed8878.json): `1 field(s) changed`
 - 2026-11-21: [description changed](../../deltas/2026-11-21/e742a173e323c903336e.json): `1 field(s) changed`
 - 2026-11-20: [description changed](../../deltas/2026-11-20/e742a173e323c903336e.json): `1 field(s) changed`
@@ -93,8 +95,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - 2026-11-11: [count changed, tool removed](../../deltas/2026-11-11/5f2d24be930573ed8878.json): `6 tool(s) removed`
 - 2026-11-09: [description changed, schema changed](../../deltas/2026-11-09/5f2d24be930573ed8878.json): `444 field(s) changed; signals: url_introduced`
 - 2026-11-09: [description changed, schema changed](../../deltas/2026-11-09/e742a173e323c903336e.json): `444 field(s) changed; signals: url_introduced`
-- 2026-11-08: [annotation changed, count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-08/e742a173e323c903336e.json): `1 tool(s) added; 22 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**
-- 2026-11-08: [annotation changed, count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-08/5f2d24be930573ed8878.json): `1 tool(s) added; 22 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**
 
 ## Check it from your agent
 

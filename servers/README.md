@@ -1,6 +1,6 @@
 # Observed MCP servers
 
-478 hosts whose MCP tool declarations we have observed. Each page lists the declared tools, every observed change, and an Atom feed of changes to that server.
+482 hosts whose MCP tool declarations we have observed. Each page lists the declared tools, every observed change, and an Atom feed of changes to that server.
 
 Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_alerts
 
@@ -56,7 +56,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [api.atmy.ai](api.atmy.ai/) (12 tools)
 - [api.bareun.ai](api.bareun.ai/) (6 tools)
 - [api.betslipdoctor.ai](api.betslipdoctor.ai/) (106 tools)
-- [api.bittuitive.ai](api.bittuitive.ai/) (28 tools)
+- [api.bittuitive.ai](api.bittuitive.ai/) (30 tools)
 - [api.bluerate.ai](api.bluerate.ai/) (3 tools)
 - [api.bowmark.ai](api.bowmark.ai/) (58 tools)
 - [api.bumblebox.ai](api.bumblebox.ai/) (17 tools)
@@ -109,6 +109,8 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [askline.ai](askline.ai/) (22 tools)
 - [asms.ai](asms.ai/) (14 tools)
 - [asrm.ai](asrm.ai/) (4 tools)
+- [atomindustries.ai](atomindustries.ai/) (9 tools)
+- [atomtechnologies.ai](atomtechnologies.ai/) (9 tools)
 - [auteng.ai](auteng.ai/) (6 tools)
 - [auth-token-mcp-service.getvda.ai](auth-token-mcp-service.getvda.ai/) (2 tools)
 - [auth-token-mcp-traced-service.getvda.ai](auth-token-mcp-traced-service.getvda.ai/) (2 tools)
@@ -130,6 +132,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [authenticated-multi-llm-agent.getvda.ai](authenticated-multi-llm-agent.getvda.ai/) (2 tools)
 - [autoblogging.ai](autoblogging.ai/) (6 tools)
 - [aviado.ai](aviado.ai/) (11 tools)
+- [avioverse.aero](avioverse.aero/) (5 tools)
 - [awardcast.ai](awardcast.ai/) (8 tools)
 - [b4-index.vercel.app](b4-index.vercel.app/) (5 tools)
 - [bankrolled.ai](bankrolled.ai/) (5 tools)
@@ -264,6 +267,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [intodns.ai](intodns.ai/) (45 tools)
 - [inxy.ai](inxy.ai/) (5 tools)
 - [iturri.ai](iturri.ai/) (22 tools)
+- [jasonlau.academy](jasonlau.academy/) (6 tools)
 - [jawz.ai](jawz.ai/) (22 tools)
 - [jobero.ai](jobero.ai/) (5 tools)
 - [justidea.agency](justidea.agency/) (8 tools)

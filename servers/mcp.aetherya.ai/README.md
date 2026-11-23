@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.aetherya.ai/mcp` | 26 | [`1c6a54a7db7e`](0ec8f666c7c4e4781c4d.json) | 2026-11-21 |
+| `https://mcp.aetherya.ai/mcp` | 26 | [`42927b8ad08b`](0ec8f666c7c4e4781c4d.json) | 2026-11-23 |
 
 ## Tools at `https://mcp.aetherya.ai/mcp`
 
@@ -39,6 +39,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-23: [description changed, schema changed](../../deltas/2026-11-23/0ec8f666c7c4e4781c4d.json): `59 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-21: [count changed, tool added, tool removed](../../deltas/2026-11-21/0ec8f666c7c4e4781c4d.json): `26 tool(s) added; 27 tool(s) removed; signals: imperative_language_introduced` **(notable)**
 
 ## Check it from your agent

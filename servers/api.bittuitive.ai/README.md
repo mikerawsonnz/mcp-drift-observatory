@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.bittuitive.ai/mcp` | 28 | [`4c1ebdf3863a`](c0c8c3bdf1cbda3c2fcd.json) | 2026-11-22 |
+| `https://api.bittuitive.ai/mcp` | 30 | [`80882842294f`](c0c8c3bdf1cbda3c2fcd.json) | 2026-11-23 |
 
 ## Tools at `https://api.bittuitive.ai/mcp`
 
@@ -19,28 +19,31 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `find_best_endpoint`: `Use this when your task needs a paid data API you have not picked yet (e.g. 'bitcoin price', 'btc price', 'air quality', 'stock fundamental…`
 - `get_ai_buildout`: `Use this when a research agent needs a quick headline for one company or the whole AI buildout: capex, year-over-year growth and whether it…`
 - `get_ai_data`: `Use this when a research agent needs AI Buildout trends from company regulatory filings (company-wide capex, revenue and cash flow, not an…`
-- `get_airport_data`: `Use this when a travel agent needs one US airport briefing before a departure or connection: delay and closure events plus current weather…`
+- `get_airport_data`: `Use this when a travel agent needs US airport status: one-airport briefing (kind="intuitive", the default; pass airport=SFO or omit to defa…`
 - `get_bitcoin_price`: `Use this when you need the current Bitcoin price (BTC/USD, btc price). Returns BitTuitive's recommended btc_intuitive value: a price checke…`
 - `get_btc_data`: `Use this when an agent needs Bitcoin data. For the current Bitcoin price (BTC/USD, btc price), start with kind="intuitive" (the default; al…`
 - `get_credit_balance`: `Use this when you want to know how much prepaid balance (sats and USDC) is left before running more calls or feeds. Read-only. Example: get…`
+- `get_expense_data`: `Use this when you need expense data. Returns JSON in the 'data' field with source attribution. Read-only; the only side effect is the payme…`
 - `get_feed_mailbox`: `Use this when you want the deliveries stored for you (a feed without a webhook, or one whose webhook failed): lists unacknowledged items, o…`
 - `get_feeds`: `Use this when you need to check your feeds: without feed_id it lists every feed and the prepaid sats balance; with feed_id it returns that…`
-- `get_fx_data`: `Use this when an agent needs official daily foreign-exchange reference rates for USD, EUR, CAD and common crosses, with a Data BitScore fro…`
+- `get_finance_data`: `Use this when you need finance data. Returns JSON in the 'data' field with source attribution. Read-only; the only side effect is the payme…`
 - `get_insights_data`: `Use this when you are deciding what data to build, source or price, or want to know what other AI agents ask for and pay for. kind="intuiti…`
 - `get_market_insights`: `Use this when you want a derived build-next signal from agent demand: supply-demand gaps and the 30-day payment conversion funnel. Aggregat…`
 - `get_pricing`: `Use this when you need current prices before spending: per-call sats and USDC for every BitTuitive data endpoint, credit bundles, subscript…`
+- `get_rates_data`: `Use this when you need rates data. Returns JSON in the 'data' field with source attribution. Read-only; the only side effect is the payment…`
 - `get_sanctions_data`: `Use this when an agent is about to pay, transfer, trade or onboard and must check whether a person, entity or crypto address appears on US…`
 - `get_scoreboard_entry`: `Use this when you need due diligence before you pay or route: given an id from find_best_endpoint or browse_scoreboard, returns the score c…`
 - `get_stock_data`: `Use this when a research agent needs US company financials or SEC filings for a ticker (SEC EDGAR): revenue, EPS and debt, or the latest 10…`
-- `get_travel_data`: `Use this when a travel agent needs one US airport briefing before a departure or connection: delay and closure events plus current weather…`
+- `get_travel_data`: `Use this when a travel agent needs US airport status: one-airport briefing (kind="intuitive", the default; pass airport=SFO or omit to defa…`
 - `get_trust_data`: `Use this when an agent is about to pay, transfer, trade or onboard and must check whether a person, entity or crypto address appears on US…`
-- `get_weather`: `Use this when an agent needs weather, Data BitScored: current conditions (kind="intuitive", the default), a 7-day forecast (kind="stats") o…`
+- `get_weather`: `Use this when an agent needs weather, Data BitScored: current conditions (kind="intuitive", the default), a 7-day forecast (kind="stats"),…`
 - `list_routable_apis`: `Use this when you need data BitTuitive does not sell directly and want it paid for you: lists every scoreboard-verified L402 API the router…`
 - `request_data`: `Use this when no tool covers the data you need (e.g. air quality, crypto OHLC, flight prices): records one demand signal (data_type, descri…`
 - `update_feed`: `Use this when you want to change a feed: interval, trigger, params, webhook_url, mailbox, or pause/resume it with 'state'. Only the fields…`
 
 ## Changes
 
+- 2026-11-23: [count changed, description changed, schema changed, tool added, tool removed](../../deltas/2026-11-23/c0c8c3bdf1cbda3c2fcd.json): `3 tool(s) added; 1 tool(s) removed; 78 field(s) changed; signals: url_introduced`
 - 2026-11-22: [count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-22/c0c8c3bdf1cbda3c2fcd.json): `7 tool(s) added; 29 field(s) changed; signals: length_more_than_doubled, url_introduced`
 - 2026-11-21: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-21/c0c8c3bdf1cbda3c2fcd.json): `1 tool(s) added; 9 field(s) changed`
 - 2026-11-20: [annotation changed, count changed, description changed, field changed, schema changed, tool added, tool removed](../../deltas/2026-11-20/c0c8c3bdf1cbda3c2fcd.json): `15 tool(s) added; 29 tool(s) removed; 56 field(s) changed; signals: credential_shaped_string_introduced, imperative_language_introduced, le…` **(notable)**

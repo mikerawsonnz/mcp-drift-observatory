@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "1c6a54a7db7e430f64b3f68cd1cbc267866db9d75a93b49e1e8f9516f12044aa",
+  "full_hash": "42927b8ad08b9a881b9a1314a509918c7455422348f7fae90ac931f7444f5819",
   "name": "ai.aetherya/mcp",
-  "observed_at": "2026-11-21T02:03:37.283922Z",
+  "observed_at": "2026-11-23T02:03:04.818871Z",
   "sources": [
     "official"
   ],
@@ -108,7 +108,7 @@
             "type": "integer"
           },
           "variants": {
-            "description": "Number of copy variants, for a copy test.",
+            "description": "Number of message variants, for a copy test or a study that compares variants (messaging_test). Every variant is simulated by every respondent, so cost scales with it. Defaults to 2, the minimum.",
             "type": "integer"
           }
         },
@@ -630,7 +630,7 @@
             "type": "string"
           },
           "market": {
-            "description": "Optional. Target market, e.g. 'RO'.",
+            "description": "Optional. Country the respondents must live in, e.g. 'RO' or 'Romania'. Only personas there are sampled; when the workspace has too few, nothing runs or bills and the result is 'needs_audience'. Ignored when 'audience' names a saved audience.",
             "type": "string"
           },
           "max_wait_seconds": {
@@ -702,6 +702,10 @@
           "eurEquivalent": {
             "type": "number"
           },
+          "matchedPersonas": {
+            "description": "On 'needs_audience' for a market: personas found in that market.",
+            "type": "number"
+          },
           "methodId": {
             "type": "string"
           },
@@ -719,12 +723,19 @@
             },
             "type": "array"
           },
+          "requestedPersonas": {
+            "description": "On 'needs_audience' for a market: respondents the study needs.",
+            "type": "number"
+          },
           "requiredSessions": {
             "description": "Present on 'needs_price_confirmation'.",
             "type": "number"
           },
           "runId": {
             "type": "string"
+          },
+          "sample": {
+            "description": "Who answered: people vs responses and where they live."
           },
           "sampleSummary": {},
           "segmentBreakdown": {
@@ -1315,7 +1326,7 @@
         "openWorldHint": true,
         "readOnlyHint": true
       },
-      "description": "List the workspace's recent simulations across studies, instant reads, plans, audits and post simulations, newest first, with the kind and id to pass to thesia_get_result or thesia_get_brief. Use it to find earlier work instead of re-running it.",
+      "description": "List the workspace's recent simulations across studies, instant reads, plans, audits and post simulations, newest first, with the kind and id to pass to thesia_get_result or thesia_get_brief. Use it to find earlier work instead of re-running it. Page back with 'before' (or bound by 'after'). Lists only the signed-in account's workspace: runs made under another sign-in or API key are in that account.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -1323,6 +1334,14 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "additionalProperties": false,
         "properties": {
+          "after": {
+            "description": "Only runs created on or after this date (ISO, e.g. '2026-11-13').",
+            "type": "string"
+          },
+          "before": {
+            "description": "Only runs created before this date or time (ISO, e.g. '2026-11-20' or a createdAt from an earlier page). Use it to page back through history.",
+            "type": "string"
+          },
           "kind": {
             "description": "Only this kind of run. Default 'all'. Studies include copy tests and instant reads.",
             "enum": [
@@ -1348,6 +1367,10 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "additionalProperties": false,
         "properties": {
+          "nextBefore": {
+            "description": "Pass as 'before' to get the next, older page.",
+            "type": "string"
+          },
           "runs": {
             "type": "array"
           },
@@ -1359,6 +1382,10 @@
               "type": "string"
             },
             "type": "array"
+          },
+          "workspaceId": {
+            "description": "The workspace these runs belong to. Runs made under another sign-in or API key are not listed.",
+            "type": "string"
           }
         },
         "required": [
@@ -1525,6 +1552,9 @@
           },
           "research": {
             "type": "string"
+          },
+          "sample": {
+            "description": "Who answered: people vs responses and where they live."
           },
           "sampleSummary": {},
           "score": {
@@ -2636,7 +2666,7 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Create synthetic-audience personas to simulate against. Describe who you want to model and get back personas (with ids) you can then target as the 'audience' in thesia_audit_site, thesia_test_copy, or thesia_ask_audience. These are SIMULATED personas (engine-generated), not real people. Returns the created personas inline.",
+      "description": "Create synthetic-audience personas to simulate against. Describe who you want to model and get back personas (with ids) you can then target as the 'audience' in thesia_audit_site, thesia_test_copy, or thesia_ask_audience. With pack_name the personas are also saved as an audience pack whose id thesia_run_study accepts. These are SIMULATED personas (engine-generated), not real people. Larger audiences can take a few minutes: the call then returns a job_id to pass back to collect them.",
       "execution": {
         "taskSupport": "forbidden"
       },
@@ -2673,7 +2703,7 @@
             "type": "object"
           },
           "category": {
-            "description": "Optional. A category/segment label for the audience (e.g. 'e-commerce', 'fintech').",
+            "description": "Optional. The product category these people buy in (e.g. 'bottled water', 'wine gifts'). It describes what they shop for, never their job.",
             "type": "string"
           },
           "count": {
@@ -2686,20 +2716,30 @@
             "description": "Who to simulate, in plain language (e.g. 'price-sensitive first-time SaaS buyers in Germany' or 'busy parents shopping for groceries online'). When provided, Thesia engine-generates personas matching it; omit for a general-consumer audience.",
             "type": "string"
           },
+          "job_id": {
+            "description": "Only to collect an audience that was still generating: pass the job_id an earlier call returned. Creates nothing new and bills nothing.",
+            "type": "string"
+          },
           "language": {
             "description": "Optional. Language for the personas, e.g. 'ro'.",
             "type": "string"
           },
           "market": {
-            "description": "Optional. Target market / locale as a country or region (e.g. 'US', 'DE', 'UK').",
+            "description": "Optional. The country every persona lives in, as a name or ISO code (e.g. 'Romania', 'RO', 'DE'). Personas are placed in that country's cities.",
             "type": "string"
+          },
+          "max_wait_seconds": {
+            "description": "How long to wait inline before handing back a job_id. Defaults to 45.",
+            "maximum": 45,
+            "minimum": 0,
+            "type": "integer"
           },
           "pack_name": {
             "description": "Optional. Name for the saved audience pack.",
             "type": "string"
           },
           "segments": {
-            "description": "Optional. Explicit audience segments (max 12); weights follow 'size'. Builds a manual blueprint.",
+            "description": "Optional. Audience segments (max 12); weights follow 'size'. Give each segment occupations, locations, interests or goals and they are used exactly as written. With only a label and description, Thesia writes those details from your words, so the people fit the segment.",
             "items": {
               "additionalProperties": false,
               "properties": {
@@ -2719,6 +2759,24 @@
                   "minLength": 1,
                   "type": "string"
                 },
+                "goals": {
+                  "description": "What they are trying to get done.",
+                  "items": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 8,
+                  "type": "array"
+                },
+                "interests": {
+                  "description": "Interests and traits, e.g. ['Bulk buying', 'Compares unit prices'].",
+                  "items": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 8,
+                  "type": "array"
+                },
                 "key": {
                   "description": "Stable id for the segment, e.g. 'loyal_buyers'.",
                   "minLength": 1,
@@ -2728,6 +2786,24 @@
                   "description": "Display name.",
                   "minLength": 1,
                   "type": "string"
+                },
+                "locations": {
+                  "description": "Where they live, e.g. ['Bucharest', 'Voluntari']; the market is added when a country is missing.",
+                  "items": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 8,
+                  "type": "array"
+                },
+                "occupations": {
+                  "description": "Jobs these people hold, e.g. ['Teacher', 'Warehouse worker', 'Homemaker']. Without them the job is a generic professional one.",
+                  "items": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 8,
+                  "type": "array"
                 },
                 "relationship_to_brand": {
                   "description": "Free text, e.g. 'switched to a competitor last year'.",
@@ -2768,9 +2844,37 @@
           "count": {
             "type": "number"
           },
+          "inMarket": {
+            "description": "How many of the personas live in the requested market.",
+            "type": "number"
+          },
+          "jobId": {
+            "description": "Pass as job_id to collect a 'running' audience.",
+            "type": "string"
+          },
+          "next": {
+            "type": "string"
+          },
+          "packId": {
+            "description": "Saved audience pack id; pass it as 'audience' to thesia_run_study.",
+            "type": "string"
+          },
+          "packName": {
+            "type": "string"
+          },
           "source": {
             "description": "Always 'synthetic_audience_simulation'.",
             "type": "string"
+          },
+          "status": {
+            "description": "'completed' | 'running' | 'failed'.",
+            "type": "string"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           }
         },
         "required": [

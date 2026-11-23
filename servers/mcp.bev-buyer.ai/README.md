@@ -6,11 +6,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.bev-buyer.ai/mcp` | 9 | [`70c465df6d89`](76770373d48a68fc84d5.json) | 2026-10-01 |
+| `https://mcp.bev-buyer.ai/mcp` | 9 | [`bd4176479060`](76770373d48a68fc84d5.json) | 2026-11-23 |
 
 ## Tools at `https://mcp.bev-buyer.ai/mcp`
 
-- `accept_offer`: `Accept one offer and place the order through the Bourse. Accepting is one x402 paid call (HTTP 402 with the payment offer until paid): it s…`
+- `accept_offer`: `Accept one offer and place the order through the Bourse. Accepting is one x402 paid call (HTTP 402 with the payment offer until paid; x402…`
 - `compare_drinks`: `Compare two to ten products side by side, field by field, each value with its source page.`
 - `create_order_intent`: `Place an order intent for one to ten records (quantity, delivery market, optional date and note, the buyer's organisation and email). The B…`
 - `find_producer`: `Find a maker and its products across every open node, with the maker's name as each source wrote it.`
@@ -22,6 +22,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-23: [description changed](../../deltas/2026-11-23/76770373d48a68fc84d5.json): `1 field(s) changed`
 - 2026-10-01: [annotation changed, field changed, schema changed](../../deltas/2026-10-01/76770373d48a68fc84d5.json): `28 field(s) changed`
 - 2026-09-29: [count changed, tool added](../../deltas/2026-09-29/76770373d48a68fc84d5.json): `3 tool(s) added`
 

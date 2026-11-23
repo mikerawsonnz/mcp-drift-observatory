@@ -5,18 +5,20 @@ servers: what tools each one **declared**, byte-exactly, and when that declarati
 
 One commit per crawl cycle. A change to a server's tool surface appears as a diff.
 
-## Latest crawl: 2026-11-22 02:01 UTC
+## Latest crawl: 2026-11-23 02:03 UTC
 
-6 of 266 observable servers changed their declared tools. Attempted 292: 266 observable, 24 auth-walled, 1 unreachable, 1 blocked.
+8 of 268 observable servers changed their declared tools. Attempted 292: 268 observable, 20 auth-walled, 4 unreachable, 0 blocked.
 
-- [ad.pantheon/mcp](deltas/2026-11-22/c385e5b261a52bf286e2.json): count changed, description changed, schema changed, tool added; 1 tool(s) added; 28 field(s) changed; signals: length_more_than_doubled
-- [ai.achromat/mcp-server](deltas/2026-11-22/b8f5252d1461a57e0368.json): schema changed; 4 field(s) changed; signals: length_more_than_doubled
-- [ai.achromat/mcp-server](deltas/2026-11-22/bada62eb0d4ca95553f4.json): schema changed; 4 field(s) changed; signals: length_more_than_doubled
-- [ai.bamf/bamf](deltas/2026-11-22/bcec739ff4350c4ddf27.json): description changed; 1 field(s) changed
-- [ai.bezal/local-commerce](deltas/2026-11-22/4cca1c526a32cc31d3b0.json): description changed, schema changed; 6 field(s) changed; signals: length_more_than_doubled
-- [ai.bittuitive.api/bittuitive](deltas/2026-11-22/c0c8c3bdf1cbda3c2fcd.json): count changed, description changed, field changed, schema changed, tool added; 7 tool(s) added; 29 field(s) changed; signals: length_more_than_doubled, url_introduced
+- [ai.aetherya/mcp](deltas/2026-11-23/0ec8f666c7c4e4781c4d.json): description changed, schema changed; 59 field(s) changed; signals: length_more_than_doubled
+- [ai.agent-bev/bev-door](deltas/2026-11-23/76770373d48a68fc84d5.json): description changed; 1 field(s) changed
+- [ai.annsa/annsa](deltas/2026-11-23/59d41e60a9e6430b00b0.json): description changed, schema changed; 13 field(s) changed
+- [ai.artemisgtm/gtm-engineer](deltas/2026-11-23/05201622ddbc4614d3f7.json): description changed; 1 field(s) changed; signals: url_introduced
+- [ai.atmy/air-quality](deltas/2026-11-23/5f23f4a4f55342a166a0.json): description changed; 1 field(s) changed
+- [ai.bittuitive.api/bittuitive](deltas/2026-11-23/c0c8c3bdf1cbda3c2fcd.json): count changed, description changed, schema changed, tool added, tool removed; 3 tool(s) added; 1 tool(s) removed; 78 field(s) changed; signals: url_introduced
+- [ai.bowmark/bowmark](deltas/2026-11-23/5f2d24be930573ed8878.json): schema changed; 2 field(s) changed; signals: imperative_language_introduced **(notable)**
+- [ai.bowmark/bowmark](deltas/2026-11-23/e742a173e323c903336e.json): schema changed; 2 field(s) changed; signals: imperative_language_introduced **(notable)**
 
-Changes per day: [2026-11-16](deltas/2026-11-16/) 11, [2026-11-17](deltas/2026-11-17/) 21, [2026-11-18](deltas/2026-11-18/) 15, [2026-11-19](deltas/2026-11-19/) 12, [2026-11-20](deltas/2026-11-20/) 15, [2026-11-21](deltas/2026-11-21/) 11, [2026-11-22](deltas/2026-11-22/) 6
+Changes per day: [2026-11-17](deltas/2026-11-17/) 21, [2026-11-18](deltas/2026-11-18/) 15, [2026-11-19](deltas/2026-11-19/) 12, [2026-11-20](deltas/2026-11-20/) 15, [2026-11-21](deltas/2026-11-21/) 11, [2026-11-22](deltas/2026-11-22/) 6, [2026-11-23](deltas/2026-11-23/) 8
 
 ## What this is
 
