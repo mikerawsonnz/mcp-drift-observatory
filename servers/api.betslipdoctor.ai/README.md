@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.betslipdoctor.ai/api/mcp` | 106 | [`13b5969a9b4b`](f29327f2a9147dd897c0.json) | 2026-11-19 |
+| `https://api.betslipdoctor.ai/api/mcp` | 106 | [`4a90572d9473`](f29327f2a9147dd897c0.json) | 2026-11-24 |
 
 ## Tools at `https://api.betslipdoctor.ai/api/mcp`
 
@@ -74,6 +74,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-24: [description changed](../../deltas/2026-11-24/f29327f2a9147dd897c0.json): `1 field(s) changed`
 - 2026-11-19: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-19/f29327f2a9147dd897c0.json): `4 tool(s) added; 9 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-18: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-18/f29327f2a9147dd897c0.json): `2 tool(s) added; 15 field(s) changed`
 - 2026-11-17: [description changed, schema changed](../../deltas/2026-11-17/f29327f2a9147dd897c0.json): `16 field(s) changed`
@@ -93,7 +94,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - 2026-10-25: [description changed](../../deltas/2026-10-25/f29327f2a9147dd897c0.json): `1 field(s) changed`
 - 2026-10-24: [description changed, schema changed](../../deltas/2026-10-24/f29327f2a9147dd897c0.json): `736 field(s) changed`
 - 2026-10-23: [annotation changed, count changed, description changed, field changed, schema changed, tool added, tool removed](../../deltas/2026-10-23/f29327f2a9147dd897c0.json): `6 tool(s) added; 1 tool(s) removed; 1913 field(s) changed; signals: length_more_than_doubled`
-- 2026-10-22: [count changed, description changed, schema changed, tool added, tool removed](../../deltas/2026-10-22/f29327f2a9147dd897c0.json): `21 tool(s) added; 7 tool(s) removed; 63 field(s) changed`
 
 ## Check it from your agent
 

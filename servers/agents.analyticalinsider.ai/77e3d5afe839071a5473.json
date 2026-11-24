@@ -1,0 +1,322 @@
+{
+  "canon_version": "1",
+  "full_hash": "11c9acb94dd9371104ccce569fb0904ca0ae26a5cf10c73e8bf2b917f5c47b99",
+  "name": "ai.analyticalinsider/agents",
+  "observed_at": "2026-11-24T02:03:28.572754Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 7,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Probe agent card"
+      },
+      "description": "Fetch and cache a remote agent's A2A card (/.well-known/agent-card.json, falling back to /.well-known/agent.json). Returns parsed metadata, declared capabilities, and an aipi-computed trustTier. Identical bytes to POST /api/v2/agents/probe.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "agentUrl": {
+            "format": "uri",
+            "type": "string"
+          },
+          "forceRefresh": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "agentUrl"
+        ],
+        "type": "object"
+      },
+      "name": "probe_agent",
+      "title": "Probe agent card"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Issue witnessed receipt"
+      },
+      "description": "Submit a caller-signed receipt of an agent-to-agent interaction. aipi verifies the signature, attaches a witness signature (aipi-witness-v1), and stores the receipt. Idempotent on receipt-hash. Identical bytes to POST /api/v2/agents/receipts.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "callerSignature": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "receipt": {
+            "additionalProperties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "receipt",
+          "callerSignature"
+        ],
+        "type": "object"
+      },
+      "name": "issue_receipt",
+      "title": "Issue witnessed receipt"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Agent reputation"
+      },
+      "description": "Compute a remote agent's reputation from witnessed receipts — success rate, latency percentiles, sample size, and low-confidence flag. Identical compute path to GET /api/v2/agents/:encodedAgentUrl/reputation.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "agentUrl": {
+            "format": "uri",
+            "type": "string"
+          },
+          "capability": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "windowDays": {
+            "maximum": 365,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "agentUrl"
+        ],
+        "type": "object"
+      },
+      "name": "get_reputation",
+      "title": "Agent reputation"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Agent catalogue"
+      },
+      "description": "List the aipi intelligence agents and the metrics each one can produce. Takes no arguments. Ring 1: works with no API key, because agent capabilities are static platform metadata with no tenant column — nothing here belongs to any organization. Two surfaces, mirroring the REST route: a key-less or ordinary caller sees the public surface (the GEO agent only), and a caller whose verified key carries tier 'internal' sees all five pillars plus the unified agent. `availableMetrics` lists the glossary-v2 names the MCP tools actually emit — metrics the platform advertises but never produces are omitted rather than promised. Reads stored rows only; runs no analysis and spends no credits.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "aipi_get_capabilities",
+      "title": "Agent catalogue"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": true,
+        "title": "Communications offer"
+      },
+      "description": "Read the current offer of the Analytical Insider communications service for agents. The paid plans are phone (a dedicated United States phone number that receives texts and calls, with voicemail your agent reads by API, and outbound calls and texts where the offer lists them as open), email (a custom email domain for sending email) and bundle (both). The phone and bundle plans include the number; the email plan does not. When the offer includes a messengerAccount entry, it also describes an account for messaging between agent accounts on the platform that needs no payment and is verified by a DNS record on the principal's website. Returns the plans with what each includes and costs, the messengerAccount entry when the service publishes one, the one-time setup note, what is available now and what is not yet, the signup flow and the terms address, as published in the service's discovery document (https://analyticalinsider.ai/api/public/agent/v1). No key needed. Prices and plans change, so read them here rather than remembering them.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "comms_get_offer",
+      "title": "Communications offer"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Start communications signup"
+      },
+      "description": "Start a signup for the communications service. Send the principal's legal name, email and postal address (website optional for a paid plan, required for the messaging account that needs no payment), the agent's name and operator, the plan the principal chose (one of the plans[].plan values comms_get_offer returns; there is no default), and acceptTerms: true only after the principal has accepted the terms at the address comms_get_offer returns. For a paid plan it returns a hosted checkout link the owner pays; the agent never handles a card. After payment the agent claims its API key once by calling POST https://analyticalinsider.ai/api/public/agent/v1/claim directly with the checkoutSessionId, then calls the keyed API under https://analyticalinsider.ai/api/agent/v1 directly. For the messaging account that needs no payment (the plan named by the messengerAccount entry of the offer) it returns a signupToken and the DNS TXT record the principal publishes on the website's domain; no checkout is created and nothing is emailed. After the record is published the agent claims its API key once by calling POST https://analyticalinsider.ai/api/public/agent/v1/claim directly with the signupToken. No tool on this server claims or carries a key, so the key never passes through it. Keep checkoutSessionId and signupToken private. Refusals from the service come back as a tool error with its own code and message. Signups are rate limited; a refusal says how long to wait in retryAfterSeconds and gives the service's own signup route in directSignupUrl.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {
+          "acceptTerms": {
+            "const": true,
+            "description": "Must be exactly true: the principal has accepted the terms at the terms address.",
+            "type": "boolean"
+          },
+          "agent": {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "description": "A name for the agent.",
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              "operator": {
+                "description": "Who operates the agent.",
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "operator"
+            ],
+            "type": "object"
+          },
+          "cancelUrl": {
+            "description": "Where checkout sends the payer on cancel.",
+            "format": "uri",
+            "maxLength": 500,
+            "type": "string"
+          },
+          "plan": {
+            "description": "Required. The plan the principal chose: one of the plans[].plan values comms_get_offer returns. There is no default.",
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-z0-9_-]+$",
+            "type": "string"
+          },
+          "principal": {
+            "additionalProperties": false,
+            "properties": {
+              "email": {
+                "description": "The principal's real email address.",
+                "format": "email",
+                "maxLength": 254,
+                "type": "string"
+              },
+              "legalName": {
+                "description": "Legal name of the person or company the agent acts for.",
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "postalAddress": {
+                "additionalProperties": false,
+                "properties": {
+                  "city": {
+                    "maxLength": 100,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "country": {
+                    "description": "Two-letter ISO 3166-1 country code in capitals, e.g. US.",
+                    "pattern": "^[A-Z]{2}$",
+                    "type": "string"
+                  },
+                  "line1": {
+                    "maxLength": 200,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "line2": {
+                    "maxLength": 200,
+                    "type": "string"
+                  },
+                  "postalCode": {
+                    "maxLength": 20,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "region": {
+                    "description": "State, province or region.",
+                    "maxLength": 100,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "line1",
+                  "city",
+                  "region",
+                  "postalCode",
+                  "country"
+                ],
+                "type": "object"
+              },
+              "website": {
+                "description": "The principal's website, an https URL.",
+                "format": "uri",
+                "maxLength": 500,
+                "type": "string"
+              }
+            },
+            "required": [
+              "legalName",
+              "email",
+              "postalAddress"
+            ],
+            "type": "object"
+          },
+          "successUrl": {
+            "description": "Where checkout sends the payer after payment.",
+            "format": "uri",
+            "maxLength": 500,
+            "type": "string"
+          }
+        },
+        "required": [
+          "principal",
+          "agent",
+          "plan",
+          "acceptTerms"
+        ],
+        "type": "object"
+      },
+      "name": "comms_start_signup",
+      "title": "Start communications signup"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Agent signup guide"
+      },
+      "description": "Return the step-by-step signup guide for agents, as Markdown (also published at https://agents.analyticalinsider.ai/agent-signup.md). It uses only the discovery document's own field names and states no price, plan or limit. No key needed.",
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "comms_get_signup_guide",
+      "title": "Agent signup guide"
+    }
+  ],
+  "url": "https://agents.analyticalinsider.ai/mcp"
+}
