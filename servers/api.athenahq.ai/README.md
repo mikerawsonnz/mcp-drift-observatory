@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.athenahq.ai/api/mcp` | 132 | [`dd35733b0fe4`](d1c9dc97b241abc09e4e.json) | 2026-11-18 |
+| `https://api.athenahq.ai/api/mcp` | 132 | [`6c802674660f`](d1c9dc97b241abc09e4e.json) | 2026-11-25 |
 
 ## Tools at `https://api.athenahq.ai/api/mcp`
 
@@ -55,8 +55,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_content_versions`: `List the saved versions of a content item, newest first. Each entry carries its version number, label, how it was produced, and who made it…`
 - `get_credit_usage`: `Read recorded organization credit consumption: total, hourly (24h) or daily trend, and charged website/group/organization pools. Use for sp…`
 - `get_credit_usage_events`: `Read a page of recorded credit charges/refunds and action labels for the organization, optionally filtered by originatingWebsiteId. Use to…`
-- `get_credits_organization`: `Get credit balance for the organization`
-- `get_credits_website`: `Get credit balance for a specific website`
+- `get_credits_organization`: `Get the organization's credit balance. When total.unlimited is true, report unlimited credits even if total.balance is zero.`
+- `get_credits_website`: `Get the website's credit balance. When credits.unlimited is true, report unlimited credits even if credits.total is zero.`
 - `get_date_range`: `Get the earliest and latest response dates for a website`
 - `get_group_detail`: `Fetch a single group by id with its member websites.`
 - `get_group_saved_views`: `List group-level saved views (filter presets) shared across the websites in a group`
@@ -74,6 +74,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-25: [description changed, schema changed](../../deltas/2026-11-25/d1c9dc97b241abc09e4e.json): `12 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-18: [schema changed](../../deltas/2026-11-18/d1c9dc97b241abc09e4e.json): `1 field(s) changed`
 - 2026-11-17: [description changed, schema changed](../../deltas/2026-11-17/d1c9dc97b241abc09e4e.json): `15 field(s) changed`
 - 2026-11-14: [annotation changed](../../deltas/2026-11-14/d1c9dc97b241abc09e4e.json): `5 field(s) changed`

@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.bittuitive.ai/mcp` | 36 | [`fb58554f9e9b`](c0c8c3bdf1cbda3c2fcd.json) | 2026-11-24 |
+| `https://api.bittuitive.ai/mcp` | 39 | [`62c2624a82dc`](c0c8c3bdf1cbda3c2fcd.json) | 2026-11-25 |
 
 ## Tools at `https://api.bittuitive.ai/mcp`
 
@@ -14,9 +14,12 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `browse_scoreboard`: `Use this when you want to survey the market instead of getting one pick: list paid agent APIs by score with filters (view="search": q, data…`
 - `buy_credits`: `Use this when you will make many calls or run feeds and want to pay once instead of per call. Suggested bundles: starter 1,000 sats / $1, s…`
 - `call_routed_api`: `Use this when you want data from another paid API without handling its invoice: pay ONE BitTuitive invoice (sats, or the same all-in price…`
+- `check_domain`: `Use this when you need DNS, registration, TLS, email, phone or IP facts about a contact. Self-hosted on BitTuitive hardware (no upstream).…`
 - `contribute_bittone`: `Use this when your agent wants to contribute a structured 0-100 score to BitTone (50 is neutral). Tickers, coins, AI models and AI topics a…`
+- `convert_pdf`: `Use this when you need clean Markdown or plain text from a PDF. Self-hosted on BitTuitive hardware (no upstream). Pass url (a public http(s…`
 - `create_feed`: `Use this when an agent would otherwise poll: get data pushed on a schedule (e.g. hourly BTC price) or when a trigger fires (BTC moves 2%, p…`
 - `delete_feed`: `Use this when you no longer want a feed. PERMANENTLY deletes the feed definition and stops all future deliveries; this cannot be undone (cr…`
+- `fetch_page`: `Use this when you need the readable text of a public web page as clean Markdown. Self-hosted on BitTuitive hardware (no upstream). Pass url…`
 - `find_best_endpoint`: `Use this when your task needs a paid data API you have not picked yet (e.g. 'bitcoin price', 'btc price', 'air quality', 'stock fundamental…`
 - `get_ai_buildout`: `Use this when a research agent needs a quick headline for one company or the whole AI buildout: capex, year-over-year growth and whether it…`
 - `get_ai_data`: `Use this when a research agent needs AI Buildout trends from company regulatory filings (company-wide capex, revenue and cash flow, not an…`
@@ -49,6 +52,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-25: [count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-25/c0c8c3bdf1cbda3c2fcd.json): `3 tool(s) added; 22 field(s) changed; signals: url_introduced`
 - 2026-11-24: [count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-24/c0c8c3bdf1cbda3c2fcd.json): `6 tool(s) added; 78 field(s) changed; signals: length_more_than_doubled, url_introduced`
 - 2026-11-23: [count changed, description changed, schema changed, tool added, tool removed](../../deltas/2026-11-23/c0c8c3bdf1cbda3c2fcd.json): `3 tool(s) added; 1 tool(s) removed; 78 field(s) changed; signals: url_introduced`
 - 2026-11-22: [count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-22/c0c8c3bdf1cbda3c2fcd.json): `7 tool(s) added; 29 field(s) changed; signals: length_more_than_doubled, url_introduced`

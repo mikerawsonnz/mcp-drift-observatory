@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://bizmoon.ai/api/mcp` | 5 | [`4e21573433df`](60513f782b423d70a731.json) | 2026-11-19 |
+| `https://bizmoon.ai/api/mcp` | 5 | [`46e776430d34`](60513f782b423d70a731.json) | 2026-11-25 |
 
 ## Tools at `https://bizmoon.ai/api/mcp`
 
@@ -18,6 +18,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-25: [schema changed](../../deltas/2026-11-25/60513f782b423d70a731.json): `2 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-19: [description changed](../../deltas/2026-11-19/60513f782b423d70a731.json): `4 field(s) changed`
 - 2026-09-19: [annotation changed, description changed, schema changed](../../deltas/2026-09-19/60513f782b423d70a731.json): `13 field(s) changed`
 

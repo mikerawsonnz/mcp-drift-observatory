@@ -6,18 +6,18 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://baseedgelabs.ai/mcp` | 4 | [`febf07b1242f`](8130ce63d6f7c63f14b8.json) | 2026-11-20 |
+| `https://baseedgelabs.ai/mcp` | 4 | [`3a20f5d3bc61`](8130ce63d6f7c63f14b8.json) | 2026-11-25 |
 
 ## Tools at `https://baseedgelabs.ai/mcp`
 
 - `export_preset`: `Returns download links to one preset's two files, each with import steps. "tradingview": a flat settings file keyed by input label, for Tra…`
-- `get_preset`: `Returns one preset in full: its summary and Strategy Tester results, the Strategy Tester properties to set (initial capital, commission, sl…`
+- `get_preset`: `Returns one preset in full: its summary, its results where published (hypothetical TradingView Strategy Tester backtests by window, each wi…`
 - `list_presets`: `Finds presets: saved settings of a strategy for one instrument and chart timeframe. Each result has its preset_id, strategy, instrument, ti…`
 - `list_strategies`: `Lists every BaseEdge Labs trading strategy for TradingView: its strategy_id, name, page on baseedgelabs.ai, whether it is free or paid, how…`
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-25: [description changed](../../deltas/2026-11-25/8130ce63d6f7c63f14b8.json): `2 field(s) changed`
 
 ## Check it from your agent
 

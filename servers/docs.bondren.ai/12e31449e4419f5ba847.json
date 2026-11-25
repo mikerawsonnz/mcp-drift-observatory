@@ -1,0 +1,255 @@
+{
+  "canon_version": "1",
+  "full_hash": "a599132ed519209d5953889886fcefe4d91d5dc580cd1a2aada625638ef05ea4",
+  "name": "ai.bondren/docs",
+  "observed_at": "2026-11-25T02:02:26.854480Z",
+  "sources": [
+    "official"
+  ],
+  "tool_count": 2,
+  "tools": [
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Read the canonical Markdown of one docs page by id, or a single section when an anchor is supplied. Returns the page/section URL, content hash, maturity, effective availability, and last-reviewed date alongside the markdown. Unknown page ids or anchors return a clean not-found error.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "anchor": {
+            "description": "optional heading anchor to read one section instead of the whole page",
+            "type": "string"
+          },
+          "page_id": {
+            "description": "the docs page id (as returned by search_docs); required",
+            "type": "string"
+          }
+        },
+        "required": [
+          "page_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_doc",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "anchor": {
+            "description": "the section anchor read, empty when the whole page was returned",
+            "type": "string"
+          },
+          "availability": {
+            "description": "effective availability: public, invite-only, or planned",
+            "type": "string"
+          },
+          "content_revision": {
+            "description": "immutable content revision of the corpus backing this document",
+            "type": "string"
+          },
+          "hash": {
+            "description": "content hash of the returned markdown",
+            "type": "string"
+          },
+          "last_reviewed": {
+            "description": "ISO date the page was last reviewed",
+            "type": "string"
+          },
+          "markdown": {
+            "description": "the canonical Markdown of the page (or the section text when anchor is set)",
+            "type": "string"
+          },
+          "markdown_url": {
+            "description": "canonical Markdown URL of the page",
+            "type": "string"
+          },
+          "maturity": {
+            "description": "content maturity: ga, preview, or planned",
+            "type": "string"
+          },
+          "page_id": {
+            "description": "the page id that was read",
+            "type": "string"
+          },
+          "title": {
+            "description": "page or section title",
+            "type": "string"
+          },
+          "url": {
+            "description": "canonical URL of the page or section",
+            "type": "string"
+          }
+        },
+        "required": [
+          "content_revision",
+          "page_id",
+          "availability",
+          "markdown"
+        ],
+        "type": "object"
+      },
+      "title": "Read a Bondren documentation page"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "description": "Search the Bondren public docs corpus for ranked sections matching a query. Limit defaults to 5, and the ranked result set is the top 10 matching sections. Returns GA and preview results by default; planned content is excluded unless include_planned is true. Each item carries its canonical URL, content hash, maturity, effective availability, and last-reviewed date. Pass page_info.next_cursor as cursor; stop only when page_info.has_more is false.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "description": "Opaque continuation cursor returned by the previous page.",
+            "maxLength": 32768,
+            "type": "string"
+          },
+          "include_planned": {
+            "description": "include maturity=planned sections (excluded by default); optional",
+            "type": "boolean"
+          },
+          "limit": {
+            "description": "Maximum number of items to return (1-100).",
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "description": "the user's docs question or keywords; required",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_docs",
+      "outputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "content_revision": {
+            "description": "immutable content revision of the corpus backing this result",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "anchor": {
+                  "description": "heading anchor on the page",
+                  "type": "string"
+                },
+                "audience": {
+                  "description": "intended audience tags",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": [
+                    "null",
+                    "array"
+                  ]
+                },
+                "availability": {
+                  "description": "effective availability: public, invite-only, or planned",
+                  "type": "string"
+                },
+                "hash": {
+                  "description": "content hash of this section",
+                  "type": "string"
+                },
+                "heading": {
+                  "description": "section heading text",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "stable chunk id",
+                  "type": "string"
+                },
+                "last_reviewed": {
+                  "description": "ISO date the page was last reviewed",
+                  "type": "string"
+                },
+                "markdown_url": {
+                  "description": "canonical Markdown URL of the page",
+                  "type": "string"
+                },
+                "maturity": {
+                  "description": "content maturity: ga, preview, or planned",
+                  "type": "string"
+                },
+                "page_id": {
+                  "description": "parent page id",
+                  "type": "string"
+                },
+                "score": {
+                  "description": "relevance score (higher is better)",
+                  "type": "number"
+                },
+                "section": {
+                  "description": "logical section label",
+                  "type": "string"
+                },
+                "title": {
+                  "description": "page title",
+                  "type": "string"
+                },
+                "url": {
+                  "description": "canonical URL of this section",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "page_id",
+                "availability",
+                "score"
+              ],
+              "type": "object"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "page_info": {
+            "additionalProperties": false,
+            "properties": {
+              "has_more": {
+                "type": "boolean"
+              },
+              "next_cursor": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              }
+            },
+            "required": [
+              "has_more",
+              "next_cursor"
+            ],
+            "type": "object"
+          },
+          "query": {
+            "description": "the normalized query these items answer",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items",
+          "page_info",
+          "content_revision",
+          "query"
+        ],
+        "type": "object"
+      },
+      "title": "Search Bondren documentation"
+    }
+  ],
+  "url": "https://docs.bondren.ai/mcp"
+}

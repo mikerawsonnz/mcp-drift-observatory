@@ -6,11 +6,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.beatra.ai/mcp` | 47 | [`e65a4c24014f`](4f93d616eb97e76f800a.json) | 2026-11-20 |
+| `https://mcp.beatra.ai/mcp` | 47 | [`b45b31a9ba8a`](4f93d616eb97e76f800a.json) | 2026-11-25 |
 
 ## Tools at `https://mcp.beatra.ai/mcp`
 
-- `beatra.assets.upload`: `Create a short-lived upload grant for an image, audio, or video file. Follow the returned HTTP PUT instructions; its response returns the a…`
+- `beatra.assets.upload`: `Create a short-lived upload grant for an image, audio, or video file. A video can be at most 50 MB (52,428,800 bytes); an image or audio fi…`
 - `beatra.audio.generate_sfx`: `Generate sound effects, foley, or looping ambient beds from a text prompt (0.5 to 30 seconds). This billable call consumes Beatra credits a…`
 - `beatra.audio.process`: `Process one audio file: trim, loop to a length, fade, normalize loudness, convert format, split into stems (vocals and accompaniment, or si…`
 - `beatra.audio.transcribe`: `Transcribe an audio file into timed text, speaker-labeled segments, detected audio events, and downloadable JSON, SRT, and VTT subtitle art…`
@@ -60,6 +60,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-25: [description changed, schema changed](../../deltas/2026-11-25/4f93d616eb97e76f800a.json): `3 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-20: [description changed, schema changed](../../deltas/2026-11-20/4f93d616eb97e76f800a.json): `180 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-19: [description changed, schema changed](../../deltas/2026-11-19/4f93d616eb97e76f800a.json): `16 field(s) changed`
 - 2026-11-18: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-18/4f93d616eb97e76f800a.json): `4 tool(s) added; 10 field(s) changed; signals: imperative_language_introduced` **(notable)**

@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://app.annsa.ai/mcp` | 8 | [`701788711226`](59d41e60a9e6430b00b0.json) | 2026-11-23 |
+| `https://app.annsa.ai/mcp` | 8 | [`616e70c36e81`](59d41e60a9e6430b00b0.json) | 2026-11-25 |
 
 ## Tools at `https://app.annsa.ai/mcp`
 
@@ -21,6 +21,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-25: [schema changed](../../deltas/2026-11-25/59d41e60a9e6430b00b0.json): `1 field(s) changed`
 - 2026-11-23: [description changed, schema changed](../../deltas/2026-11-23/59d41e60a9e6430b00b0.json): `13 field(s) changed`
 - 2026-11-20: [schema changed](../../deltas/2026-11-20/59d41e60a9e6430b00b0.json): `20 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-19: [schema changed](../../deltas/2026-11-19/59d41e60a9e6430b00b0.json): `7 field(s) changed`
@@ -40,7 +41,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - 2026-10-29: [description changed, schema changed](../../deltas/2026-10-29/59d41e60a9e6430b00b0.json): `13 field(s) changed`
 - 2026-10-27: [description changed, schema changed](../../deltas/2026-10-27/59d41e60a9e6430b00b0.json): `163 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**
 - 2026-10-21: [schema changed](../../deltas/2026-10-21/59d41e60a9e6430b00b0.json): `1 field(s) changed`
-- 2026-10-20: [schema changed](../../deltas/2026-10-20/59d41e60a9e6430b00b0.json): `8 field(s) changed`
 
 ## Check it from your agent
 
