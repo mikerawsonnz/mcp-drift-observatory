@@ -7,7 +7,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
 | `https://a2uicatalog.ai/mcp-docs` | 2 | [`40a8c2d85a07`](3c6cdbffd223af3533e0.json) | 2026-11-11 |
-| `https://a2uicatalog.ai/mcp` | 40 | [`f1a2d63e9dd6`](57663a025cf9685e6622.json) | 2026-11-14 |
+| `https://a2uicatalog.ai/mcp` | 42 | [`5d4c5cd41617`](57663a025cf9685e6622.json) | 2026-11-26 |
 
 ## Tools at `https://a2uicatalog.ai/mcp-docs`
 
@@ -25,6 +25,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `describe_playbook`: `Explain a playbook to a HUMAN as a rendered surface: the frame it reads against, the lenses available, and the questions it will ask them.…`
 - `diagram_studio`: `Draw a diagram in-chat with the full Diagram Studio interface (MCP Apps hosts only; it opens fullscreen where the host allows it). YOU writ…`
 - `distill_document`: `Compile a training.md / roadmap markdown document into a live interactive A2UI app — DETERMINISTIC parser, no model involved. Fact sheet: i…`
+- `draw_architecture`: `Draw an architecture or flow diagram in the chat. YOU write the diagram as Mermaid flowchart text (first line "flowchart LR" or "graph TD";…`
+- `draw_sequence`: `Draw a sequence diagram (who sends what to whom, in order) in the chat. YOU write it as Mermaid sequenceDiagram text (first line "sequenceD…`
 - `drawio_open`: `Open a diagram you wrote in draw.io (diagrams.net). YOU write the diagram as mxGraph XML, the format draw.io reads; this tool checks it, an…`
 - `emit_deployment`: `🎓 GRADUATE a tested surface into a dedicated, DEPLOYER-ONLY standing app in YOUR OWN Google Apps Script account. Returns a deterministic re…`
 - `emit_runbook_surface`: `Stamp your content through a DECLARED runbook — a pre-authored, judgment-free surface composition. You supply content only; the runbook sup…`
@@ -59,6 +61,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-26: [count changed, tool added](../../deltas/2026-11-26/57663a025cf9685e6622.json): `2 tool(s) added`
 - 2026-11-14: [description changed, field changed, schema changed](../../deltas/2026-11-14/57663a025cf9685e6622.json): `25 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-12: [field changed](../../deltas/2026-11-12/57663a025cf9685e6622.json): `14 field(s) changed`
 

@@ -6,10 +6,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.adadvisor.ai/mcp` | 43 | [`52e47361c25d`](c151597f0d7058b04027.json) | 2026-10-31 |
+| `https://api.adadvisor.ai/mcp` | 60 | [`e71ad296e2a1`](c151597f0d7058b04027.json) | 2026-11-26 |
 
 ## Tools at `https://api.adadvisor.ai/mcp`
 
+- `add_product_from_link`: `Add a product to the Product Store from the link to its page. A link to a Shopify store's product is imported from that store; any other pa…`
 - `change_entity_budget`: `Update the budget of a Meta campaign or ad set. Takes effect immediately. Provide exactly one of daily_budget or lifetime_budget in the acc…`
 - `change_entity_status`: `Pause or resume one or more Meta campaigns, ad sets, or ads. Takes effect immediately. Live mutation — entities stop or start delivering on…`
 - `check_lead_gen_readiness`: `Check whether this account can actually run lead gen — BEFORE building anything. Lead generation has four independent prerequisites, and ea…`
@@ -18,44 +19,61 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `create_adset`: `Create one or more Meta ad sets. NOT idempotent — each call creates new ad sets. All ad sets are created as PAUSED. The targeting spec is a…`
 - `create_campaign`: `Create one or more Meta ad campaigns. NOT idempotent — each call creates new campaigns. All campaigns are created as PAUSED. After creation…`
 - `create_creative`: `Create one or more Meta ad creatives. NOT idempotent — each call creates new creatives. Pass a list of ''creatives'' to create several in a…`
+- `create_design_kit`: `Create a new Design Kit for a Business, e.g. to try a different theme. A new kit is never the default: creating one does not change what an…`
 - `create_lead_form`: `Create one or more Meta Lead Forms (instant forms) on a Facebook Page. NOT idempotent — each call creates new forms. Forms cannot be delete…`
 - `create_lead_form_audience`: `Build a custom audience from how people interacted with a lead form. This is what turns lead gen into a funnel instead of a one-shot: the p…`
 - `create_lookalike_audience`: `Create a lookalike audience from an existing custom audience seed. NOT idempotent — each call creates a new audience on Meta. Lookalike aud…`
+- `create_product`: `Add a product to the Product Store by hand. For a product that has its own page, add_product_from_link is the better way: it reads the titl…`
 - `create_website_audience`: `Create a website custom audience based on pixel events. NOT idempotent — each call creates a new audience on Meta. Common use cases: - Excl…`
+- `delete_design_kit`: `Delete a Design Kit. This cannot be undone. The kit's content and its list of assets are gone for good; the images themselves stay in the m…`
 - `duplicate_ad`: `Duplicate a Meta ad into the same or a different ad set. NOT idempotent — each call creates a new ad. The new ad inherits the original's cr…`
 - `duplicate_adset`: `Duplicate a Meta ad set into the same or a different campaign. NOT idempotent — each call creates a new ad set. By default duplicates the a…`
 - `duplicate_campaign`: `Duplicate a Meta campaign, creating a new copy in the same ad account. NOT idempotent — each call creates a new campaign. By default duplic…`
 - `estimate_audience_size`: `Estimate the audience size for a targeting spec without creating anything. Use this to explore how big an audience would be before committi…`
+- `get_ad_concept`: `One ad in full: every Revision, Verdict and Meta ad made from it. Returns the Intent, where the ad stands, each Revision (the oldest first;…`
+- `get_credit_balance`: `The Credits a Business can spend on ads now, and what one ad costs. Credits pay for the ads AdAdvisor draws (request_ads). A Business has I…`
 - `get_lead_form`: `Inspect one Meta Lead Form in full — every question, disclaimer and screen. Use this whenever you need to know what a form actually ASKS. A…`
 - `get_performance`: `Get performance metrics — how are my campaigns/ads doing? Use this to compare entities, find top or bottom performers, check spend and ROAS…`
 - `get_pixel_health`: `Get pixel health for a Meta ad account — metadata, event counts, source and host breakdown. Returns the account's pixel(s) with: - Metadata…`
+- `get_product`: `One product in full: its fields, pictures, Product Note and readiness. Returns the description, price, variants, the Product Note (what the…`
 - `get_results_health`: `Is this account producing results the way it usually does? Use this to tell a real stop or drop in results from ordinary day-to-day noise,…`
+- `get_task_status`: `How a piece of background work is going: 'working', 'done' or 'failed'. Use it after a tool answers 'working' with a task_id (add_product_f…`
 - `get_timeseries`: `Get daily trend data — spot performance shifts day over day. Use this to see how a campaign, ad set, or ad is trending, detect when a perfo…`
+- `give_ad_verdict`: `Keep the person's Verdict on an ad: approved, changes requested or rejected. A Verdict says whether the ad is good. It is the signed-in per…`
 - `init_upload`: `Get presigned S3 URLs for direct upload — internal helper for the Upload Creatives widget. Prefer calling upload_creatives, which opens the…`
 - `list_ad_accounts`: `Discover and list all Meta ad accounts the user can access — start here. This is the entry point for every session. Call this FIRST to find…`
+- `list_ad_concepts`: `List the ads AdAdvisor made for a Business, by where each stands. An Ad Concept is one ad: what it was made to do (its Intent: persona, awa…`
 - `list_ads`: `List ads — show which creatives are running and their setup. Use this to see what ads exist, review creative details, or answer "what ads a…`
 - `list_adsets`: `List ad sets — show targeting, budgets, and optimization config. Use this to see what ad sets exist, review targeting and setup, or answer…`
 - `list_campaigns`: `List campaigns — show what campaigns exist, their config and budgets. Use this to see what campaigns are running, review setup before makin…`
 - `list_creatives`: `List existing ad creatives for an account — use to find a creative_id for reuse with create_ad. Queries the tenant DB directly — fast index…`
 - `list_custom_audiences`: `List custom audiences available for targeting in this ad account. Returns each audience's ID, name, subtype, approximate size, and delivery…`
+- `list_design_kits`: `List a Business's Design Kits in full, the default first. A Design Kit tells AdAdvisor how an ad of this brand should look: the palette, th…`
 - `list_lead_forms`: `List existing Meta Lead Forms (instant forms) for a Facebook Page. Lead forms are page-scoped (endpoint: /{page_id}/leadgen_forms), so the…`
 - `list_media_assets`: `Browse this business's Creatives Hub — every media asset the platform holds. The Hub is the shared library across surfaces and agents: rend…`
 - `list_pages`: `List Facebook Pages reachable for advertising from this ad account. Returns each page's id, name, the connecting user's Page-role tasks (e.…`
+- `list_products`: `List the products a Business sells: its Product Store. Each product comes with its price, its featured picture's media_asset_id (get_produc…`
 - `list_promotable_posts`: `List existing organic posts that can be promoted as ads. Use this to find a Facebook Page post or Instagram post the business already publi…`
 - `preview_existing_creatives`: `Preview existing creatives that use the same image or video, with engagement metrics. Call this BEFORE creating a new creative to check if…`
 - `register_media_assets`: `Push Creatives Hub assets to a Meta ad account and get their image hashes back. This is the ONLY way to make a generated or uploaded asset…`
+- `request_ads`: `Ask Iris, AdAdvisor's ad maker, for static ads of a Business's products. SPENDS CREDITS: each ad drawn costs the Business Credits, the same…`
 - `search_ad_images`: `Search images in this account's ad library and open a visual picker to select one or more. Queries meta_ad_images by name (case-insensitive…`
 - `search_ad_videos`: `Search videos in this account's ad library and open a visual picker to select one or more. Queries meta_ad_videos by title (case-insensitiv…`
 - `search_targeting`: `Search targeting options — find interests, demographics, locations, behaviors. Use this before create_adset or update_adset_targeting to ge…`
 - `set_lead_form_status`: `Archive or reactivate a Meta Lead Form. Archiving is the ONLY retirement path Meta offers — lead forms cannot be deleted, by us or by anyon…`
+- `show_ad_concepts`: `Show a page of a Business's ads to the person, as a deck to swipe. Use this when the person should look at the ads and judge them. Each ad…`
 - `update_adset_targeting`: `Update the targeting for a Meta ad set. Takes effect immediately. Workflow: 1. search_targeting(search_type='interests', query='...') to fi…`
+- `update_design_kit`: `Rename a Design Kit, replace its content, change its assets, or make it the default. Overwrites what was there, and 'content' replaces the…`
 - `update_entity`: `Patch arbitrary fields on a Meta campaign, ad set, or ad. Idempotent. Long-tail edit tool. Use the dedicated change_entity_status / change_…`
+- `update_product`: `Change a product's fields, write its Product Note, or archive it. Overwrites what was there. What AdAdvisor knows about the product for an…`
+- `update_product_pictures`: `Add, describe, remove and reorder a product's pictures in one call. The parts are applied in this order: remove, add, describe, order. The…`
 - `upload_ad_image`: `Upload a single image to Meta — internal helper for the Upload Creatives widget. Prefer calling upload_creatives, which opens the widget an…`
 - `upload_ad_video`: `Upload a video to Meta — internal helper for the Upload Creatives widget. Prefer calling upload_creatives, which opens the widget and runs…`
 - `upload_creatives`: `Open the upload widget for adding images and videos to a Meta ad account. Opens an interactive widget where the user can: - Drag & drop or…`
 
 ## Changes
 
+- 2026-11-26: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-26/c151597f0d7058b04027.json): `17 tool(s) added; 5 field(s) changed`
 - 2026-10-31: [description changed](../../deltas/2026-10-31/c151597f0d7058b04027.json): `1 field(s) changed`
 - 2026-10-30: [schema changed](../../deltas/2026-10-30/c151597f0d7058b04027.json): `9 field(s) changed; signals: imperative_language_introduced, length_more_than_doubled` **(notable)**
 - 2026-10-08: [description changed, schema changed](../../deltas/2026-10-08/c151597f0d7058b04027.json): `9 field(s) changed; signals: length_more_than_doubled`

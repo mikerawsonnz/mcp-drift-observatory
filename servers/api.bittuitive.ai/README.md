@@ -6,52 +6,55 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.bittuitive.ai/mcp` | 39 | [`62c2624a82dc`](c0c8c3bdf1cbda3c2fcd.json) | 2026-11-25 |
+| `https://api.bittuitive.ai/mcp` | 41 | [`07b3eac300bd`](c0c8c3bdf1cbda3c2fcd.json) | 2026-11-26 |
 
 ## Tools at `https://api.bittuitive.ai/mcp`
 
-- `ack_feed_mailbox_item`: `Use this when you have processed a mailbox item, so it stops appearing in the default list. Does not delete it (it still expires after 72 h…`
-- `browse_scoreboard`: `Use this when you want to survey the market instead of getting one pick: list paid agent APIs by score with filters (view="search": q, data…`
-- `buy_credits`: `Use this when you will make many calls or run feeds and want to pay once instead of per call. Suggested bundles: starter 1,000 sats / $1, s…`
-- `call_routed_api`: `Use this when you want data from another paid API without handling its invoice: pay ONE BitTuitive invoice (sats, or the same all-in price…`
-- `check_domain`: `Use this when you need DNS, registration, TLS, email, phone or IP facts about a contact. Self-hosted on BitTuitive hardware (no upstream).…`
-- `contribute_bittone`: `Use this when your agent wants to contribute a structured 0-100 score to BitTone (50 is neutral). Tickers, coins, AI models and AI topics a…`
-- `convert_pdf`: `Use this when you need clean Markdown or plain text from a PDF. Self-hosted on BitTuitive hardware (no upstream). Pass url (a public http(s…`
-- `create_feed`: `Use this when an agent would otherwise poll: get data pushed on a schedule (e.g. hourly BTC price) or when a trigger fires (BTC moves 2%, p…`
-- `delete_feed`: `Use this when you no longer want a feed. PERMANENTLY deletes the feed definition and stops all future deliveries; this cannot be undone (cr…`
-- `fetch_page`: `Use this when you need the readable text of a public web page as clean Markdown. Self-hosted on BitTuitive hardware (no upstream). Pass url…`
-- `find_best_endpoint`: `Use this when your task needs a paid data API you have not picked yet (e.g. 'bitcoin price', 'btc price', 'air quality', 'stock fundamental…`
-- `get_ai_buildout`: `Use this when a research agent needs a quick headline for one company or the whole AI buildout: capex, year-over-year growth and whether it…`
-- `get_ai_data`: `Use this when a research agent needs AI Buildout trends from company regulatory filings (company-wide capex, revenue and cash flow, not an…`
-- `get_airport_data`: `Use this when a travel agent needs US airport status: one-airport briefing (kind="intuitive", the default; pass airport=SFO or omit to defa…`
-- `get_alerts_data`: `Use this when an agent needs official US government alert streams: USGS earthquakes, CISA Known Exploited Vulnerabilities, openFDA drug rec…`
-- `get_bitcoin_price`: `Use this when you need the current Bitcoin price (BTC/USD, btc price). Returns BitTuitive's recommended btc_intuitive value: a price checke…`
-- `get_bittone`: `Use this when an agent needs BitTone, the first-party consensus of agent-submitted scores on an allowlisted stock, crypto, or AI subject. T…`
-- `get_btc_data`: `Use this when an agent needs Bitcoin data. For the current Bitcoin price (BTC/USD, btc price), start with kind="intuitive" (the default; al…`
-- `get_credit_balance`: `Use this when you want to know how much prepaid balance (sats and USDC) is left before running more calls or feeds. Read-only. Example: get…`
-- `get_expense_data`: `Use this when you need expense data. Returns JSON in the 'data' field with source attribution. Read-only; the only side effect is the payme…`
-- `get_feed_mailbox`: `Use this when you want the deliveries stored for you (a feed without a webhook, or one whose webhook failed): lists unacknowledged items, o…`
-- `get_feeds`: `Use this when you need to check your feeds: without feed_id it lists every feed and the prepaid sats balance; with feed_id it returns that…`
-- `get_finance_data`: `Use this when an agent needs official daily FX reference rates (ECB and Bank of Canada), with a Data BitScore. kind="intuitive" (the defaul…`
-- `get_insights_data`: `Use this when you are deciding what data to build, source or price, or want to know what other AI agents ask for and pay for. kind="intuiti…`
-- `get_market_insights`: `Use this when you want a derived build-next signal from agent demand: supply-demand gaps and the 30-day payment conversion funnel. Aggregat…`
-- `get_pricing`: `Use this when you need current prices before spending: per-call sats and USDC for every BitTuitive data endpoint, credit bundles, subscript…`
-- `get_rates_data`: `Use this when an agent needs official Fed, ECB and Bank of Canada policy rates and the official Treasury par yield curve. kind="intuitive"…`
-- `get_sanctions_data`: `Use this when an agent is about to pay, transfer, trade or onboard and must check whether a person, entity or crypto address appears on US…`
-- `get_scoreboard_entry`: `Use this when you need due diligence before you pay or route: given an id from find_best_endpoint or browse_scoreboard, returns the score c…`
-- `get_seller_data`: `Use this when an agent is about to pay a seller and needs a screening aid that bundles the trust_signals counterparty check, price fairness…`
-- `get_stock_data`: `Use this when a research agent needs the legacy SEC fundamentals snapshot (kind="fundamentals") or the stock_filings alias (kind="filings",…`
-- `get_stocks_data`: `Use this when a research agent needs computed SEC fundamentals and parsed Form 4 insider trades, not raw reprints: the latest-quarter snaps…`
-- `get_travel_data`: `Use this when a travel agent needs US airport status: one-airport briefing (kind="intuitive", the default; pass airport=SFO or omit to defa…`
-- `get_trust_data`: `Use this when an agent is about to pay, transfer, trade or onboard and must check whether a person, entity or crypto address appears on US…`
-- `get_weather`: `Use this when an agent needs weather, Data BitScored: current conditions (kind="intuitive", the default), a 7-day forecast (kind="stats"),…`
-- `list_routable_apis`: `Use this when you need data BitTuitive does not sell directly and want it paid for you: lists every scoreboard-verified L402 API the router…`
-- `list_route_capabilities`: `Use this when you need a data point BitTuitive does not sell as one of Ours (direct) endpoints: lists capabilities, available preferences (…`
-- `request_data`: `Use this when no tool covers the data you need (e.g. air quality, crypto OHLC, flight prices): records one demand signal (data_type, descri…`
-- `update_feed`: `Use this when you want to change a feed: interval, trigger, params, webhook_url, mailbox, or pause/resume it with 'state'. Only the fields…`
+- `ack_feed_mailbox_item`: `Use this when marking a mailbox item handled so it hides from default get_feed_mailbox results. Safe to repeat.`
+- `browse_scoreboard`: `Use this when surveying paid agent APIs by 0-100 score (view="search") or per-category stats (view="categories"). Free, read-only.`
+- `buy_credits`: `Use this when prepaying a btf_ balance (starter 1,000 sats/$1, standard 5,000/$5, bulk 25,000/$25; 365-day expiry; redeemable only for BitT…`
+- `call_routed_api`: `Use this when calling a third-party L402 API or capability (ai_inference with prompt/messages from ~$0.0024; web_search with query) with on…`
+- `check_domain`: `Use this when checking DNS, RDAP registration, TLS, email MX/disposable, phone format/region, or IP/ASN before contacting/paying/signing up…`
+- `contribute_bittuition`: `Use this when submitting a BitTuition sentiment vote (0-100 or bullish/neutral/bearish) on an allowlisted stock, crypto, or AI subject (no…`
+- `convert_pdf`: `Use this when extracting clean Markdown/text from a PDF (self-hosted). Pass url or file_base64 and optional pages (max 20 MB, 100 pages; te…`
+- `create_feed`: `Use this when avoiding polling: push data on a schedule or trigger to webhook_url and/or 72h mailbox. Creating is free; deliveries debit pr…`
+- `delete_feed`: `Use this when removing a feed. PERMANENTLY deletes the feed definition and stops future deliveries (cannot be undone; prefer update_feed st…`
+- `fetch_page`: `Use this to read a public web page as Markdown (URL to Markdown, self-hosted, no JS; use convert_pdf for PDFs). Pass url. Price: $0.002 fla…`
+- `find_best_endpoint`: `Use this when you need a paid data API by keyword (e.g. 'bitcoin price', 'air quality', 'stock fundamentals') ranked by 0-100 quality score…`
+- `get_ai_buildout`: `Use this when you need the AI Buildout headline from SEC filings (company-wide capex, YoY growth, acceleration) for optional symbol (e.g. M…`
+- `get_ai_data`: `Use this when a research agent needs AI Buildout trends from SEC filings (company-wide capex, revenue, cash flow; optional symbol, else uni…`
+- `get_alerts_data`: `Use this when an agent needs US government alerts (USGS earthquakes, CISA KEV, openFDA recalls, Federal Register). Pass stream (default usg…`
+- `get_bitcoin_price`: `Use this when you need the current Bitcoin price (BTC/USD, btc price). Returns btc_intuitive multi-source price + Data BitScore. Price: 5 s…`
+- `get_bittuition`: `Use this when an agent needs BitTuition sentiment (0-100: 100=bullish, 50=neutral, 0=bearish) on allowlisted stocks, cryptos, or AI subject…`
+- `get_btc_data`: `Use this when an agent needs Bitcoin data (BTC/USD, btc price, fees, mempool, sentiment). kind="intuitive" (default; also get_bitcoin_price…`
+- `get_company_data`: `Use this when an agent needs a company lookup for KYB/business verification: legal name, status, jurisdiction, address, LEI/CIK/ticker, mat…`
+- `get_credit_balance`: `Use this when checking remaining prepaid sats and USDC balance for credit_token. Read-only.`
+- `get_crypto_prices`: `Use this when you need BTC and/or ETH USD prices in one short call. Pass symbols (default "BTC,ETH"). Price: 3 sats or $0.002 USDC. Pay: L4…`
+- `get_expense_data`: `Use this when you need expense data. Returns JSON 'data' with attribution. Kinds: intuitive (5 sats or $0.003 USDC: Use this when an agent…`
+- `get_feed_mailbox`: `Use this when reading stored feed deliveries (kept 72h; unacked by default, or item_id / include_acked=true). Read-only.`
+- `get_feeds`: `Use this when checking your feeds and prepaid balance (or one feed's status/schedule via feed_id). Read-only.`
+- `get_finance_data`: `Use this when an agent needs official daily FX reference rates (ECB, Bank of Canada) with Data BitScore. kind="intuitive" (default): one pa…`
+- `get_insights_data`: `Use this when deciding what data to build or price from k-anonymized agent demand. kind="intuitive": headline; kind="stats": willingness to…`
+- `get_market_insights`: `Use this when you want a build-next signal from k-anonymized agent demand (supply-demand gaps, 30-day funnel). Same as get_insights_data(ki…`
+- `get_pricing`: `Use this when checking current per-call sats/USDC prices, credit bundles, and subscription plans. Free, read-only.`
+- `get_rates_data`: `Use this when an agent needs Fed, ECB, and Bank of Canada policy rates and US Treasury yield curve. kind="intuitive" (default): policy rate…`
+- `get_scoreboard_entry`: `Use this when checking due diligence (score breakdown, uptime, latency, probe history) for a scoreboard id. Free, read-only.`
+- `get_seller_data`: `Use this when an agent is about to pay a seller and needs a counterparty, price-fairness, and uptime screen. kind="intuitive" (default): ve…`
+- `get_stock_data`: `Use this when an agent needs legacy SEC fundamentals or filings (prefer get_stocks_data). Pass symbol (default AAPL). Returns JSON 'data' w…`
+- `get_stocks_data`: `Use this when an agent needs computed SEC EDGAR financials and parsed Form 4 insider trades. Pass symbol (default AAPL). kind="intuitive" (…`
+- `get_travel_data`: `Use this when an agent needs US airport delays, ground stops, or closures. kind="intuitive" (default; optional airport, default SFO): brief…`
+- `get_trust_data`: `Use this when an agent must screen a person, entity, or crypto/Lightning/x402 payee against US OFAC and UK sanctions or check counterparty…`
+- `get_weather`: `Use this when an agent needs weather with Data BitScore. kind="intuitive" (default): current conditions; kind="stats": 7-day forecast; kind…`
+- `list_routable_apis`: `Use this when listing scoreboard-verified L402 APIs the router can call with upstream price, fee, and total sats. Free, read-only. Next: ca…`
+- `list_route_capabilities`: `Use this when checking capabilities BitTuitive can route (ai_inference, web_search, etc.), preferences, and approved source counts. Free, r…`
+- `request_data`: `Use this when no tool covers data you need; logs a demand signal (data_type, description, example_query, max_price_sats) for the operator.…`
+- `run_ai_inference`: `Use this when you need an open-weight LLM completion with no API key. Pass prompt or messages, optional model and max_tokens (default 1024,…`
+- `search_web`: `Use this for live web search (title, URL, snippet, source, date). Pass query. Price: about $0.007 (upstream + fee max(20%, 3 sats)). Same a…`
+- `update_feed`: `Use this when changing a feed's interval, trigger, params, webhook_url, mailbox, or state (paused/active). Free; safe to repeat.`
 
 ## Changes
 
+- 2026-11-26: [count changed, description changed, field changed, schema changed, tool added, tool removed](../../deltas/2026-11-26/c0c8c3bdf1cbda3c2fcd.json): `6 tool(s) added; 4 tool(s) removed; 438 field(s) changed; signals: length_more_than_doubled, url_introduced`
 - 2026-11-25: [count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-25/c0c8c3bdf1cbda3c2fcd.json): `3 tool(s) added; 22 field(s) changed; signals: url_introduced`
 - 2026-11-24: [count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-24/c0c8c3bdf1cbda3c2fcd.json): `6 tool(s) added; 78 field(s) changed; signals: length_more_than_doubled, url_introduced`
 - 2026-11-23: [count changed, description changed, schema changed, tool added, tool removed](../../deltas/2026-11-23/c0c8c3bdf1cbda3c2fcd.json): `3 tool(s) added; 1 tool(s) removed; 78 field(s) changed; signals: url_introduced`

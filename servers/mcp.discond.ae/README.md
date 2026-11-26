@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.discond.ae/mcp` | 9 | [`bd6452a6a4cd`](cd7db03de9f0ecc82710.json) | 2026-11-20 |
+| `https://mcp.discond.ae/mcp` | 9 | [`af4d18a0e527`](cd7db03de9f0ecc82710.json) | 2026-11-26 |
 
 ## Tools at `https://mcp.discond.ae/mcp`
 
@@ -22,6 +22,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-26: [schema changed](../../deltas/2026-11-26/cd7db03de9f0ecc82710.json): `4 field(s) changed`
 - 2026-11-20: [description changed, schema changed](../../deltas/2026-11-20/cd7db03de9f0ecc82710.json): `10 field(s) changed`
 - 2026-11-17: [schema changed](../../deltas/2026-11-17/cd7db03de9f0ecc82710.json): `35 field(s) changed; signals: imperative_language_introduced` **(notable)**
 - 2026-11-16: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-16/cd7db03de9f0ecc82710.json): `1 tool(s) added; 3 field(s) changed`

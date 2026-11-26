@@ -1,6 +1,6 @@
 # Observed MCP servers
 
-487 hosts whose MCP tool declarations we have observed. Each page lists the declared tools, every observed change, and an Atom feed of changes to that server.
+489 hosts whose MCP tool declarations we have observed. Each page lists the declared tools, every observed change, and an Atom feed of changes to that server.
 
 Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_alerts
 
@@ -10,12 +10,12 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [4ai.ai](4ai.ai/) (10 tools)
 - [69ai.ai](69ai.ai/) (13 tools)
 - [_aux.prdictionedge.ai](_aux.prdictionedge.ai/) (2 tools)
-- [a2uicatalog.ai](a2uicatalog.ai/) (42 tools)
+- [a2uicatalog.ai](a2uicatalog.ai/) (44 tools)
 - [achromat.ai](achromat.ai/) (1 tools)
 - [achurch.ai](achurch.ai/) (10 tools)
 - [actwise.ai](actwise.ai/) (2 tools)
 - [advisorsai.ai](advisorsai.ai/) (6 tools)
-- [aeoengine.ai](aeoengine.ai/) (4 tools)
+- [aeoengine.ai](aeoengine.ai/) (2 tools)
 - [afmr.ai](afmr.ai/) (8 tools)
 - [agenlify.ai](agenlify.ai/) (3 tools)
 - [agent.autoposter.ai](agent.autoposter.ai/) (16 tools)
@@ -33,7 +33,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [agents.avasis.ai](agents.avasis.ai/) (5 tools)
 - [agentsec.kernora.ai](agentsec.kernora.ai/) (2 tools)
 - [agentsindex.ai](agentsindex.ai/) (11 tools)
-- [agentsrank.ai](agentsrank.ai/) (20 tools)
+- [agentsrank.ai](agentsrank.ai/) (33 tools)
 - [ai-akari.ai](ai-akari.ai/) (7 tools)
 - [aibotoffice.ai](aibotoffice.ai/) (26 tools)
 - [aient.ai](aient.ai/) (2 tools)
@@ -47,7 +47,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [apexai.academy](apexai.academy/) (30 tools)
 - [apexrunner.ai](apexrunner.ai/) (52 tools)
 - [api-v2.lifeclaw.agentese.ai](api-v2.lifeclaw.agentese.ai/) (16 tools)
-- [api.adadvisor.ai](api.adadvisor.ai/) (43 tools)
+- [api.adadvisor.ai](api.adadvisor.ai/) (60 tools)
 - [api.agentrapay.ai](api.agentrapay.ai/) (6 tools)
 - [api.aislabs.ai](api.aislabs.ai/) (12 tools)
 - [api.alphabazaar.ai](api.alphabazaar.ai/) (24 tools)
@@ -59,7 +59,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [api.atmy.ai](api.atmy.ai/) (12 tools)
 - [api.bareun.ai](api.bareun.ai/) (6 tools)
 - [api.betslipdoctor.ai](api.betslipdoctor.ai/) (106 tools)
-- [api.bittuitive.ai](api.bittuitive.ai/) (39 tools)
+- [api.bittuitive.ai](api.bittuitive.ai/) (41 tools)
 - [api.bluerate.ai](api.bluerate.ai/) (3 tools)
 - [api.bowmark.ai](api.bowmark.ai/) (58 tools)
 - [api.bumblebox.ai](api.bumblebox.ai/) (17 tools)
@@ -151,6 +151,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [betterpost.ai](betterpost.ai/) (23 tools)
 - [bidbetter.ai](bidbetter.ai/) (2 tools)
 - [bidclub.ai](bidclub.ai/) (6 tools)
+- [bigredbutton.ai](bigredbutton.ai/) (3 tools)
 - [bizmoon.ai](bizmoon.ai/) (5 tools)
 - [blast-radius.ai](blast-radius.ai/) (9 tools)
 - [blinibot.ai](blinibot.ai/) (16 tools)
@@ -461,6 +462,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [structured-output-mcp-traced-agent.getvda.ai](structured-output-mcp-traced-agent.getvda.ai/) (2 tools)
 - [synap-mcp.maximem.ai](synap-mcp.maximem.ai/) (4 tools)
 - [tandem.ac](tandem.ac/) (13 tools)
+- [tax.brainy.ae](tax.brainy.ae/) (5 tools)
 - [the-stall.intuitek.ai](the-stall.intuitek.ai/) (302 tools)
 - [thebureauoflostcontext.agency](thebureauoflostcontext.agency/) (5 tools)
 - [thirdhemisphere.agency](thirdhemisphere.agency/) (12 tools)
@@ -474,7 +476,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [verify.noevant.ai](verify.noevant.ai/) (5 tools)
 - [www.agentboard.ai](www.agentboard.ai/) (38 tools)
 - [www.ai-portal.ai](www.ai-portal.ai/) (4 tools)
-- [www.aim-shield.ai](www.aim-shield.ai/) (10 tools)
+- [www.aim-shield.ai](www.aim-shield.ai/) (11 tools)
 - [www.almostimpossible.agency](www.almostimpossible.agency/) (6 tools)
 - [www.arcreport.ai](www.arcreport.ai/) (26 tools)
 - [www.beachclubs.ae](www.beachclubs.ae/) (4 tools)

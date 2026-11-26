@@ -6,11 +6,12 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://www.aim-shield.ai/mcp` | 10 | [`1771e5a47b33`](89b62f82cc23b3feb966.json) | 2026-11-18 |
+| `https://www.aim-shield.ai/mcp` | 11 | [`fa268037dfc4`](89b62f82cc23b3feb966.json) | 2026-11-26 |
 
 ## Tools at `https://www.aim-shield.ai/mcp`
 
 - `antes_de_actuar`: `Para agentes de IA que actúan en nombre de una persona. Antes de pagar, rellenar datos, iniciar sesión o descargar algo, pásanos el enlace…`
+- `comprobar_comercio`: `Para agentes de compra de IA. Llámala antes de pagar en un comercio que la persona no ha usado antes: pásanos su «url» o su «dominio» y, si…`
 - `comprobar_cuenta_bancaria`: `Dice si un IBAN es válido, de qué país y banco es y, si das la cuenta de siempre, si el cambio es sospechoso. Úsalo antes de pagar a una cu…`
 - `comprobar_mensaje`: `Dice si un mensaje (SMS, correo, WhatsApp), un enlace o un texto tiene señales de estafa, por qué y qué hacer. Pega el texto tal cual lo re…`
 - `cortafuegos_de_ia`: `Para chatbots y agentes de una empresa. Con «entrada», pásanos lo que escribió una persona antes de dárselo a la IA: detecta intentos de sa…`
@@ -23,7 +24,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-26: [count changed, tool added](../../deltas/2026-11-26/89b62f82cc23b3feb966.json): `1 tool(s) added`
 
 ## Check it from your agent
 

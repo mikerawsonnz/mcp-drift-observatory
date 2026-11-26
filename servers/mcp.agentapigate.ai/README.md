@@ -6,18 +6,18 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.agentapigate.ai/mcp` | 4 | [`ab1054ed853c`](db2d4296f359addb82c6.json) | 2026-11-21 |
+| `https://mcp.agentapigate.ai/mcp` | 4 | [`002c83459154`](db2d4296f359addb82c6.json) | 2026-11-26 |
 
 ## Tools at `https://mcp.agentapigate.ai/mcp`
 
-- `call_endpoint`: `Execute an endpoint and return compact LLM-ready output (-80% context tokens).`
+- `call_endpoint`: `Execute any endpoint (e.g. search.google.web, search.google.news, web.extract.markdown, youtube.video.transcript) and return compact LLM-re…`
 - `get_account_status`: `Inspect paid_usd, bonus_usd, rate limit, and active sub-key caps.`
 - `get_endpoint_schema`: `Get JSON input schema, price, and sample params for an endpoint_id.`
 - `search_endpoints`: `Search 136 real-time APIs across x, search, social, commerce, b2b, finance, local, intel. Returns id, price_usd, p50_ms, summary.`
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-26: [description changed](../../deltas/2026-11-26/db2d4296f359addb82c6.json): `1 field(s) changed; signals: length_more_than_doubled`
 
 ## Check it from your agent
 

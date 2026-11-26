@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "52e47361c25df89df3b40d3b08b8edc38f97eb9f4bf75a0872f19b0d96f869a3",
+  "full_hash": "e71ad296e2a1f721d9d100c02882e3fe014e3f9ada5e44addb1020a084f5e13d",
   "name": "ai.adadvisor/mcp-server",
-  "observed_at": "2026-10-31T02:05:54.594119Z",
+  "observed_at": "2026-11-26T02:02:17.308327Z",
   "sources": [
     "official"
   ],
-  "tool_count": 43,
+  "tool_count": 60,
   "tools": [
     {
       "_meta": {
@@ -5198,7 +5198,7 @@
         "readOnlyHint": false,
         "title": "Update Entity Fields"
       },
-      "description": "Patch arbitrary fields on a Meta campaign, ad set, or ad. Idempotent.\n\nLong-tail edit tool. Use the dedicated change_entity_status / change_entity_budget\ntools for the hot paths — they are safer and have richer error messages.\nEach field of EntityFieldsPatch documents which entity_type(s) it applies to.\n\nLive mutation — changes apply immediately on Meta. State before/after is\ncaptured for audit. NOT for editing targeting (use update_adset_targeting).",
+      "description": "Patch arbitrary fields on a Meta campaign, ad set, or ad. Idempotent.\n\nLong-tail edit tool. Use the dedicated change_entity_status / change_entity_budget\ntools for the hot paths — they are safer and have richer error messages.\nEach field of EntityFieldsPatch documents which entity_type(s) it applies to.\n\nTo edit a live ad's copy, headline, media or link: create_creative with\nthe new version, then entity_type='ad' with fields.creative_id on the\nexisting ad. Never build a second ad to change the first.\n\nLive mutation — changes apply immediately on Meta. State before/after is\ncaptured for audit. NOT for editing targeting (use update_adset_targeting).",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -5300,6 +5300,19 @@
                 ],
                 "default": null,
                 "description": "Billing event (IMPRESSIONS, LINK_CLICKS, THRUPLAY). Applies to: adset."
+              },
+              "creative_id": {
+                "anyOf": [
+                  {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Point this ad at another creative: how a live ad's copy, headline, media or destination link is edited. A creative itself cannot be changed after creation, so the edit is create_creative with the new version, then creative_id here on the SAME ad. The ad keeps its id, its ad set and its spend history; do not build a second ad beside it. Meta reviews the ad again and starts its delivery learning over, and the likes and comments on the old post do not carry to the new one. Applies to: ad."
               },
               "daily_budget": {
                 "anyOf": [
@@ -17183,6 +17196,3507 @@
         "type": "object"
       },
       "title": "List Promotable Posts"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": [
+            "discovery",
+            "products",
+            "read"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List Products"
+      },
+      "description": "List the products a Business sells: its Product Store.\n\nEach product comes with its price, its featured picture's\nmedia_asset_id (get_product gives a picture's display_url) and a short\nreadiness summary (whether an ad can be made of it, how many pictures\nit has, whether it has a Product Note, and how much AdAdvisor knows\nabout it). Products come from a connected store, from a product page\nlink, or were added by hand. Use get_product for one product in full.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "business_id": {
+            "description": "The Business to work on: the business_id (a UUID) that list_ad_accounts answers beside each ad account. Not an ad account id.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "limit": {
+            "default": 25,
+            "description": "Products per page (1-50). Defaults to 25.",
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "description": "How many to skip, for the next page.",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "search": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Words a person would use for a product ('gift set', 'serum'). Matched against the title, type, category, tags, vendor, option values and description. Omit for every product."
+          },
+          "status": {
+            "default": "active",
+            "description": "Which products to list. Defaults to 'active'.",
+            "enum": [
+              "active",
+              "draft",
+              "archived"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id"
+        ],
+        "type": "object"
+      },
+      "name": "list_products",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "business_id": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer"
+          },
+          "matched": {
+            "description": "How many products the request matched.",
+            "type": "integer"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "next_offset": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Pass as offset for the next page; null when exhausted."
+          },
+          "products": {
+            "items": {
+              "additionalProperties": true,
+              "properties": {
+                "handle": {
+                  "type": "string"
+                },
+                "product_id": {
+                  "type": "string"
+                },
+                "readiness": {
+                  "additionalProperties": true,
+                  "description": "How ready a product is to have an ad made of it.",
+                  "properties": {
+                    "can_be_drawn": {
+                      "description": "False when the product has no picture or is not active. An ad cannot be made of it until that is fixed; nothing overrides this.",
+                      "type": "boolean"
+                    },
+                    "description_chars": {
+                      "anyOf": [
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "has_note": {
+                      "type": "boolean"
+                    },
+                    "has_page_link": {
+                      "anyOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "pictures": {
+                      "type": "integer"
+                    },
+                    "pictures_described": {
+                      "anyOf": [
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "profile_current": {
+                      "anyOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null,
+                      "description": "False when the product changed since it was graded. It is read again, at no cost, when the next ad is asked for."
+                    },
+                    "profile_grade": {
+                      "description": "How much AdAdvisor knows about the product for an ad, graded the last time an agent read it. 'not_read_yet' until the first ad is asked for. 'thin' means an ad would have little true to say: add a page link, a fuller description or a Product Note.",
+                      "enum": [
+                        "rich",
+                        "partial",
+                        "thin",
+                        "not_read_yet"
+                      ],
+                      "type": "string"
+                    },
+                    "to_improve": {
+                      "anyOf": [
+                        {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null,
+                      "description": "What a person could add, in the order worth doing."
+                    }
+                  },
+                  "required": [
+                    "can_be_drawn",
+                    "pictures",
+                    "has_note",
+                    "profile_grade"
+                  ],
+                  "type": "object"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "store_kept": {
+                  "description": "True when a connected Shopify store keeps this product: its fields are changed in Shopify, and only its Product Note and added pictures are written here.",
+                  "type": "boolean"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "product_id",
+                "handle",
+                "title",
+                "status",
+                "store_kept",
+                "readiness"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "status": {
+            "const": "success",
+            "default": "success",
+            "type": "string"
+          },
+          "total": {
+            "description": "How many products the Business has in this status.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "business_id",
+          "count",
+          "matched",
+          "total",
+          "products"
+        ],
+        "type": "object"
+      },
+      "title": "List Products"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": [
+            "products",
+            "read"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Product"
+      },
+      "description": "One product in full: its fields, pictures, Product Note and readiness.\n\nReturns the description, price, variants, the Product Note (what the\nowner knows that the storefront does not say), every picture with its\npicture_id, description and a display_url that expires after 15\nminutes, and a readiness block: whether an ad can be made of the\nproduct, what it is read from, the grade of what AdAdvisor knows about\nit ('rich', 'partial', 'thin' or 'not_read_yet'), and what a person\ncould add to improve its ads.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "business_id": {
+            "description": "The Business to work on: the business_id (a UUID) that list_ad_accounts answers beside each ad account. Not an ad account id.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "product_id": {
+            "description": "The product: its product_id (from list_products), or its handle.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "product_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_product",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "One product in full, after a read or a write.",
+        "properties": {
+          "business_id": {
+            "type": "string"
+          },
+          "next_steps": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "product": {
+            "additionalProperties": true,
+            "description": "The product: its fields, its Product Note (note), its pictures with their picture_id and description, and its readiness.",
+            "type": "object"
+          },
+          "status": {
+            "default": "success",
+            "enum": [
+              "success",
+              "partial"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "product"
+        ],
+        "type": "object"
+      },
+      "title": "Get Product"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": [
+            "mutation",
+            "products"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Add Product From Link"
+      },
+      "description": "Add a product to the Product Store from the link to its page.\n\nA link to a Shopify store's product is imported from that store; any\nother page is read by AdAdvisor, which files the product's title,\ndescription, price and pictures. A product the Business already has at\nthat address is answered as it is. Costs nothing.\n\nAnswers at once. 'done' carries the product_id when the store already\nheld the product. Otherwise 'working' carries a task_id: ask\nget_task_status every few seconds until it is 'done' or 'failed'. The\nwork usually takes under a minute and gives up after seven. Asking\nagain is what moves it on, so do ask.\n\nIdempotent: the same link names the same product, never a second one.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "business_id": {
+            "description": "The Business to work on: the business_id (a UUID) that list_ad_accounts answers beside each ad account. Not an ad account id.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "url": {
+            "description": "The address of the product's own page, e.g. 'https://shop.example.com/products/day-cream'. One product's page, not a shop's home page or a collection.",
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "url"
+        ],
+        "type": "object"
+      },
+      "name": "add_product_from_link",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "How a piece of background work is going.",
+        "properties": {
+          "ads": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "An Ad Request: each ad with its index, its status ('drawing', 'done' or 'failed') and, once drawn, its ad_concept_id and title."
+          },
+          "business_id": {
+            "type": "string"
+          },
+          "credits": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "An Ad Request: the Credits 'held' for it and, once it ended, those 'captured' (taken) and 'returned'. The answer that starts a request carries 'held' and 'balance_after'."
+          },
+          "done": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "An Ad Request: how many ads are drawn so far."
+          },
+          "failures": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "An Ad Request: each ad that could not be drawn, with why."
+          },
+          "kind": {
+            "enum": [
+              "add_product_from_link",
+              "request_ads"
+            ],
+            "type": "string"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "next_steps": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "product_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "requested": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "An Ad Request: how many ads were asked for."
+          },
+          "status": {
+            "description": "'working': ask again with get_task_status in a few seconds. 'done': the result is in this answer. 'failed': message says why.",
+            "enum": [
+              "working",
+              "done",
+              "failed"
+            ],
+            "type": "string"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "What to pass to get_task_status. null when the work was done at once."
+          }
+        },
+        "required": [
+          "status",
+          "kind",
+          "business_id"
+        ],
+        "type": "object"
+      },
+      "title": "Add Product From Link"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": [
+            "internal",
+            "products",
+            "read"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Task Status"
+      },
+      "description": "How a piece of background work is going: 'working', 'done' or 'failed'.\n\nUse it after a tool answers 'working' with a task_id (add_product_from_link, request_ads). For a product from a link, ask every few seconds; each ask also moves the work on, and 'done' carries the product_id. For an Ad Request, ask every 20 seconds: the answer says how many ads are done, each finished ad's ad_concept_id, why any could not be drawn, and the Credits held, taken and given back. 'failed' says why in message. Does not count against the daily tool-call allowance.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "business_id": {
+            "description": "The Business to work on: the business_id (a UUID) that list_ad_accounts answers beside each ad account. Not an ad account id.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "task_id": {
+            "description": "The task_id a tool answered when it started the work.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "task_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_task_status",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "How a piece of background work is going.",
+        "properties": {
+          "ads": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "An Ad Request: each ad with its index, its status ('drawing', 'done' or 'failed') and, once drawn, its ad_concept_id and title."
+          },
+          "business_id": {
+            "type": "string"
+          },
+          "credits": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "An Ad Request: the Credits 'held' for it and, once it ended, those 'captured' (taken) and 'returned'. The answer that starts a request carries 'held' and 'balance_after'."
+          },
+          "done": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "An Ad Request: how many ads are drawn so far."
+          },
+          "failures": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "An Ad Request: each ad that could not be drawn, with why."
+          },
+          "kind": {
+            "enum": [
+              "add_product_from_link",
+              "request_ads"
+            ],
+            "type": "string"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "next_steps": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "product_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "requested": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "An Ad Request: how many ads were asked for."
+          },
+          "status": {
+            "description": "'working': ask again with get_task_status in a few seconds. 'done': the result is in this answer. 'failed': message says why.",
+            "enum": [
+              "working",
+              "done",
+              "failed"
+            ],
+            "type": "string"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "What to pass to get_task_status. null when the work was done at once."
+          }
+        },
+        "required": [
+          "status",
+          "kind",
+          "business_id"
+        ],
+        "type": "object"
+      },
+      "title": "Get Task Status"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": [
+            "mutation",
+            "products"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Create Product"
+      },
+      "description": "Add a product to the Product Store by hand.\n\nFor a product that has its own page, add_product_from_link is the\nbetter way: it reads the title, description, price and pictures off the\npage. Use this for a product with no page, or to say exactly what the\nproduct is.\n\nNOT idempotent: each call makes a new product, so check list_products\nfirst. A product made here is 'active'. The answer is the product in\nfull, with its readiness and, under pictures_added, what became of\neach picture asked for. Its pictures come without a display_url;\nget_product gives those.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "business_id": {
+            "description": "The Business to work on: the business_id (a UUID) that list_ad_accounts answers beside each ad account. Not an ad account id.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "compare_at_price": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The price before a sale, e.g. '39.00'."
+          },
+          "currency_code": {
+            "anyOf": [
+              {
+                "maxLength": 3,
+                "minLength": 3,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "ISO 4217 code of the currency it is sold in, e.g. 'USD'."
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "What it is, what it does for its buyer, what it must not be claimed to do. Plain text."
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The Product Note: what the owner knows that the storefront does not say (who buys it, what to stress, what to avoid)."
+          },
+          "online_store_url": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The address of the product's own page, if it has one. If it does, add_product_from_link fills the product in for you."
+          },
+          "pictures": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": false,
+                  "description": "One picture to show on a product.",
+                  "properties": {
+                    "description": {
+                      "anyOf": [
+                        {
+                          "maxLength": 512,
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null,
+                      "description": "What the picture shows that cannot be told from it: which size or variant, which side, 'old packaging, do not use', 'lifestyle shot, not the actual pack'. Read with the picture when an ad is made."
+                    },
+                    "image_url": {
+                      "anyOf": [
+                        {
+                          "maxLength": 2000,
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null,
+                      "description": "A public web address of the picture (https). It is fetched into the Business's media library. Provide this OR media_asset_id."
+                    },
+                    "media_asset_id": {
+                      "anyOf": [
+                        {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null,
+                      "description": "An image already in the Business's media library (asset_id from list_media_assets). Provide this OR image_url."
+                    }
+                  },
+                  "type": "object"
+                },
+                "maxItems": 8,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Pictures of the product, the featured one first. An ad cannot be made of a product with no picture."
+          },
+          "price": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "A plain decimal, e.g. '29.00'."
+          },
+          "product_type": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "What kind of product it is, e.g. 'Face serum'."
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 250,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Tags."
+          },
+          "title": {
+            "description": "The product's name.",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "vendor": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The brand that makes it."
+          }
+        },
+        "required": [
+          "business_id",
+          "title"
+        ],
+        "type": "object"
+      },
+      "name": "create_product",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "One product in full, after a read or a write.",
+        "properties": {
+          "business_id": {
+            "type": "string"
+          },
+          "next_steps": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "product": {
+            "additionalProperties": true,
+            "description": "The product: its fields, its Product Note (note), its pictures with their picture_id and description, and its readiness.",
+            "type": "object"
+          },
+          "status": {
+            "default": "success",
+            "enum": [
+              "success",
+              "partial"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "product"
+        ],
+        "type": "object"
+      },
+      "title": "Create Product"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": [
+            "mutation",
+            "products"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Update Product"
+      },
+      "description": "Change a product's fields, write its Product Note, or archive it.\n\nOverwrites what was there. What AdAdvisor knows about the product for\nan ad is read from its description, price, pictures, page and Product\nNote, so a change here is used by the next ad made of it.\n\nA product a connected Shopify store keeps (store_kept: true) accepts\nonly `note` here: its other fields are changed in Shopify and arrive\non their own. Setting status to 'archived' puts a product away so no\nad is made of it; 'active' brings it back. Nothing is deleted.\n\nIdempotent: sending the same changes again changes nothing. The\nanswer's pictures come without a display_url; get_product gives those.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_intent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "OPTIONAL free-text on why the change is made. Logged for telemetry."
+          },
+          "business_id": {
+            "description": "The Business to work on: the business_id (a UUID) that list_ad_accounts answers beside each ad account. Not an ad account id.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "changes": {
+            "additionalProperties": false,
+            "description": "The fields to change. Only the keys sent are changed; a key sent as null clears that field. E.g. {\"note\": \"Mostly bought as a gift for new parents.\"}",
+            "properties": {
+              "compare_at_price": {
+                "anyOf": [
+                  {
+                    "maxLength": 40,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The price before a sale, as a plain decimal, e.g. '39.00'."
+              },
+              "currency_code": {
+                "anyOf": [
+                  {
+                    "maxLength": 3,
+                    "minLength": 3,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "ISO 4217 code of the currency the product is sold in, e.g. 'USD'."
+              },
+              "description": {
+                "anyOf": [
+                  {
+                    "maxLength": 20000,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The product's description, as its storefront would show it: what it is, what it does for its buyer, what it must not be claimed to do. Plain text."
+              },
+              "note": {
+                "anyOf": [
+                  {
+                    "maxLength": 2000,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The Product Note: what the owner knows about this product that an ad should use and the storefront does not say, in their own words (who really buys it, what to stress, what objection to answer, what never to say). It outranks everything else known about the product when an ad is written. Replaces the note whole; null clears it. The one field that can be written on a product a connected Shopify store keeps."
+              },
+              "online_store_url": {
+                "anyOf": [
+                  {
+                    "maxLength": 2000,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The address of the product's own page. Its proof, offers and wording are read from that page when an ad is made."
+              },
+              "price": {
+                "anyOf": [
+                  {
+                    "maxLength": 40,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The price as a plain decimal in the product's currency, e.g. '29.00'. Only for a product with nothing to choose (one variant)."
+              },
+              "product_type": {
+                "anyOf": [
+                  {
+                    "maxLength": 255,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "What kind of product it is, in the seller's words, e.g. 'Face serum'."
+              },
+              "status": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "active",
+                      "draft",
+                      "archived"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "'active' products are the only ones an agent sees and an ad can be made of. 'archived' puts a product away without deleting it; setting it back to 'active' undoes that."
+              },
+              "tags": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 250,
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The product's tags. Replaces them all."
+              },
+              "title": {
+                "anyOf": [
+                  {
+                    "maxLength": 255,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The product's name."
+              },
+              "vendor": {
+                "anyOf": [
+                  {
+                    "maxLength": 255,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "The brand that makes it."
+              }
+            },
+            "type": "object"
+          },
+          "product_id": {
+            "description": "The product: its product_id (from list_products), or its handle.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "product_id",
+          "changes"
+        ],
+        "type": "object"
+      },
+      "name": "update_product",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "One product in full, after a read or a write.",
+        "properties": {
+          "business_id": {
+            "type": "string"
+          },
+          "next_steps": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "product": {
+            "additionalProperties": true,
+            "description": "The product: its fields, its Product Note (note), its pictures with their picture_id and description, and its readiness.",
+            "type": "object"
+          },
+          "status": {
+            "default": "success",
+            "enum": [
+              "success",
+              "partial"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "product"
+        ],
+        "type": "object"
+      },
+      "title": "Update Product"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": [
+            "mutation",
+            "products"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Update Product Pictures"
+      },
+      "description": "Add, describe, remove and reorder a product's pictures in one call.\n\nThe parts are applied in this order: remove, add, describe, order. The\nfirst picture is the featured one, which is what an ad shows of the\nproduct. A picture's description says what cannot be told from it\n(which size, which side, 'old packaging') and is read with the picture\nwhen an ad is made.\n\nOn a product a connected Shopify store keeps, the store's own pictures\n(from_store: true) cannot be described, removed or reordered here;\npictures can still be added beside them. Each part's outcome is listed\nunder results, and the product is answered as it now is, its pictures\nwithout a display_url (get_product gives those). Removing a\npicture from a product never deletes the image.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "add": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": false,
+                  "description": "One picture to show on a product.",
+                  "properties": {
+                    "description": {
+                      "anyOf": [
+                        {
+                          "maxLength": 512,
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null,
+                      "description": "What the picture shows that cannot be told from it: which size or variant, which side, 'old packaging, do not use', 'lifestyle shot, not the actual pack'. Read with the picture when an ad is made."
+                    },
+                    "image_url": {
+                      "anyOf": [
+                        {
+                          "maxLength": 2000,
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null,
+                      "description": "A public web address of the picture (https). It is fetched into the Business's media library. Provide this OR media_asset_id."
+                    },
+                    "media_asset_id": {
+                      "anyOf": [
+                        {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null,
+                      "description": "An image already in the Business's media library (asset_id from list_media_assets). Provide this OR image_url."
+                    }
+                  },
+                  "type": "object"
+                },
+                "maxItems": 8,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Pictures to show on the product, each by a public image address or by an image already in the media library."
+          },
+          "agent_intent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "OPTIONAL free-text on why the change is made. Logged for telemetry."
+          },
+          "business_id": {
+            "description": "The Business to work on: the business_id (a UUID) that list_ad_accounts answers beside each ad account. Not an ad account id.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "describe": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": false,
+                  "description": "A new description for a picture the product already shows.",
+                  "properties": {
+                    "description": {
+                      "anyOf": [
+                        {
+                          "maxLength": 512,
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null,
+                      "description": "The new description. null clears it."
+                    },
+                    "picture_id": {
+                      "description": "The picture's picture_id, from get_product.",
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "picture_id"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 50,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "New descriptions for pictures the product already shows."
+          },
+          "order": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 250,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "picture_ids in the order wanted. The first becomes the featured picture, the one an ad shows. Pictures left out keep their place after the named ones."
+          },
+          "product_id": {
+            "description": "The product: its product_id (from list_products), or its handle.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "remove": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 50,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "picture_ids to stop showing on the product. The images stay in the media library."
+          }
+        },
+        "required": [
+          "business_id",
+          "product_id"
+        ],
+        "type": "object"
+      },
+      "name": "update_product_pictures",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "One product in full, after a read or a write.",
+        "properties": {
+          "business_id": {
+            "type": "string"
+          },
+          "next_steps": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "product": {
+            "additionalProperties": true,
+            "description": "The product: its fields, its Product Note (note), its pictures with their picture_id and description, and its readiness.",
+            "type": "object"
+          },
+          "status": {
+            "default": "success",
+            "enum": [
+              "success",
+              "partial"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "product"
+        ],
+        "type": "object"
+      },
+      "title": "Update Product Pictures"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": [
+            "design_kits",
+            "discovery",
+            "read"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List Design Kits"
+      },
+      "description": "List a Business's Design Kits in full, the default first.\n\nA Design Kit tells AdAdvisor how an ad of this brand should look: the\npalette, the typography, the mood, what to avoid, and the images it may\nuse by name (a logo, a style reference, a character). A Business may\nhave several, for different themes or campaigns. The default kit is the\none an ad is made under when none is named.\n\nEach kit is answered whole: its content and its assets, each with a\ndisplay_url that expires after 15 minutes.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "business_id": {
+            "description": "The Business to work on: the business_id (a UUID) that list_ad_accounts answers beside each ad account. Not an ad account id.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id"
+        ],
+        "type": "object"
+      },
+      "name": "list_design_kits",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "business_id": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer"
+          },
+          "design_kits": {
+            "items": {
+              "additionalProperties": true,
+              "properties": {
+                "assets": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "content": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "is_default": {
+                  "description": "The default kit is the one an ad is made under when none is named.",
+                  "type": "boolean"
+                },
+                "kit_id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kit_id",
+                "name",
+                "is_default",
+                "content",
+                "assets"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "status": {
+            "const": "success",
+            "default": "success",
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "count",
+          "design_kits"
+        ],
+        "type": "object"
+      },
+      "title": "List Design Kits"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": [
+            "design_kits",
+            "mutation"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Create Design Kit"
+      },
+      "description": "Create a new Design Kit for a Business, e.g. to try a different theme.\n\nA new kit is never the default: creating one does not change what any\nother ad or conversation uses. To make ads under it, name it when\nasking for them, or make it the default with\nupdate_design_kit(..., make_default=true).\n\nNOT idempotent: each call makes a new kit. The answer is the kit in\nfull, with what became of each asset under results.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "assets": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": false,
+                  "description": "One image to enrol in a Design Kit, so a render can summon it by name.",
+                  "properties": {
+                    "description": {
+                      "anyOf": [
+                        {
+                          "maxLength": 200,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null,
+                      "description": "One line on what the image is and when to use it."
+                    },
+                    "kind": {
+                      "description": "What a render takes from the image. 'logo': the brand's mark, placed as it is. 'style': its look is borrowed, never its subject. 'character': a person or mascot whose identity is matched.",
+                      "enum": [
+                        "logo",
+                        "style",
+                        "character"
+                      ],
+                      "type": "string"
+                    },
+                    "label": {
+                      "description": "The name a render summons it by, unique within the kit, e.g. 'Logo', 'Founder', 'Studio look'.",
+                      "maxLength": 40,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "media_asset_id": {
+                      "description": "An image in the Business's media library (asset_id from list_media_assets).",
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "media_asset_id",
+                    "label",
+                    "kind"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 12,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Images from the media library to enrol in the kit: a logo, style references, characters."
+          },
+          "business_id": {
+            "description": "The Business to work on: the business_id (a UUID) that list_ad_accounts answers beside each ad account. Not an ad account id.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "content": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "The body of one Design Kit — everything a render should hold, evoke and\navoid, minus the Kit Assets (those are rows, not JSON).",
+                "properties": {
+                  "avoid": {
+                    "default": [],
+                    "items": {
+                      "maxLength": 120,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "maxItems": 12,
+                    "type": "array"
+                  },
+                  "brand_name": {
+                    "anyOf": [
+                      {
+                        "maxLength": 80,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "mood": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": false,
+                        "description": "The three named prose slots exist because named lighting is the\nhighest-leverage slot in a scene prompt (scene-prompting SKILL.md). They are\nprose, not enums, precisely so a person can say what a taxonomy cannot.",
+                        "properties": {
+                          "composition_rule": {
+                            "anyOf": [
+                              {
+                                "maxLength": 300,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "default": null
+                          },
+                          "lighting": {
+                            "anyOf": [
+                              {
+                                "maxLength": 300,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "default": null
+                          },
+                          "style_descriptors": {
+                            "default": [],
+                            "items": {
+                              "maxLength": 60,
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "maxItems": 8,
+                            "type": "array"
+                          },
+                          "surface": {
+                            "anyOf": [
+                              {
+                                "maxLength": 300,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "default": null
+                          }
+                        },
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "palette": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "accent_hex": {
+                            "anyOf": [
+                              {
+                                "pattern": "^#[0-9a-fA-F]{6}$",
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "default": null
+                          },
+                          "colors": {
+                            "default": [],
+                            "items": {
+                              "additionalProperties": false,
+                              "description": "One colour, named. The name is required because the lock paragraph binds\na hex to a SURFACE (\"the primary surfaces read in #1B3A2D\") — a bare\ntrailing list of hexes got typeset into the frame on 2026-08-16.",
+                              "properties": {
+                                "hex": {
+                                  "pattern": "^#[0-9a-fA-F]{6}$",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "maxLength": 40,
+                                  "minLength": 1,
+                                  "type": "string"
+                                },
+                                "role": {
+                                  "enum": [
+                                    "primary",
+                                    "secondary",
+                                    "accent",
+                                    "background",
+                                    "text"
+                                  ],
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "hex",
+                                "name",
+                                "role"
+                              ],
+                              "type": "object"
+                            },
+                            "maxItems": 8,
+                            "type": "array"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "typography": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": false,
+                        "description": "Typography is a STYLE DESCRIPTOR only. No image model on the roster\nrenders a named face on demand, so nothing here is ever a promise of glyph\nrendering — the render block says so out loud.",
+                        "properties": {
+                          "body_family": {
+                            "anyOf": [
+                              {
+                                "maxLength": 80,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "default": null
+                          },
+                          "heading_family": {
+                            "anyOf": [
+                              {
+                                "maxLength": 80,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "default": null
+                          },
+                          "style": {
+                            "anyOf": [
+                              {
+                                "enum": [
+                                  "sans-serif",
+                                  "serif",
+                                  "display",
+                                  "mono"
+                                ],
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "default": null
+                          }
+                        },
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  }
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "How ads under this kit should look: brand_name, palette (up to 8 named colours with a role each), typography, mood (style descriptors, lighting, surface, composition rule) and up to 12 things to avoid. Everything is optional."
+          },
+          "name": {
+            "description": "The kit's name, e.g. 'Holiday 2026' or 'Minimal'.",
+            "maxLength": 80,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "create_design_kit",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "business_id": {
+            "type": "string"
+          },
+          "design_kit": {
+            "additionalProperties": true,
+            "properties": {
+              "assets": {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "content": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "is_default": {
+                "description": "The default kit is the one an ad is made under when none is named.",
+                "type": "boolean"
+              },
+              "kit_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "kit_id",
+              "name",
+              "is_default",
+              "content",
+              "assets"
+            ],
+            "type": "object"
+          },
+          "next_steps": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "status": {
+            "default": "success",
+            "enum": [
+              "success",
+              "partial"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "design_kit"
+        ],
+        "type": "object"
+      },
+      "title": "Create Design Kit"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": [
+            "design_kits",
+            "mutation"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Update Design Kit"
+      },
+      "description": "Rename a Design Kit, replace its content, change its assets, or make it the default.\n\nOverwrites what was there, and `content` replaces the kit's whole\ncontent. A change to the default kit, and making another kit the\ndefault, changes how every later ad of this Business looks, in the\nAdAdvisor app as well as here.\n\nParts are applied in this order: name and content, remove_asset_ids,\nadd_assets, make_default. Each asset change's outcome is listed under\nresults. Idempotent: the same call again changes nothing more.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "add_assets": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": false,
+                  "description": "One image to enrol in a Design Kit, so a render can summon it by name.",
+                  "properties": {
+                    "description": {
+                      "anyOf": [
+                        {
+                          "maxLength": 200,
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null,
+                      "description": "One line on what the image is and when to use it."
+                    },
+                    "kind": {
+                      "description": "What a render takes from the image. 'logo': the brand's mark, placed as it is. 'style': its look is borrowed, never its subject. 'character': a person or mascot whose identity is matched.",
+                      "enum": [
+                        "logo",
+                        "style",
+                        "character"
+                      ],
+                      "type": "string"
+                    },
+                    "label": {
+                      "description": "The name a render summons it by, unique within the kit, e.g. 'Logo', 'Founder', 'Studio look'.",
+                      "maxLength": 40,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "media_asset_id": {
+                      "description": "An image in the Business's media library (asset_id from list_media_assets).",
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "media_asset_id",
+                    "label",
+                    "kind"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 12,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Images from the media library to enrol in the kit."
+          },
+          "agent_intent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "OPTIONAL free-text on why the change is made. Logged for telemetry."
+          },
+          "business_id": {
+            "description": "The Business to work on: the business_id (a UUID) that list_ad_accounts answers beside each ad account. Not an ad account id.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "content": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "description": "The body of one Design Kit — everything a render should hold, evoke and\navoid, minus the Kit Assets (those are rows, not JSON).",
+                "properties": {
+                  "avoid": {
+                    "default": [],
+                    "items": {
+                      "maxLength": 120,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "maxItems": 12,
+                    "type": "array"
+                  },
+                  "brand_name": {
+                    "anyOf": [
+                      {
+                        "maxLength": 80,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "mood": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": false,
+                        "description": "The three named prose slots exist because named lighting is the\nhighest-leverage slot in a scene prompt (scene-prompting SKILL.md). They are\nprose, not enums, precisely so a person can say what a taxonomy cannot.",
+                        "properties": {
+                          "composition_rule": {
+                            "anyOf": [
+                              {
+                                "maxLength": 300,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "default": null
+                          },
+                          "lighting": {
+                            "anyOf": [
+                              {
+                                "maxLength": 300,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "default": null
+                          },
+                          "style_descriptors": {
+                            "default": [],
+                            "items": {
+                              "maxLength": 60,
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "maxItems": 8,
+                            "type": "array"
+                          },
+                          "surface": {
+                            "anyOf": [
+                              {
+                                "maxLength": 300,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "default": null
+                          }
+                        },
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "palette": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "accent_hex": {
+                            "anyOf": [
+                              {
+                                "pattern": "^#[0-9a-fA-F]{6}$",
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "default": null
+                          },
+                          "colors": {
+                            "default": [],
+                            "items": {
+                              "additionalProperties": false,
+                              "description": "One colour, named. The name is required because the lock paragraph binds\na hex to a SURFACE (\"the primary surfaces read in #1B3A2D\") — a bare\ntrailing list of hexes got typeset into the frame on 2026-08-16.",
+                              "properties": {
+                                "hex": {
+                                  "pattern": "^#[0-9a-fA-F]{6}$",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "maxLength": 40,
+                                  "minLength": 1,
+                                  "type": "string"
+                                },
+                                "role": {
+                                  "enum": [
+                                    "primary",
+                                    "secondary",
+                                    "accent",
+                                    "background",
+                                    "text"
+                                  ],
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "hex",
+                                "name",
+                                "role"
+                              ],
+                              "type": "object"
+                            },
+                            "maxItems": 8,
+                            "type": "array"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "typography": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": false,
+                        "description": "Typography is a STYLE DESCRIPTOR only. No image model on the roster\nrenders a named face on demand, so nothing here is ever a promise of glyph\nrendering — the render block says so out loud.",
+                        "properties": {
+                          "body_family": {
+                            "anyOf": [
+                              {
+                                "maxLength": 80,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "default": null
+                          },
+                          "heading_family": {
+                            "anyOf": [
+                              {
+                                "maxLength": 80,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "default": null
+                          },
+                          "style": {
+                            "anyOf": [
+                              {
+                                "enum": [
+                                  "sans-serif",
+                                  "serif",
+                                  "display",
+                                  "mono"
+                                ],
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "default": null
+                          }
+                        },
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  }
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The kit's content. REPLACES the whole content: send every part to keep (read it first with list_design_kits), not only what changes."
+          },
+          "kit_id": {
+            "description": "The kit's kit_id, from list_design_kits.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "make_default": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "true makes this the Business's default kit, the one every ad and every new conversation in AdAdvisor uses unless another is named; the kit that was the default stops being it. false makes it no longer the default. Omit to leave the default as it is."
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "A new name for the kit."
+          },
+          "remove_asset_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 12,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "kit_asset_ids to take out of the kit. The images stay in the media library."
+          }
+        },
+        "required": [
+          "business_id",
+          "kit_id"
+        ],
+        "type": "object"
+      },
+      "name": "update_design_kit",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "business_id": {
+            "type": "string"
+          },
+          "design_kit": {
+            "additionalProperties": true,
+            "properties": {
+              "assets": {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "content": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "is_default": {
+                "description": "The default kit is the one an ad is made under when none is named.",
+                "type": "boolean"
+              },
+              "kit_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "kit_id",
+              "name",
+              "is_default",
+              "content",
+              "assets"
+            ],
+            "type": "object"
+          },
+          "next_steps": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "status": {
+            "default": "success",
+            "enum": [
+              "success",
+              "partial"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "design_kit"
+        ],
+        "type": "object"
+      },
+      "title": "Update Design Kit"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": [
+            "design_kits",
+            "mutation"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Delete Design Kit"
+      },
+      "description": "Delete a Design Kit. This cannot be undone.\n\nThe kit's content and its list of assets are gone for good; the images\nthemselves stay in the media library. Conversations in AdAdvisor that\nwere using the kit carry on with no kit. Deleting the default kit\nleaves the Business with no default until another kit is made one.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_intent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "OPTIONAL free-text on why the kit is deleted. Logged for telemetry."
+          },
+          "business_id": {
+            "description": "The Business to work on: the business_id (a UUID) that list_ad_accounts answers beside each ad account. Not an ad account id.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "kit_id": {
+            "description": "The kit's kit_id, from list_design_kits.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "kit_id"
+        ],
+        "type": "object"
+      },
+      "name": "delete_design_kit",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "business_id": {
+            "type": "string"
+          },
+          "kit_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "next_steps": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "status": {
+            "const": "success",
+            "default": "success",
+            "type": "string"
+          },
+          "was_default": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "business_id",
+          "kit_id",
+          "name",
+          "was_default"
+        ],
+        "type": "object"
+      },
+      "title": "Delete Design Kit"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": [
+            "ad_concepts",
+            "read"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "List Ad Concepts"
+      },
+      "description": "List the ads AdAdvisor made for a Business, by where each stands.\n\nAn Ad Concept is one ad: what it was made to do (its Intent: persona,\nawareness, angle, format, offer, products), its copy and pictures (a\nRevision; a redraw adds another), the Verdicts it was given and the\nMeta ads made from it. Every ad is under one group, and counts says\nhow many stand in each.\n\nPictures are named by media_asset_id and come without an address:\nget_ad_concept gives one ad's, and show_ad_concepts shows a page of\nads to the person.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "business_id": {
+            "description": "The Business to work on: the business_id (a UUID) that list_ad_accounts answers beside each ad account. Not an ad account id.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "group": {
+            "anyOf": [
+              {
+                "enum": [
+                  "to_review",
+                  "ready",
+                  "running",
+                  "changes_requested",
+                  "rejected"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Only the ads under one group: 'to_review' (no Verdict yet on its latest Revision), 'ready' (approved and not running), 'running' (live on Meta now), 'changes_requested' (owed a new Revision) and 'rejected'. Omit for every ad, in that order of groups."
+          },
+          "limit": {
+            "default": 10,
+            "description": "Ads per page (1-25). Defaults to 10.",
+            "maximum": 25,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "description": "How many to skip, for the next page.",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "business_id"
+        ],
+        "type": "object"
+      },
+      "name": "list_ad_concepts",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "A page of a Business's ads, with how many stand in each group.",
+        "properties": {
+          "ad_concepts": {
+            "description": "Each ad: its title, group, standing, Intent (persona, awareness, angle, format, offer, products) and its latest Revision with its copy, the text set in the picture, and its pictures.",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "business_id": {
+            "type": "string"
+          },
+          "business_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "count": {
+            "description": "How many ads this page carries.",
+            "type": "integer"
+          },
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "How many ads stand in each group.",
+            "type": "object"
+          },
+          "group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The group asked for, or null for every group."
+          },
+          "matched": {
+            "description": "How many ads the group asked for holds.",
+            "type": "integer"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "next_offset": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "next_steps": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "picture_urls_expire_in": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "status": {
+            "const": "success",
+            "default": "success",
+            "type": "string"
+          },
+          "total": {
+            "description": "Every ad of the Business, in any group.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "business_id",
+          "total",
+          "counts",
+          "matched",
+          "count",
+          "ad_concepts"
+        ],
+        "type": "object"
+      },
+      "title": "List Ad Concepts"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": [
+            "ad_concepts",
+            "read"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Ad Concept"
+      },
+      "description": "One ad in full: every Revision, Verdict and Meta ad made from it.\n\nReturns the Intent, where the ad stands, each Revision (the oldest\nfirst; latest_revision_id names the one that counts) with its copy,\nthe text set in its picture, what its copy still lacks (copy_missing;\nan approval needs none) and its pictures with a display_url that\nexpires after 15 minutes, every Verdict in the order given, and each\nMeta ad made from it with whether it is running now.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "ad_concept_id": {
+            "description": "The ad: its ad_concept_id, from list_ad_concepts.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "business_id": {
+            "description": "The Business to work on: the business_id (a UUID) that list_ad_accounts answers beside each ad account. Not an ad account id.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "ad_concept_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_ad_concept",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "One ad in full.",
+        "properties": {
+          "ad_concept": {
+            "additionalProperties": true,
+            "description": "The ad: its Intent, where it stands, every Revision with its copy and pictures, every Verdict it was given and every Meta ad made from it.",
+            "type": "object"
+          },
+          "business_id": {
+            "type": "string"
+          },
+          "next_steps": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "picture_urls_expire_in": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "status": {
+            "const": "success",
+            "default": "success",
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "ad_concept"
+        ],
+        "type": "object"
+      },
+      "title": "Get Ad Concept"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": [
+            "ad_concepts",
+            "read"
+          ]
+        },
+        "ui": {
+          "resourceUri": "ui://adadvisor/ad-concepts"
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Show Ad Concepts"
+      },
+      "description": "Show a page of a Business's ads to the person, as a deck to swipe.\n\nUse this when the person should look at the ads and judge them. Each\nad is shown as it would run, one at a time: the person swipes or taps\nto approve or reject it, or asks for a change with a note, and can\nundo. The deck keeps each Verdict itself, as the person's own, the\nway the AdAdvisor app does; rejecting an ad that is running asks them\nfirst. Do not also call give_ad_verdict for what they decide there.\nIn a client that does not let the deck save, it sends the person's\nchoices back as one message instead, and give_ad_verdict keeps them.\n\nThe answer is what list_ad_concepts answers, plus each picture's\ndisplay_url (15 minutes). To read ads without showing them, use\nlist_ad_concepts, which is much smaller.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "business_id": {
+            "description": "The Business to work on: the business_id (a UUID) that list_ad_accounts answers beside each ad account. Not an ad account id.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "group": {
+            "default": "to_review",
+            "description": "Which ads to show: 'to_review' (no Verdict yet on its latest Revision), 'ready' (approved and not running), 'running' (live on Meta now), 'changes_requested' (owed a new Revision) and 'rejected'. Defaults to 'to_review'.",
+            "enum": [
+              "to_review",
+              "ready",
+              "running",
+              "changes_requested",
+              "rejected"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "default": 6,
+            "description": "Ads to show (1-12). Defaults to 6.",
+            "maximum": 12,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "description": "How many to skip, for the next page.",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "business_id"
+        ],
+        "type": "object"
+      },
+      "name": "show_ad_concepts",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "A page of a Business's ads, with how many stand in each group.",
+        "properties": {
+          "ad_concepts": {
+            "description": "Each ad: its title, group, standing, Intent (persona, awareness, angle, format, offer, products) and its latest Revision with its copy, the text set in the picture, and its pictures.",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "business_id": {
+            "type": "string"
+          },
+          "business_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "count": {
+            "description": "How many ads this page carries.",
+            "type": "integer"
+          },
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "How many ads stand in each group.",
+            "type": "object"
+          },
+          "group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The group asked for, or null for every group."
+          },
+          "matched": {
+            "description": "How many ads the group asked for holds.",
+            "type": "integer"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "next_offset": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "next_steps": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "picture_urls_expire_in": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "status": {
+            "const": "success",
+            "default": "success",
+            "type": "string"
+          },
+          "total": {
+            "description": "Every ad of the Business, in any group.",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "business_id",
+          "total",
+          "counts",
+          "matched",
+          "count",
+          "ad_concepts"
+        ],
+        "type": "object"
+      },
+      "title": "Show Ad Concepts"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": [
+            "ad_concepts",
+            "mutation"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Give Ad Verdict"
+      },
+      "description": "Keep the person's Verdict on an ad: approved, changes requested or rejected.\n\nA Verdict says whether the ad is good. It is the signed-in person's\nown, so give the one they stated, never one of your own. It launches\nnothing, and only one thing reaches Meta: rejecting an ad that is\nRUNNING pauses its Meta ads at once. That call is refused, with\nnothing written, until it is sent again with confirm_pause=true; ask\nthe person first.\n\nRefused when: the person may only look (a viewer of the organization);\nan approval is given to an ad whose copy is not whole (copy_missing);\na request for changes has no note; a reason is not on the list; the\nRevision named is no longer the latest. A request for changes is kept\nwith its note and is not redrawn on its own yet.\n\nNOT idempotent: each call keeps another Verdict. The person's latest\none is what stands.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "ad_concept_id": {
+            "description": "The ad: its ad_concept_id, from list_ad_concepts.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "agent_intent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "OPTIONAL free-text on why the Verdict is given. Logged for telemetry."
+          },
+          "business_id": {
+            "description": "The Business to work on: the business_id (a UUID) that list_ad_accounts answers beside each ad account. Not an ad account id.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "confirm_pause": {
+            "default": false,
+            "description": "Only with 'rejected' on an ad that is running: true pauses its Meta ads now. Send it only after the person agreed to stop those ads.",
+            "type": "boolean"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The person's own words. Required with 'changes_requested': it says what to change, and the next Revision is drawn from it."
+          },
+          "reasons": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 10,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Why, with a rejection or a request for changes. Keys of the reasons list: off_brand, product_wrong, picture_off, weak_copy, wrong_claim, wrong_audience, too_busy, other. Not sent with an approval."
+          },
+          "revision_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The Revision the person was looking at (the ad's latest: latest_revision.revision_id in a list, latest_revision_id on one ad). Send it: the Verdict is refused if the ad was redrawn since, so it never judges a picture they did not see."
+          },
+          "verdict": {
+            "description": "'approved': the ad is good and may run some day. 'changes_requested': the idea is right and a stated change is owed (note is required). 'rejected': not this idea. 'withdrawn': take the person's Verdict back.",
+            "enum": [
+              "approved",
+              "changes_requested",
+              "rejected",
+              "withdrawn"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "ad_concept_id",
+          "verdict"
+        ],
+        "type": "object"
+      },
+      "name": "give_ad_verdict",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "A Verdict as it was kept, and what it did to the ad account.",
+        "properties": {
+          "ad_concept": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "business_id": {
+            "type": "string"
+          },
+          "next_steps": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "not_paused": {
+            "description": "Running Meta ad ids it tried to pause and could not.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "paused": {
+            "description": "The Meta ad ids this Verdict paused.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "status": {
+            "default": "success",
+            "enum": [
+              "success",
+              "partial"
+            ],
+            "type": "string"
+          },
+          "verdict": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "verdict",
+          "ad_concept"
+        ],
+        "type": "object"
+      },
+      "title": "Give Ad Verdict"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": [
+            "ad_requests",
+            "mutation"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true,
+        "readOnlyHint": false,
+        "title": "Request Ads"
+      },
+      "description": "Ask Iris, AdAdvisor's ad maker, for static ads of a Business's products.\n\nSPENDS CREDITS: each ad drawn costs the Business Credits, the same as\nin the AdAdvisor app (get_credit_balance says the price and what is\nleft). Ask the person before calling. The Credits for every ad asked\nfor are held first; the ones for ads that are drawn are taken and the\nrest are given back.\n\nAnswers at once with a task_id. Ask get_task_status every 20 seconds;\nfour ads take about 5 minutes. Each finished ad is an Ad Concept\nwaiting for a Verdict: show_ad_concepts shows them to the person.\nNothing is launched on Meta.\n\nThe ads show the product, not people: an ad led by a person is made\nin the AdAdvisor app, not here.\n\nRefused, with nothing held, when: the Business is not an AI Business;\na product is unknown, not active or has no picture; nothing is known\nabout a product (no page link, no Product Note and a short\ndescription: refused with what to add, unless proceed_anyway=true);\nthe balance does not cover every ad asked for;\ntwo Ad Requests of the Business are already in progress.\n\nIdempotent on idempotency_key: the same key answers the same request.\nA new request needs a new key.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "angle": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "A wish for what the ad is made to do: the argument it makes, e.g. 'a gift that gets used'."
+          },
+          "brief": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "What the person wants of these ads, in their words: the occasion, the tone, what to stress or avoid."
+          },
+          "business_id": {
+            "description": "The Business to work on: the business_id (a UUID) that list_ad_accounts answers beside each ad account. Not an ad account id.",
+            "minLength": 1,
+            "type": "string"
+          },
+          "count": {
+            "default": 1,
+            "description": "How many ads to draw (1-4), spread over the products named. At least one per product. Each costs Credits. Defaults to 1.",
+            "maximum": 4,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "design_kit": {
+            "default": "default",
+            "description": "'default' draws under the Business's default Design Kit (its brand look). 'none' draws under no kit. Defaults to 'default'.",
+            "enum": [
+              "default",
+              "none"
+            ],
+            "type": "string"
+          },
+          "design_kit_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "A kit_id from list_design_kits to draw under that kit. When given it wins over design_kit."
+          },
+          "exact_lines": {
+            "anyOf": [
+              {
+                "items": {
+                  "maxLength": 120,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 4,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Up to 4 lines to set in the picture word for word, e.g. a headline the person wrote. Omit to let Iris write them."
+          },
+          "format": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "A wish for what the ad is made to do: the kind of ad, e.g. 'before and after', 'customer review', 'benefit callouts'."
+          },
+          "idempotency_key": {
+            "description": "A fresh random value per new request (a UUID is fine); send the same value to retry the same request. The same key never draws or charges twice.",
+            "maxLength": 200,
+            "minLength": 8,
+            "type": "string"
+          },
+          "offer": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "A wish for what the ad is made to do: the offer it carries, e.g. '20% off this week'. Only a real offer."
+          },
+          "persona": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "A wish for what the ad is made to do: who it speaks to, e.g. 'new parents short on sleep'."
+          },
+          "placement": {
+            "default": "portrait",
+            "description": "The shape: 'square' (1:1 feed), 'portrait' (4:5 feed), 'vertical' (9:16 stories and reels) or 'landscape' (16:9). Defaults to 'portrait'.",
+            "enum": [
+              "square",
+              "portrait",
+              "vertical",
+              "landscape"
+            ],
+            "type": "string"
+          },
+          "proceed_anyway": {
+            "default": false,
+            "description": "A request is refused when nothing is known about a product (no page link, no Product Note and a short description), with what would help. true goes on as the product is. It never overrides a product with no picture.",
+            "type": "boolean"
+          },
+          "product_ids": {
+            "description": "The products to make ads of: 1 to 4 product_ids (from list_products) or handles, each an active product of this Business with at least one picture.",
+            "items": {
+              "maxLength": 255,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 4,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "business_id",
+          "product_ids",
+          "idempotency_key"
+        ],
+        "type": "object"
+      },
+      "name": "request_ads",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "How a piece of background work is going.",
+        "properties": {
+          "ads": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "An Ad Request: each ad with its index, its status ('drawing', 'done' or 'failed') and, once drawn, its ad_concept_id and title."
+          },
+          "business_id": {
+            "type": "string"
+          },
+          "credits": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "An Ad Request: the Credits 'held' for it and, once it ended, those 'captured' (taken) and 'returned'. The answer that starts a request carries 'held' and 'balance_after'."
+          },
+          "done": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "An Ad Request: how many ads are drawn so far."
+          },
+          "failures": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "An Ad Request: each ad that could not be drawn, with why."
+          },
+          "kind": {
+            "enum": [
+              "add_product_from_link",
+              "request_ads"
+            ],
+            "type": "string"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "next_steps": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "product_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "requested": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "An Ad Request: how many ads were asked for."
+          },
+          "status": {
+            "description": "'working': ask again with get_task_status in a few seconds. 'done': the result is in this answer. 'failed': message says why.",
+            "enum": [
+              "working",
+              "done",
+              "failed"
+            ],
+            "type": "string"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "What to pass to get_task_status. null when the work was done at once."
+          }
+        },
+        "required": [
+          "status",
+          "kind",
+          "business_id"
+        ],
+        "type": "object"
+      },
+      "title": "Request Ads"
+    },
+    {
+      "_meta": {
+        "fastmcp": {
+          "tags": [
+            "credits",
+            "read"
+          ]
+        }
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Get Credit Balance"
+      },
+      "description": "The Credits a Business can spend on ads now, and what one ad costs.\n\nCredits pay for the ads AdAdvisor draws (request_ads). A Business has\nIncluded Credits, granted each period by its plan, and purchased\nCredits, which do not expire. Returns both, when the Included Credits\nare next granted, the price of one static ad, and whether the\nBusiness may ask for ads at all (only an AI Business can).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "business_id": {
+            "description": "The Business to work on: the business_id (a UUID) that list_ad_accounts answers beside each ad account. Not an ad account id.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id"
+        ],
+        "type": "object"
+      },
+      "name": "get_credit_balance",
+      "outputSchema": {
+        "additionalProperties": true,
+        "description": "What a Business can spend on ads now.",
+        "properties": {
+          "ai_business": {
+            "description": "Whether this Business may ask for ads. false: reason says why.",
+            "type": "boolean"
+          },
+          "balance": {
+            "additionalProperties": true,
+            "description": "Credits available now: 'included' (this period's), 'purchased' (bought, they do not expire), 'total', and 'unlimited'. When unlimited is true the plan's Included Credits have no ceiling: included and total are null and any request is covered.",
+            "type": "object"
+          },
+          "business_id": {
+            "type": "string"
+          },
+          "next_steps": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "price": {
+            "additionalProperties": true,
+            "description": "What things cost in Credits: 'static_ad' is one drawn ad.",
+            "type": "object"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "resets_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "When the Included Credits are next granted."
+          },
+          "status": {
+            "const": "success",
+            "default": "success",
+            "type": "string"
+          }
+        },
+        "required": [
+          "business_id",
+          "balance",
+          "price",
+          "ai_business"
+        ],
+        "type": "object"
+      },
+      "title": "Get Credit Balance"
     }
   ],
   "url": "https://api.adadvisor.ai/mcp"

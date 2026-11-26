@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://achurch.ai/mcp` | 10 | [`efdb3e1ad7ac`](f7c5ba7365d810101ae3.json) | 2026-11-20 |
+| `https://achurch.ai/mcp` | 10 | [`bfbd1e2e7d03`](f7c5ba7365d810101ae3.json) | 2026-11-26 |
 
 ## Tools at `https://achurch.ai/mcp`
 
@@ -23,7 +23,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-26: [schema changed](../../deltas/2026-11-26/f7c5ba7365d810101ae3.json): `13 field(s) changed`
 
 ## Check it from your agent
 

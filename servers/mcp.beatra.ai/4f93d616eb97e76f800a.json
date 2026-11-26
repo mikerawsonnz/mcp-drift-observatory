@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "b45b31a9ba8afa21654eb1750c12f391b017e4f9fb1545507bc310cd02704a63",
+  "full_hash": "db9e642bc9912cce219ecca9b5f85c5ebd2cc377da4144df6bf529819db08876",
   "name": "ai.beatra/beatra",
-  "observed_at": "2026-11-25T02:02:24.066810Z",
+  "observed_at": "2026-11-26T02:02:27.805738Z",
   "sources": [
     "official"
   ],
@@ -8841,7 +8841,7 @@
         "openWorldHint": true,
         "readOnlyHint": false
       },
-      "description": "Generate songs or instrumentals from a prompt, lyrics, or reference audio; optionally set a target length in seconds, reuse a saved persona, or score from reference images, a video, or audio. Make lyric timing, cover art, a visualizer MP4, or a WAV for a chosen track afterwards with beatra.music.edit. This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry.",
+      "description": "Generate songs or instrumentals from a prompt, lyrics, or reference audio; optionally set a target length in seconds, reuse a saved persona, or score from reference images, a video, or audio. Make lyric timing, cover art, a visualizer MP4, or a WAV for a chosen track afterwards with beatra.music.edit. Pass an explicit model when using `model_options` (e.g. `model='suno-6'` for `model_options.suno` or `model='minimax-music-3.0'` for `model_options.minimax`). When supplying Suno lyrics or custom controls (`negative_tags`, `vocal_gender` `'m'`/`'f'`, `style_weight`, `weirdness_constraint`, `audio_weight`), set `model='suno-6'` and `model_options.suno.custom_mode=true` (with `title`, plus `lyrics` unless `instrumental=true`). This billable call consumes Beatra credits and creates an asynchronous task. Submit exactly once, then poll with beatra.tasks.get. Reuse the same client_request_id only for an identical retry.",
       "inputSchema": {
         "$defs": {
           "MediaInputArtifact": {
@@ -9013,7 +9013,8 @@
                     "type": "null"
                   }
                 ],
-                "default": null
+                "default": null,
+                "description": "MiniMax-specific options; requires explicit model='minimax-music-3.0' (cannot be combined with model='auto')."
               },
               "suno": {
                 "anyOf": [
@@ -9024,7 +9025,8 @@
                     "type": "null"
                   }
                 ],
-                "default": null
+                "default": null,
+                "description": "Suno-specific options; requires explicit model='suno-6' (cannot be combined with model='auto')."
               }
             },
             "title": "MusicModelOptions",
@@ -9164,6 +9166,7 @@
                   }
                 ],
                 "default": null,
+                "description": "Required true when passing lyrics or any Suno custom control (negative_tags, vocal_gender, style_weight, weirdness_constraint, audio_weight); also requires title (and lyrics unless instrumental=true).",
                 "title": "Custom Mode"
               },
               "negative_tags": {
@@ -9209,6 +9212,7 @@
                   }
                 ],
                 "default": null,
+                "description": "Preferred vocal gender: 'm' (male) or 'f' (female). Requires custom_mode=true.",
                 "title": "Vocal Gender"
               },
               "weirdness_constraint": {
@@ -21576,7 +21580,7 @@
         "openWorldHint": false,
         "readOnlyHint": true
       },
-      "description": "List models currently selectable for one Beatra generation capability, including live supported controls, constraints, customer credit prices, and billing basis. `capability` is required and must be an exact generation capability from this tool's input schema enum. For image prices, select the pricing.options entry whose dimensions match the admitted output; Use before choosing or comparing a model or estimating cost; otherwise keep model=auto.",
+      "description": "List models currently selectable for one Beatra generation capability, including live supported controls, constraints, customer credit prices, and billing basis. `capability` is required and must be an exact generation capability from this tool's input schema enum (e.g. `speech_to_text` for `beatra.audio.transcribe`, `text_to_music` or `reference_audio_to_music` for `beatra.music.generate`, `video_to_text` for `beatra.videos.understand`, `sound_effects` for `beatra.audio.generate_sfx`, and specific `music_*` operation capabilities for `beatra.music.edit` — never tool names or broad aliases like `image`, `music`, `music_edit`, `audio_transcribe`, or `sfx`). For image prices, select the pricing.options entry whose dimensions match the admitted output; use before choosing or comparing a model or estimating cost; otherwise keep model=auto.",
       "inputSchema": {
         "properties": {
           "capability": {

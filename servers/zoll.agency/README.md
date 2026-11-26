@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://zoll.agency/mcp` | 8 | [`025349c7bd47`](4a6b54c7b92fc67af28d.json) | 2026-11-11 |
+| `https://zoll.agency/mcp` | 8 | [`cf2cf6935d04`](4a6b54c7b92fc67af28d.json) | 2026-11-26 |
 
 ## Tools at `https://zoll.agency/mcp`
 
@@ -21,6 +21,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-26: [schema changed](../../deltas/2026-11-26/4a6b54c7b92fc67af28d.json): `7 field(s) changed`
 - 2026-11-11: [annotation changed, description changed, field changed](../../deltas/2026-11-11/4a6b54c7b92fc67af28d.json): `3 field(s) changed`
 - 2026-11-10: [count changed, description changed, tool added, tool removed](../../deltas/2026-11-10/4a6b54c7b92fc67af28d.json): `2 tool(s) added; 1 tool(s) removed; 3 field(s) changed; signals: length_more_than_doubled`
 

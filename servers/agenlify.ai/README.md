@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://agenlify.ai/mcp` | 3 | [`af24171defa0`](af8840ee5a1320cc5990.json) | 2026-10-14 |
+| `https://agenlify.ai/mcp` | 3 | [`9d4240f43619`](af8840ee5a1320cc5990.json) | 2026-11-26 |
 
 ## Tools at `https://agenlify.ai/mcp`
 
@@ -16,7 +16,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-26: [schema changed](../../deltas/2026-11-26/af8840ee5a1320cc5990.json): `7 field(s) changed`
 
 ## Check it from your agent
 
