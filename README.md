@@ -5,27 +5,20 @@ servers: what tools each one **declared**, byte-exactly, and when that declarati
 
 One commit per crawl cycle. A change to a server's tool surface appears as a diff.
 
-## Latest crawl: 2026-11-26 02:03 UTC
+## Latest crawl: 2026-11-27 02:03 UTC
 
-15 of 270 observable servers changed their declared tools. Attempted 305: 270 observable, 28 auth-walled, 6 unreachable, 1 blocked.
+8 of 268 observable servers changed their declared tools. Attempted 381: 268 observable, 82 auth-walled, 24 unreachable, 7 blocked.
 
-- [ae.discond/discond](deltas/2026-11-26/cd7db03de9f0ecc82710.json): schema changed; 4 field(s) changed
-- [agency.zoll/ausfuhr](deltas/2026-11-26/4a6b54c7b92fc67af28d.json): schema changed; 7 field(s) changed
-- [ai.a2uicatalog/catalog](deltas/2026-11-26/57663a025cf9685e6622.json): count changed, tool added; 2 tool(s) added
-- [ai.achurch/church](deltas/2026-11-26/f7c5ba7365d810101ae3.json): schema changed; 13 field(s) changed
-- [ai.adadvisor/mcp-server](deltas/2026-11-26/c151597f0d7058b04027.json): count changed, description changed, schema changed, tool added; 17 tool(s) added; 5 field(s) changed
-- [ai.aeoengine/best-ai-search-agency-aeo-report](deltas/2026-11-26/b4551d53f9e6ab4923f1.json): annotation changed, count changed, description changed, schema changed, tool removed; 2 tool(s) removed; 3 field(s) changed
-- [ai.agenlify/catalog](deltas/2026-11-26/af8840ee5a1320cc5990.json): schema changed; 7 field(s) changed
-- [ai.agentapigate/amazon-product-walmart-shopify-ecommerce-mcp](deltas/2026-11-26/db2d4296f359addb82c6.json): description changed; 1 field(s) changed; signals: length_more_than_doubled
-- [ai.agentsrank/agentsrank](deltas/2026-11-26/e901088f2b853a367dca.json): annotation changed, count changed, description changed, tool added; 13 tool(s) added; 26 field(s) changed; signals: length_more_than_doubled
-- [ai.aim-shield/mcp](deltas/2026-11-26/89b62f82cc23b3feb966.json): count changed, tool added; 1 tool(s) added
-- [ai.arcreport/mcp](deltas/2026-11-26/5b7f6412bf3c3e91b70c.json): description changed; 1 field(s) changed
-- [ai.beatra/beatra](deltas/2026-11-26/4f93d616eb97e76f800a.json): description changed, schema changed; 6 field(s) changed
-- [ai.bittuitive.api/bittuitive](deltas/2026-11-26/c0c8c3bdf1cbda3c2fcd.json): count changed, description changed, field changed, schema changed, tool added, tool removed; 6 tool(s) added; 4 tool(s) removed; 438 field(s) changed; signals: length_more_than_doubled, url_introduced
-- [ai.bondren/docs](deltas/2026-11-26/12e31449e4419f5ba847.json): schema changed; 1 field(s) changed
-- [ai.bootpay/mcp](deltas/2026-11-26/a46719d28a156bbc76f4.json): description changed; 2 field(s) changed; signals: length_more_than_doubled
+- [ac.mizan/registry](deltas/2026-11-27/70c77423ed2d6ce6e69e.json): count changed, tool added; 1 tool(s) added
+- [ae.discond/discond](deltas/2026-11-27/cd7db03de9f0ecc82710.json): count changed, tool added; 1 tool(s) added
+- [ai.a2uicatalog/catalog](deltas/2026-11-27/57663a025cf9685e6622.json): field changed, schema changed; 291 field(s) changed
+- [ai.aetherya/mcp](deltas/2026-11-27/0ec8f666c7c4e4781c4d.json): description changed, field changed, schema changed; 21 field(s) changed
+- [ai.agentapigate/amazon-product-walmart-shopify-ecommerce-mcp](deltas/2026-11-27/db2d4296f359addb82c6.json): annotation changed, description changed, schema changed; 75 field(s) changed; signals: length_more_than_doubled
+- [ai.annsa/annsa](deltas/2026-11-27/59d41e60a9e6430b00b0.json): schema changed; 26 field(s) changed
+- [ai.beatra/beatra](deltas/2026-11-27/4f93d616eb97e76f800a.json): schema changed; 2 field(s) changed
+- [ai.bittuitive.api/bittuitive](deltas/2026-11-27/c0c8c3bdf1cbda3c2fcd.json): description changed, tool added, tool removed; 1 tool(s) added; 1 tool(s) removed; 2 field(s) changed
 
-Changes per day: [2026-11-20](deltas/2026-11-20/) 15, [2026-11-21](deltas/2026-11-21/) 11, [2026-11-22](deltas/2026-11-22/) 6, [2026-11-23](deltas/2026-11-23/) 8, [2026-11-24](deltas/2026-11-24/) 3, [2026-11-25](deltas/2026-11-25/) 10, [2026-11-26](deltas/2026-11-26/) 15
+Changes per day: [2026-11-21](deltas/2026-11-21/) 11, [2026-11-22](deltas/2026-11-22/) 6, [2026-11-23](deltas/2026-11-23/) 8, [2026-11-24](deltas/2026-11-24/) 3, [2026-11-25](deltas/2026-11-25/) 10, [2026-11-26](deltas/2026-11-26/) 15, [2026-11-27](deltas/2026-11-27/) 8
 
 ## What this is
 

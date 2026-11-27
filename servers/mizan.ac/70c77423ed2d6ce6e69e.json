@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "0b7261ca40dea7a76969821ccfcb14e0378964d7ef9b6195e3a2d404d2a60b46",
+  "full_hash": "01e0b933b4341ca40b14ec8b54a2b766c85272b5797b781eefb0444d81de11d4",
   "name": "ac.mizan/registry",
-  "observed_at": "2026-11-12T02:02:46.892531Z",
+  "observed_at": "2026-11-27T02:02:29.428256Z",
   "sources": [
     "official"
   ],
-  "tool_count": 5,
+  "tool_count": 6,
   "tools": [
     {
       "annotations": {
@@ -1116,6 +1116,94 @@
         "type": "object"
       },
       "title": "The registry's size"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "readOnlyHint": true
+      },
+      "description": "Search mizan.ac's public pages for how Mizan works: the anti-cheat and its server module, the ban registry and its API, RCON tools, the Discord bot, pricing, disputes and false flags, privacy, terms and the changelog. Returns the most relevant passages, each with its page's link. It holds no player records: use lookup_player for a player.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "limit": {
+            "description": "Passages to return, most relevant first. Defaults to 5.",
+            "maximum": 10,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "description": "A question or keywords, such as \"how do I dispute a ban\" or \"rust bansServerEndpoint\".",
+            "maxLength": 300,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_docs",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "ok": {
+            "const": true,
+            "type": "boolean"
+          },
+          "query": {
+            "type": "string"
+          },
+          "readAt": {
+            "description": "ISO 8601 time",
+            "type": "string"
+          },
+          "results": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "page": {
+                  "description": "The mizan.ac page the passage is from; cite it.",
+                  "type": "string"
+                },
+                "score": {
+                  "description": "How well the passage matches, 0 to 1.",
+                  "type": "number"
+                },
+                "text": {
+                  "description": "The passage, as Markdown.",
+                  "type": "string"
+                },
+                "title": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "page",
+                "title",
+                "score",
+                "text"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "ok",
+          "query",
+          "readAt",
+          "results"
+        ],
+        "type": "object"
+      },
+      "title": "Search Mizan's docs"
     },
     {
       "annotations": {

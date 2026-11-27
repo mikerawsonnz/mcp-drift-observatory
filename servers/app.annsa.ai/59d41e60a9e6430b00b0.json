@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "616e70c36e81a71f6795f2e1dfc3be326db2fddf89f1203d9163d45f9a42f264",
+  "full_hash": "3df07fd279e160700e14dd01efff9605d31b98476135d4d6e2bceb35fd3379b2",
   "name": "ai.annsa/annsa",
-  "observed_at": "2026-11-25T02:02:20.077899Z",
+  "observed_at": "2026-11-27T02:02:42.669224Z",
   "sources": [
     "official"
   ],
@@ -468,7 +468,7 @@
       "inputSchema": {
         "properties": {
           "action": {
-            "description": "ship: Mark the priority shipped. It only records it; nothing deploys. retract undoes it. A Marketing piece sends published_url (the live link) instead of pr_url, after a person's yes. claim: Take a priority to work on. Starts a spec if there isn't one and gives you spec_id and holder_key. note: Leave a note on the spec about what you did or found. To correct an earlier note, send a new one with supersedes. handoff: Pass the work to another agent or a person, with a note for them. dispatch: Post @claude on the priority's GitHub issue so Claude picks it up there. The person stays assigned. A person's action. unclaim: Unclaim a priority so another agent can pick it up. close: Close the priority in one call, even if it's claimed or has a PR. It stays under Closed with your reason. write: Replace one section of the spec with new text. If the section belongs to someone else, your text is saved as a proposed change for them. verify: Record how you checked Done When lines, by proof kind: a test id for (proof: test), a URL for staging or prod. Add a result (a screen, a check, a measure or a test) so a person sees what you found. lines=[...] records many at once. covers=partial needs a gap; state=pending needs a reason. media=true gives an upload link for a screenshot. It doesn't block ship. escalate: Ask a person to decide something; it lands in their Needs you. Send topic, ask, trigger, principle and checked. One open ask per priority; the same topic updates it. resolve: Settle a routine question, like 'is this a duplicate of #N?', the way your principles already decide it. Each outcome fits one kind of question. Returns use_id so you can undo. undo: Reverse your own resolve, by use_id.",
+            "description": "ship: Mark the priority shipped. It only records it; nothing deploys. retract undoes it. A Marketing piece sends published_url (the live link) instead of pr_url, after a person's yes. claim: Take a priority to work on. Starts a spec if there isn't one and gives you spec_id and holder_key. note: Leave a note on the spec about what you did or found. To correct an earlier note, send a new one with supersedes. handoff: Pass the work to another agent or a person, with a note for them. dispatch: Post @claude on the priority's GitHub issue so Claude picks it up there. The person stays assigned. A person's action. unclaim: Unclaim a priority so another agent can pick it up. close: Close the priority in one call, even if it's claimed or has a PR. It stays under Closed with your reason. write: Replace one section of the spec with new text. If the section belongs to someone else, your text is saved as a proposed change for them. verify: Record how you checked Done When lines, by proof kind: a test id for (proof: test), a URL for staging or prod. Add a result (a screen, a check, a measure or a test) so a person sees it. lines=[...] records many at once. covers=partial needs a gap; state=pending needs a reason. media=true gives a screenshot upload link. It doesn't block ship. escalate: Ask a person to decide something; it lands in their Needs you. Send topic, ask, trigger, principle and checked. One open ask per priority; the same topic updates it. resolve: Settle a routine question, like 'is this a duplicate of #N?', the way your principles already decide it. Each outcome fits one kind of question. Returns use_id so you can undo. undo: Reverse your own resolve, by use_id.",
             "enum": [
               "ship",
               "claim",
@@ -490,7 +490,7 @@
             "type": "string"
           },
           "assigned_to": {
-            "description": "Who gets it: an agent (like claude-code or codex) or a person's email. Empty unassigns.",
+            "description": "An agent (like claude-code) or a person's email. Empty unassigns.",
             "type": "string"
           },
           "checked": {
@@ -500,8 +500,12 @@
             },
             "type": "array"
           },
+          "commit": {
+            "description": "For verify: a sha in the PR; default head.",
+            "type": "string"
+          },
           "covers": {
-            "description": "For verify: partial when the check proves part of the line.",
+            "description": "For verify: partial when the check proves part of it.",
             "enum": [
               "full",
               "partial"
@@ -509,7 +513,7 @@
             "type": "string"
           },
           "done_when_index": {
-            "description": "For verify: which Done When line, counting from 1 as annsa.spec lists them.",
+            "description": "For verify: which Done When line, from 1 as annsa.spec lists them.",
             "minimum": 1,
             "type": "integer"
           },
@@ -566,7 +570,7 @@
             "type": "string"
           },
           "lines": {
-            "description": "For verify: many Done When lines, each {done_when_index, how, where, result, covers, gap, state, reason, until}.",
+            "description": "For verify: many lines, each {done_when_index, how, where, result, covers, gap, state, reason, until}.",
             "items": {
               "type": "object"
             },
@@ -574,16 +578,16 @@
             "type": "array"
           },
           "media": {
-            "description": "For verify: true to attach a screenshot or video; the reply gives an upload link.",
+            "description": "For verify: true to attach a screenshot or video; reply gives an upload link.",
             "type": "boolean"
           },
           "media_bytes": {
-            "description": "For verify with media: file size in bytes (images 5 MB, video 25 MB).",
+            "description": "For verify media: bytes (image 5 MB, video 25 MB).",
             "minimum": 1,
             "type": "integer"
           },
           "media_type": {
-            "description": "For verify with media: image/png, image/webp, image/jpeg or video/mp4.",
+            "description": "For verify media: image/png, webp, jpeg or video/mp4.",
             "enum": [
               "image/png",
               "image/webp",
@@ -743,7 +747,7 @@
             "type": "number"
           },
           "state": {
-            "description": "For verify: pending when not checked yet; give reason and until.",
+            "description": "For verify: pending when unchecked; give reason and until.",
             "enum": [
               "checked",
               "pending"
@@ -794,7 +798,7 @@
             "type": "string"
           },
           "where": {
-            "description": "For verify: a test id (path::test), URL or mcp:annsa.spec#N that shows the check.",
+            "description": "For verify: a test id (path::test), URL or mcp:annsa.spec#N showing the check.",
             "maxLength": 500,
             "type": "string"
           }
@@ -1339,7 +1343,7 @@
             "type": "boolean"
           },
           "assigned_to": {
-            "description": "Who gets it: an agent (like claude-code or codex) or a person's email. Empty unassigns.",
+            "description": "An agent (like claude-code) or a person's email. Empty unassigns.",
             "type": "string"
           },
           "at": {
@@ -1392,6 +1396,10 @@
             ],
             "type": "string"
           },
+          "cover": {
+            "description": "For direction update: cover key, like covers/plant. Blank removes.",
+            "type": "string"
+          },
           "custom_fields": {
             "description": "{field: value}, by name or id; a new value is added.",
             "type": "object"
@@ -1416,6 +1424,10 @@
             "description": "For direction update: the page text, at least 50 characters.",
             "type": "string"
           },
+          "done": {
+            "description": "Direction update: tick this task.",
+            "type": "string"
+          },
           "duplicates": {
             "description": "For merge: the priorities being folded into `into`.",
             "items": {
@@ -1424,7 +1436,7 @@
             "type": "array"
           },
           "evidence": {
-            "description": "For direction op=update: the evidence behind the change.",
+            "description": "For direction update: the evidence.",
             "type": "string"
           },
           "expected_stage": {
@@ -1452,7 +1464,7 @@
             "type": "string"
           },
           "heading": {
-            "description": "For direction update: write only the section under this heading.",
+            "description": "For direction update: write only this heading's section.",
             "type": "string"
           },
           "instruction": {
@@ -1545,7 +1557,7 @@
             "type": "string"
           },
           "parent": {
-            "description": "The priority this one sits under. For bet op=place: the bet. For direction update: the page (doc_id) to nest under; none is top level.",
+            "description": "The priority this sits under. For bet place: the bet. For direction update: the page to nest under; none is top.",
             "type": "string"
           },
           "park_reason": {
@@ -1609,7 +1621,7 @@
             "type": "string"
           },
           "quote": {
-            "description": "For direction op=comment: the line you're replying to.",
+            "description": "For direction comment: the line you quote.",
             "type": "string"
           },
           "rank": {
@@ -1664,8 +1676,16 @@
             ],
             "type": "string"
           },
+          "task": {
+            "description": "Direction update: add a quick task.",
+            "type": "string"
+          },
+          "tasks": {
+            "description": "Direction get: open tasks, mine or all.",
+            "type": "string"
+          },
           "thread_id": {
-            "description": "For direction op=comment: the thread to reply in.",
+            "description": "For direction comment: the thread.",
             "type": "string"
           },
           "title": {

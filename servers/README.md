@@ -1,6 +1,6 @@
 # Observed MCP servers
 
-489 hosts whose MCP tool declarations we have observed. Each page lists the declared tools, every observed change, and an Atom feed of changes to that server.
+493 hosts whose MCP tool declarations we have observed. Each page lists the declared tools, every observed change, and an Atom feed of changes to that server.
 
 Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_alerts
 
@@ -149,6 +149,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [beliefstate.ai](beliefstate.ai/) (23 tools)
 - [benchgecko.ai](benchgecko.ai/) (9 tools)
 - [betterpost.ai](betterpost.ai/) (23 tools)
+- [bettershell.ai](bettershell.ai/) (13 tools)
 - [bidbetter.ai](bidbetter.ai/) (2 tools)
 - [bidclub.ai](bidclub.ai/) (6 tools)
 - [bigredbutton.ai](bigredbutton.ai/) (3 tools)
@@ -185,6 +186,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [cold-api.coldstate.ai](cold-api.coldstate.ai/) (16 tools)
 - [collager.ai](collager.ai/) (5 tools)
 - [companyproof.ai](companyproof.ai/) (3 tools)
+- [compare.ac](compare.ac/) (4 tools)
 - [compeller.ai](compeller.ai/) (30 tools)
 - [contabo.run.mcp.com.ai](contabo.run.mcp.com.ai/) (124 tools)
 - [contentsweep.ai](contentsweep.ai/) (35 tools)
@@ -199,6 +201,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [cryptography-google-auth-oauthlib-931267.getvda.ai](cryptography-google-auth-oauthlib-931267.getvda.ai/) (2 tools)
 - [cryptography-langchain-core-mcp-07d652.getvda.ai](cryptography-langchain-core-mcp-07d652.getvda.ai/) (2 tools)
 - [cursu.ai](cursu.ai/) (1 tools)
+- [cytric.apps.azwell.ai](cytric.apps.azwell.ai/) (14 tools)
 - [dablock.ai](dablock.ai/) (5 tools)
 - [dabyte.ai](dabyte.ai/) (5 tools)
 - [daishi.ai](daishi.ai/) (35 tools)
@@ -321,6 +324,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [mcp.agenticterminal.ai](mcp.agenticterminal.ai/) (6 tools)
 - [mcp.ahel.ai](mcp.ahel.ai/) (11 tools)
 - [mcp.airshelf.ai](mcp.airshelf.ai/) (8 tools)
+- [mcp.alchemyagent.ai](mcp.alchemyagent.ai/) (12 tools)
 - [mcp.alphacreek.ai](mcp.alphacreek.ai/) (5 tools)
 - [mcp.arcangel.ai](mcp.arcangel.ai/) (9 tools)
 - [mcp.arvx.ai](mcp.arvx.ai/) (3 tools)
@@ -347,7 +351,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [mcp.datadubai.ae](mcp.datadubai.ae/) (6 tools)
 - [mcp.demanddiscovery.ai](mcp.demanddiscovery.ai/) (10 tools)
 - [mcp.deployit.ai](mcp.deployit.ai/) (3 tools)
-- [mcp.discond.ae](mcp.discond.ae/) (9 tools)
+- [mcp.discond.ae](mcp.discond.ae/) (10 tools)
 - [mcp.djzs.ai](mcp.djzs.ai/) (4 tools)
 - [mcp.dotsy.ai](mcp.dotsy.ai/) (91 tools)
 - [mcp.dreamlit.ai](mcp.dreamlit.ai/) (12 tools)
@@ -393,7 +397,7 @@ Every crawl's changes across all servers, on Telegram: https://t.me/mcp_drift_al
 - [memcached-mongodb-redis-compose-generator.getvda.ai](memcached-mongodb-redis-compose-generator.getvda.ai/) (2 tools)
 - [minio-postgres-redis-stack-generator.getvda.ai](minio-postgres-redis-stack-generator.getvda.ai/) (2 tools)
 - [mitosislabs.ai](mitosislabs.ai/) (14 tools)
-- [mizan.ac](mizan.ac/) (5 tools)
+- [mizan.ac](mizan.ac/) (6 tools)
 - [mom.achromat.ai](mom.achromat.ai/) (1 tools)
 - [moonlings.ai](moonlings.ai/) (8 tools)
 - [mrk.ae](mrk.ae/) (22 tools)

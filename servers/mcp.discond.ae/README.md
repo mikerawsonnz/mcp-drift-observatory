@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.discond.ae/mcp` | 9 | [`af4d18a0e527`](cd7db03de9f0ecc82710.json) | 2026-11-26 |
+| `https://mcp.discond.ae/mcp` | 10 | [`0d4bf9a79fe1`](cd7db03de9f0ecc82710.json) | 2026-11-27 |
 
 ## Tools at `https://mcp.discond.ae/mcp`
 
@@ -14,6 +14,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `discond_find_discounts`: `Search UAE merchants with live discounts on Discond by free text, place (emirate or area such as "Dubai Marina"), coordinates, discount pro…`
 - `discond_find_venues`: `Find UAE restaurants, cafés and other venues near an area or landmark (e.g. "Burj Khalifa", "Dubai Marina", "Yas Island") that fit a cuisin…`
 - `discond_get_business`: `Get one Discond merchant by id: name, a short description when we have one, categories, providers, link and its branches. Pass the user's l…`
+- `discond_get_menu`: `What a UAE restaurant serves and what it costs: dishes with AED prices (from the merchant's menu on Talabat, or dine-in menu photos on Zoma…`
 - `discond_get_offer`: `Get one Discond offer by id: headline, terms, validity and redeem links. Requires the user to be signed in to Discond.`
 - `discond_list_categories`: `List Discond merchant categories with ids, optionally filtered by name.`
 - `discond_list_offers`: `List live Discond offers, filtered by merchant, branch, provider, category, validity or online-only, sorted by newest, expiring or biggest…`
@@ -22,6 +23,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-27: [count changed, tool added](../../deltas/2026-11-27/cd7db03de9f0ecc82710.json): `1 tool(s) added`
 - 2026-11-26: [schema changed](../../deltas/2026-11-26/cd7db03de9f0ecc82710.json): `4 field(s) changed`
 - 2026-11-20: [description changed, schema changed](../../deltas/2026-11-20/cd7db03de9f0ecc82710.json): `10 field(s) changed`
 - 2026-11-17: [schema changed](../../deltas/2026-11-17/cd7db03de9f0ecc82710.json): `35 field(s) changed; signals: imperative_language_introduced` **(notable)**

@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "002c83459154fadd543230eca1d2036c537f96d9751e752954ce84b598d98c36",
+  "full_hash": "8ca3d569f400a63e549ff0327f01e47ab662b55aa284812bc5fe9595980c0068",
   "name": "ai.agentapigate/amazon-product-walmart-shopify-ecommerce-mcp",
-  "observed_at": "2026-11-26T02:02:18.457970Z",
+  "observed_at": "2026-11-27T02:02:35.268136Z",
   "sources": [
     "official"
   ],
@@ -10,12 +10,14 @@
   "tools": [
     {
       "annotations": {
+        "openWorldHint": false,
         "readOnlyHint": true
       },
-      "description": "Search 136 real-time APIs across x, search, social, commerce, b2b, finance, local, intel. Returns id, price_usd, p50_ms, summary.",
+      "description": "Search 145 real-time APIs across x, search, social, commerce, b2b, finance, local, intel. Returns id, price_usd, p50_ms, summary.",
       "inputSchema": {
         "properties": {
           "category": {
+            "description": "Optional pack filter, e.g. \"search\", \"social\", \"finance\", or \"b2b\".",
             "enum": [
               "x",
               "search",
@@ -29,23 +31,80 @@
             "type": "string"
           },
           "query": {
-            "description": "Keyword (e.g. youtube transcript, tweets, sec filings, seo)",
+            "description": "Keyword query, e.g. \"youtube transcript\", \"sec filings\", or \"hotel prices\".",
             "type": "string"
           }
         },
         "type": "object"
       },
-      "name": "search_endpoints"
+      "name": "search_endpoints",
+      "outputSchema": {
+        "properties": {
+          "count": {
+            "description": "Number of matching endpoints.",
+            "type": "integer"
+          },
+          "endpoints": {
+            "description": "Matched catalog endpoints.",
+            "items": {
+              "properties": {
+                "bonus_eligible": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "p50_ms": {
+                  "type": "integer"
+                },
+                "pack": {
+                  "type": "string"
+                },
+                "price_usd": {
+                  "type": "number"
+                },
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "pack",
+                "price_usd",
+                "p50_ms",
+                "summary"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "example_next_call": {
+            "additionalProperties": true,
+            "description": "Ready-to-run call_endpoint template.",
+            "type": "object"
+          },
+          "sandbox_credit_note": {
+            "description": "Sandbox credit & next-step guidance.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "count",
+          "endpoints"
+        ],
+        "type": "object"
+      }
     },
     {
       "annotations": {
+        "openWorldHint": false,
         "readOnlyHint": true
       },
       "description": "Get JSON input schema, price, and sample params for an endpoint_id.",
       "inputSchema": {
         "properties": {
           "endpoint_id": {
-            "description": "e.g. youtube.video.transcript or search.google.web",
+            "description": "Canonical endpoint ID, e.g. \"youtube.video.transcript\" or \"search.google.web\".",
             "type": "string"
           }
         },
@@ -54,20 +113,63 @@
         ],
         "type": "object"
       },
-      "name": "get_endpoint_schema"
+      "name": "get_endpoint_schema",
+      "outputSchema": {
+        "properties": {
+          "bonus_eligible": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string"
+          },
+          "input_schema": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "pack": {
+            "type": "string"
+          },
+          "price_usd": {
+            "type": "number"
+          },
+          "sample_params": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": {
+            "type": "string"
+          },
+          "x402_price_usd": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "pack",
+          "price_usd",
+          "sample_params",
+          "input_schema"
+        ],
+        "type": "object"
+      }
     },
     {
       "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": true,
         "readOnlyHint": false
       },
       "description": "Execute any endpoint (e.g. search.google.web, search.google.news, web.extract.markdown, youtube.video.transcript) and return compact LLM-ready output (-80% context tokens).",
       "inputSchema": {
         "properties": {
           "endpoint_id": {
+            "description": "Target endpoint ID from search_endpoints, e.g. \"search.google.web\".",
             "type": "string"
           },
           "format": {
             "default": "compact",
+            "description": "Output compression format (\"compact\", \"md\", or \"json\"), e.g. \"compact\".",
             "enum": [
               "compact",
               "md",
@@ -76,11 +178,12 @@
             "type": "string"
           },
           "max_cost_usd": {
-            "description": "Per-call USD ceiling",
+            "description": "Optional per-call USD ceiling, e.g. 0.005.",
             "type": "number"
           },
           "params": {
             "additionalProperties": true,
+            "description": "Endpoint request arguments matching get_endpoint_schema, e.g. {\"q\":\"MCP servers\",\"limit\":5}.",
             "type": "object"
           }
         },
@@ -89,10 +192,29 @@
         ],
         "type": "object"
       },
-      "name": "call_endpoint"
+      "name": "call_endpoint",
+      "outputSchema": {
+        "additionalProperties": true,
+        "properties": {
+          "data": {
+            "description": "Normalized response object (or compact markdown string when format=\"md\")."
+          },
+          "meta": {
+            "additionalProperties": true,
+            "description": "Execution receipt (request_id, endpoint, cost_usd, tokens_est, cached).",
+            "type": "object"
+          }
+        },
+        "required": [
+          "meta",
+          "data"
+        ],
+        "type": "object"
+      }
     },
     {
       "annotations": {
+        "openWorldHint": false,
         "readOnlyHint": true
       },
       "description": "Inspect paid_usd, bonus_usd, rate limit, and active sub-key caps.",
@@ -100,7 +222,38 @@
         "properties": {},
         "type": "object"
       },
-      "name": "get_account_status"
+      "name": "get_account_status",
+      "outputSchema": {
+        "properties": {
+          "bonus_locked_usd": {
+            "type": "number"
+          },
+          "bonus_usd": {
+            "type": "number"
+          },
+          "key": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "paid_usd": {
+            "type": "number"
+          },
+          "rpm_limit": {
+            "type": "integer"
+          },
+          "total_spendable_usd": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "paid_usd",
+          "bonus_usd",
+          "total_spendable_usd",
+          "rpm_limit",
+          "key"
+        ],
+        "type": "object"
+      }
     }
   ],
   "url": "https://mcp.agentapigate.ai/mcp"

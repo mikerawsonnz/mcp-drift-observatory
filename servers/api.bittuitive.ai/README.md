@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.bittuitive.ai/mcp` | 41 | [`07b3eac300bd`](c0c8c3bdf1cbda3c2fcd.json) | 2026-11-26 |
+| `https://api.bittuitive.ai/mcp` | 41 | [`cd5fef5a108c`](c0c8c3bdf1cbda3c2fcd.json) | 2026-11-27 |
 
 ## Tools at `https://api.bittuitive.ai/mcp`
 
@@ -47,13 +47,14 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_weather`: `Use this when an agent needs weather with Data BitScore. kind="intuitive" (default): current conditions; kind="stats": 7-day forecast; kind…`
 - `list_routable_apis`: `Use this when listing scoreboard-verified L402 APIs the router can call with upstream price, fee, and total sats. Free, read-only. Next: ca…`
 - `list_route_capabilities`: `Use this when checking capabilities BitTuitive can route (ai_inference, web_search, etc.), preferences, and approved source counts. Free, r…`
-- `request_data`: `Use this when no tool covers data you need; logs a demand signal (data_type, description, example_query, max_price_sats) for the operator.…`
+- `request_endpoint`: `Use this when no tool has the data you need: describe it and we log demand; similar requests merge into votes. Pass id to upvote an existin…`
 - `run_ai_inference`: `Use this when you need an open-weight LLM completion with no API key. Pass prompt or messages, optional model and max_tokens (default 1024,…`
 - `search_web`: `Use this for live web search (title, URL, snippet, source, date). Pass query. Price: about $0.007 (upstream + fee max(20%, 3 sats)). Same a…`
 - `update_feed`: `Use this when changing a feed's interval, trigger, params, webhook_url, mailbox, or state (paused/active). Free; safe to repeat.`
 
 ## Changes
 
+- 2026-11-27: [description changed, tool added, tool removed](../../deltas/2026-11-27/c0c8c3bdf1cbda3c2fcd.json): `1 tool(s) added; 1 tool(s) removed; 2 field(s) changed`
 - 2026-11-26: [count changed, description changed, field changed, schema changed, tool added, tool removed](../../deltas/2026-11-26/c0c8c3bdf1cbda3c2fcd.json): `6 tool(s) added; 4 tool(s) removed; 438 field(s) changed; signals: length_more_than_doubled, url_introduced`
 - 2026-11-25: [count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-25/c0c8c3bdf1cbda3c2fcd.json): `3 tool(s) added; 22 field(s) changed; signals: url_introduced`
 - 2026-11-24: [count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-24/c0c8c3bdf1cbda3c2fcd.json): `6 tool(s) added; 78 field(s) changed; signals: length_more_than_doubled, url_introduced`

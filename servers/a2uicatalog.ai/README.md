@@ -7,7 +7,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
 | `https://a2uicatalog.ai/mcp-docs` | 2 | [`40a8c2d85a07`](3c6cdbffd223af3533e0.json) | 2026-11-11 |
-| `https://a2uicatalog.ai/mcp` | 42 | [`5d4c5cd41617`](57663a025cf9685e6622.json) | 2026-11-26 |
+| `https://a2uicatalog.ai/mcp` | 42 | [`b64f5653042c`](57663a025cf9685e6622.json) | 2026-11-27 |
 
 ## Tools at `https://a2uicatalog.ai/mcp-docs`
 
@@ -61,6 +61,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-27: [field changed, schema changed](../../deltas/2026-11-27/57663a025cf9685e6622.json): `291 field(s) changed`
 - 2026-11-26: [count changed, tool added](../../deltas/2026-11-26/57663a025cf9685e6622.json): `2 tool(s) added`
 - 2026-11-14: [description changed, field changed, schema changed](../../deltas/2026-11-14/57663a025cf9685e6622.json): `25 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-12: [field changed](../../deltas/2026-11-12/57663a025cf9685e6622.json): `14 field(s) changed`

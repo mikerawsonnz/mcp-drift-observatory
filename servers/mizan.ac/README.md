@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mizan.ac/mcp` | 5 | [`0b7261ca40de`](70c77423ed2d6ce6e69e.json) | 2026-11-12 |
+| `https://mizan.ac/mcp` | 6 | [`01e0b933b434`](70c77423ed2d6ce6e69e.json) | 2026-11-27 |
 
 ## Tools at `https://mizan.ac/mcp`
 
@@ -15,9 +15,11 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `list_sources`: `List the ban lists Mizan reads, largest first: each list's name, who issues its bans, the games it covers, its bans and how many are in for…`
 - `lookup_player`: `Look up a player's Mizan record: their bans across every list Mizan reads, whether any list banned them for cheating, and Steam's own VAC a…`
 - `registry_stats`: `The size of Mizan's registry: how many ban lists it reads, the bans on them, how many are in force, and the same counts for each game.`
+- `search_docs`: `Search mizan.ac's public pages for how Mizan works: the anti-cheat and its server module, the ban registry and its API, RCON tools, the Dis…`
 
 ## Changes
 
+- 2026-11-27: [count changed, tool added](../../deltas/2026-11-27/70c77423ed2d6ce6e69e.json): `1 tool(s) added`
 - 2026-11-12: [schema changed](../../deltas/2026-11-12/70c77423ed2d6ce6e69e.json): `19 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-10: [schema changed](../../deltas/2026-11-10/70c77423ed2d6ce6e69e.json): `5 field(s) changed`
 

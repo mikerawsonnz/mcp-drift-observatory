@@ -1,8 +1,8 @@
 {
   "canon_version": "1",
-  "full_hash": "07b3eac300bd7664b988949666adc6c8fe7c2d7be676aa38bd8b4cf633bc718f",
+  "full_hash": "cd5fef5a108c6bbe6be4078029b9142c4dd96a918b3f0615519eab75d16c32a3",
   "name": "ai.bittuitive.api/bittuitive",
-  "observed_at": "2026-11-26T02:02:29.807038Z",
+  "observed_at": "2026-11-27T02:02:50.546979Z",
   "sources": [
     "official"
   ],
@@ -182,40 +182,45 @@
         "openWorldHint": false,
         "readOnlyHint": false
       },
-      "description": "Use this when no tool covers data you need; logs a demand signal (data_type, description, example_query, max_price_sats) for the operator. Free.",
+      "description": "Use this when no tool has the data you need: describe it and we log demand; similar requests merge into votes. Pass id to upvote an existing request. Free.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
           "contact": {
-            "description": "Optional private follow-up email.",
-            "type": "string"
-          },
-          "data_type": {
-            "description": "Category, e.g. weather, stocks, other.",
-            "type": "string"
-          },
-          "description": {
-            "description": "What you need and why.",
+            "description": "Private.",
             "type": "string"
           },
           "example_query": {
-            "description": "Example query or URL.",
             "type": "string"
           },
-          "max_price_sats": {
-            "description": "Max sats per call.",
-            "minimum": 0,
+          "frequency": {
+            "enum": [
+              "once",
+              "hourly",
+              "daily",
+              "realtime"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "description": "Upvote this request.",
             "type": "integer"
+          },
+          "max_price_usd": {
+            "description": "Per call.",
+            "minimum": 0,
+            "type": "number"
+          },
+          "need": {
+            "description": "Data you need.",
+            "maxLength": 300,
+            "type": "string"
           }
         },
-        "required": [
-          "data_type",
-          "description"
-        ],
         "type": "object"
       },
-      "name": "request_data",
-      "title": "Request missing data (free)"
+      "name": "request_endpoint",
+      "title": "Request an endpoint (free)"
     },
     {
       "annotations": {
@@ -1607,7 +1612,7 @@
         "openWorldHint": true,
         "readOnlyHint": true
       },
-      "description": "Use this when an agent needs BitTuition sentiment (0-100: 100=bullish, 50=neutral, 0=bearish) on allowlisted stocks, cryptos, or AI subjects (min 5 contributors; 1 sat/$0.001). kind=\"intuitive\" (default). Vote via contribute_bittuition. Returns JSON `data` with attribution. Kinds: intuitive (1 sats or $0.001 USDC). Pay: L402 (`l402_credential`), x402 (`x402_payment`), or `credit_token` (https://api.bittuitive.ai/pay, bittuitive://guide/pricing). Info only; not financial/legal advice; no warranty.",
+      "description": "Use this when an agent needs BitTuition sentiment (0-100: 100=bullish, 50=neutral, 0=bearish) on allowlisted stocks, cryptos, or AI subjects (min 5 contributors; reads 1 sat/$0.001; votes may be free). kind=\"intuitive\" (default). Vote via contribute_bittuition. Returns JSON `data` with attribution. Kinds: intuitive (1 sats or $0.001 USDC). Pay: L402 (`l402_credential`), x402 (`x402_payment`), or `credit_token` (https://api.bittuitive.ai/pay, bittuitive://guide/pricing). Info only; not financial/legal advice; no warranty.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
@@ -1759,7 +1764,7 @@
         "openWorldHint": false,
         "readOnlyHint": false
       },
-      "description": "Use this when submitting a BitTuition sentiment vote (0-100 or bullish/neutral/bearish) on an allowlisted stock, crypto, or AI subject (no free text; 1 sat/$0.001). Passing terms_version accepts the terms in bittuitive://guide/pricing or GET /api/v1/bittuition/terms. Pay: L402 (`l402_credential`), x402 (`x402_payment`), or `credit_token` (https://api.bittuitive.ai/pay, bittuitive://guide/pricing). Info only; not financial/legal advice; no warranty.",
+      "description": "Use this when submitting a BitTuition sentiment vote (0-100 or bullish/neutral/bearish) on an allowlisted stock, crypto, or AI subject (no free text; first 1,000 votes/day free, 3 per client per subject, then 1 sat/$0.001). Passing terms_version accepts the terms in bittuitive://guide/pricing or GET /api/v1/bittuition/terms. Pay: L402 (`l402_credential`), x402 (`x402_payment`), or `credit_token` (https://api.bittuitive.ai/pay, bittuitive://guide/pricing). Info only; not financial/legal advice; no warranty.",
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
