@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mrk.ae/api/mcp` | 22 | [`3ea43485a7c0`](bb43c026bcc1ebed4e48.json) | 2026-11-10 |
+| `https://mrk.ae/api/mcp` | 22 | [`1aaa88ff65f5`](bb43c026bcc1ebed4e48.json) | 2026-11-28 |
 
 ## Tools at `https://mrk.ae/api/mcp`
 
@@ -30,12 +30,12 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `search_glossary`: `Search the MRK Dubai real estate glossary for a term definition. Returns matching terms with definitions.`
 - `search_insights`: `Search MRK's sourced Dubai market insights (original commentary with linked sources). Filter by text and category.`
 - `search_listings`: `Search MRK Real Estate's live sale listings (from the MRK CRM, refreshed every 5 minutes). Filter by text, location, type, price and bedroo…`
-- `search_projects`: `Search ~2,400 Dubai residential projects (DLD-registered plus MRK-researched new launches). Filter by community, developer, stage, handover…`
-- `submit_enquiry`: `Send a buyer/seller enquiry to MRK Real Estate's advisory team on the user's behalf. Only call with the user's explicit consent. Requires n…`
+- `search_projects`: `Search thousands of Dubai residential projects (DLD-registered plus MRK-researched new launches). Filter by community, developer, stage, ha…`
+- `submit_enquiry`: `Sends a buyer or seller enquiry to MRK Real Estate's advisory team on the user's behalf, with the name and contact details the user provide…`
 
 ## Changes
 
-- None observed since we started watching.
+- 2026-11-28: [annotation changed, description changed, field changed](../../deltas/2026-11-28/bb43c026bcc1ebed4e48.json): `44 field(s) changed`
 
 ## Check it from your agent
 

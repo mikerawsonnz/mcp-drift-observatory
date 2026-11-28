@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.bittuitive.ai/mcp` | 41 | [`cd5fef5a108c`](c0c8c3bdf1cbda3c2fcd.json) | 2026-11-27 |
+| `https://api.bittuitive.ai/mcp` | 41 | [`b9ec30db7d0b`](c0c8c3bdf1cbda3c2fcd.json) | 2026-11-28 |
 
 ## Tools at `https://api.bittuitive.ai/mcp`
 
@@ -24,9 +24,9 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_ai_buildout`: `Use this when you need the AI Buildout headline from SEC filings (company-wide capex, YoY growth, acceleration) for optional symbol (e.g. M…`
 - `get_ai_data`: `Use this when a research agent needs AI Buildout trends from SEC filings (company-wide capex, revenue, cash flow; optional symbol, else uni…`
 - `get_alerts_data`: `Use this when an agent needs US government alerts (USGS earthquakes, CISA KEV, openFDA recalls, Federal Register). Pass stream (default usg…`
-- `get_bitcoin_price`: `Use this when you need the current Bitcoin price (BTC/USD, btc price). Returns btc_intuitive multi-source price + Data BitScore. Price: 5 s…`
+- `get_bitcoin_price`: `Use this when you need the current Bitcoin price (BTC/USD, btc price). Returns btc_intuitive multi-source price, the price BitScore, and th…`
 - `get_bittuition`: `Use this when an agent needs BitTuition sentiment (0-100: 100=bullish, 50=neutral, 0=bearish) on allowlisted stocks, cryptos, or AI subject…`
-- `get_btc_data`: `Use this when an agent needs Bitcoin data (BTC/USD, btc price, fees, mempool, sentiment). kind="intuitive" (default; also get_bitcoin_price…`
+- `get_btc_data`: `Use this when an agent needs Bitcoin data (BTC/USD, fees, mining, sentiment). kind="intuitive" (default; also get_bitcoin_price): multi-sou…`
 - `get_company_data`: `Use this when an agent needs a company lookup for KYB/business verification: legal name, status, jurisdiction, address, LEI/CIK/ticker, mat…`
 - `get_credit_balance`: `Use this when checking remaining prepaid sats and USDC balance for credit_token. Read-only.`
 - `get_crypto_prices`: `Use this when you need BTC and/or ETH USD prices in one short call. Pass symbols (default "BTC,ETH"). Price: 3 sats or $0.002 USDC. Pay: L4…`
@@ -54,6 +54,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-28: [description changed, schema changed](../../deltas/2026-11-28/c0c8c3bdf1cbda3c2fcd.json): `10 field(s) changed`
 - 2026-11-27: [description changed, tool added, tool removed](../../deltas/2026-11-27/c0c8c3bdf1cbda3c2fcd.json): `1 tool(s) added; 1 tool(s) removed; 2 field(s) changed`
 - 2026-11-26: [count changed, description changed, field changed, schema changed, tool added, tool removed](../../deltas/2026-11-26/c0c8c3bdf1cbda3c2fcd.json): `6 tool(s) added; 4 tool(s) removed; 438 field(s) changed; signals: length_more_than_doubled, url_introduced`
 - 2026-11-25: [count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-25/c0c8c3bdf1cbda3c2fcd.json): `3 tool(s) added; 22 field(s) changed; signals: url_introduced`

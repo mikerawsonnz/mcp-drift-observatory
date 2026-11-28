@@ -1,12 +1,12 @@
 {
   "canon_version": "1",
-  "full_hash": "783f07d1013d0ff924e07e5b75744bbe3a6ffcfe94bd06574b459d5896711194",
+  "full_hash": "937022d4eeb703f316b871f08ee396200cf4e5e7091ce94e7ab4eaa964e79459",
   "name": "ai.azquo/azquo",
-  "observed_at": "2026-10-30T02:04:29.062351Z",
+  "observed_at": "2026-11-28T02:02:48.348136Z",
   "sources": [
     "official"
   ],
-  "tool_count": 41,
+  "tool_count": 46,
   "tools": [
     {
       "annotations": {
@@ -80,7 +80,7 @@
         "readOnlyHint": false,
         "title": "Write values with AQL"
       },
-      "description": "Write a 2D region of values into an Azquo database using the same AQL grammar as query_aql.\nAQL reference: https://www.azquo.com/connect/#aql\n\nMirrors the read shape — rowHeadings × columnHeadings × context — and adds a 2D `values` array.\nThe cell at values[r][c] is anchored to the union of rowHeadings[r] + columnHeadings[c] + context, exactly as a read at the same coordinates would resolve.\n\nTwo modes, distinguished by options.createNames:\n\n  Case 1 — TRANSACTIONAL find-or-create.\n    Caller supplies options.rowSet + options.rowLanguage (and/or columnSet + columnLanguage) + createNames: true.\n    Unresolved row/column headings are FIND-OR-CREATED under the target set with the language attribute set.\n    Arrow form: rowSet = \"A->B\" puts new names into B as a child of A (chain is auto-created if missing).\n    Use for: importing new transactions, customers, or any entity whose ID column is the row heading.\n\n  Case 2 — MULTI-FACETED all-or-nothing (default; createNames: false).\n    Every heading must resolve to an existing name. Any miss is fatal — no values land.\n    Use for: writing into a pre-structured region where the names are already known.\n\nStructure-only mode: omit `values` (or pass []). The call resolves the headings, find-or-creates names if createNames=true, but writes no values. Equivalent to declaring hierarchy.\n\nFor date columns where the duplicate-name trap applies, use options.rowLanguage = \"date\" (bare attribute name, no \"language\" prefix). rowLanguage / columnLanguage always take the literal attribute name verbatim.\n\ncreateNames and ignoreHeadingErrors are mutually exclusive — supply at most one.\n\n═══ PROVENANCE — required on every write ═══\nsource: origin reference (file/URL/document). Lands on Provenance.name in the audit trail.\nagent:  your AI agent name (e.g. \"Claude\"). Lands on Provenance.method.",
+      "description": "Write a 2D region of values into an Azquo database using the same AQL grammar as query_aql.\nAQL reference: https://www.azquo.com/connect/#aql\n\nMirrors the read shape — rowHeadings × columnHeadings × context — and adds a 2D `values` array.\nThe cell at values[r][c] is anchored to the union of rowHeadings[r] + columnHeadings[c] + context, exactly as a read at the same coordinates would resolve.\n\nTwo modes, distinguished by options.createNames:\n\n  Case 1 — TRANSACTIONAL find-or-create.\n    Caller supplies options.rowSet + options.rowLanguage (and/or columnSet + columnLanguage) + createNames: true.\n    Unresolved row/column headings are FIND-OR-CREATED under the target set with the language attribute set.\n    Arrow form: rowSet = \"A->B\" puts new names into B as a child of A (chain is auto-created if missing).\n    Use for: importing new transactions, customers, or any entity whose ID column is the row heading.\n\n  Case 2 — MULTI-FACETED all-or-nothing (default; createNames: false).\n    Every heading must resolve to an existing name. Any miss is fatal — no values land.\n    Use for: writing into a pre-structured region where the names are already known.\n\nStructure-only mode: omit `values` (or pass []). The call resolves the headings, find-or-creates names if createNames=true, but writes no values. Equivalent to declaring hierarchy. columnHeadings still needs at least one heading.\n\nFor date columns where the duplicate-name trap applies, use options.rowLanguage = \"date\" (bare attribute name, no \"language\" prefix). rowLanguage / columnLanguage always take the literal attribute name verbatim.\n\ncreateNames and ignoreHeadingErrors are mutually exclusive — supply at most one.\n\n═══ PROVENANCE — required on every write ═══\nsource: origin reference (file/URL/document). Lands on Provenance.name in the audit trail.\nagent:  your AI agent name (e.g. \"Claude\"). Lands on Provenance.method.",
       "inputSchema": {
         "properties": {
           "agent": {
@@ -160,7 +160,7 @@
         "readOnlyHint": true,
         "title": "Trace where a value came from"
       },
-      "description": "Explain where one value in a query_aql result came from: the provenance (which import, file, user or\nwrite, and when) of every stored value behind the cell, and the calculation if the cell is a function or\na total. Read-only. Use it when a number looks wrong or the user asks \"where does this figure come from?\".\nFor the history of a name's attributes and set membership use name_history instead.\n\nCall it with exactly the rowHeadings, columnHeadings and context you passed to query_aql (the query is\nre-run to locate the cell), plus the zero-based row and col of the cell in that result's rows array.\nExample: after query_aql returned rows[2][0] = 1250, pass the same three arrays with row 2, col 0.\n\nReturns headline (the cell and its headings), function (the formula, when calculated) and\nauditForDisplayList - one entry per provenance: user, method, name (the source, e.g. the file), date,\ncontext and the values it supplied (capped at 1000). Returns {message: \"cell not found\"} when row/col\nis outside the result. Earlier, overwritten values show only while the database records history\n(history_settings).",
+      "description": "Explain where one value in a query_aql result came from: the provenance (which import, file, user or\nwrite, and when) of every stored value behind the cell, and the calculation if the cell is a function or\na total. Read-only. Use it when a number looks wrong or the user asks \"where does this figure come from?\".\nIt covers stored values only, not the history of a name's attributes or set membership.\n\nCall it with exactly the rowHeadings, columnHeadings and context you passed to query_aql (the query is\nre-run to locate the cell), plus the zero-based row and col of the cell in that result's rows array.\nExample: after query_aql returned rows[2][0] = 1250, pass the same three arrays with row 2, col 0.\n\nReturns headline (the cell and its headings), function (the formula, when calculated) and\nauditForDisplayList - one entry per provenance: user, method, name (the source, e.g. the file), date,\ncontext and the values it supplied (capped at 1000). Returns {message: \"cell not found\"} when row/col\nis outside the result. Earlier, overwritten values show only while the database records history\n(history_settings).",
       "inputSchema": {
         "properties": {
           "business": {
@@ -285,7 +285,7 @@
         "readOnlyHint": false,
         "title": "Create database"
       },
-      "description": "Create a new, empty Azquo database in the current business (see current_business). Use it to start a new\nmodel from scratch; to start from a ready-made one use copy_from_library, and to experiment on an existing\ndatabase use try_on_copy. Needs an administrator or developer; the creator becomes its owner.\n\nThe name is cleaned: spaces become underscores and anything other than letters, digits and underscores is\ndropped (\"Sales 2026!\" becomes Sales_2026). Fails with database_create_failed if a database of that\nname already exists in the business - check list_databases first.\n\ndatabaseServerId: usually left out - the database then goes on the default server, the one the admin\nsite's New database offers first. Give it only to choose a particular server; an unknown id fails with\nunknown_databaseServerId and the error lists the valid ids.\n\nReturns the new database record: id, name (as cleaned), persistenceName, databaseServerId and its\ncounts (all zero). Next steps are usually apply_structure or import_file, then persist_database.",
+      "description": "Create a new, empty Azquo database in the current business (see current_business). Use it to start a new\nmodel from scratch. Needs an administrator or developer; the creator becomes its owner.\n\nThe name is cleaned: spaces become underscores and anything other than letters, digits and underscores is\ndropped (\"Sales 2026!\" becomes Sales_2026). Fails with database_create_failed if a database of that\nname already exists in the business - check list_databases first.\n\ndatabaseServerId: usually left out - the database then goes on the default server, the one the admin\nsite's New database offers first. Give it only to choose a particular server; an unknown id fails with\nunknown_databaseServerId and the error lists the valid ids.\n\nReturns the new database record: id, name (as cleaned), persistenceName, databaseServerId and its\ncounts (all zero). Next steps are usually apply_structure or import_file, then persist_database.",
       "inputSchema": {
         "properties": {
           "business": {
@@ -308,6 +308,38 @@
       },
       "name": "create_database",
       "title": "Create database"
+    },
+    {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Create import link"
+      },
+      "description": "Get a link where a data file (CSV, TSV, Excel - anything an Azquo import reads) is IMPORTED into a database,\nexactly as an upload to /api/importdata imports it, at the same speed. Use it to bulk-load a file when you\nhave no shell, or without handling an API key: the link is the only credential, reaches one database for\nyou, and lasts 60 minutes.\n\n- A file the USER has: give them url; they open it in a browser and drop the file. The page shows the result.\n- A file you made, with a shell or code sandbox: run curlCommand with -F files=@path for each file. The reply\n  is JSON with each file's result.\nEach file is imported as it arrives, so the file needs its Azquo header row (or a matching import template) and\na name that says where the data came from - the file name chooses how it is read and is written into the\nprovenance of every value.\n\nReturns url, curlCommand, token, expiresInMinutes. Keep token: what each file imported - lines imported and\nrejected, values and names adjusted, warnings - can be looked up with it afterwards. A slow import is still\nrunning: look up what it did rather than sending the file again.\n\nFor a scheduled or repeated load, a script posting to /api/importdata with an API key needs no link.",
+      "inputSchema": {
+        "properties": {
+          "business": {
+            "description": "Optional. The business this call is for, by name, e.g. \"azquo\" - it then runs there whatever business the session is in. Worth giving on writes when you work in more than one business: a new MCP session starts in the login's own business. list_businesses shows the names.",
+            "type": "string"
+          },
+          "database": {
+            "description": "Database to import into",
+            "type": "string"
+          },
+          "note": {
+            "description": "Optional line shown on the upload page, e.g. which file to drop",
+            "type": "string"
+          }
+        },
+        "required": [
+          "database"
+        ],
+        "type": "object"
+      },
+      "name": "create_import_link",
+      "title": "Create import link"
     },
     {
       "annotations": {
@@ -654,6 +686,45 @@
     },
     {
       "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Find notes"
+      },
+      "description": "Find notes - the shared reference text in a database's Meta information - by the words in their titles\nAND their text, including dated updates added later. Read-only.\n\nwords: the words to look for. A note matches only if it contains every word, ignoring case, in its title\nor anywhere in its text. Put a phrase in double quotes to match it as written, e.g.\n  \"\\\"bulk load\\\" csv\"  finds notes containing the phrase 'bulk load' and the word 'csv'.\nWords match inside longer words: 'import' also finds 'imports' and 'reimport'.\n\ntopic: optional - search only within one set inside Meta information (and everything below it).\nLeft out, all of Meta information is searched.\n\nBest matches first: words in the title count for more than words in the text, then newer notes first.\nReturns total (how many notes matched), truncated, and for each match its nameId, title, topics (the sets it\nis in), date, matchedIn ('title' and/or the attributes whose text matched), a snippet of the text around\nthe first match, and textLength (characters of AI TEXT). isTopic is true when the match is itself a topic\nwith notes under it. The full text is not returned.",
+      "inputSchema": {
+        "properties": {
+          "business": {
+            "description": "Optional. The business this call is for, by name, e.g. \"azquo\" - it then runs there whatever business the session is in. Worth giving on writes when you work in more than one business: a new MCP session starts in the login's own business. list_businesses shows the names.",
+            "type": "string"
+          },
+          "database": {
+            "description": "Database name, e.g. \"azquo_skills\" or a project database",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Most matches to return (default 20, at most 100)",
+            "type": "integer"
+          },
+          "topic": {
+            "description": "Optional: a set inside Meta information to search within, e.g. \"Import\"",
+            "type": "string"
+          },
+          "words": {
+            "description": "Words to find - every one must appear. Double quotes keep a phrase together.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "database",
+          "words"
+        ],
+        "type": "object"
+      },
+      "name": "find_notes",
+      "title": "Find notes"
+    },
+    {
+      "annotations": {
         "destructiveHint": false,
         "idempotentHint": false,
         "openWorldHint": false,
@@ -877,6 +948,32 @@
       },
       "name": "import_from_url",
       "title": "Import from URL"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
+        "title": "Check an import link"
+      },
+      "description": "See what has been imported through an import link. Read-only.\n\nPass the link's token (or its whole url). Returns database, expires, expired, state - 'waiting' until a file\narrives, then 'imported' - and imports: one entry per file with fileName, the time, and its result (lines\nimported and rejected, values and names adjusted, warnings with a sample, any error). Check those counts\nagainst the source - a finished import is not proof of a correct one, and a large number of names adjusted\non a load of values usually means its keys did not match existing names.\n\nResults are kept for two days, and not across a server restart.",
+      "inputSchema": {
+        "properties": {
+          "business": {
+            "description": "Optional. The business this call is for, by name, e.g. \"azquo\" - it then runs there whatever business the session is in. Worth giving on writes when you work in more than one business: a new MCP session starts in the login's own business. list_businesses shows the names.",
+            "type": "string"
+          },
+          "token": {
+            "description": "The link's token, or the url it came with",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "type": "object"
+      },
+      "name": "import_link_status",
+      "title": "Check an import link"
     },
     {
       "annotations": {
@@ -1360,6 +1457,48 @@
       "annotations": {
         "openWorldHint": false,
         "readOnlyHint": true,
+        "title": "Read note"
+      },
+      "description": "Read one note - shared reference text in a database's Meta information - in full, in reading order.\nRead-only.\n\nGive nameId (from a search or listing) or the exact title. A title shared by more than one name is refused\nwith their ids, so pass nameId then.\n\nReturns title, nameId, topics (the sets it sits in), date, and sections: the note's text split by attribute,\nAI TEXT first, then dated sections such as 'UPDATE 2026-11-27' oldest first (the date is read from the\nattribute's name), then any others by name. Each section is {attribute, text}.\n\nLong notes come in pages: at most maxChars characters of section text per call (default 20000, at most\n50000). totalChars is the whole note; when more remains, truncated is true and nextOffset is the offset to\npass for the next page. A section cut at the page edge has partial: true and continues on the next page.",
+      "inputSchema": {
+        "properties": {
+          "business": {
+            "description": "Optional. The business this call is for, by name, e.g. \"azquo\" - it then runs there whatever business the session is in. Worth giving on writes when you work in more than one business: a new MCP session starts in the login's own business. list_businesses shows the names.",
+            "type": "string"
+          },
+          "database": {
+            "description": "Database name, e.g. \"azquo_skills\" or a project database",
+            "type": "string"
+          },
+          "maxChars": {
+            "description": "Most characters of text to return in this call (default 20000, at most 50000)",
+            "type": "integer"
+          },
+          "nameId": {
+            "description": "The note's id. Give this or title.",
+            "type": "integer"
+          },
+          "offset": {
+            "description": "Where to start in the note's text - 0 (default) or a nextOffset from the previous call",
+            "type": "integer"
+          },
+          "title": {
+            "description": "The note's exact title, ignoring case. Give this or nameId.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "database"
+        ],
+        "type": "object"
+      },
+      "name": "read_note",
+      "title": "Read note"
+    },
+    {
+      "annotations": {
+        "openWorldHint": false,
+        "readOnlyHint": true,
         "title": "Read workbook"
       },
       "description": "Read inside one workbook held against a database — a `report`, `importTemplate` or `setupSheet` (use list_database_sheets to see what exists). Called without `sheet` it returns the workbook's shape: every sheet with its extent, and every defined name with its scope and target — for an Azquo workbook the az_ names ARE the model, so start here. Called WITH `sheet` it returns that sheet's cells, showing formulas in preference to computed values. It returns structure and text, NOT the file itself: workbooks run to megabytes, so use the admin's Download button if you want the actual file. Setup sheets and import templates are administrator/developer only; reports follow the caller's report permissions.",
@@ -1522,6 +1661,73 @@
       },
       "name": "try_on_copy",
       "title": "Try changes on a copy"
+    },
+    {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false,
+        "readOnlyHint": false,
+        "title": "Write note"
+      },
+      "description": "Write a note: shared reference text kept in a database's Meta information, read by every user and agent\nwith access to the database. Notes are how a procedure, decision, finding or status recorded now is still\nthere for the next session.\n\nKeep a note short and to one subject, and file it under every topic a reader might start from, so it is\nreached by browsing from any of them: topics takes a list, the first being its main topic. Each topic is an\nexisting set inside Meta information, or Meta information itself, and all are checked before anything is written.\n\nmode 'create' (the default) adds a new note called title under the topics. The text goes in the note's AI TEXT\nattribute and today's date in DATE. mode 'append' adds text to an existing note in one of the topics as a new\nattribute named UPDATE <date> - for a short status change on the same subject; a new subject belongs in a new\nnote. Append also files the note under any listed topic it is not yet in. Nothing is ever replaced or deleted.\n\nThe response gives noteChars, and a warning once a note passes 3000 characters.\n\nA provenance line - Provenance: Name<email> with <agent> on <date> - is added at the end of the text unless\nthe text already ends with one.\n\nTitles: browsing shows titles only and title matches rank first, so put every term a reader would look for in\nthe title. A title is one line and cannot contain ';' or a backtick. 'create' refuses a title already used by a\nnote in one of the topics (append to it instead) or by any other name in the database, and every refusal says\nnothing was written.\n\nReturns nameId, action ('created' or 'appended'), the attribute written, the date, and changed: true.\n\nsource: where the content comes from - a conversation, file, URL or document. agent: your AI agent name\n(e.g. \"Claude\"). Both are required and land in the audit trail.",
+      "inputSchema": {
+        "properties": {
+          "agent": {
+            "description": "AI agent name (e.g. \"Claude\"). REQUIRED.",
+            "type": "string"
+          },
+          "business": {
+            "description": "Optional. The business this call is for, by name, e.g. \"azquo\" - it then runs there whatever business the session is in. Worth giving on writes when you work in more than one business: a new MCP session starts in the login's own business. list_businesses shows the names.",
+            "type": "string"
+          },
+          "database": {
+            "description": "Database name, e.g. \"azquo_skills\" or a project database",
+            "type": "string"
+          },
+          "mode": {
+            "description": "'create' (default) for a new note, 'append' to add to an existing note in one of the topics",
+            "enum": [
+              "create",
+              "append"
+            ],
+            "type": "string"
+          },
+          "source": {
+            "description": "Where the content comes from - conversation, file, URL or document. REQUIRED.",
+            "type": "string"
+          },
+          "text": {
+            "description": "The note's text. For 'append', the text to add.",
+            "type": "string"
+          },
+          "title": {
+            "description": "The note's title - one line, no ';' or backtick, with every term a later search will use",
+            "type": "string"
+          },
+          "topic": {
+            "description": "A single topic - the same as topics with one entry. Give topics or topic.",
+            "type": "string"
+          },
+          "topics": {
+            "description": "Every set inside Meta information the note belongs in, main topic first, e.g. [\"Import\", \"Data model\"]",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "database",
+          "title",
+          "text",
+          "source",
+          "agent"
+        ],
+        "type": "object"
+      },
+      "name": "write_note",
+      "title": "Write note"
     }
   ],
   "url": "https://data.azquo.ai/mcp"

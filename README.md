@@ -5,20 +5,24 @@ servers: what tools each one **declared**, byte-exactly, and when that declarati
 
 One commit per crawl cycle. A change to a server's tool surface appears as a diff.
 
-## Latest crawl: 2026-11-27 02:03 UTC
+## Latest crawl: 2026-11-28 02:02 UTC
 
-8 of 268 observable servers changed their declared tools. Attempted 381: 268 observable, 82 auth-walled, 24 unreachable, 7 blocked.
+12 of 270 observable servers changed their declared tools. Attempted 305: 270 observable, 24 auth-walled, 11 unreachable, 0 blocked.
 
-- [ac.mizan/registry](deltas/2026-11-27/70c77423ed2d6ce6e69e.json): count changed, tool added; 1 tool(s) added
-- [ae.discond/discond](deltas/2026-11-27/cd7db03de9f0ecc82710.json): count changed, tool added; 1 tool(s) added
-- [ai.a2uicatalog/catalog](deltas/2026-11-27/57663a025cf9685e6622.json): field changed, schema changed; 291 field(s) changed
-- [ai.aetherya/mcp](deltas/2026-11-27/0ec8f666c7c4e4781c4d.json): description changed, field changed, schema changed; 21 field(s) changed
-- [ai.agentapigate/amazon-product-walmart-shopify-ecommerce-mcp](deltas/2026-11-27/db2d4296f359addb82c6.json): annotation changed, description changed, schema changed; 75 field(s) changed; signals: length_more_than_doubled
-- [ai.annsa/annsa](deltas/2026-11-27/59d41e60a9e6430b00b0.json): schema changed; 26 field(s) changed
-- [ai.beatra/beatra](deltas/2026-11-27/4f93d616eb97e76f800a.json): schema changed; 2 field(s) changed
-- [ai.bittuitive.api/bittuitive](deltas/2026-11-27/c0c8c3bdf1cbda3c2fcd.json): description changed, tool added, tool removed; 1 tool(s) added; 1 tool(s) removed; 2 field(s) changed
+- [ad.pantheon/mcp](deltas/2026-11-28/c385e5b261a52bf286e2.json): count changed, description changed, schema changed, tool removed; 1 tool(s) removed; 3 field(s) changed
+- [ae.brainy/brainy-48](deltas/2026-11-28/469089a5676175c4aa62.json): count changed, tool added; 1 tool(s) added
+- [ae.mrk/dubai-property](deltas/2026-11-28/bb43c026bcc1ebed4e48.json): annotation changed, description changed, field changed; 44 field(s) changed
+- [ai.agentapigate/amazon-product-walmart-shopify-ecommerce-mcp](deltas/2026-11-28/db2d4296f359addb82c6.json): description changed, schema changed; 5 field(s) changed
+- [ai.agenticfabricationnetwork/ufp](deltas/2026-11-28/db3010688319f7ebe01c.json): description changed; 3 field(s) changed
+- [ai.ahel/ahel](deltas/2026-11-28/f81cefdfba92e36c524a.json): description changed, schema changed; 3 field(s) changed
+- [ai.alphabazaar/arena](deltas/2026-11-28/9edc0fb290126b4b5256.json): description changed; 2 field(s) changed; signals: length_more_than_doubled
+- [ai.augmap/maps](deltas/2026-11-28/84a4400d881dca99e201.json): count changed, description changed, schema changed, tool added; 1 tool(s) added; 17 field(s) changed
+- [ai.azquo/azquo](deltas/2026-11-28/a27acba80c8350153e96.json): count changed, description changed, tool added; 5 tool(s) added; 3 field(s) changed; signals: credential_shaped_string_introduced **(notable)**
+- [ai.beatra/beatra](deltas/2026-11-28/4f93d616eb97e76f800a.json): description changed, schema changed; 10 field(s) changed; signals: length_more_than_doubled
+- [ai.betslipdoctor/mcp](deltas/2026-11-28/f29327f2a9147dd897c0.json): description changed; 1 field(s) changed
+- [ai.bittuitive.api/bittuitive](deltas/2026-11-28/c0c8c3bdf1cbda3c2fcd.json): description changed, schema changed; 10 field(s) changed
 
-Changes per day: [2026-11-21](deltas/2026-11-21/) 11, [2026-11-22](deltas/2026-11-22/) 6, [2026-11-23](deltas/2026-11-23/) 8, [2026-11-24](deltas/2026-11-24/) 3, [2026-11-25](deltas/2026-11-25/) 10, [2026-11-26](deltas/2026-11-26/) 15, [2026-11-27](deltas/2026-11-27/) 8
+Changes per day: [2026-11-22](deltas/2026-11-22/) 6, [2026-11-23](deltas/2026-11-23/) 8, [2026-11-24](deltas/2026-11-24/) 3, [2026-11-25](deltas/2026-11-25/) 10, [2026-11-26](deltas/2026-11-26/) 15, [2026-11-27](deltas/2026-11-27/) 8, [2026-11-28](deltas/2026-11-28/) 12
 
 ## What this is
 

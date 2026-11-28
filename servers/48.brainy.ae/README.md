@@ -6,17 +6,19 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://48.brainy.ae/mcp` | 4 | [`faac278f27ef`](469089a5676175c4aa62.json) | 2026-11-25 |
+| `https://48.brainy.ae/mcp` | 5 | [`8535ba9a5185`](469089a5676175c4aa62.json) | 2026-11-28 |
 
 ## Tools at `https://48.brainy.ae/mcp`
 
 - `compare_ai_seat_costs`: `Compare 12-month AI seat and automation costs in USD and AED. Estimates use the AED catalogue price. Token counts per run are optional.`
 - `estimate_diagnosis`: `Compare interview schedules and see what the free diagnosis includes and who qualifies.`
 - `list_automations`: `List catalogue automations, prices and estimated delivery days in UAE or Spain.`
+- `receipts_to_spreadsheet_free`: `Get the free receipt-to-Excel page, its limits and privacy details. Direct users to upload on the page.`
 - `request_free_diagnosis`: `Get the conditions and a pre-filled WhatsApp link for the user to open.`
 
 ## Changes
 
+- 2026-11-28: [count changed, tool added](../../deltas/2026-11-28/469089a5676175c4aa62.json): `1 tool(s) added`
 - 2026-11-25: [count changed, tool added](../../deltas/2026-11-25/469089a5676175c4aa62.json): `1 tool(s) added`
 
 ## Check it from your agent

@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://api.betslipdoctor.ai/api/mcp` | 106 | [`4a90572d9473`](f29327f2a9147dd897c0.json) | 2026-11-24 |
+| `https://api.betslipdoctor.ai/api/mcp` | 106 | [`4cd2979c0f76`](f29327f2a9147dd897c0.json) | 2026-11-28 |
 
 ## Tools at `https://api.betslipdoctor.ai/api/mcp`
 
@@ -33,7 +33,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_bettor_profile`: `Read this authenticated account’s bettor model, optionally filtered by topic: confirmed notes and revisions, separately attributed Honcho i…`
 - `get_box_score`: `Read the in-play or final score and box score for one game (eventId from search_markets or the board), the same read as the app’s Live game…`
 - `get_crowd_parlay`: `Read the crowd parlay (the app’s Heat Check card): the one parlay bettors are on most right now, built in code, 2 to 4 legs on different ga…`
-- `get_desk`: `v1.5 Kalshi: a Kalshi pick’s link opens Kalshi’s board for the game (linkKind "game") and linkMarket names the one Kalshi market that is th…`
+- `get_desk`: `v1.6 pulse (counts only, every plan): pulse.posted lists picks posted per UTC hour for the last 193 hours ({hour, picks}) and pulse.settled…`
 - `get_desk_arbitrage`: `The Desk’s open sure-win pairs (GET desk/arbitrage): two bets on the two sides of the same bet at the same line at two different books whos…`
 - `get_desk_evidence`: `One Desk pick’s number and the evidence that moved its Grade (GET desk/evidence): {pickId, label, book, oddsAmerican, fairPct (the Desk’s o…`
 - `get_desk_expired`: `Desk picks that left the Queue because their edge is gone (expiredWhy "edge") or because their Grade came back D or F (expiredWhy "grade"),…`
@@ -74,6 +74,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-28: [description changed](../../deltas/2026-11-28/f29327f2a9147dd897c0.json): `1 field(s) changed`
 - 2026-11-24: [description changed](../../deltas/2026-11-24/f29327f2a9147dd897c0.json): `1 field(s) changed`
 - 2026-11-19: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-19/f29327f2a9147dd897c0.json): `4 tool(s) added; 9 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-18: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-18/f29327f2a9147dd897c0.json): `2 tool(s) added; 15 field(s) changed`
@@ -93,7 +94,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - 2026-10-26: [schema changed](../../deltas/2026-10-26/f29327f2a9147dd897c0.json): `4 field(s) changed`
 - 2026-10-25: [description changed](../../deltas/2026-10-25/f29327f2a9147dd897c0.json): `1 field(s) changed`
 - 2026-10-24: [description changed, schema changed](../../deltas/2026-10-24/f29327f2a9147dd897c0.json): `736 field(s) changed`
-- 2026-10-23: [annotation changed, count changed, description changed, field changed, schema changed, tool added, tool removed](../../deltas/2026-10-23/f29327f2a9147dd897c0.json): `6 tool(s) added; 1 tool(s) removed; 1913 field(s) changed; signals: length_more_than_doubled`
 
 ## Check it from your agent
 

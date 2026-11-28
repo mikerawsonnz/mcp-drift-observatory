@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.pantheon.ad/mcp` | 38 | [`c1d99fb401c1`](c385e5b261a52bf286e2.json) | 2026-11-22 |
+| `https://mcp.pantheon.ad/mcp` | 37 | [`f3416416f6c7`](c385e5b261a52bf286e2.json) | 2026-11-28 |
 
 ## Tools at `https://mcp.pantheon.ad/mcp`
 
@@ -27,7 +27,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `get_strategic_avatar`: `Read the customer avatar research of a project: pain matrix, core wound, desire chain, objections, triggers, customer language and strategi…`
 - `get_top_performing_ads`: `Get the longest-running ads of the Facebook pages the user follows. An ad that keeps running for months is usually profitable, so these are…`
 - `get_viral_content`: `Viral Content: one post (caption, metrics) with the user's saved analysis in that language, if any, and the vocabulary of persuasion mechan…`
-- `list_analyzed_pages`: `List the Facebook pages the user analyzed in one section of Pantheon (competitors, inspiration or own brand campaigns), with analysis statu…`
+- `list_analyzed_pages`: `List the Facebook pages the user analyzed in one section of Pantheon (competitors or inspiration), with analysis status and ad counts. Use…`
 - `list_brand_voices`: `List the Brand Voices saved in the user's account. Use the ids with run_ad_copilot.`
 - `list_followed_creators`: `Viral Content: the creators the user follows (platform, author_key, name, number of collected posts, last post date) and their follow limit.`
 - `list_offer_briefs`: `List the Offer Briefs saved in the user's account. Use the ids with run_ad_copilot and run_sales_psychology.`
@@ -35,7 +35,6 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `list_projects`: `List the user's Pantheon projects (customer avatar analyses). Call it first to get the project_id needed by get_strategic_avatar, run_sales…`
 - `list_radar_offers`: `List the user's offers that have the radar on, with their niche and target countries. Use the ids with get_ideas_matrix and build_ideas_mat…`
 - `run_ad_copilot`: `Rewrite an ad from the library into 3 copy variants for the user's audience, offer and brand voice. Uses 1 Ad Copilot credit. Runs in the b…`
-- `run_brand_campaign_analysis`: `Collect and analyze the ads of the user's own brand Facebook page. Uses 1 Brand Campaigns credit. Runs in the background: call get_job_stat…`
 - `run_competitor_spy`: `Collect and analyze every ad of a competitor's Facebook page from the Meta Ad Library. Uses 1 Competitor Spy credit. Runs in the background…`
 - `run_competitor_xray`: `Run the X-ray of a competitor page analyzed with the Competitor Spy. Uses 1 X-ray credit and 1 ad label credit per ad not labeled yet. Tell…`
 - `run_inspiration_search`: `Collect and analyze the ads of a Facebook page outside the user's niche, to borrow ideas from other markets. Uses 1 Inspiration Search cred…`
@@ -51,6 +50,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-28: [count changed, description changed, schema changed, tool removed](../../deltas/2026-11-28/c385e5b261a52bf286e2.json): `1 tool(s) removed; 3 field(s) changed`
 - 2026-11-22: [count changed, description changed, schema changed, tool added](../../deltas/2026-11-22/c385e5b261a52bf286e2.json): `1 tool(s) added; 28 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-21: [count changed, description changed, field changed, schema changed, tool added](../../deltas/2026-11-21/c385e5b261a52bf286e2.json): `1 tool(s) added; 17 field(s) changed; signals: length_more_than_doubled`
 - 2026-11-20: [count changed, field changed, schema changed, tool added](../../deltas/2026-11-20/c385e5b261a52bf286e2.json): `2 tool(s) added; 4 field(s) changed`

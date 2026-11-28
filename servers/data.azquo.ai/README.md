@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://data.azquo.ai/mcp` | 41 | [`783f07d1013d`](a27acba80c8350153e96.json) | 2026-10-30 |
+| `https://data.azquo.ai/mcp` | 46 | [`937022d4eeb7`](a27acba80c8350153e96.json) | 2026-11-28 |
 
 ## Tools at `https://data.azquo.ai/mcp`
 
@@ -15,7 +15,8 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `audit_cell`: `Explain where one value in a query_aql result came from: the provenance (which import, file, user or write, and when) of every stored value…`
 - `copy_azquo_skills`: `Copy azquo_skills (the Azquo usage-skills database) from data.azquo.ai into the current business, so a local or offline Azquo has its own c…`
 - `copy_from_library`: `Copy one database from the shared Azquo library into the current business, with its reports, import templates and uploaded file types. ASK…`
-- `create_database`: `Create a new, empty Azquo database in the current business (see current_business). Use it to start a new model from scratch; to start from…`
+- `create_database`: `Create a new, empty Azquo database in the current business (see current_business). Use it to start a new model from scratch. Needs an admin…`
+- `create_import_link`: `Get a link where a data file (CSV, TSV, Excel - anything an Azquo import reads) is IMPORTED into a database, exactly as an upload to /api/i…`
 - `create_upload_link`: `Get a link where the USER uploads documents (Word, PDF, Excel, PowerPoint, anything) to keep with a database. Use this whenever a file shou…`
 - `current_business`: `Return the currently effective business and user for this MCP session, and whether an acting-as override is in effect. Use before any destr…`
 - `delete_database`: `Permanently delete an Azquo database by name, with all its names, values and history. NOT REVERSIBLE - there is no restore, and its backups…`
@@ -26,11 +27,13 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `describe_query`: `Resolve a name-query expression and return the matched names with full details: parents, attributes (including AI Text bodies and any other…`
 - `describe_set`: `Drill into a named set: returns its child names with child counts, plus the parent path. Use after describe_database to explore a specific…`
 - `edit_name_attributes`: `Surgical attribute edit on an existing name. Each entry in the attributes map sets that attribute on the named name; an empty string value…`
+- `find_notes`: `Find notes - the shared reference text in a database's Meta information - by the words in their titles AND their text, including dated upda…`
 - `get_report_data`: `Fetch the full data for a report, including all regions and current choice values. Reports in Azquo are Excel-based templates with named da…`
 - `history_settings`: `See or change whether a database records history - value history (audit_cell), name attribute history and set membership history (name_hist…`
 - `import_file`: `Import SMALL INLINE DATA into an Azquo database - a base64-encoded blob under 'fileContent'. Filename selects the import template. THIS IS…`
 - `import_from_query`: `Run SQL against a configured external database connection and import the result into an Azquo database. THE SERVER CONNECTS AND FETCHES - t…`
 - `import_from_url`: `Bulk-load a delimited-text or spreadsheet file into a database by URL. THE SERVER DOWNLOADS IT, so the file never passes through your conte…`
+- `import_link_status`: `See what has been imported through an import link. Read-only. Pass the link's token (or its whole url). Returns database, expires, expired,…`
 - `list_businesses`: `List the businesses this MCP session can switch between. Peers are derived from the API key owner's email — one entry per business that ema…`
 - `list_database_sheets`: `List every Excel workbook associated with one database, grouped into the three kinds Azquo holds: 'reports' (online reports users run), 'se…`
 - `list_databases`: `List all Azquo databases available to the current user. The shared 'azquo' business overlays two DBs onto every session: 'azquo_skills' (re…`
@@ -47,13 +50,16 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 - `persist_database`: `Flush pending writes for this database to disk. Edits via edit_name_attributes, apply_structure, AQL edit: primitives etc. are queued in-me…`
 - `query_aql`: `Query an Azquo database using AQL (Azquo Query Language). AQL reference: https://www.azquo.com/connect/#aql Read-only - this never creates…`
 - `read_document`: `Read a stored document (see list_documents) as Markdown - headings, lists, tables, slides and pages kept. Long documents come a page at a t…`
+- `read_note`: `Read one note - shared reference text in a database's Meta information - in full, in reading order. Read-only. Give nameId (from a search o…`
 - `read_workbook`: `Read inside one workbook held against a database — a 'report', 'importTemplate' or 'setupSheet' (use list_database_sheets to see what exist…`
 - `restore_name`: `Bring back a deleted name (ids from list_deleted_names or name_history). It returns as a NEW name with a new id, its attributes as they wer…`
 - `switch_business`: `Switch the active business for subsequent MCP tool calls in this session. The switch is this MCP session's alone: other agents or chats on…`
 - `try_on_copy`: `Try changes on a throwaway copy of a database before making them for real. action=start makes an in-memory copy of the database. From then…`
+- `write_note`: `Write a note: shared reference text kept in a database's Meta information, read by every user and agent with access to the database. Notes…`
 
 ## Changes
 
+- 2026-11-28: [count changed, description changed, tool added](../../deltas/2026-11-28/a27acba80c8350153e96.json): `5 tool(s) added; 3 field(s) changed; signals: credential_shaped_string_introduced` **(notable)**
 - 2026-10-30: [description changed](../../deltas/2026-10-30/a27acba80c8350153e96.json): `5 field(s) changed`
 - 2026-10-28: [count changed, description changed, tool added](../../deltas/2026-10-28/a27acba80c8350153e96.json): `1 tool(s) added; 2 field(s) changed`
 

@@ -6,7 +6,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 | Endpoint | Tools | Hash | Declared since |
 |---|---|---|---|
-| `https://mcp.ahel.ai` | 11 | [`5e202e452163`](f81cefdfba92e36c524a.json) | 2026-11-18 |
+| `https://mcp.ahel.ai` | 11 | [`2df3457f023a`](f81cefdfba92e36c524a.json) | 2026-11-28 |
 
 ## Tools at `https://mcp.ahel.ai`
 
@@ -24,6 +24,7 @@ Observed by the [MCP Drift Observatory](../../README.md). We record what this se
 
 ## Changes
 
+- 2026-11-28: [description changed, schema changed](../../deltas/2026-11-28/f81cefdfba92e36c524a.json): `3 field(s) changed`
 - 2026-11-18: [description changed](../../deltas/2026-11-18/f81cefdfba92e36c524a.json): `1 field(s) changed; signals: imperative_language_introduced` **(notable)**
 - 2026-11-15: [schema changed](../../deltas/2026-11-15/f81cefdfba92e36c524a.json): `1 field(s) changed`
 - 2026-11-14: [schema changed](../../deltas/2026-11-14/f81cefdfba92e36c524a.json): `1 field(s) changed; signals: length_more_than_doubled`
